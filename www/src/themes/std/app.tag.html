@@ -1,0 +1,20 @@
+<app>
+
+  <appbar/>
+  <div id="content" class="{theme.style.color.background} {theme.style.color.text}" />
+  <footer-tag background={theme.style.color.highlightBackground} />
+
+  <script>
+    const tag = this
+    self.theme = sudocms.getTheme()
+    $('body').addClass(self.theme.style.color.background);
+
+    sudocms.observe(sudocms.$.theme, function(theme) {
+      $('body').removeClass(self.theme.style.color.background)
+      $('body').addClass(theme.style.color.background)
+      self.theme = theme
+      tag.update();
+    });
+
+  </script>
+</app>

@@ -1,0 +1,7 @@
+*~
+\#*\#
+node_modules/**
+settings.js
+static/*.*
+www/settings.js
+local.db/**

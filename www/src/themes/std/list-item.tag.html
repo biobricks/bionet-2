@@ -1,0 +1,41 @@
+<list-item>
+  <!-- avatar list item template -->
+  <div class="collection-item  avatar2 valign-wrapper {theme.style.color.background} {theme.style.color.text}" onclick={clickitem}>
+    <img if={item.avatar} class="circle" src={item.avatar} alt="" />
+    <div class="left" style="display: inline-block; width:70%">
+      <div class="left" style="cursor: pointer; cursor: hand;">{item.primary_text}</div><br/>
+      <div class="left" style="cursor: pointer; cursor: hand;">{item.secondary_text}</div>
+    </div>
+    <div class="right" style="display: inline-block; width:30%">
+      <i if={item.starred} class="material-icons right {theme.style.color.text} valign">{item.righticon}</i>
+      <i if={!item.starred} class="material-icons right grey-text valign">{item.righticon}</i>
+      <span class="right" if={item.secondary_url} onclick={clickavailability} href="{item.secondary_url}" style="cursor: pointer; cursor: hand; ">{item.secondary_url_label}</span>
+    </div>
+  </div>
+
+  <script>
+    self.item = opts.item
+    self.clickitem = function() {
+      var itemData = {}
+      try {
+        itemData = JSON.parse(opts.item.data)
+      } catch(e) {   
+      }
+
+      sudocms.route('partDataAccessor','cache','fromSearchItem',itemData)
+      window.location = opts.item.url
+    }
+
+    self.clickavailability = function(e) {
+      e.stopPropagation()
+      window.location = opts.item.secondary_url
+    }
+
+  </script>
+</list-item>
+
+<list-header>
+  <div class="collection-header {theme.style.color.background} {theme.style.color.text}">
+    <div><span>{opts.primaryHeader}</span><span class="right">{opts.secondaryHeader}</span></div>
+  </div>
+</list-header>

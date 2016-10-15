@@ -1,0 +1,45 @@
+<scanner>
+  <div id="scanner-widget"></div>
+  <!--
+  <content-container style="padding-top:110px;">
+    <section-container>
+      <div class="s12 center">
+        <img src="static/images/scan_overlay_grid.png" width="100%" />
+      <div style="height:32px;"/>
+      <std-button action={scanButton} label="scan" />
+      </div>
+    </section-container>
+  </content-container>
+      -->
+  <style>
+    @font-face {
+      font-family: 'Roboto';
+      src: url('static/fonts/roboto/Roboto-Medium.eot');
+      src: url(static/'fonts/roboto/Roboto-Medium.eot?#iefix') format('embedded-opentype'), url('static/fonts/roboto/Roboto-Medium.woff') format('woff'), url('static/fonts/roboto/Roboto-Medium.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+  </style>
+  
+  <script>
+    this.on('mount', function() {
+      sudocms.dispatch('startScan', {
+        status: 'start'
+      })
+    })
+    this.on('unmount', function() {
+      sudocms.dispatch('startScan', {
+        status: 'stop'
+      })
+    })
+
+    // todo: add events handling to initiate and shutdown pixi via streams
+    self.scanButton = function() {
+      sudocms.dispatch('startScan', {
+        status: 'start'
+      })
+    }
+
+  </script>
+</scanner>

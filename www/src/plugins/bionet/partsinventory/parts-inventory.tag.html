@@ -1,0 +1,148 @@
+<parts-inventory>
+  <content-container style="padding-top:100px;">
+    <section-container>
+      <search-input label="search inventory" name="searchbio" action={searchclick} value={searchbioInit}/>
+      <div id="part-inventory-content" class="{theme.style.color.background} {theme.style.color.text}">
+        <inventory-treeview labid={labid}/>
+      </div>
+    </section-container>
+  </content-container>
+  <script>
+    const tag = this
+    self.searchbioInit = ''
+    
+    self.labid = 'LAB180'
+      //self.labid='LAB4133'
+    const q = {
+      locationid: self.labid
+    }
+    sudocms.dispatch('inventoryQuery', q)
+  
+    const getParam = function(q, token) {
+      var value = '';
+      if (q.indexOf(token) >= 0) {
+        var pos = q.indexOf(token)
+        value = q.substr(pos + 2)
+        pos = value.indexOf(' ')
+        if (pos > 0) {
+          value = value.substr(0, pos - 1)
+        }
+      } else {
+        value = undefined
+      }
+      return value
+    }
+    
+    self.searchclick = function() {
+      var partid = self.searchbio.value
+      var distance = getParam(partid, 'd:')
+      var locationid = getParam(partid, 'l:')
+      if (locationid === undefined) {
+        locationid = self.labid
+      } else {
+        self.labid=locationid
+        tag.update()
+      }
+      const pos = partid.indexOf(':')
+      if (pos >= 0) {
+        if (pos === 1) partid = undefined
+        else partid = partid.substr(0, pos - 2)
+      }
+      const q = {
+        q: self.searchbio.value,
+        partid: partid,
+        locationid: locationid,
+        distance: distance
+      }
+      sudocms.dispatch('inventoryQuery', q)
+    }
+
+
+  </script>
+</parts-inventory>
+
+<treeview>
+
+  <ul style="margin:0 0 0 1em;position:relative">
+    <li style="padding:0 1.5em;">
+      <list-item item={item}/>
+      <treeview each={item in subitems} item={item}/>
+    </li>
+  </ul>
+  <script>
+    var item = opts.item
+      //console.log('treeview item: %s', JSON.stringify(item,null,2))
+
+    var subitems = [];
+
+    var inventoryType = {
+      F: 'Freezer',
+      S: 'Shelf',
+      C: 'Cassette'
+    }
+    const subitem = item.subitem
+    for (var key in subitem) {
+      if (subitem.hasOwnProperty(key)) {
+
+        const lcode = key.charAt(0)
+        if (inventoryType[lcode] !== undefined) {
+          var stext = ''
+          if (lcode === 'C') {
+            stext = subitem[key].data.partid
+            console.log('subitem: %s st:%s', JSON.stringify(subitem, null, 2), stext)
+          }
+          var ditem = {
+            primary_text: inventoryType[lcode] + ' ' + key,
+            secondary_text: stext,
+            subitem: subitem[key]
+          }
+          subitems.push(ditem)
+          console.log("treeview key=%s", key)
+        }
+      }
+    }
+    self.subitems = subitems
+
+  </script>
+</treeview>
+
+<inventory-treeview>
+
+  <list-container>
+    <treeview each={item in subitems} item={item}/>
+  </list-container>
+
+  <script>
+    /*
+    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+    */
+    const labid = opts.labid
+    self.primaryHeader = 'Lab ' + labid + ' inventory'
+    const tag = this
+    self.subitems = []
+
+    self.searchresult = sudocms.getModel('inventory') || []
+
+    sudocms.observe('inventory', function(list) {
+      self.secondaryHeader = ''
+      self.searchresult = list
+
+      var item = list
+      var subitems = []
+      for (var key in item) {
+        if (item.hasOwnProperty(key)) {
+          var ditem = {
+            primary_text: key,
+            subitem: item[key]
+          }
+          subitems.push(ditem)
+        }
+      }
+      self.subitems = subitems
+      console.log('inventory-treeview :',JSON.stringify(subitems))
+      tag.update()
+    })
+
+  </script>
+
+</inventory-treeview>

@@ -1,0 +1,57 @@
+<part-list>
+
+  <content-container style="padding-top:100px;">
+    <section-container>
+      <list-container>
+        <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+        <list-item no-reorder each={item in inventorylist} item={item}/>
+      </list-container>
+      <pagination items={pagination}/>
+    </section-container>
+  </content-container>
+
+  <script>
+    const q = sudocms.getModel('searchQuery')
+    self.primaryHeader = 'Search results for "' + JSON.stringify(q) + '"'
+    self.inventorylist = sudocms.getModel('searchCache')
+    self.secondaryHeader = self.inventorylist.length + ' items'
+
+    self.pagination = [{
+      url: '1',
+      label: '1'
+    }, {
+      url: '2',
+      label: '2'
+    }, {
+      url: '3',
+      label: '3',
+      active: 'active blue darken-2'
+    }, {
+      url: '4',
+      label: '4'
+    }, {
+      url: '5',
+      label: '5'
+    }]
+
+    /*
+    const tag = this
+    const partsListObserver = function(list) {
+      self.list = list
+      tag.update();
+    };
+    sudocms.observe('partsList', partsListObserver)
+    */
+
+    /*
+    this.on('unmount', function() {
+      sudocms.removeObserver('partsList',partsListObserver)
+    })
+    */
+
+    this.on('unmount', function() {
+      self.inventorylist = undefined
+    })
+
+  </script>
+</part-list>

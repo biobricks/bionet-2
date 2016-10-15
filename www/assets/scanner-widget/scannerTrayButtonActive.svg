@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="29.53776mm"
+   height="14.91835mm"
+   viewBox="0 0 104.66135 52.860295"
+   id="svg6626"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="scannerTrayButton.svg">
+  <defs
+     id="defs6628" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.99512712"
+     inkscape:cx="38.571423"
+     inkscape:cy="25.714281"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1600"
+     inkscape:window-height="838"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata6631">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-3.5346906e-6,-999.50191)">
+    <g
+       style="display:inline"
+       id="g10755-6-8"
+       transform="matrix(0.83777728,0,0,0.81317486,-547.1789,975.55617)">
+      <rect
+         ry="12.542474"
+         y="31.781578"
+         x="655.46606"
+         height="60.336117"
+         width="120.2587"
+         id="rect10727-0-6"
+         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#43d0ff;fill-opacity:1;fill-rule:evenodd;stroke:#0084b0;stroke-width:4.84622675;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate;filter-blend-mode:normal;filter-gaussianBlur-deviation:0" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30.91020584px;line-height:125%;font-family:Tahoma;-inkscape-font-specification:Tahoma;letter-spacing:0px;word-spacing:0px;display:inline;fill:#c6e8f6;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="658.49683"
+         y="74.150131"
+         id="text5035-8-4-1"
+         sodipodi:linespacing="125%"
+         transform="scale(1.0287963,0.97200971)"><tspan
+           sodipodi:role="line"
+           id="tspan5037-5-5-8"
+           x="658.49683"
+           y="74.150131"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Tahoma;-inkscape-font-specification:Tahoma;fill:#c6e8f6;fill-opacity:1">TRAY</tspan></text>
+    </g>
+  </g>
+</svg>

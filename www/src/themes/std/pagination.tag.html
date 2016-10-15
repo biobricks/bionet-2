@@ -1,0 +1,7 @@
+<pagination>
+  <ul class="pagination {theme.style.color.background} {theme.style.color.text}">
+    <li class="disabled "><a href="#! "><i class="material-icons {theme.style.color.text}">chevron_left</i></a></li>
+    <li each={item in opts.items} class="{item.active} waves-effect"><a href="{item.url}" class="{theme.style.color.text}">{item.label}</a></li>
+    <li class="waves-effect "><a href="#! "><i class="material-icons {theme.style.color.text}">chevron_right</i></a></li>
+  </ul>
+</pagination>

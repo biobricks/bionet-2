@@ -1,0 +1,17 @@
+<breadcrumbs>
+  <div id="breadcrumb-nav">
+    <nav class="{opts.background} darken-2" style="height:34px;">
+      <div class="nav-wrapper container" style="line-height:34px;">
+        <a no-reorder each={item in items} href={item.url} class="breadcrumb">{item.label}</a>
+      </div>
+    </nav>
+  </div>
+  <script>
+    const tag = this
+    const thisSelf = self
+    sudocms.observe(sudocms.$.breadcrumbs, function(breadcrumbs) {
+      thisSelf.items = breadcrumbs
+      tag.update();
+    })
+  </script>
+</breadcrumbs>

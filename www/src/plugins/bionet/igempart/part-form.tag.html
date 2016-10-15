@@ -1,0 +1,135 @@
+<part-form>
+  <content-container style="padding-top:165px;">
+    <section-container>
+      <div id="edit-part-content" class="{theme.style.color.background} {theme.style.color.text}">
+        <part-specifications/>
+      </div>
+    </section-container>
+  </content-container>
+  <script>
+    sudocms.addRouteDestination('editPart', 'specifications', function(formData) {
+      console.log('edit part specifications:', JSON.stringify(formData))
+      riot.mount('div#edit-part-content', 'part-specifications')
+    })
+    sudocms.addRouteDestination('editPart', 'sequence', function(formData) {
+      console.log('edit part sequence:', JSON.stringify(formData))
+      riot.mount('div#edit-part-content', 'part-sequence')
+    })
+    sudocms.addRouteDestination('editPart', 'notes', function(formData) {
+      console.log('edit part instance:', JSON.stringify(formData))
+      riot.mount('div#edit-part-content', 'part-notes')
+    })
+
+  </script>
+</part-form>
+
+<part-specifications>
+  <form-container>
+    <form-text-input label="Part Name" name="partName" value={formData.name}/>
+    <form-textarea-input label="Description" name="description" value={formData.description}/>
+    <form-text-input label="Created by" name="creator" value={formData.creator}/>
+    <form-text-input label="Created" name="created" value={formData.created}/>
+    <form-text-input label="Storage temperature" name="temperature" value={formData.temperature}/>
+    <form-textarea-input label="Biosafety level" name="bsl" value={formData.bsl}/>
+    <form-switch label="Biohazardous?" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
+    <form-textarea-input label="Sequence" name="sequence" value={formData.sequence}/>
+    <form-image imagesrc={formData.avatar} label="Avatar" height="60px" />
+    <form-text-input label="" name="avatar" value={formData.avatar}/>
+    <form-image imagesrc={formData.qrcode} label="Datamatrix code" height="140px" />
+    <std-button action={submitForm} label="submit" />
+  </form-container>
+  <script>
+    //var self=this
+    //self.formData = {}
+    self.formData = sudocms.getModel('partData')
+    console.log('part-form, data:', JSON.stringify(self.formData))
+    const tag = this
+
+    sudocms.observe('partData', function(partData) {
+      self.formData = partData;
+      tag.update();
+    });
+
+    self.submitForm = function(e) {
+      //console.log('submit function', JSON.stringify(formData))
+
+      // partData is immutable, so creating a clone is necessary to modify object
+      const partData = JSON.parse(JSON.stringify(self.formData))
+
+      partData.name = self.partName.value
+      partData.description = self.description.value
+      partData.creator = self.creator.value
+      partData.temperature = self.temperature.value
+      partData.bsl = self.bsl.value
+      partData.biohazard = self.biohazard.value
+      partData.created = self.created.value
+      partData.avatar = self.avatar.value,
+        partData.sequence = self.sequence.value
+
+      //console.log('submit function', JSON.stringify(partData))
+
+      // dispatch updated part data
+      sudocms.route('partDataAccessor', 'storeClass', 'toSearchItem', partData)
+        //sudocms.dispatch('putPartData', partData)
+    }
+
+  </script>
+</part-specifications>
+
+<part-notes>
+  <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
+  <script>
+    var formData = sudocms.getModel('partData')
+
+  </script>
+</part-notes>
+
+<part-sequence>
+  <form-container>
+    <div style="height:500px">
+      <object width="100%" height="100%" type="application/x-shockwave-flash" data="static/assets/bioux/plasmid_viewer.swf" id="plasmid_viewer" style="visibility: inherit; border:0px;">
+        <param name='allowfullscreen' value='true' />
+        <param name='allowscriptaccess' value='always' />
+        <!-- The initial sequence can be loaded using the flashvars parameter and URL-encoded JSON  -->
+        <!-- This will fail if the JSON is not 100% correct. E.g. remember that hashes are formatted -->
+        <!-- like: {"key": "value"} and _not_ like: {key: "value"} -->
+        <!-- Also note the "json=" at the beginning of the value. This is required. -->
+        <param name='flashvars' value='{gfpSeqString}' />
+      </object>
+    </div>
+    <form-textarea-input label="Sequence" name="sequence" value={formData.sequence}/>
+    <std-button action={submitForm} label="submit" />
+  </form-container>
+  <script>
+    var formData = sudocms.getModel('partData')
+      //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
+
+    // map igem plasmid annotations to flash plasmid viewer component
+    var annotations = formData.plasmidAnnotations
+    var features = []
+    if (annotations !== undefined) {
+      for (var i = 0; i < annotations.length; i++) {
+        var annotation = annotations[i]
+        features.push({
+          name: annotation[3],
+          type: annotation[0],
+          from: annotation[1],
+          to: annotation[2]
+        })
+      }
+    }
+    var seq_obj = {
+      name: formData.name,
+      sequence: formData.sequence,
+      features: features
+    }
+    self.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
+      //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
+
+    self.submitForm = function(e) {
+      console.log('plasmid, submit form')
+      sudocms.route('editPart', 'genPlasmidView', undefined, sudocms.getModel('partData'))
+    }
+
+  </script>
+</part-sequence>
