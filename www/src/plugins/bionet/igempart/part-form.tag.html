@@ -2,28 +2,17 @@
   <content-container style="padding-top:165px;">
     <section-container>
       <div id="edit-part-content" class="{theme.style.color.background} {theme.style.color.text}">
-        <part-specifications/>
+        <part-specification/>
       </div>
     </section-container>
   </content-container>
   <script>
-    sudocms.addRouteDestination('editPart', 'specifications', function(formData) {
-      console.log('edit part specifications:', JSON.stringify(formData))
-      riot.mount('div#edit-part-content', 'part-specifications')
-    })
-    sudocms.addRouteDestination('editPart', 'sequence', function(formData) {
-      console.log('edit part sequence:', JSON.stringify(formData))
-      riot.mount('div#edit-part-content', 'part-sequence')
-    })
-    sudocms.addRouteDestination('editPart', 'notes', function(formData) {
-      console.log('edit part instance:', JSON.stringify(formData))
-      riot.mount('div#edit-part-content', 'part-notes')
-    })
+
 
   </script>
 </part-form>
 
-<part-specifications>
+<part-specification>
   <form-container>
     <form-text-input label="Part Name" name="partName" value={formData.name}/>
     <form-textarea-input label="Description" name="description" value={formData.description}/>
@@ -39,47 +28,19 @@
     <std-button action={submitForm} label="submit" />
   </form-container>
   <script>
-    //var self=this
-    //self.formData = {}
-    self.formData = sudocms.getModel('partData')
-    console.log('part-form, data:', JSON.stringify(self.formData))
-    const tag = this
+    app.this.formData = state.editPart
 
-    sudocms.observe('partData', function(partData) {
-      self.formData = partData;
-      tag.update();
-    });
 
-    self.submitForm = function(e) {
-      //console.log('submit function', JSON.stringify(formData))
+    this.submitForm = function(e) {
 
-      // partData is immutable, so creating a clone is necessary to modify object
-      const partData = JSON.parse(JSON.stringify(self.formData))
-
-      partData.name = self.partName.value
-      partData.description = self.description.value
-      partData.creator = self.creator.value
-      partData.temperature = self.temperature.value
-      partData.bsl = self.bsl.value
-      partData.biohazard = self.biohazard.value
-      partData.created = self.created.value
-      partData.avatar = self.avatar.value,
-        partData.sequence = self.sequence.value
-
-      //console.log('submit function', JSON.stringify(partData))
-
-      // dispatch updated part data
-      sudocms.route('partDataAccessor', 'storeClass', 'toSearchItem', partData)
-        //sudocms.dispatch('putPartData', partData)
     }
 
   </script>
-</part-specifications>
+</part-specification>
 
 <part-notes>
   <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
   <script>
-    var formData = sudocms.getModel('partData')
 
   </script>
 </part-notes>
@@ -101,7 +62,8 @@
     <std-button action={submitForm} label="submit" />
   </form-container>
   <script>
-    var formData = sudocms.getModel('partData')
+/*
+    var formData = app.getModel('partData')
       //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
 
     // map igem plasmid annotations to flash plasmid viewer component
@@ -125,10 +87,9 @@
     }
     self.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
       //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
+*/
+    this.submitForm = function(e) {
 
-    self.submitForm = function(e) {
-      console.log('plasmid, submit form')
-      sudocms.route('editPart', 'genPlasmidView', undefined, sudocms.getModel('partData'))
     }
 
   </script>

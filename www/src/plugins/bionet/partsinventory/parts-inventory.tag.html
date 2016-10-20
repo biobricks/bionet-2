@@ -16,7 +16,7 @@
     const q = {
       locationid: self.labid
     }
-    sudocms.dispatch('inventoryQuery', q)
+    app.dispatch('inventoryQuery', q)
   
     const getParam = function(q, token) {
       var value = '';
@@ -54,7 +54,7 @@
         locationid: locationid,
         distance: distance
       }
-      sudocms.dispatch('inventoryQuery', q)
+      app.dispatch('inventoryQuery', q)
     }
 
 
@@ -121,9 +121,9 @@
     const tag = this
     self.subitems = []
 
-    self.searchresult = sudocms.getModel('inventory') || []
+    self.searchresult = app.getModel('inventory') || []
 
-    sudocms.observe('inventory', function(list) {
+    app.observe('inventory', function(list) {
       self.secondaryHeader = ''
       self.searchresult = list
 

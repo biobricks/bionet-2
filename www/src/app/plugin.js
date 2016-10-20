@@ -5,7 +5,7 @@ const plugin = function (name) {
   //console.log('init plugin:', plugin.name)
   
   // receive notifications from plugin stream
-  const observer = sudocms.addObserver(sudocms.$.plugin, function (cmd) {
+  const observer = app.addObserver(app.$.plugin, function (cmd) {
     //console.log(plugin.name, ' plugin cmd:', cmd)
     switch (cmd) {
       case plugin.$.start:
@@ -13,7 +13,7 @@ const plugin = function (name) {
         break;
       case plugin.$.remove:
         plugin.remove();
-        sudocms.removeObserver(sudocms.$.plugin, observer)
+        app.removeObserver(app.$.plugin, observer)
         break;
     }
   })

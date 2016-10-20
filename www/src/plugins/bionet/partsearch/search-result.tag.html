@@ -14,7 +14,7 @@
   <script>
     const tag = this
     // todo: store search query somewhere else
-    const q = sudocms.getModel('bioClassQuery')
+    const q = app.getModel('bioClassQuery')
     self.primaryHeader = 'Search results for "' + q.q + '"'
 
     self.pagination = [{
@@ -36,32 +36,32 @@
     }]
 
     //self.searchresult = []
-    self.searchresult = sudocms.getModel('searchCache') || []
+    self.searchresult = app.getModel('searchCache') || []
     self.secondaryHeader = self.searchresult.length + ' items'
     
     /*
-    sudocms.observe('searchCache', (result) => {
+    app.observe('searchCache', (result) => {
       self.secondaryHeader = result.length + ' items'
       self.searchresult = result
       tag.update()
     })
     
     // handle begin stream message
-    sudocms.addRouteDestination('searchResult', 'start', function() {
+    app.addRouteDestination('searchResult', 'start', function() {
       //console.log('searchResult start')
       self.searchresult = []
-      //sudocms.getStream('searchCache').init(undefined)
+      //app.getStream('searchCache').init(undefined)
     })
 
     // handle end stream message
-    sudocms.addRouteDestination('searchResult', 'end', function() {
+    app.addRouteDestination('searchResult', 'end', function() {
       //console.log('searchResult end')
       //self.secondaryHeader = self.searchresult.length + ' items'
-      //sudocms.dispatch('searchCache', self.searchresult)
+      //app.dispatch('searchCache', self.searchresult)
       //tag.update()
     })
 
-    sudocms.addRouteDestination('searchResult', 'packet', function(streamItem) {
+    app.addRouteDestination('searchResult', 'packet', function(streamItem) {
       //console.log('searchResult packet')
       //console.log('search result: receiving packet %s', JSON.stringify(streamItem))
       self.secondaryHeader = self.searchresult.length + ' items'
@@ -71,17 +71,17 @@
     */
 
     // handle list message
-    sudocms.addRouteDestination('searchResult', 'list', function(list) {
+    app.addRouteDestination('searchResult', 'list', function(list) {
       self.secondaryHeader = list.length + ' items'
       self.searchresult = list
       tag.update()
-      sudocms.dispatch('searchCache', list)
+      app.dispatch('searchCache', list)
     })
                                 
 
     this.on('unmount', function() {
       self.searchresult = undefined
-      sudocms.removeRouteDestination('searchResult', 'list')
+      app.removeRouteDestination('searchResult', 'list')
     })
 
   </script>

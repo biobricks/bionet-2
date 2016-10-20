@@ -3,40 +3,52 @@ import Plugin from './plugin';
 import Persist from './persist'
 import NanoStream from './NanoStream';
 import NanoRoute from './NanoRoute';
+const EventEmitter = require('events');
+import search from './search'
 
-const app = {
 
-  remote: undefined, // RPC connection to server
-  user: undefined, // currently logged in user
+class App extends EventEmitter {
 
-  login: undefined,
-  logout: undefined,
+  constructor() {
+    super()
+
+    this.state = {}
+
+    this.remote = undefined // RPC connection to server
+    this.user = undefined // currently logged in user
+
+    this.login = undefined
+    this.logout = undefined
  
-  stream: {},
-  plugin: {},
+    this.stream = {}
+    this.plugin = {}
 
-  // built-in streams
-  $: {
-    plugin: 'plugin',
-    login: 'login',
-    loginState: 'loginState',
-    primaryNav: 'primaryNav',
-    secondaryNav: 'secondaryNav',
-    appBarConfig: 'appBarConfig',
-    breadcrumbs: 'breadcrumbs',
-    theme: 'theme',
-    settings: 'settings'
-  },
+    // built-in streams
+    this.$ = {
+      plugin: 'plugin',
+      login: 'login',
+      loginState: 'loginState',
+      primaryNav: 'primaryNav',
+      secondaryNav: 'secondaryNav',
+      appBarConfig: 'appBarConfig',
+      breadcrumbs: 'breadcrumbs',
+      theme: 'theme',
+      settings: 'settings'
+    }
 
-  // initialize sudocms
-  initialize: function () {
+    this.ui = require('../ui/methods');
+  }
+
+  // initialize app
+  initialize() {
     const thisModule = this
 
     // initialize local storage
-    Persist.openDB();
+    Persist.openDB()
 
     // plugin control stream
     this.addStream(this.$.plugin)
+
 
     // login data streams
     this.addStream(this.$.login)
@@ -78,21 +90,27 @@ const app = {
       thisModule.putLocal(thisModule.$.settings, JSON.stringify(newSettings))
     })
 
-  },
+  }
+
+  search(query) {
+    
+
+
+  }
 
   // plugin methods
-  addPlugin: function (name) {
+  addPlugin(name) {
     const newPlugin = new Plugin(name)
     this.plugin[name] = newPlugin
     return newPlugin
-  },
-  removePlugin: function (name) {
+  }
+  removePlugin(name) {
     plugin[name].remove()
     delete this.plugin[name];
-  },
+  }
 
   // load settings and startup plugins 
-  startPlugins: function () {
+  startPlugins() {
 
     const settings = this.getStream(this.$.settings)
     const thisModule = this
@@ -118,112 +136,129 @@ const app = {
       thisModule.dispatch(thisModule.$.plugin, 'start')
       thisModule.startRouter()
     })
-  },
+  }
 
   // start router - after plugins have been started
-  startRouter: function () {
+  startRouter() {
 
     // mount root component
     riot.mount('div#app', 'app')
 
     // initialize and start router
-    riot.route.base('#!')
+    riot.route.base('/')
     riot.route.start(true)
 
     console.log('app started')
-  },
+  }
 
   // stream methods
-  dispatch: function (name, message) {
+  dispatch(name, message) {
     //console.log('dispatching to stream:',name)
     this.stream[name].dispatch(message);
-  },
-  route: function (router, address, mapper, message) {
+  }
+
+  route(router, address, mapper, message) {
     //console.log('routing %s to %s with mapper %s', address, router, mapper)
     this.stream[router].route(address, mapper, message)
-  },
-  observe: function (name, observer) {
+  }
+
+  observe(name, observer) {
     this.stream[name].observe(observer);
-  },
-  getStream: function (name) {
+  }
+
+  getStream(name) {
     return this.stream[name];
-  },
-  getModel: function (name) {
+  }
+
+  getModel(name) {
     //console.log('getModel:',name)
     return this.stream[name].getModel();
-  },
-  addObserver: function (name, observer) {
+  }
+
+  addObserver(name, observer) {
     //console.log('addObserver:', name)
     this.stream[name].addObserver(observer);
-  },
-  removeObserver: function (name, observer) {
+  }
+
+  removeObserver(name, observer) {
     //console.log('removeObserver:', name)
     this.stream[name].removeObserver(observer);
-  },
-  addStream: function (name, stream) {
+  }
+
+  addStream(name, stream) {
     if (stream === undefined) stream = new NanoStream();
     //console.log('addStream:',name)
     this.stream[name] = stream;
     return stream;
-  },
-  addStreamRouter: function (name, stream) {
+  }
+
+  addStreamRouter(name, stream) {
     if (stream === undefined) stream = new NanoRoute();
     //console.log('addRoute:',name)
     this.stream[name] = stream;
     return stream;
-  },
-  addRouteDestination: function (router, address, f) {
+  }
+
+  addRouteDestination(router, address, f) {
     this.stream[router].addRoute(address, f)
-  },
-  removeRouteDestination: function (router, address) {
+  }
+
+  removeRouteDestination(router, address) {
     this.stream[router].removeRoute(address);
-  },
-  initStream: function (name, state) {
+  }
+
+  initStream(name, state) {
     //console.log('init stream:', name, JSON.stringify(state))
     this.stream[name].init(state)
-  },
-  removeStream: function (name) {
+  }
+
+  removeStream(name) {
     delete this.stream[name];
-  },
+  }
 
   // local storage methods
-  getLocal: function (key, cb) {
+  getLocal(key, cb) {
     Persist.get(key, cb)
-  },
-  putLocal: function (key, data, cb) {
+  }
+
+  putLocal(key, data, cb) {
     Persist.put(key, data, cb)
-  },
+  }
+
   // todo: deprecated, remove when queries available
-  readTestData: function (cb) {
+  readTestData(cb) {
     Persist.readTestData(cb)
-  },
+  }
 
   // route methods
-  addRoute: function (path, router) {
+  addRoute(path, router) {
     riot.route(path, router);
-  },
+  }
 
   // settings methods
-  getSettings: function () {
+  getSettings() {
     return this.getModel(this.$.settings)
-  },
-  putSetting: function (property) {
+  }
+
+
+  putSetting(property) {
     //console.log('putSettings:',JSON.stringify(property))
     this.dispatch(this.$.settings, property)
-  },
+  }
 
   // login methods
-  getLoginState: function () {
+  getLoginState() {
     return this.getModel(this.$.loginState)
-  },
+  }
 
   // theme methods
-  getTheme: function () {
+  getTheme() {
     return this.getModel(this.$.theme)
-  },
-  getThemeMethod: function () {
+  }
+
+  getThemeMethod() {
     return this.getTheme().method;
   }
 
 };
-export default app;
+export default new App();

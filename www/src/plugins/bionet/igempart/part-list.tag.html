@@ -11,9 +11,9 @@
   </content-container>
 
   <script>
-    const q = sudocms.getModel('searchQuery')
+    const q = app.getModel('searchQuery')
     self.primaryHeader = 'Search results for "' + JSON.stringify(q) + '"'
-    self.inventorylist = sudocms.getModel('searchCache')
+    self.inventorylist = app.getModel('searchCache')
     self.secondaryHeader = self.inventorylist.length + ' items'
 
     self.pagination = [{
@@ -40,12 +40,12 @@
       self.list = list
       tag.update();
     };
-    sudocms.observe('partsList', partsListObserver)
+    app.observe('partsList', partsListObserver)
     */
 
     /*
     this.on('unmount', function() {
-      sudocms.removeObserver('partsList',partsListObserver)
+      app.removeObserver('partsList',partsListObserver)
     })
     */
 

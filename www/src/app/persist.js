@@ -30,7 +30,7 @@ const persist = {
         const streamItem = JSON.parse(data.value);
         //console.log('readStream:' + data.key, '=', JSON.stringify(streamItem));
         if (streamItem.id !== undefined) {
-          sudocms.dispatch('searchResult', streamItem)
+          app.dispatch('searchResult', streamItem)
         }
       })
       .on('error', function (err) {

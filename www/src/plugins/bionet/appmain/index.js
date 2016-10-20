@@ -6,7 +6,7 @@ var appmain = {
     
     //-------------------------------------------------------------------------
     // ui components
-    require('./home.tag.html')
+//    require('./home.tag.html')
 
     //----------------------------------------------------------------------------
     // primary nav - logged in
@@ -39,39 +39,12 @@ var appmain = {
       action: '/#!/help'
     }]
 
-    sudocms.dispatch(sudocms.$.primaryNav, loggedOutNav)
+    app.dispatch(app.$.primaryNav, loggedOutNav)
 
-    // login successful
-    sudocms.observe(sudocms.$.login, (login) => {
-        const toast = sudocms.getThemeMethod().toast
-      //sudocms.getThemeMethod().toast('login: username='+login.username+" password="+login.password)
-        // TODO actually log in!
-        app.login(login.username, login.password, function(err, user) {
-            if(err) {
-                toast("Wrong username or password")
-                sudocms.dispatch(sudocms.$.loginState, false)
-                return;
-            }
-            sudocms.dispatch(sudocms.$.loginState, true)
-        });
-    })
-
-    // login state
-    sudocms.addObserver(sudocms.$.loginState, (loginState) => {
-      console.log('loginState, index.js')
-      const toast = sudocms.getThemeMethod().toast
-      if (loginState) {
-        toast('logged into bionet')
-        sudocms.dispatch(sudocms.$.primaryNav, loggedInNav)
-      } else {
-        toast('logged out of bionet')
-        sudocms.dispatch(sudocms.$.primaryNav, loggedOutNav)
-      }
-    })
 
     // signup process
-    const signupClient = sudocms.addStream('signupClient')
-    const signupServer = sudocms.addStream('signupServer')
+    const signupClient = app.addStream('signupClient')
+    const signupServer = app.addStream('signupServer')
 
     // store current value of signup up process and forward step name and value to observer
     signupServer.reduce((m, b) => {
@@ -87,6 +60,7 @@ var appmain = {
       newState.value = b.value
       return newState
     })
+
 
     // signup process verification
     signupServer.observe((step) => {
@@ -171,20 +145,13 @@ var appmain = {
 
     // TODO JUUL move non-namespaced routes to main file
 
-    sudocms.addRoute('/', function () {
-      sudocms.dispatch(sudocms.$.appBarConfig, {
-        enableTopNav: true,
-        enableBreadCrumbs: false,
-        enableSubbar: false
-      })
-      riot.mount('div#content', 'home')
-    })
 
-    sudocms.addRoute('/logout', function () {
+
+    app.addRoute('/logout', function () {
       console.log("logging out");
       app.logout(function() {
         console.log("logged out");
-        sudocms.dispatch(sudocms.$.loginState, false)
+        app.dispatch(app.$.loginState, false)
         riot.route('/')
       });
     })

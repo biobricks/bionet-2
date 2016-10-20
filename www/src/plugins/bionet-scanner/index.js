@@ -4,7 +4,7 @@ import scanner from './scanner'
 import bionetScannerApi from './bionetScannerApi'
 import scanProcessor from './scanProcessor'
 
-const bionetScanPlugin = sudocms.addPlugin('bionetScan2')
+const bionetScanPlugin = app.addPlugin('bionetScan2')
 
 bionetScanPlugin.start = function () {
 
@@ -13,8 +13,8 @@ bionetScanPlugin.start = function () {
 
   //-------------------------------------------------------------------------
   // data streams
-  const startScan = sudocms.addStream('startScan')
-  const scanResult = sudocms.addStream('scanResult')
+  const startScan = app.addStream('startScan')
+  const scanResult = app.addStream('scanResult')
   const thisModule = this
   startScan.observe((msg) => {
     switch (msg.status) {
@@ -33,8 +33,8 @@ bionetScanPlugin.start = function () {
 
   //-------------------------------------------------------------------------
   // routes
-  sudocms.addRoute('/scan..', function () {
-    sudocms.dispatch(sudocms.$.appBarConfig, {
+  app.addRoute('/scan..', function () {
+    app.dispatch(app.$.appBarConfig, {
       enableTopNav: false,
       enableBreadCrumbs: false,
       enableSubbar: false
@@ -64,9 +64,9 @@ bionetScanPlugin.runScanner = function () {
   const q = riot.route.query()
   const config = {}
   if (q.id !== undefined) {
-    config.q = sudocms.getModel('bioInstanceQuery')
+    config.q = app.getModel('bioInstanceQuery')
     config.cassette = undefined
-    const cassetteList = sudocms.getModel('searchCache')
+    const cassetteList = app.getModel('searchCache')
     for (var i = 0; i < cassetteList.length; i++) {
       var cassette = cassetteList[i].data
       if (cassette.id === q.id) {

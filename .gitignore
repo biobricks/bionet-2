@@ -5,3 +5,4 @@ settings.js
 static/*.*
 www/settings.js
 local.db/**
+www/js/bionet.js

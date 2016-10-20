@@ -8,7 +8,7 @@ import igemPart from './igempart'
 import partSearch from './partsearch'
 import partsInventory from './partsinventory'
 
-const bionetPlugin = sudocms.addPlugin('bionet')
+const bionetPlugin = app.addPlugin('bionet')
 
 bionetPlugin.start = function () {
 

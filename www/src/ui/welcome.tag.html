@@ -1,0 +1,185 @@
+<welcome>
+  <content-container style="padding-top:100px;">
+    <section-container>
+      <div id="home-page-content" class="{theme.style.color.background} {theme.style.color.text}">
+        <mpassword-form/>
+      </div>
+      <div style="height:30px" />
+      <div class="center red-text">{errorMsg}</div><br/>
+    </section-container>
+  </content-container>
+  <script>
+
+    const tag = this
+
+    app.on('signupError', function(msg) {
+      self.errorMsg = msg
+      tag.update()
+    })
+
+  </script>
+</welcome>
+
+<mpassword-form>
+  <form class="col center" onsubmit={searchclick}>
+    <img class="center" src="static/images/home-bionet.png" height="220px" />
+    <div style="height:40px" />
+
+    <search-input label="search biomaterials" name="searchbio" value={searchbioInit}/>
+  </form>
+  <form if={!app.user} onsubmit={signupAction}>
+      <div class="center">OR</div>
+      <form-text-input-empty label="enter invitation code, hint:'code'" name="mpassword" value={mpasswordInit}/>
+      <std-button label="sign up" />
+  </form>
+
+
+  <script>
+    const tag = this
+    self.searchbioInit = ''
+    self.mpasswordInit = ''
+
+    self.loggedin = app.getLoginState()
+    var observer = {}
+
+    const getParam = function(q, token) {
+      var value = '';
+      if (q.indexOf(token) >= 0) {
+        var pos = q.indexOf(token)
+        value = q.substr(pos + 2)
+        pos = value.indexOf(' ')
+        if (pos > 0) {
+          value = value.substr(0, pos - 1)
+        }
+      } else {
+        value = undefined
+      }
+      return value
+    }
+
+    // submit search query and route to search results
+    self.searchclick = function() {
+      var partid = self.searchbio.value
+      var distance = getParam(partid, 'd:')
+      var locationid = getParam(partid, 'l:')
+      if (locationid === undefined) locationid = 'LAB'
+      const pos = partid.indexOf(':')
+      if (pos >= 0) {
+        if (pos === 1) partid = undefined
+        else partid = partid.substr(0, pos - 2)
+      }
+      const q={
+        q:self.searchbio.value
+      }
+      /*
+      const q = {
+        q: self.searchbio.value,
+        partid: partid,
+        locationid: locationid,
+        distance: distance
+      }
+      */
+      app.dispatch('bioClassQuery', q)
+      console.log('search query:',JSON.stringify(q))
+      app.dispatch('bioClassCache', [])
+      riot.route('q?terms='+encodeURIComponent(self.searchbio.value))
+    }
+
+
+    this.on('before-mount', function() {
+      observer = app.addObserver(app.$.loginState, function(loginState) {
+        self.loggedin = loginState
+        tag.update()
+      })
+    })
+    this.on('unmount', function() {
+      app.removeObserver(app.$.loginState, observer)
+    })
+
+    // TODO on app.user change we need to update 
+
+    signupAction(e) {
+      var masterPassword = self.mpassword.value
+      app.remote.checkMasterPassword(masterPassword, function(err) {
+        if(err) {
+          app.emit('signupError', err);
+          return;
+        }
+        app.emit('signupError', '');
+
+        app.state.signup = {masterPassword};
+
+        // proceed to email entry
+        riot.mount('div#home-page-content', 'email-form')
+      });
+    };
+
+
+  </script>
+</mpassword-form>
+
+<email-form>
+  <form class="col s6 center" onsubmit={submitForm}>
+    <img class="center" src="static/images/home-bionet.png" height="220px" />
+    <div style="height:40px" />
+    <form-text-input-empty label="enter email" name="enteremail" value={enteremailInit}/>
+    <input type="submit" style="visibility:hidden" />
+    <std-button label="join" />
+  </form>
+
+  <script>
+    this.enteremailInit = ''
+
+    this.submitForm = function(e) {
+      app.state.signup.email = self.enteremail.value
+      riot.mount('div#home-page-content', 'password-form')
+    }
+
+  </script>
+</email-form>
+
+<password-form>
+  <form class="col s6 center" onsubmit={submitForm}>
+    <img class="center" src="static/images/home-bionet.png" height="220px" />
+    <div style="height:40px" />
+    <password-text-input-empty label="enter a password" name="enterpassword1" />
+    <password-text-input-empty label="enter password again" name="enterpassword2" />
+    <input type="submit" style="visibility:hidden" />
+    <std-button label="join" />
+  </form>
+
+  <script>
+    submitForm(e) {
+
+      if(self.enterpassword1.value !== self.enterpassword2.value) {
+        app.emit('signupError', 'Passwords do not match.')
+        return
+      }
+      app.emit('signupError', '');
+
+      app.remote.createUser(app.state.signup.email, self.enterpassword1.value, {
+        masterPassword: app.state.signup.masterPassword
+      }, function(err, user) {
+        if(err) {
+          app.emit('signupError', err)
+          return
+        }
+        
+        app.ui.toast("Signup successful!")
+
+        app.login(app.state.signup.email, this.enterpassword1.value, function(err, user) {
+          if(err) return app.ui.toast("Login failed: " + err) // TODO better error handling
+
+          app.state.signup = {} // reset signup state
+
+          // TODO get rid of this
+          // UI components should listen for app.user change
+          app.dispatch(app.$.loginState, true)
+
+          riot.route('inventory') // TODO probably not where we want to end up
+         })
+      })    
+    }
+
+  </script>
+</password-form>

@@ -8,12 +8,12 @@ var partsearch = {
     // search
     require('./search-result.tag.html')
 
-    sudocms.addStream('bioClassQuery')
-    sudocms.addStream('bioInstanceQuery')
-    const searchResult = sudocms.addStreamRouter('searchResult')
-    const searchCache = sudocms.addStream('searchCache').init(undefined)
-    const bioClassCache = sudocms.addStream('bioClassCache').init(undefined)
-    const bioInstanceCache = sudocms.addStream('bioInstanceCache').init(undefined)
+    app.addStream('bioClassQuery')
+    app.addStream('bioInstanceQuery')
+    const searchResult = app.addStreamRouter('searchResult')
+    const searchCache = app.addStream('searchCache').init(undefined)
+    const bioClassCache = app.addStream('bioClassCache').init(undefined)
+    const bioInstanceCache = app.addStream('bioInstanceCache').init(undefined)
 
     searchResult.reduceRoute('class', (m, streamItem) => {
       const mapItem = function (x) {
@@ -72,35 +72,35 @@ var partsearch = {
       }
     })
 
-    sudocms.observe('bioClassQuery', (q) => {
-      sudocms.getStream('searchCache').init(undefined)
+    app.observe('bioClassQuery', (q) => {
+      app.getStream('searchCache').init(undefined)
       bionetapi.partClassSearch(q.q, (result, data, msg) => {
         //console.log('search callback: result:%b data:%s', result, JSON.stringify(data, null, 2))
         if (result) {
-          //sudocms.route('searchResult', 'end')
-          sudocms.route('searchResult', 'list', 'class', data)
-          sudocms.dispatch('bioClassCache', searchResult.getModel())
+          //app.route('searchResult', 'end')
+          app.route('searchResult', 'list', 'class', data)
+          app.dispatch('bioClassCache', searchResult.getModel())
         } else {
-          sudocms.getThemeMethod().toast(msg)
+          app.getThemeMethod().toast(msg)
         }
       })
     })
 
-    sudocms.observe('bioInstanceQuery', (q) => {
+    app.observe('bioInstanceQuery', (q) => {
 
       // initialize search result stream
-      //sudocms.route('searchResult', 'start')
-      sudocms.getStream('searchCache').init(undefined)
+      //app.route('searchResult', 'start')
+      app.getStream('searchCache').init(undefined)
 
       // initiate query
       //if (q.partid !== undefined) {
         bionetapi.partInstanceSearch(q, (result, data, msg) => {
           if (result) {
-            //sudocms.route('searchResult', 'end')
-            sudocms.route('searchResult', 'list', 'instance', data)
-            sudocms.dispatch('bioInstanceCache', searchResult.getModel())
+            //app.route('searchResult', 'end')
+            app.route('searchResult', 'list', 'instance', data)
+            app.dispatch('bioInstanceCache', searchResult.getModel())
           } else {
-            sudocms.getThemeMethod().toast(msg)
+            app.getThemeMethod().toast(msg)
           }
         })
       //}
@@ -108,8 +108,8 @@ var partsearch = {
 
     //---------------------------------------------------------------------
     // search route
-    sudocms.addRoute('/q..', function () {
-      sudocms.dispatch(sudocms.$.appBarConfig, {
+    app.addRoute('/q..', function () {
+      app.dispatch(app.$.appBarConfig, {
         enableTopNav: true,
         enableBreadCrumbs: true,
         enableSubbar: false
@@ -131,13 +131,13 @@ var partsearch = {
           locationid: lab,
           distance: distance
         }
-        sudocms.dispatch('bioInstanceQuery', qp)
-        sudocms.dispatch('searchCache', bioInstanceCache.getModel())
-        sudocms.dispatch(sudocms.$.breadcrumbs, [{
+        app.dispatch('bioInstanceQuery', qp)
+        app.dispatch('searchCache', bioInstanceCache.getModel())
+        app.dispatch(app.$.breadcrumbs, [{
             'label': 'search',
             'url': '#!/'
         }, {
-            'label': sudocms.getModel('bioClassQuery').q,
+            'label': app.getModel('bioClassQuery').q,
             'url': '#!/q' + terms
         }, {
             'label': q.partid,
@@ -145,12 +145,12 @@ var partsearch = {
         }
         ]);
       } else {
-        sudocms.dispatch('searchCache', bioClassCache.getModel())
-        sudocms.dispatch(sudocms.$.breadcrumbs, [{
+        app.dispatch('searchCache', bioClassCache.getModel())
+        app.dispatch(app.$.breadcrumbs, [{
             'label': 'search',
             'url': '#!/'
         }, {
-            'label': sudocms.getModel('bioClassQuery').q,
+            'label': app.getModel('bioClassQuery').q,
             'url': '#!/q' + terms
         }
         ]);

@@ -60,6 +60,7 @@ var accounts = {
                     return cb(err);
                 }
             }
+          console.log("USER CREATED, sending verification", user, opts.value.verificationCode);
             mailer.sendVerification(user, opts.value.verificationCode, cb);
         });
     },

@@ -24,19 +24,19 @@
   
   <script>
     this.on('mount', function() {
-      sudocms.dispatch('startScan', {
+      app.dispatch('startScan', {
         status: 'start'
       })
     })
     this.on('unmount', function() {
-      sudocms.dispatch('startScan', {
+      app.dispatch('startScan', {
         status: 'stop'
       })
     })
 
     // todo: add events handling to initiate and shutdown pixi via streams
     self.scanButton = function() {
-      sudocms.dispatch('startScan', {
+      app.dispatch('startScan', {
         status: 'start'
       })
     }

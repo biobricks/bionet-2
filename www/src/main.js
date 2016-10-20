@@ -1,8 +1,6 @@
 import app from './app'
 
-window.app = app
-window.sudocms = app // todo remove all refs to sudocms naming
-
+window.app = app // our one global variable
 app.initialize()
 
 // install plugins
@@ -10,12 +8,14 @@ app.initialize()
 require('./plugins/bionet')
 require('./plugins/bionet-scanner')
 
-// install theme
-require('./themes/std')
+var ui = require('./ui')
+var routes = require('./routes.js');
 
 var $ = require('jquery');
 window.$ = $;
 window.jQuery = $;
+$.formToObject = require('form_to_object');
+$.xtend = require('xtend'); // extend that does not modify arguments
 
 var emailValidator = require('email-validator');
 var passwordValidator = require('./password_validator.js');
@@ -104,11 +104,6 @@ function connector(cb) {
       }
     });
     
-    /*
-      remote.foo(function(err, msg) {
-      console.log("Got: " + msg);
-      });
-    */
   });
 }
 
@@ -159,6 +154,7 @@ app.logout = function(cb) {
   });
 
 };
+
 
 $(document).ready(function() {
   

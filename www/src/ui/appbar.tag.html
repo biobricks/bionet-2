@@ -1,0 +1,153 @@
+<appbar>
+  <appbar-container>
+
+    <!-- primary navigation -->
+    <topnav-container if={enableTopNav}>
+
+      <!-- logo -->
+      <a id="logo-container" href="/" class="brand-logo"><img src={ theme.style.color.smallLogo } style="height:44px; margin-top:10px;" alt="" /></a>
+
+      <div style="margin-left:80px;">
+        <!--
+        <li><a id="searchbar" data-activates="searchbar2"><i class="material-icons left {theme.style.color.navText}">search</i></a></li>
+        <div class="nav-wrapper">
+          <form>
+            <div class="input-field">
+              <input id="search" type="search" required>
+              <label for="search"><i class="material-icons black-text">search</i></label>
+              <i class="material-icons">close</i>
+            </div>
+          </form>
+        </div>
+        -->
+
+        <!-- full menu -->
+        <nav-group tagid={fullMenu.id} classname={fullMenu.classname} stylename={fullMenu.style} navitems={fullMenu.items}/>
+      </div>
+
+      <!-- icons -->
+      <ul class="right">
+        <!--
+        <li><a id="searchbar" data-activates="searchbar2"><i class="material-icons left {theme.style.color.navText}">search</i></a></li>
+        -->
+        <settings-button/>
+        <login-button/>
+      </ul>
+
+      <!-- mobile slide-out menu -->
+      <a id="mobile-nav" data-activates={mobileMenu.id} class="button-collapse"><i class="material-icons {theme.style.color.navButton}">menu</i></a>
+      <nav-group tagid={mobileMenu.id} classname={mobileMenu.classname} navitems={mobileMenu.items}/>
+
+    </topnav-container>
+
+    <breadcrumbs if={enableBreadCrumbs} items={breadcrumbs} background={theme.style.color.highlightBackground} />
+
+    <!-- secondary navigation -->
+    <topnav-container if={enableSubbar}>
+
+      <nav-group tagid={secondaryfullMenu.id} classname={secondaryfullMenu.classname} navitems={secondaryfullMenu.items}/>
+
+      <!-- todo data-activated does not work -->
+      <a id="mobile-nav-secondary" data-activates={secondaryMobileMenu.id} class="button-collapse"><i class="material-icons {theme.style.color.navButton}">view_module</i></a>
+      <nav-group tagid={secondaryMobileMenu.id} classname={secondaryMobileMenu.classname} navitems={secondaryMobileMenu.items}/>
+
+    </topnav-container>
+  </appbar-container>
+  <login/>
+  <settings/>
+
+  <!-- search form
+<form>
+        <div class="input-field">
+          <input id="search" type="search" required>
+          <label for="search"><i class="material-icons">search</i></label>
+          <i class="material-icons">close</i>
+        </div>
+      </form>
+-->
+
+  <script>
+    const tag = this
+    self.theme = app.getTheme()
+    self.enableTopNav = true
+    self.enableBreadCrumbs = false
+    self.enableSubbar = false
+
+    // observe changes to appbar configuration update appbar
+    app.observe(app.$.appBarConfig, function(config) {
+      self.enableTopNav = config.enableTopNav
+      self.enableBreadCrumbs = config.enableBreadCrumbs
+      self.enableSubbar = config.enableSubbar
+      tag.update();
+    });
+
+    // initialize primary nav
+    const primaryNavItems = app.getModel(app.$.primaryNav)
+      //style: 'margin-left:80px;',
+    self.fullMenu = {
+      id: 'full-menu',
+      classname: 'hide-on-med-and-down left',
+      items: primaryNavItems
+    }
+    self.mobileMenu = {
+      id: 'mobile-menu',
+      classname: 'side-nav ' + self.theme.style.color.navText + ' ' + self.theme.style.color.navBackground,
+      items: primaryNavItems
+    }
+    
+    // observe changes to primary nav and update appbar
+    app.observe(app.$.primaryNav, function(navItems) {
+      self.fullMenu.items = navItems
+      self.mobileMenu.items = navItems
+      tag.update();
+    });
+
+    // initialize secondary nav
+    const secondaryNavItems = app.getModel(app.$.secondaryNav)
+    self.secondaryfullMenu = {
+      id: 'secondary-full-menu',
+      classname: 'hide-on-med-and-down left',
+      items: secondaryNavItems
+    }
+    self.secondaryMobileMenu = {
+      id: 'mobile-menu2',
+      classname: 'side-nav ' + self.theme.style.color.navText + ' ' + self.theme.style.color.navBackground,
+      items: secondaryNavItems
+    }
+    
+    // observe changes to secondary nav and update appbar
+    app.observe(app.$.secondaryNav, function(navItems) {
+      self.secondaryfullMenu.items = navItems
+      self.secondaryMobileMenu.items = navItems
+      tag.update();
+    });
+    
+    // attach materialize actions to tags after completion of mounting tags
+    this.on('mount', function() {
+      $('#login-slideout').sideNav({
+        closeOnClick: true,
+        edge: 'right'
+      });
+      $('#login-slideout').collapsible();
+      $("#settings-slideout").sideNav({
+          closeOnClick: false,
+          edge: 'right'
+        })
+        //$("#settings-slideout").dropdown();
+      $('#mobile-nav').sideNav({
+        closeOnClick: true
+      });
+      $('#mobile-nav-secondary').sideNav({
+        closeOnClick: true
+      });
+      $('.parallax').parallax();
+      $(".dropdown-button").dropdown({
+        hover: true,
+        beloworigin: true
+      });
+      $('.materialboxed').materialbox();
+    })
+
+  </script>
+
+</appbar>

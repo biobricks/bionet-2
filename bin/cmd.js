@@ -64,7 +64,7 @@ var userStatic = require('ecstatic')({
 settings.labelImageFilePath = path.resolve(path.join(settings.userFilePath, settings.labelImageFilePath));
 
 
-var physicalDB = level('./db/materials');
+var bioDB = level('./db/bio');
 
 var uDB = level('./db/users');
 var userDB = sublevel(uDB, 'accountdown', { valueEncoding: 'json' });
@@ -151,18 +151,25 @@ printServer.start(settings, function(err) {
 });
 
 
-function savePhysicalToDB(m, cb) {
-    idGenerator.getCur(function(err, curID) {
-        if(err) return cb(err);
-//        if(!m.humanID || m.humanID > curID) {
-//            return cb("missing or invalid human readable ID");
-//        }
-        physicalDB.put(m.id, m, {valueEncoding: 'json'}, function(err) {
-            if(err) return cb(err);
-            addToIndex(m);
-            cb(null, m.id);
-        });
-    })
+function createMaterialInDB(m, cb) {
+  idGenerator.getCur(function(err, curID) {
+    if(err) return cb(err);
+
+    // TODO check for human readable id
+//  if(!m.humanID || m.humanID > curID) {
+//    return cb("missing or invalid human readable ID");
+//  }
+
+    // TODO should we ever generate these on the server?
+    m.id = m.id || uuid();
+    m.updated = m.updated || new Date()
+
+    bioDB.put(m.id, m, {valueEncoding: 'json'}, function(err) {
+      if(err) return cb(err);
+      addToIndex(m);
+      cb(null, m.id);
+    });
+  })
 }
 
 websocket.createServer({server: server}, function(stream) {
@@ -241,21 +248,13 @@ websocket.createServer({server: server}, function(stream) {
                 idGenerator.next(cb);
             },
 
-/*
-            printLabel: function(filePath, cb) {
-                // ToDo proper callback
-                printServer.printLabel(filePath);
-                cb();
-            },
-*/
-
-            delPhysical: function(uuid, cb) {
-                if(!uuid) return cb("Missing uuid");
+            delMaterial: function(id, cb) {
+                if(!id) return cb("Missing id");
                 
-                physicalDB.del(uuid, cb);
+                bioDB.del(id, cb);
             },
 
-            savePhysical: function(m, imageData, doPrint, cb) {
+            createMaterial: function(m, imageData, doPrint, cb) {
                 if(!m.id) m.id = uuid();
 
                 var mtch;
@@ -273,7 +272,7 @@ websocket.createServer({server: server}, function(stream) {
                         m.physicals.push(m.newPhysical);
                         delete m.newPhysical
 
-                        savePhysicalToDB(m, function(err, id) {
+                        createMaterialInDB(m, function(err, id) {
                             if(err) return cb(err);
                             if(!doPrint) return cb(null, id);
                             
@@ -285,25 +284,25 @@ websocket.createServer({server: server}, function(stream) {
                         console.log("saved with file", imagePath);
                     });
                 } else {
-                    savePhysicalToDB(m, cb);
+                    createMaterialInDB(m, cb);
                     console.log("saved with no file");
                 }
                 
                 console.log("saving:", m);
             },
 
-            getPhysical: function(id, cb) {
+            getMaterial: function(id, cb) {
                 console.log("getting:", id);
-                physicalDB.get(id, {valueEncoding: 'json'}, function(err, p) {
+                bioDB.get(id, {valueEncoding: 'json'}, function(err, p) {
                     if(err) return console.log(err);
                     cb(null, p);
                 });
             },
 
-            getPhysicalByHumanID: function(humanID, cb) {
+            getMaterialByHumanID: function(humanID, cb) {
 
 
-                var s = physicalDB.createReadStream({valueEncoding: 'json'});
+                var s = bioDB.createReadStream({valueEncoding: 'json'});
                 var found = false;
                 var out = s.pipe(through.obj(function(data, enc, next) {
                     if(data.value.humanID == humanID) {
@@ -336,7 +335,7 @@ websocket.createServer({server: server}, function(stream) {
                 var count = 0;
                 var out = s.pipe(through(function(data, enc, cb) {
                     console.log("data.value", data.value);
-                    physicalDB.get(data.value, function(err, p) {
+                    bioDB.get(data.value, function(err, p) {
                         if(!err && p) {
                             this.push(JSON.stringify(p));
                             count++;
@@ -355,14 +354,14 @@ websocket.createServer({server: server}, function(stream) {
             }),
 
             search: rpc.syncStream(function(q) {
-                var s = physicalDB.createReadStream({valueEncoding: 'json'});
+                var s = bioDB.createReadStream({valueEncoding: 'json'});
 
 
                 var out = s.pipe(through.obj(function(data, enc, cb) {
                     if((data.value.name && data.value.name.toLowerCase().match(q.toLowerCase())) || (data.value.description && data.value.description.toLowerCase().match(q.toLowerCase()))) {
                         this.push(data.value);
                     }
-                    
+                   
                     cb();
                 }));
                 

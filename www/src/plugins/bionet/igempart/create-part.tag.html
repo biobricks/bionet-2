@@ -2,52 +2,54 @@
   <content-container style="padding-top:165px;">
     <section-container>
       <div id="create-part-content" class="{theme.style.color.background} {theme.style.color.text}">
-        <create-name/>
+        <create-specification />
       </div>
     </section-container>
   </content-container>
   <script>
-    sudocms.addRouteDestination('createPart', 'name', function(formData) {
-      //console.log('create part name:', JSON.stringify(formData))
-      riot.mount('div#create-part-content', 'create-name')
+
+    this.on('before-mount', function() {
+      console.log("mount?");
+    });
+
+    // setup secondary nav
+    app.dispatch(app.$.secondaryNav, [{
+        label: 'specifications',
+        icon: undefined,
+        action: '/create/specs'
+    }, {
+        label: 'sequence',
+        icon: undefined,
+        action: '/create/sequence'
+    }, {
+        label: 'physical instance',
+        icon: undefined,
+        action: '/create/instances'
+    }])
+
+    // initialize breadcrumbs
+    app.dispatch(app.$.breadcrumbs, [{
+      'label': 'inventory',
+      'url': '/'
+      }, {
+      'label': 'create part',
+      'url': '#'
+    }]);
+
+    // configure app bar
+    app.dispatch(app.$.appBarConfig, {
+      enableTopNav: true,
+      enableBreadCrumbs: true,
+      enableSubbar: true
     })
-    sudocms.addRouteDestination('createPart', 'specifications', function(formData) {
-      //console.log('create part specifications:', JSON.stringify(formData))
-      riot.mount('div#create-part-content', 'create-specifications')
-    })
-    sudocms.addRouteDestination('createPart', 'sequence', function(formData) {
-      //console.log('create part sequence:', JSON.stringify(formData))
-      riot.mount('div#create-part-content', 'create-sequence')
-    })
-    sudocms.addRouteDestination('createPart', 'instance', function(formData) {
-      //console.log('create part instance:', JSON.stringify(formData))
-      riot.mount('div#create-part-content', 'create-instance')
-    })
+
 
   </script>
 </create-part>
 
-<create-name>
-  <div style="height:60px" />
-  <form class="col center">
-    <form-text-input-empty label="Part Name" name="partName" value={formData.name} />
-    <std-button action={createAction} label="create part" />
-  </form>
-  <script>
-    self.formData = sudocms.getModel('createPart')
-    self.createAction = function() {
-      const partData = JSON.parse(JSON.stringify(self.formData))
-      partData.name = self.partName.value
-      sudocms.route('partDataAccessor', 'storeClass', 'toSearchItem', partData)
-      sudocms.route('createPart', 'specifications', undefined, partData)
-    }
-
-  </script>
-</create-name>
-
-<create-specifications>
-  <form-container>
-    <form-text-input label="Part Name" name="partName" value={formData.name}/>
+<create-specification>
+  <form name="createPartForm" class="col s12" onsubmit={submitForm}>
+    <form-text-input label="Part Name" name="partName" value={formData.partName}/>
     <form-textarea-input label="Description" name="description" value={formData.description}/>
     <form-text-input label="Created by" name="creator" value={formData.creator}/>
     <form-text-input label="Created" name="created" value={formData.created}/>
@@ -56,40 +58,42 @@
     <form-switch label="Biohazardous?" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
     <form-image imagesrc={formData.avatar} label="Avatar" height="60px" />
     <form-text-input label="" name="avatar" value={formData.avatar}/>
-    <std-button action={submitForm} label="submit" />
-  </form-container>
+    <std-button label="submit" action={submitForm} />
+    <input type="submit" style="visibility:hidden" />
+  </form>
   <script>
-    self.formData = sudocms.getModel('createPart')
-    self.submitForm = function() {
-      const partData = JSON.parse(JSON.stringify(self.formData))
-      partData.name = self.partName.value
-      partData.description = self.description.value
-      partData.creator = self.creator.value
-      partData.temperature = self.temperature.value
-      partData.bsl = self.bsl.value
-      partData.biohazard = self.biohazard.value
-      partData.created = self.created.value
-      partData.avatar = self.avatar.value
-      sudocms.route('partDataAccessor', 'storeClass', 'toSearchItem', partData)
-      sudocms.route('createPart', 'sequence', undefined, partData)
+    self.formData = app.state.createPart
+    app.state.createPart = app.state.createPart || {}
+
+    $(this.createPartForm).change(function(e) {
+      $.extend(app.state.createPart, $.formToObject(self.createPartForm))
+    }.bind(this));
+
+    submitForm(e) {
+
+      app.remote.createMaterial(app.state.createPart, null, false, function(err, id) {
+        if(err) return app.ui.toast("Error: " + err) // TODO handle error
+        
+        app.ui.toast("Material created with ID: " + id)
+      });
+
     }
 
   </script>
-</create-specifications>
+</create-specification>
+
 
 <create-sequence>
-  <form-container>
+  <form-container action={submitForm}>
     <form-textarea-input label="DNA Sequence" name="sequence" value={formData.sequence}/>
-    <std-button action={submitForm} label="submit" />
+    <std-button action={parent.submitForm} label="submit" />
+    <input type="submit" style="visibility:hidden" />
   </form-container>
   <script>
-    self.formData = sudocms.getModel('createPart')
-    self.submitForm = function() {
-      const partData = JSON.parse(JSON.stringify(self.formData))
-      partData.sequence = self.sequence.value
-      console.log('create sequence:', JSON.stringify(partData))
-      sudocms.route('partDataAccessor', 'storeClass', 'toSearchItem', partData)
-      sudocms.route('createPart', 'instance', undefined, self.formData)
+    app.state.createPart = app.state.createPart || {}
+
+    submitForm(e) {
+      console.log("SUBMIT seq");
     }
 
   </script>
@@ -100,17 +104,13 @@
     <form-text-input label="Physical Location Code" name="location" value={formData.location}/>
     <form-text-input label="Datamatrix Code" name="datamatrix" value={formData.qrcode}/>
     <form-image imagesrc={formData.qrcode} label="Datamatrix code" height="140px" />
-    <std-button action={submitForm} label="submit" />
+    <std-button action={submitForm3} label="submit" />
   </form-container>
   <script>
-    self.formData = sudocms.getModel('createPart')
-    self.submitForm = function() {
-      const partData = JSON.parse(JSON.stringify(self.formData))
-      partData.location = self.location.value
-      partData.datamatrix = self.datamatrix.value
-      console.log('create instance:', JSON.stringify(partData))
-      sudocms.route('partDataAccessor', 'storeClass', 'toSearchItem', partData)
-    }
+
+//    this.submitForm = function() {
+
+//    }
 
   </script>
 </create-instance>

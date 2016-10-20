@@ -99,7 +99,7 @@ var bionetapi = {
             data: result._source.props
           }
           //console.log('part class:',JSON.stringify(result._source))
-          //sudocms.route('searchResult', 'packet', 'class', part)
+          //app.route('searchResult', 'packet', 'class', part)
         response.push(part)
       }
       cb(true, response, '')
@@ -186,7 +186,7 @@ var bionetapi = {
             locationid: result._source.locationid,
             distance: d
           }
-          //sudocms.route('searchResult', 'packet', 'instance', cassette)
+          //app.route('searchResult', 'packet', 'instance', cassette)
 
         //console.log(JSON.stringify(cassette, null, 2));
         response.push(cassette)

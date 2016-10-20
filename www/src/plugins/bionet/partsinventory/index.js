@@ -6,22 +6,22 @@ var partsInventory = {
   init: function () {
     require('./parts-inventory.tag.html')
 
-    sudocms.addStream('inventoryQuery')
-    const inventorySearchResult = sudocms.addStreamRouter('inventorySearchResult')
-    const inventory = sudocms.addStream('inventory').init(undefined)
-    const inventoryCache = sudocms.addStream('inventoryCache').init(undefined)
+    app.addStream('inventoryQuery')
+    const inventorySearchResult = app.addStreamRouter('inventorySearchResult')
+    const inventory = app.addStream('inventory').init(undefined)
+    const inventoryCache = app.addStream('inventoryCache').init(undefined)
 
-    sudocms.observe('inventoryQuery', (q) => {
+    app.observe('inventoryQuery', (q) => {
 
-      sudocms.getStream('searchCache').init(undefined)
+      app.getStream('searchCache').init(undefined)
       console.log('inventory query:', JSON.stringify(q))
         // initiate query
       bionetapi.partInstanceSearch(q, (result, data, msg) => {
         if (result) {
-          sudocms.route('inventorySearchResult', 'list', 'instance', data)
-          sudocms.dispatch('inventoryCache', inventorySearchResult.getModel())
+          app.route('inventorySearchResult', 'list', 'instance', data)
+          app.dispatch('inventoryCache', inventorySearchResult.getModel())
         } else {
-          sudocms.getThemeMethod().toast(msg)
+          app.getThemeMethod().toast(msg)
         }
       })
     })
@@ -55,7 +55,7 @@ var partsInventory = {
       }
     })
 
-    sudocms.addRouteDestination('inventorySearchResult', 'list', function (list2) {
+    app.addRouteDestination('inventorySearchResult', 'list', function (list2) {
 
       // sort inventory by location id
       // todo: return sorted result from elasticsearch
@@ -92,22 +92,22 @@ var partsInventory = {
       }
 
       console.log('inventory search result, list=%s', JSON.stringify(inventoryTree, null, 2))
-      sudocms.dispatch('inventory', inventoryTree)
-        //sudocms.dispatch('inventory', list)
+      app.dispatch('inventory', inventoryTree)
+        //app.dispatch('inventory', list)
     })
 
-    sudocms.addRoute('/inventory..', function () {
+    app.addRoute('/inventory..', function () {
       const q = riot.route.query()
       console.log('route: inventory')
-        //sudocms.dispatch('getPartsList', q)
-      sudocms.dispatch(sudocms.$.appBarConfig, {
+        //app.dispatch('getPartsList', q)
+      app.dispatch(app.$.appBarConfig, {
         enableTopNav: true,
         enableBreadCrumbs: true,
         enableSubbar: false
       })
 
       // todo: set inventory item
-      sudocms.dispatch(sudocms.$.breadcrumbs, [{
+      app.dispatch(app.$.breadcrumbs, [{
         'label': 'inventory',
         'url': '#!/'
       }, {
