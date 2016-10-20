@@ -19,7 +19,7 @@ $.xtend = require('xtend'); // extend that does not modify arguments
 
 var emailValidator = require('email-validator');
 var passwordValidator = require('./password_validator.js');
-var settings = require('./settings.js');
+//var settings = require('./settings.js');
 var LabelMaker = require('./labelmaker.js');
 var QrCode = require('qrcode-reader');
 var getUserMedia = require('getusermedia');
@@ -30,7 +30,7 @@ var $ = require('jquery');
 var websocket = require('websocket-stream');
 var rpc = require('rpc-multistream'); // RPC and multiple streams over one stream
 var auth = require('rpc-multiauth'); // authentication
-var through = require('through'); // stream helper
+var through = require('through2'); // stream helper
 
 //var labelMaker = new LabelMaker({symbolPath: settings.symbolPath});
 
