@@ -115,10 +115,13 @@ class App extends EventEmitter {
     const settings = this.getStream(this.$.settings)
     const thisModule = this
 
+    console.log("Got here 1");
     // retrieve user settings from local storage or set default
     this.getLocal(this.$.settings, function (err, value) {
+    console.log("Got here 2");
       var settingsObj = {}
       if (err) {
+        console.log("Got here 3");
         //console.log('error reading userSettings:', err)
         // todo: encrypt/decript password in local storage
         settingsObj = {
@@ -129,11 +132,14 @@ class App extends EventEmitter {
         }
         thisModule.putLocal(thisModule.$.settings, JSON.stringify(settingsObj))
       } else {
+        console.log("Got here 4");
         settingsObj = JSON.parse(value)
           //console.log('retrieved userSettings:', JSON.stringify(settingsObj))
       }
+      console.log("Got here 5");
       settings.init(settingsObj)
       thisModule.dispatch(thisModule.$.plugin, 'start')
+
       thisModule.startRouter()
     })
   }
