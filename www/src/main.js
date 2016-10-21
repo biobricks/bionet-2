@@ -1,3 +1,7 @@
+
+
+var $ = window.$
+
 import app from './app'
 
 window.app = app // our one global variable
@@ -11,13 +15,9 @@ require('./plugins/bionet-scanner')
 var ui = require('./ui')
 var routes = require('./routes.js');
 
-var $ = require('jquery');
-window.$ = $;
-window.jQuery = $;
-$.formToObject = require('form_to_object');
-$.xtend = require('xtend'); // extend that does not modify arguments
 
-require('materialize-css');
+window.$.formToObject = require('form_to_object');
+window.$.xtend = require('xtend'); // extend that does not modify arguments
 
 var emailValidator = require('email-validator');
 var passwordValidator = require('./password_validator.js');
@@ -29,7 +29,6 @@ var settings = {
 var LabelMaker = require('./labelmaker.js');
 var QrCode = require('qrcode-reader');
 var getUserMedia = require('getusermedia');
-var $ = require('jquery');
 
 // an auto-reconnecting stream over web http
 //var reconnect = require('reconnect-core')(require('shoe')); 

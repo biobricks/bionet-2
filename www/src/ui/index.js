@@ -2,6 +2,8 @@ import {
   toast
 } from './methods'
 
+//console.log("======= TWO", $().sideNav, $)
+
 const stdThemePlugin = app.addPlugin('stdTheme')
 stdThemePlugin.start = function () {
 

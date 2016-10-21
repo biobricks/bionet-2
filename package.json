@@ -27,9 +27,7 @@
       ]
     ]
   },
-  "browserify-shim": {
-    "materialize": "materialize"
-  },
+
   "dependencies": {
     "accountdown": "^4.1.0",
     "accountdown-basic": "^1.1.0",
