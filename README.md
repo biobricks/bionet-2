@@ -47,7 +47,7 @@ or you can find the latest version (on the NCBI ftp server)[ftp://ftp.ncbi.nlm.n
 cp settings.js.example settings.js 
 
 # TODO currently non-existant
-cp www/settings.js.example www/settings.js
+#cp www/settings.js.example www/settings.js
 ```
 
 Then edit each of the settings.js files to suit your needs.
@@ -57,6 +57,14 @@ Then edit each of the settings.js files to suit your needs.
 ```
 cd print_host_keys/
 ssh-keygen -t rsa -f myhostkey -N ""
+cd ../
+```
+
+and for the client:
+
+```
+cd print_client_keys/
+ssh-keygen -t rsa -f mykey -N ""
 cd ../
 ```
 
