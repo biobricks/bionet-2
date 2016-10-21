@@ -21,7 +21,7 @@ var emailValidator = require('email-validator');
 var passwordValidator = require('./password_validator.js');
 //var settings = require('./settings.js');
 var settings = {
-  
+  base_url: 'http://localhost:8000',
 };
 
 var LabelMaker = require('./labelmaker.js');
