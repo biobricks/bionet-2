@@ -17,3 +17,9 @@
   margin-right: auto;
   visibility: hidden;
 }
+
+.scan .keyboard-form {
+  display: block;
+  height: 0; 
+  overflow: hidden;
+}

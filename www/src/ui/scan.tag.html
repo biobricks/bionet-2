@@ -13,6 +13,10 @@
     <div id="debug"></div>
     <div class="canvas-layers"></div>
     <div class="canvas-box"></div>
+    <form class="keyboard-form" name="keyboardInputForm" onsubmit={keyboardScan}>
+      <input id="keyboardInput" type="text" name="code" autocomplete="off" />
+      <input type="submit" />
+    </form>
   </div>
   <script>
 
@@ -57,8 +61,8 @@
       $('#debug').html(str);
     }
 
-    function scanSuccess(id) {
-       modalCallback(null, id)
+    function scanSuccess(code) {
+       runCallback(null, code)
     }
 
     function scan(delay) {
@@ -96,10 +100,33 @@
       keepScanning = false;
     })
 
+    self.keyboardScan = function(e) {
+      e.preventDefault();
+      var code = self.keyboardInputForm.code.value
+      scanSuccess(code);
+    }.bind(this);
+
+    // prevent text input field from loosing focus
+    function initKeyboardCapture() {
+      console.log('llllllllll', $('#keyboardInput'))
+      setTimeout(function() {
+        $('#keyboardInput').focus()
+        $(self.keyboardInputForm.code).blur(function(e) {
+          $('#keyboardInput').focus()
+        });
+      }, 1)
+    }
+
+    function runCallback(err, code) {
+      if(modalCallback) return modalCallback(err, code);
+    }
+
     this.on('mount', function() {
-      modalCallback = this.opts.cb || function(){}
+      modalCallback = this.opts.cb
       self.qr = new QrCode();
       self.scanCtx = self.scanCanvas.getContext("2d");
+
+      initKeyboardCapture()
 
       getUserMedia({video: true, audio: false}, function(err, stream) {
         $('#cameraAccessMsg').css('display', 'none');

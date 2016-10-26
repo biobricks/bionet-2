@@ -3,7 +3,7 @@
   <div style="margin-top:100px">
     <form name="createPhysicalForm" class="col s12" onsubmit={submitForm}>
       <p>
-        Barcode: <a class="waves-effect waves-light btn" onclick={scanTube}>scan tube</a> or <a class="waves-effect waves-light btn" onclick={createLabel}>create label</a>
+        Barcode: <a class="waves-effect waves-light btn" onclick={scanItem}>scan</a> or <a class="waves-effect waves-light btn" onclick={createLabel}>create label</a>
       </p>
       <p>
          Location: <a class="waves-effect waves-light btn" onclick={scanContainer}>scan container</a>
@@ -18,24 +18,40 @@
     </div>
   </div>
   <script>
-    this.scanTube = function() {
-      
+    /*
+       * add keyboard capture scanning to scan modal
+       * add print modal and make it actually print
+       * link create-physical from create-form
+       * link create (virtual) from create-form
+       * make create-physical actually save to db
+       * make create-physical capable of editing
+       * add Tim's physicals list to materials
 
-    }
+       * get normal search working
+       * get inventory search working
 
-    this.scanTube = function() {
+
+       * ensure date/time and author are always saved
+       * ensure access control works
+    */
+
+
+    this.scanItem = function() {
       var opts = {
-        title: "Scan tube",
-        subtitle: "Scan the bottom of the CryoTube",
+        title: "Scan",
+        subtitle: "Scan the item's barcode",
         subTag: "scan",
         cb: function(err, id) {
-          console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+          console.log("CODE CALLBACK", err, id);
+          $(self.scanModal).closeModal();
+          tags[0].unmount(true)
         }
       }
       var tags = riot.mount('#scanModal', 'modal-content', opts)
+
       $(self.scanModal).openModal({
         complete: function() { 
-          tags[0].unmount()
+          tags[0].unmount(true)
         }
       })
     }
@@ -46,13 +62,16 @@
         subtitle: "Scan the barcode of e.g. the box or freezer where you put this item",
         subTag: "scan",
         cb: function(err, id) {
-           console.log('WOOP WOOP')
+          console.log("CODE CALLBACK", err, id);
+          $(self.scanModal).closeModal();
+          tags[0].unmount(true)
         }
       }
       var tags = riot.mount('#scanModal', 'modal-content', opts)
+
       $(self.scanModal).openModal({
         complete: function() { 
-          tags[0].unmount()
+          tags[0].unmount(true)
         }
       })
     }
