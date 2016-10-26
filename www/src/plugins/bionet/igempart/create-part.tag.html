@@ -8,10 +8,6 @@
   </content-container>
   <script>
 
-    this.on('before-mount', function() {
-      console.log("mount?");
-    });
-
     // setup secondary nav
     app.dispatch(app.$.secondaryNav, [{
         label: 'specifications',
@@ -65,16 +61,20 @@
     self.formData = app.state.createPart
     app.state.createPart = app.state.createPart || {}
 
+    // TODO JUUl this doesn't work if using $(self.createPartForm)
+    // probably because it needs to be run from within on('mount')
     $(this.createPartForm).change(function(e) {
       $.extend(app.state.createPart, $.formToObject(self.createPartForm))
     }.bind(this));
 
     submitForm(e) {
 
-      app.remote.createMaterial(app.state.createPart, null, false, function(err, id) {
+      app.remote.saveMaterial(app.state.createPart, null, false, function(err, id) {
         if(err) return app.ui.toast("Error: " + err) // TODO handle error
         
         app.ui.toast("Material created with ID: " + id)
+
+        riot.route('/edit/' + id);
       });
 
     }

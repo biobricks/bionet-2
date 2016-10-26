@@ -8,13 +8,44 @@
   </content-container>
   <script>
 
+    // setup secondary nav
+    app.dispatch(app.$.secondaryNav, [{
+        label: 'specifications',
+        icon: undefined,
+        action: '/edit/'+opts.partID+'/specs'
+    }, {
+        label: 'sequence',
+        icon: undefined,
+        action: '/edit/'+opts.partID+'/sequence'
+    }, {
+        label: 'physical instance',
+        icon: undefined,
+        action: '/edit/'+opts.partID+'/instances'
+    }])
+
+    // initialize breadcrumbs
+    app.dispatch(app.$.breadcrumbs, [{
+      'label': 'inventory',
+      'url': '/'
+      }, {
+    'label': 'edit part',
+      'url': '#'
+    }]);
+
+    // configure app bar
+    app.dispatch(app.$.appBarConfig, {
+      enableTopNav: true,
+      enableBreadCrumbs: true,
+      enableSubbar: true
+    })
+
 
   </script>
 </part-form>
 
 <part-specification>
-  <form-container>
-    <form-text-input label="Part Name" name="partName" value={formData.name}/>
+  <form name="editPartForm" class="col s12" onsubmit={submitForm}>
+    <form-text-input label="Part Name" name="partName" value={formData.partName}/>
     <form-textarea-input label="Description" name="description" value={formData.description}/>
     <form-text-input label="Created by" name="creator" value={formData.creator}/>
     <form-text-input label="Created" name="created" value={formData.created}/>
@@ -26,13 +57,27 @@
     <form-text-input label="" name="avatar" value={formData.avatar}/>
     <form-image imagesrc={formData.qrcode} label="Datamatrix code" height="140px" />
     <std-button action={submitForm} label="submit" />
-  </form-container>
+    <input type="submit" style="visibility:hidden" />
+  </form>
   <script>
-    app.this.formData = state.editPart
+    self.formData = app.state.editPart
 
+    $(this.editPartForm).change(function(e) {
+      $.extend(app.state.editPart, $.formToObject(self.editPartForm))
+    }.bind(this));
 
     this.submitForm = function(e) {
+      if(!app.state.editPart.id) {
+        app.ui.toast("Error: Missing part ID") // TODO better error handling
+        return;
+      }
 
+      app.remote.saveMaterial(app.state.editPart, null, false, function(err, id) {
+        if(err) return app.ui.toast("Error: " + err) // TODO handle error
+        
+        app.ui.toast("Material saved with ID: " + id)
+        riot.route('/edit/' + id);
+      });
     }
 
   </script>
@@ -48,6 +93,7 @@
 <part-sequence>
   <form-container>
     <div style="height:500px">
+<!--
       <object width="100%" height="100%" type="application/x-shockwave-flash" data="static/assets/bioux/plasmid_viewer.swf" id="plasmid_viewer" style="visibility: inherit; border:0px;">
         <param name='allowfullscreen' value='true' />
         <param name='allowscriptaccess' value='always' />
@@ -60,6 +106,7 @@
     </div>
     <form-textarea-input label="Sequence" name="sequence" value={formData.sequence}/>
     <std-button action={submitForm} label="submit" />
+-->
   </form-container>
   <script>
 /*

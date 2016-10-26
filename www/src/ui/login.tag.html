@@ -2,7 +2,7 @@
   <div id="login-slideout2" class="side-nav" style="width:300px;z-index:9999">
     <close-button action={closeLogin} color='white' />
     <img src="static/images/bionet_login.png" width="300px" />
-    <form class="col" style="margin-top:30px;margin-left:15%">
+    <form class="col" style="margin-top:30px;margin-left:15%" onsubmit={submitLogin}>
       <div class="row">
         <div class="input-field" style="width:85%">
           <input id="username" type="text" value="" />
@@ -16,6 +16,7 @@
         </div>
       </div>
       <std-button action={submitLogin} label="login" class="center" style="width:85%;margin:0" />
+      <input type="submit" style="display:none" />
       <a onclick={forgotPassword} class="blue-text darken-3" style="padding:0;margin-top:30px;height:14px;line-height:14px;cursor:pointer">forgot password?</a>
     </form>
   </div>
@@ -31,6 +32,9 @@
           app.dispatch(app.$.loginState, false)
           return;
         }
+        self.username.value = ''
+        self.loginpassword.value = ''
+        self.closeLogin()
         app.dispatch(app.$.loginState, true)
       });
     }
@@ -44,8 +48,10 @@
 </login>
 
 <login-button>
-  <li if={!loggedIn}><a id="login-slideout" data-activates="login-slideout2" class="right {theme.style.color.navButton}" style="margin:0">login</a></li>
-  <li if={loggedIn}><a href="/logout" id="login-slideout" class="right {theme.style.color.navButton}">logout</a></li>
+  <li>
+    <a id="login-slideout" data-activates="login-slideout2" class="right {theme.style.color.navButton}" style="margin:0;display:{loggedIn ? 'none' : 'inline'}">login</a>
+    <a if={loggedIn} href="/logout" class="right {theme.style.color.navButton}">logout</a>
+  </li>
   <script>
     const tag = this;
     self.loggedIn = app.getLoginState()
@@ -53,11 +59,17 @@
     this.on('before-mount', function() {
       //console.log('login-button mount')
       observer = app.addObserver(app.$.loginState, function(loggedIn) {
+       console.log("!!!!! loginstate change");
         //console.log('loginState, login.js')
         self.loggedIn = loggedIn
         tag.update()
       })
     })
+
+    this.on('mount', function() {
+
+    });
+
     this.on('unmount', function() {
       app.removeObserver(app.$.loginState, observer)
     })

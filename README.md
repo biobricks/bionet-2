@@ -5,7 +5,7 @@ This is a work in progress. Don't expect anything to work.
 
 ```
 sudo aptitude install git # if you don't already have git installed
-git clone https://github.com/biobricks/bionet
+git clone git@gitlab.com:biobricks/bionet.git
 ```
 
 # Installing pre-requisites

@@ -1,0 +1,94 @@
+<scan>
+
+  <div class="scan">
+    Scanning QR and DataMatrix codes
+    <canvas id="scanCanvas" class="scanCanvas" width="560" height="560"></canvas>
+    <video id="scanVideo" class="scanVideo" width="560" height="560"></video>    
+    <div id="debug"></div>
+    <div class="canvas-layers"></div>
+    <div class="canvas-box"></div>
+  </div>
+  <script>
+    var QrCode = require('qrcode-reader');
+    var getUserMedia = require('getusermedia');
+    var path = require('path');
+    var settings = require('../settings.js')
+
+    var dmdecode = require("datamatrix-decode");
+    var datamatrix = require('../../../../biomatrix-scratch');
+
+    function getIDFromURL(url) {
+      var m = url.match(new RegExp('^'+settings.base_url+'/p/(\\d+)'));
+      if(!m || (m.length < 2)) return null;
+      return parseInt(m[1]);
+    }
+
+    function decodeQrCode(cb) {
+      var data = self.scanCtx.getImageData(0, 0, self.scanCanvas.width, self.scanCanvas.height);
+      self.qr.callback = cb;
+      self.qr.decode(data);
+    }
+
+    function decodeDMCode(cb) {
+      datamatrix(null, self.scanCanvas, {
+        debug: true
+      }, function(err, data) {
+        if(err) return cb(null)
+        cb(data);
+      });
+    }
+
+    function debug(str) {
+      str = $('#debug').html() + "<br/>\n" + str;
+      $('#debug').html(str);
+    }
+
+    function scan(delay) {
+      delay = delay || 500; // delay between frames in ms
+
+      self.scanCtx.drawImage(self.scanVideo, 0, 0);
+      console.log("scanning...")
+      decodeDMCode(function(data) {
+        if(!data) return setTimeout(scan, delay);
+//        $('.canvas-layers').html(' ')
+//        $('.canvas-box').html(' ')
+        console.log("GOT CODE");
+      });
+
+/*
+      decodeQrCode(function(data) {
+        if(!data) return setTimeout(scan, delay);
+        var id = getIDFromURL(data);
+        if(id) { // TODO error handling
+          $(self.scanVideo).css('background-color', 'green');
+          setTimeout(function() {
+            console.log("SCANNED", id);
+  //        page('/edit/'+id);
+          }, 250);
+        } else {
+          setTimeout(scan, delay);
+        }
+      });
+*/
+    }
+
+
+    this.on('mount', function() {
+      self.qr = new QrCode();
+      self.scanCtx = self.scanCanvas.getContext("2d");
+
+      getUserMedia({video: true, audio: false}, function(err, stream) {
+        if(err) {
+          app.ui.toast("Error: Unable to get camera device: " + err); // TODO handle error better
+          return;
+        }
+            
+        self.scanVideo.src = window.URL.createObjectURL(stream);
+        self.scanVideo.play();
+            
+        setTimeout(scan, 500);                
+      });
+    });
+
+  </script>
+</scan>

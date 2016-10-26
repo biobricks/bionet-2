@@ -254,7 +254,7 @@ websocket.createServer({server: server}, function(stream) {
                 bioDB.del(id, cb);
             },
 
-            createMaterial: function(m, imageData, doPrint, cb) {
+            saveMaterial: function(m, imageData, doPrint, cb) {
                 if(!m.id) m.id = uuid();
 
                 var mtch;
@@ -294,6 +294,7 @@ websocket.createServer({server: server}, function(stream) {
             getMaterial: function(id, cb) {
                 console.log("getting:", id);
                 bioDB.get(id, {valueEncoding: 'json'}, function(err, p) {
+                  console.log("!! GOT:", p);
                     if(err) return console.log(err);
                     cb(null, p);
                 });

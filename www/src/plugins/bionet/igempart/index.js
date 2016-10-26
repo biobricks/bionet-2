@@ -15,8 +15,6 @@ var igempart = {
     app.addStream('getPartsList')
     app.addStream('partsList')
 
-
-    console.log("=== create init");
     
     riot.route('/create', function() {
       app.state.createPart = {}
@@ -35,31 +33,48 @@ var igempart = {
       }
     })
 
-    riot.route('/edit/*', function(partID) {
-      console.log("getting part:", partID)
-      app.remote.getMaterial(partID, function(err, data) {
-        console.log("=====", err, data)
-        if(err) {
-          riot.mount('div#content', 'err404', {msg: err})
-          return
-        }
-        app.state.editPart = data
+    function getMaterial(id, cb) {
+      if(!id) return riot.mount('div#content', 'err404', {msg: "Missing ID field in URL"})
 
-        riot.mount('div#content', 'part-form')
+      if(app.state.editPart && app.state.editPart.id && app.state.editPart.id === id) {
+        process.nextTick(function() {
+          cb(app.state.editPart)
+        });
+      } else {
+        app.remote.getMaterial(id, function(err, data) {
+          if(err) {
+            riot.mount('div#content', 'err404', {msg: err})
+            return
+          }
+          cb(data);
+        })
+      }
+    }
+    riot.route('/edit/*', function(partID) {
+
+      getMaterial(partID, function(data) {
+        app.state.editPart = data
+        riot.mount('div#content', 'part-form', {partID})
       })
+
     })
 
     riot.route('/edit/*/*', function(partID, section) {
-      riot.mount('div#content', 'part-form')
-      if(section == 'sequence') {
-        riot.mount('div#create-part-content', 'part-sequence')
-      } else if(section == 'instances') {
-        riot.mount('div#create-part-content', 'part-notes')
-      } else {
-        riot.mount('div#create-part-content', 'part-specification')
-      }
-    })
 
+      getMaterial(partID, function(data) {
+        app.state.editPart = data
+        var opts = {partID}
+
+        riot.mount('div#content', 'part-form', opts)
+        if(section == 'sequence') {
+          riot.mount('div#edit-part-content', 'part-sequence', opts)
+        } else if(section == 'instances') {
+          riot.mount('div#edit-part-content', 'part-notes', opts)
+        } else {
+          riot.mount('div#edit-part-content', 'part-specification', opts)
+        }
+      });
+    })
 
     require('./create-part.tag.html')
     require('./part-form.tag.html')

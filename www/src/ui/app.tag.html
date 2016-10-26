@@ -10,6 +10,7 @@
     $('body').addClass(self.theme.style.color.background);
 
     app.observe(app.$.theme, function(theme) {
+    // TODO theming should be done by loading and unloading css files (or sets of styles)
       $('body').removeClass(self.theme.style.color.background)
       $('body').addClass(theme.style.color.background)
       self.theme = theme

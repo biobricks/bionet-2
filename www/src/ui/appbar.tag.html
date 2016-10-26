@@ -124,11 +124,13 @@
     
     // attach materialize actions to tags after completion of mounting tags
     this.on('mount', function() {
+
       $('#login-slideout').sideNav({
         closeOnClick: true,
         edge: 'right'
       });
       $('#login-slideout').collapsible();
+
       $("#settings-slideout").sideNav({
           closeOnClick: false,
           edge: 'right'

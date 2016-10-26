@@ -126,6 +126,9 @@ stdThemePlugin.start = function () {
   require('./err404.tag.html')
   require('./welcome.tag.html')
 
+  require('./create-form.tag.html')
+  require('./scan.tag.html')
+
   /*
   todo: add standard components for:
   card
