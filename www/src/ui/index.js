@@ -127,6 +127,7 @@ stdThemePlugin.start = function () {
   require('./welcome.tag.html')
 
   require('./create-form.tag.html')
+  require('./create-physical.tag.html')
   require('./scan.tag.html')
 
   /*

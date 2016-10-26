@@ -1,14 +1,26 @@
 <scan>
 
   <div class="scan">
-    Scanning QR and DataMatrix codes
+    <div class="error"></div>
+
+    <div id="cameraAccessMsg">
+      <h5 style="color:green">Waiting for browser camera access</h5>
+      <p>Without camera access you will only be able to scan using an attached USB barcode scanner</p>
+    </div>        
+
     <canvas id="scanCanvas" class="scanCanvas" width="560" height="560"></canvas>
-    <video id="scanVideo" class="scanVideo" width="560" height="560"></video>    
+    <video id="scanVideo" class="scanVideo" width="440" height="330"></video>
     <div id="debug"></div>
     <div class="canvas-layers"></div>
     <div class="canvas-box"></div>
   </div>
   <script>
+
+    var modalCallback;
+
+    var keepScanning = true;
+    var enableDM = false;
+
     var QrCode = require('qrcode-reader');
     var getUserMedia = require('getusermedia');
     var path = require('path');
@@ -33,6 +45,8 @@
       datamatrix(null, self.scanCanvas, {
         debug: true
       }, function(err, data) {
+        $('.canvas-layers').html(' '); // TODO tmp debug removal
+        $('.canvas-box').html(' '); // TODO tmp debug removal
         if(err) return cb(null)
         cb(data);
       });
@@ -43,46 +57,64 @@
       $('#debug').html(str);
     }
 
+    function scanSuccess(id) {
+       modalCallback(null, id)
+    }
+
     function scan(delay) {
+      if(!keepScanning) return;
       delay = delay || 500; // delay between frames in ms
 
       self.scanCtx.drawImage(self.scanVideo, 0, 0);
       console.log("scanning...")
-      decodeDMCode(function(data) {
-        if(!data) return setTimeout(scan, delay);
-//        $('.canvas-layers').html(' ')
-//        $('.canvas-box').html(' ')
-        console.log("GOT CODE");
-      });
-
-/*
       decodeQrCode(function(data) {
-        if(!data) return setTimeout(scan, delay);
-        var id = getIDFromURL(data);
-        if(id) { // TODO error handling
-          $(self.scanVideo).css('background-color', 'green');
-          setTimeout(function() {
-            console.log("SCANNED", id);
-  //        page('/edit/'+id);
-          }, 250);
-        } else {
-          setTimeout(scan, delay);
+        if(!data) {
+          if(!enableDM) {
+            setTimeout(scan, delay);
+          } else {
+            decodeDMCode(function(data) {
+              if(!data) return setTimeout(scan, delay);
+              console.log("GOT CODE");
+              // TODO decode then call scanSuccess
+            });
+          }
+          return
         }
+        var id = getIDFromURL(data);
+        if(!id) return setTimeout(scan, delay);
+        // TODO visual indication of scan success
+        scanSuccess(id);
       });
-*/
     }
 
+    function scanError(str) { 
+      $('.scan .error').html(str);
+      $('#scanVideo').css('display', 'none');
+    }
+
+    this.on('unmount', function() {
+      keepScanning = false;
+    })
 
     this.on('mount', function() {
+      modalCallback = this.opts.cb || function(){}
       self.qr = new QrCode();
       self.scanCtx = self.scanCanvas.getContext("2d");
 
       getUserMedia({video: true, audio: false}, function(err, stream) {
+        $('#cameraAccessMsg').css('display', 'none');
         if(err) {
-          app.ui.toast("Error: Unable to get camera device: " + err); // TODO handle error better
+          if(err.name === 'DevicesNotFoundError') {
+            scanError("Hmm, looks like your device doesn't have a camera.");
+          } else if(err.name === 'InternalError') {
+            scanError("Could not access your camera. Is another application using it?");
+          } else {
+            scanError("Unknown error: " + err.msg)
+          }
           return;
         }
-            
+
+        $(self.scanVideo).css('visibility', 'visible');
         self.scanVideo.src = window.URL.createObjectURL(stream);
         self.scanVideo.play();
             

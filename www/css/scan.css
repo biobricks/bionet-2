@@ -1,6 +1,10 @@
 
 .scan {
-  margin-top: 80px;
+
+}
+
+.scan .error {
+  color: red;
 }
 
 .scan .scanCanvas {
@@ -8,8 +12,8 @@
 }
 
 .scan .scanVideo {
-  border: 1px solid #AAA;    
   margin-top: 20px;
-  padding-left: 10px;
-  padding-right: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  visibility: hidden;
 }

@@ -1,0 +1,92 @@
+<create-physical>
+
+  <div style="margin-top:100px">
+    <form name="createPhysicalForm" class="col s12" onsubmit={submitForm}>
+      <p>
+        Barcode: <a class="waves-effect waves-light btn" onclick={scanTube}>scan tube</a> or <a class="waves-effect waves-light btn" onclick={createLabel}>create label</a>
+      </p>
+      <p>
+         Location: <a class="waves-effect waves-light btn" onclick={scanContainer}>scan container</a>
+      </p>
+      <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
+      <std-button label="submit" action={submitForm} />
+      <input type="submit" style="visibility:hidden" />
+    </form>
+
+    <div id="scanModal" class="scanModal modal">
+
+    </div>
+  </div>
+  <script>
+    this.scanTube = function() {
+      
+
+    }
+
+    this.scanTube = function() {
+      var opts = {
+        title: "Scan tube",
+        subtitle: "Scan the bottom of the CryoTube",
+        subTag: "scan",
+        cb: function(err, id) {
+          console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        }
+      }
+      var tags = riot.mount('#scanModal', 'modal-content', opts)
+      $(self.scanModal).openModal({
+        complete: function() { 
+          tags[0].unmount()
+        }
+      })
+    }
+
+    this.scanContainer = function() {
+      var opts = {
+        title: "Scan location",
+        subtitle: "Scan the barcode of e.g. the box or freezer where you put this item",
+        subTag: "scan",
+        cb: function(err, id) {
+           console.log('WOOP WOOP')
+        }
+      }
+      var tags = riot.mount('#scanModal', 'modal-content', opts)
+      $(self.scanModal).openModal({
+        complete: function() { 
+          tags[0].unmount()
+        }
+      })
+    }
+
+
+  </script>
+</create-physical>
+
+
+<modal-content>
+  <div>
+    <div class="modal-content">
+      <h4>{opts.title}</h4>
+      <p>{opts.subtitle}</p>
+      <div id="modalContents"></div>
+    </div>
+<!--
+    <div class="modal-footer">
+      <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+    </div>
+-->
+  </div>
+
+  <script>
+
+    var tags;
+
+    this.on('mount', function() {
+      tags = riot.mount('#modalContents', this.opts.subTag, this.opts);
+    })
+
+    this.on('before-unmount', function() {
+      tags[0].unmount()
+    })
+
+  </script>
+</modal-content>

@@ -40,3 +40,14 @@ riot.route('/scan', function () {
   })
   riot.mount('div#content', 'scan')
 })
+
+
+
+riot.route('/create-physical', function () {
+  app.dispatch(app.$.appBarConfig, {
+    enableTopNav: true,
+    enableBreadCrumbs: false,
+    enableSubbar: false
+  })
+  riot.mount('div#content', 'create-physical')
+})
