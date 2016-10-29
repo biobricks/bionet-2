@@ -20,7 +20,7 @@ var bionetapi = {
   },
   shutdown: function () {},
   checkMasterPassword: function (password, cb) {
-    const result = password === 'code'
+    const result = password === 'bionet'
     const err = (result) ? '' : 'Invalid code.'
     cb(result, err)
   },

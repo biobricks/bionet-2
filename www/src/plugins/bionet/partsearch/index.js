@@ -14,12 +14,13 @@ var partsearch = {
     const searchCache = app.addStream('searchCache').init(undefined)
     const bioClassCache = app.addStream('bioClassCache').init(undefined)
     const bioInstanceCache = app.addStream('bioInstanceCache').init(undefined)
+//           secondary_url: '#!/q?partid=' + x.id,
 
     searchResult.reduceRoute('class', (m, streamItem) => {
       const mapItem = function (x) {
         return {
-          url: '#!/item?id=' + x.id,
-          secondary_url: '#!/q?partid=' + x.id,
+          url: '/edit/' + x.id,
+          secondary_url: '/q?partid=' + x.id,
           secondary_url_label: 'view availabilty',
           righticon: 'star',
           primary_text: x.id,
@@ -47,8 +48,9 @@ var partsearch = {
       const mapItem = function (x) {
         var distance = (x.distance !== undefined) ? ' ' + Math.round(x.distance) + 'km' : ''
         if (distance === ' 0km') distance = ' ***available in lab'
+          //url: '#!/scan?id=' + x.id,
         return {
-          url: '#!/scan?id=' + x.id,
+          url: '/scan?id=' + x.id,
           righticon: 'star',
           primary_text: x.locationid,
           secondary_text: x.id + distance,

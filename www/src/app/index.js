@@ -164,7 +164,7 @@ class App extends EventEmitter {
   }
 
   route(router, address, mapper, message) {
-    //console.log('routing %s to %s with mapper %s', address, router, mapper)
+    console.log('app.js routing %s to %s with mapper %s', address, router, mapper)
     this.stream[router].route(address, mapper, message)
   }
 

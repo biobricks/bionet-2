@@ -3,8 +3,10 @@
   "version": "0.0.1",
   "scripts": {
     "postinstall": "cp node_modules/materialize-css/js/date_picker/picker.js node_modules/materialize-css/bin/",
-    "watchify": "watchify -v -e www/src/main.js -o www/js/bionet.js",
-    "build": "cross-env NODE_ENV=production browserify -e src/main.js -m -o web/js/bionet.js",
+     "watchify": "watchify -vd -p browserify-hmr -e www/src/main.js -o www/js/bionet.js",
+    "serve": "http-server ./www -c 1 -a localhost",
+    "dev": "npm-run-all --parallel watchify",
+    "build": "cross-env NODE_ENV=production browserify -e www/src/main.js -m -o www/js/bionet.js",
     "lint": "eslint --ext .js www/src test/unit",
     "test": "karma start karma.conf.js",
     "start": "./bin/cmd.js"

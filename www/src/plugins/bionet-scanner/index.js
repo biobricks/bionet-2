@@ -63,6 +63,7 @@ bionetScanPlugin.runScanner = function () {
   const thisModule = this
   const q = riot.route.query()
   const config = {}
+
   if (q.id !== undefined) {
     config.q = app.getModel('bioInstanceQuery')
     config.cassette = undefined

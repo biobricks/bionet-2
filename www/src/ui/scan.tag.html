@@ -6,7 +6,7 @@
     <div id="cameraAccessMsg">
       <h5 style="color:green">Waiting for browser camera access</h5>
       <p>Without camera access you will only be able to scan using an attached USB barcode scanner</p>
-    </div>        
+    </div>
 
     <canvas id="scanCanvas" class="scanCanvas" width="560" height="560"></canvas>
     <video id="scanVideo" class="scanVideo" width="440" height="330"></video>
@@ -28,7 +28,7 @@
     var QrCode = require('qrcode-reader');
     var getUserMedia = require('getusermedia');
     var path = require('path');
-    var settings = require('../settings.js')
+    var settings = require('../../../settings.js')
 
     var dmdecode = require("datamatrix-decode");
     var datamatrix = require('../../../../biomatrix-scratch');
@@ -91,7 +91,7 @@
       });
     }
 
-    function scanError(str) { 
+    function scanError(str) {
       $('.scan .error').html(str);
       $('#scanVideo').css('display', 'none');
     }
@@ -144,8 +144,8 @@
         $(self.scanVideo).css('visibility', 'visible');
         self.scanVideo.src = window.URL.createObjectURL(stream);
         self.scanVideo.play();
-            
-        setTimeout(scan, 500);                
+
+        setTimeout(scan, 500);
       });
     });
 

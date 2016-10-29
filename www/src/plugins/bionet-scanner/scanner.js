@@ -30,7 +30,7 @@ const scanner = {
   init: function (streams, stage) {
     this.streams = streams;
     this.stage = stage
-    this.assets = './assets/scanner-widget/';
+    this.assets = '/static/assets/scanner-widget/';
     const s = this.streams;
 
     // scan indicator stream
@@ -91,7 +91,7 @@ const scanner = {
     const bg = new PIXI.extras.TilingSprite(resources.background.texture, 1600, 1120);
     bg.x = 0;
     bg.y = 0;
-    this.stage.addChild(bg);
+   this.stage.addChild(bg);
 
     // arrow buttons
     const arrowDown = new PIXI.Sprite.fromImage(this.assets + 'arrowDown.svg');
@@ -154,7 +154,7 @@ const scanner = {
       fill: '#00a5dc',
       backgroundColor: '#00000000'
     };
-    var cassetteTxtStr = (this.configuration.cassette!==undefined) ? this.configuration.cassette.locationid + trayFormatStr : trayFormatStr;
+    var cassetteTxtStr = (this.configuration.cassette !== undefined) ? this.configuration.cassette.locationid + trayFormatStr : trayFormatStr;
     const cassetteText = new PIXI.Text(cassetteTxtStr, cassetteTextProps);
     cassetteText.position.x = 418;
     cassetteText.position.y = 115;
@@ -170,7 +170,7 @@ const scanner = {
     } else {
       scanImage.x = 450 + gridAdjustment.x
     }
-    scanImage.y = 212 + +gridAdjustment.y
+    scanImage.y = 212 + gridAdjustment.y
     scanImage.width = SCAN_GRID_PIXELS_X
     scanImage.height = SCAN_GRID_PIXELS_Y
     scanImage.visible = true
@@ -307,7 +307,7 @@ const scanner = {
         scanSprite.visible = true
         scanSprite.alpha = 0.75
       } else {
-        cassetteText.text = thisModule.configuration.cassette.locationid + trayFormatStr + ' '+scanGrid.getCellCoordinates(highlight[0])
+        cassetteText.text = thisModule.configuration.cassette.locationid + trayFormatStr + ' ' + scanGrid.getCellCoordinates(highlight[0])
       }
 
     }
