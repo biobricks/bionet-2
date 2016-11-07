@@ -51,7 +51,9 @@ settings.staticPath = path.join(__dirname, '..', settings.staticPath);
 var ecstatic = require('ecstatic')({
     root: settings.staticPath,
     baseDir: 'static',
-    gzip: true
+    gzip: true,
+    cache: 1,
+    mimeTypes: {'mime-type':['image/svg+xml','jpg', 'png']}
 });
 
 settings.userFilePath = path.join(__dirname, '..', settings.userFilePath);
@@ -203,6 +205,7 @@ websocket.createServer({server: server}, function(stream) {
         },
 
         checkMasterPassword: function(password, cb) {
+        console.log('checkMasterPassword:%s:',settings.userSignupPassword);
             if(password != settings.userSignupPassword) {
                 return cb("Invalid master password");
             }

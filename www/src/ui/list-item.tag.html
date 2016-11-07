@@ -23,12 +23,14 @@
       }
 
       app.route('partDataAccessor','cache','fromSearchItem',itemData)
-      window.location = opts.item.url
+      riot.route(opts.item.url,opts.item.url,true)
+      //window.location = opts.item.url
     }
 
     self.clickavailability = function(e) {
       e.stopPropagation()
-      window.location = opts.item.secondary_url
+      riot.route(opts.item.secondary_url,opts.item.secondary_url,true)
+      //window.location = opts.item.secondary_url
     }
 
   </script>

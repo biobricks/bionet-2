@@ -27,10 +27,10 @@
 
     <search-input label="search biomaterials" name="searchbio" value={searchbioInit}/>
   </form>
-  <form if={!app.user} onsubmit={signupAction}>
+  <form if={!app.user} onsubmit={signupAction} class="col center">
       <div class="center">OR</div>
-      <form-text-input-empty label="enter invitation code, hint:'code'" name="mpassword" value={mpasswordInit}/>
-      <std-button label="sign up" />
+      <form-text-input-empty label="enter invitation code, hint:bionet" name="mpassword" value={mpasswordInit}/>
+      <std-button label="sign up" action={signupAction}/>
   </form>
 
 
@@ -96,10 +96,11 @@
       app.removeObserver(app.$.loginState, observer)
     })
 
-    // TODO on app.user change we need to update 
+    // TODO on app.user change we need to update
 
-    signupAction(e) {
+    self.signupAction = function(e) {
       var masterPassword = self.mpassword.value
+      console.log('signupAction: master password=%s',self.mpassword.value)
       app.remote.checkMasterPassword(masterPassword, function(err) {
         if(err) {
           app.emit('signupError', err);
@@ -124,13 +125,13 @@
     <div style="height:40px" />
     <form-text-input-empty label="enter email" name="enteremail" value={enteremailInit}/>
     <input type="submit" style="visibility:hidden" />
-    <std-button label="join" />
+    <std-button label="join" action={submitForm}/>
   </form>
 
   <script>
     this.enteremailInit = ''
 
-    this.submitForm = function(e) {
+    self.submitForm = function(e) {
       app.state.signup.email = self.enteremail.value
       riot.mount('div#home-page-content', 'password-form')
     }
@@ -145,11 +146,11 @@
     <password-text-input-empty label="enter a password" name="enterpassword1" />
     <password-text-input-empty label="enter password again" name="enterpassword2" />
     <input type="submit" style="visibility:hidden" />
-    <std-button label="join" />
+    <std-button label="join" action={submitForm} />
   </form>
 
   <script>
-    submitForm(e) {
+    self.submitForm = function(e) {
 
       if(self.enterpassword1.value !== self.enterpassword2.value) {
         app.emit('signupError', 'Passwords do not match.')
@@ -164,7 +165,7 @@
           app.emit('signupError', err)
           return
         }
-        
+
         app.ui.toast("Signup successful!")
 
         app.login(app.state.signup.email, this.enterpassword1.value, function(err, user) {
@@ -178,7 +179,7 @@
 
           riot.route('inventory') // TODO probably not where we want to end up
          })
-      })    
+      })
     }
 
   </script>
