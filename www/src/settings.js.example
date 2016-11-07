@@ -1,0 +1,19 @@
+
+
+module.exports = {
+    // The URL where this app is accessed.
+    // Used for generating absolute links and redirects
+    base_url: 'http://localhost:8000',
+
+    // the relative URL at which symbol files 
+    // for the label generator are available
+    symbolPath: '/static/symbols',
+
+    // If false, anyone can create users
+    // if true, only admins can create users (ToDo not implemented yet)
+    // !!!IMPORTANT!!! 
+    // IF true userSignupPassword must also be set in ../settings.js
+    // or it will still be possible for anyone to create users
+    // the setting in this file only affects the UI and provides no security
+    restrictUserSignup: true
+};
