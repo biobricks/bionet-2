@@ -7,6 +7,8 @@ import appMain from './appmain'
 import igemPart from './igempart'
 import partSearch from './partsearch'
 import partsInventory from './partsinventory'
+import errorPage from './error_page'
+import passwordReset from './password_reset'
 
 const bionetPlugin = app.addPlugin('bionet')
 
@@ -31,6 +33,14 @@ bionetPlugin.start = function () {
   //-------------------------------------------------------------------------
   // initialize parts inventory module
   partsInventory.init()
+  
+  //-------------------------------------------------------------------------
+  // initialize password reset
+  passwordReset.init();
+
+  //-------------------------------------------------------------------------
+  // initialize error handling
+  errorPage.init();
 
 }
 
