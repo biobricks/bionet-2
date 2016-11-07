@@ -1,0 +1,120 @@
+<autocomplete>
+  <div>
+    <div>
+      <input type="text" id="q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
+    </div>
+    <ul id="matchList">
+      <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.text}</li>
+      <li if={matches && !matches.length} class="no-match">No matches found</li>
+    </ul>
+  </div>
+  <script>
+
+    var searchCallback;
+    
+    function query(s, cb) {
+      if(!searchCallback) return;
+      s = s.trim();
+      if(!s) return null;
+      s = s.replace(/\s+/g, ' ')
+
+      searchCallback(s, cb)
+    }
+
+    self.selected = null
+
+    this.on('mount', function() {
+
+      searchCallback = this.opts.searchCallback;
+
+      self.updateMatchListPosition = function() {
+        var pos = $(self.q).position();
+        pos.top += $(self.q).innerHeight() + 2;
+        pos.left -= 7 // TODO why?
+        pos.width = $(self.q).innerWidth();
+        $(self.matchList).css(pos)
+      }.bind(this)
+
+      self.selectCurrent = function() {
+        var sel = self.matches[self.selected]
+        self.q.value = sel.text
+        self.hideMatches()
+      }.bind(this)
+
+
+      self.hideMatches = function(e) {
+        self.matches = null
+        self.selected = null
+        this.update()
+      }.bind(this)
+
+      self.elementOver = function(e) {
+        if($(e.target).hasClass('no-match')) return;
+          var lis = $(self.matchList).find('li');
+        var i;
+        for(i=0; i < lis.length; i++) {
+          if(lis[i] == e.target) {
+            self.selected = i
+            break
+          }
+        }
+        this.update()
+     }.bind(this)
+
+      self.updateMatchListPosition();
+
+      self.matches = []
+
+      $(self.q).keydown(function(e) {
+        if(e.keyCode === 38) { // up arrow
+          e.preventDefault()
+          if(self.selected !== null && self.selected > 0) self.selected--
+          this.update();
+        } else if(e.keyCode === 40) { // down arrow
+          e.preventDefault()
+          if(self.selected !== null && self.selected < self.matches.length-1) self.selected++
+          this.update();
+        } else if(e.keyCode === 27) { // escape
+          self.hideMatches()
+        } else if(e.keyCode === 9 || e.keyCode === 13) { // tab or enter
+          if(self.selected === null) return // normal operation if nothing selected
+          e.preventDefault();
+          self.selectCurrent()
+        }
+
+      }.bind(this));
+
+      $(self.q).on('input', function(e) {
+        
+        query(self.q.value, function(err, results) {
+          if(err) return; // TODO handle
+
+          self.matches = results;
+
+          if(self.matches && self.matches.length) {
+            selected = 0;
+          } else {
+            selected = null
+          }
+          this.update()
+
+        }.bind(this));       
+      }.bind(this))
+    })
+
+    this.on('updated', function() {
+      if(self.matches && self.matches.length) {
+        $(self.matchList).css('border', '')
+      } else {
+        $(self.matchList).css('border', 'none')
+      }
+      var q = self.q.value
+      q = q.trim();
+      q = q.replace(/\s+/g, ' ').toLowerCase()
+
+      $(self.q).css('color', '');
+
+    })
+
+  </script>
+</autocomplete>
