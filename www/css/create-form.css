@@ -61,3 +61,8 @@
 .query-container {
   overflow: hidden;
 }
+
+.create-unknown {
+    margin-top: 100px;
+    margin-left: 100px;
+}

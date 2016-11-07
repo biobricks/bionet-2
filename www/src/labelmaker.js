@@ -12,6 +12,7 @@ function LabelMaker(opts) {
     this.leftMargin = opts.leftMargin || 5;
     this.topMargin = opts.topMargin || 5;
     this.bottomMargin = opts.bottomMargin || 12;
+    this.lineMargins = opts.lineMargins || {};
     this.maxLines = opts.maxLines || 7; // maximum number of lines
     this.symbolSpacing = opts.symbolSpacing || 40;
     this.labelWidth = opts.labelWidth || 1083;
@@ -29,6 +30,10 @@ function LabelMaker(opts) {
     this.ctx = tmpCanvas.getContext('2d');
     this.clear();
 
+    this.setOpt = function(optName, value) {
+      this[optName] = value;
+    };
+
     // get a copy of the context
     this.ctxCopy = function() {
 	      var c = document.createElement('canvas');
@@ -37,6 +42,16 @@ function LabelMaker(opts) {
         var ctx = c.getContext('2d');
         ctx.drawImage(this.ctx.canvas, 0, 0);
         return ctx;
+    };
+
+    // get total vertical offset of a line due to line margins of above lines
+    this.getLineMargins = function(lineNum) {
+      var totalMargin = 0;
+      var i;
+      for(i=0; i <= lineNum; i++) {
+        if(this.lineMargins[i]) totalMargin += this.lineMargins[i]
+      }
+      return totalMargin;
     };
 
     this.drawLabel = function(canvas, url, txt, symbols, cb) {
@@ -48,10 +63,12 @@ function LabelMaker(opts) {
 
         if(typeof symbols.bsl === 'string') {
             symbols.bsl = parseInt(symbols.bsl);
+            if(isNaN(symbols.bsl)) symbols.bsl = undefined
         }
 
         if(typeof symbols.temperature === 'string') {
             symbols.temperature = parseInt(symbols.temperature);
+            if(isNaN(symbols.temperature)) symbols.temperature = undefined
         }
 
         this.clear();
@@ -91,6 +108,8 @@ function LabelMaker(opts) {
 //        ctx.translate(height, 0);
         txt = txt || '';
         var lines = txt.split("\n");
+
+        var lineMargin;
         var i, line;
         for(i=0; i < lines.length && i < this.maxLines; i++) {
             if(i==0) {
@@ -101,7 +120,8 @@ function LabelMaker(opts) {
                 ctx.font = this.fontSize + 'px' + ' ' + this.fontFamily;
             }
             line = lines[i];
-		        ctx.fillText(line, this.labelHeight + this.leftMargin, this.topMargin + this.lineHeight * (i + 1));
+            lineMargin = this.getLineMargins(i) || 0;
+		        ctx.fillText(line, this.labelHeight + this.leftMargin, this.topMargin + this.lineHeight * (i + 1) + lineMargin);
         }
 
         function show() {
@@ -183,8 +203,7 @@ function LabelMaker(opts) {
 
         }.bind(this);
 
-        if(symbols.temperature) {
-
+        if(symbols.temperature !== undefined) {
             drawSymbolTemp(symbols.temperature, 0, function(err, offset) {
 
                 if(symbols.biohazard) {

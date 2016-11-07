@@ -1,6 +1,10 @@
 
 import riot from 'riot'
 
+// is this string formatted like a UUID?
+function isUUID(str) {
+  return !!str.toLowerCase().match(/^[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}$/)
+}
 
 riot.route('/', function () {
   app.dispatch(app.$.appBarConfig, {
@@ -22,6 +26,14 @@ riot.route('/logout', function () {
   });
 })
 
+riot.route('/create-unknown/*', function(name) {
+  app.dispatch(app.$.appBarConfig, {
+    enableTopNav: true,
+    enableBreadCrumbs: false,
+    enableSubbar: false
+  })
+  riot.mount('div#content', 'create-unknown')
+})
 
 riot.route('/create-form', function () {
   app.dispatch(app.$.appBarConfig, {
@@ -42,12 +54,46 @@ riot.route('/scan', function () {
 })
 
 
-
-riot.route('/create-physical', function () {
+riot.route('/p/*', function (id) {
   app.dispatch(app.$.appBarConfig, {
     enableTopNav: true,
     enableBreadCrumbs: false,
     enableSubbar: false
   })
-  riot.mount('div#content', 'create-physical')
+  setTimeout(function() {
+    app.remote.getMaterialByHumanID(id, function(err, m) {
+      riot.mount('div#content', 'view-physical', m)
+    });
+  }, 500);
+})
+
+// TODO remove again
+riot.route('/print', function () {
+  app.dispatch(app.$.appBarConfig, {
+    enableTopNav: true,
+    enableBreadCrumbs: false,
+    enableSubbar: false
+  })
+  riot.mount('div#content', 'print')
+})
+
+riot.route('/create-physical/*', function(typeOrID) {
+  app.dispatch(app.$.appBarConfig, {
+    enableTopNav: true,
+    enableBreadCrumbs: false,
+    enableSubbar: false
+  })
+
+  var opts = {}
+  typeOrID = decodeURIComponent(typeOrID).trim()
+
+  opts.type = typeOrID
+
+  if(isUUID(typeOrID)) {
+    opts.virtualID = typeOrID
+  }  else {
+    opts.type = typeOrID
+  }
+
+  riot.mount('div#content', 'create-physical', opts);
 })

@@ -23,3 +23,16 @@
   height: 0; 
   overflow: hidden;
 }
+
+
+#curBarcode {
+  padding: 10px;
+  color: green;
+  font-weight: bold;
+}
+
+#curContainerBarcode {
+  padding: 10px;
+  color: green;
+  font-weight: bold;
+}

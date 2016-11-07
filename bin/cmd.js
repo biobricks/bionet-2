@@ -254,11 +254,92 @@ websocket.createServer({server: server}, function(stream) {
                 bioDB.del(id, cb);
             },
 
-            saveMaterial: function(m, imageData, doPrint, cb) {
+            physicalAutocomplete: function(query, cb) {
+
+              // TODO 
+              cb(null, [
+                {text: "Room 231"},
+                {text: "Room 251"},
+                {text: "Room 101"},
+                {text: "Room 310"}
+              ]);
+            },
+
+            getType: function(name, cb) {
+                name = name.toLowerCase().trim().replace(/\s+/g, ' ')
+                process.nextTick(function() {
+                  var i;
+                  for(i=0; i < settings.dataTypes.length; i++) {
+                    if(settings.dataTypes[i].name === name) {
+                      cb(null, settings.dataTypes[i]);
+                      return;
+                    }
+                  }
+                  var err = new Error("No type with the specified name exists");
+                  err.notFound = true;
+                  cb(err);
+                })
+            },
+
+            createAutocomplete: function(type, q, cb) {
+              var results = {
+                types: [],
+                virtuals: []
+              };
+              if(!q) return cb(null, results);
+              q = q.toLowerCase().trim()
+
+              if(!q.length) return cb(null, results);
+
+              q = q.replace(/\s+/g, '.*')
+              q = new RegExp(q);
+
+
+
+              // type not already specified so return type hits
+              if(!type) {
+                var i;
+                for(i=0; i < settings.dataTypes.length; i++) {
+                  if(settings.dataTypes[i].name.match(q)) {
+                    results.types.push(settings.dataTypes[i]);
+                  }
+                }
+              } else {
+                type = type.name.toLowerCase().trim()
+              }
+              
+              var s = bioDB.createReadStream({valueEncoding: 'json'});
+  
+              var out = s.pipe(through.obj(function(data, enc, cb) {
+                if((data.value.partName && data.value.partName.toLowerCase().match(q))) {
+                  if(!type || (type && data.value.type === type)) {
+                    if(results.virtuals.length <= 10)
+                      results.virtuals.push(data.value)
+                  }
+                }
+                cb()
+              }));
+
+              s.on('close', function() {
+                cb(null, results);
+              });
+
+              out.on('end', function() {
+              });
+              
+              out.on('error', function(err) {
+                cb(err); // TODO handle better
+                console.error("search stream error:", err);
+              });
+            },
+
+            savePhysical: function(m, imageData, doPrint, cb) {
+
                 if(!m.id) m.id = uuid();
 
                 var mtch;
                 if(imageData && (mtch = imageData.match(/^data:image\/png;base64,(.*)/))) {
+
 
                     var imageBuffer = new Buffer(mtch[1], 'base64');
                     // TODO size check
@@ -266,11 +347,11 @@ websocket.createServer({server: server}, function(stream) {
                     fs.writeFile(imagePath, imageBuffer, function(err) {
                         if(err) return cb(err);
 
-
-                        m.newPhysical.labelImagePath = imagePath;
-                        m.physicals = m.physicals || [];
-                        m.physicals.push(m.newPhysical);
-                        delete m.newPhysical
+                       m.labelImagePath = imagePath; 
+//                        m.newPhysical.labelImagePath = imagePath;
+//                        m.physicals = m.physicals || [];
+//                        m.physicals.push(m.newPhysical);
+//                        delete m.newPhysical
 
                         createMaterialInDB(m, function(err, id) {
                             if(err) return cb(err);
@@ -294,8 +375,7 @@ websocket.createServer({server: server}, function(stream) {
             getMaterial: function(id, cb) {
                 console.log("getting:", id);
                 bioDB.get(id, {valueEncoding: 'json'}, function(err, p) {
-                  console.log("!! GOT:", p);
-                    if(err) return console.log(err);
+                    if(err) return cb(err);
                     cb(null, p);
                 });
             },
@@ -306,7 +386,8 @@ websocket.createServer({server: server}, function(stream) {
                 var s = bioDB.createReadStream({valueEncoding: 'json'});
                 var found = false;
                 var out = s.pipe(through.obj(function(data, enc, next) {
-                    if(data.value.humanID == humanID) {
+                    if(!data || !data.value || !data.value.label) return next()
+                    if(data.value.label.humanID == humanID) {
                         found = true;
                         cb(null, data.value);
                     } else {

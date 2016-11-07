@@ -20,7 +20,7 @@ stdThemePlugin.start = function () {
     action: '/inventory'
   }, {
     label: 'create',
-    action: '/create'
+    action: '/create-form'
   }, {
     label: 'scan',
     action: '/scan'
@@ -129,6 +129,10 @@ stdThemePlugin.start = function () {
   require('./create-form.tag.html')
   require('./create-physical.tag.html')
   require('./scan.tag.html')
+  require('./print.tag.html')
+  require('./autocomplete.tag.html')
+  require('./create-unknown.tag.html')
+  require('./view-physical.tag.html')
 
   /*
   todo: add standard components for:

@@ -20,6 +20,7 @@
   </div>
   <script>
 
+    var cameraStream;
     var modalCallback;
 
     var keepScanning = true;
@@ -108,7 +109,7 @@
 
     // prevent text input field from loosing focus
     function initKeyboardCapture() {
-      console.log('llllllllll', $('#keyboardInput'))
+
       setTimeout(function() {
         $('#keyboardInput').focus()
         $(self.keyboardInputForm.code).blur(function(e) {
@@ -117,9 +118,27 @@
       }, 1)
     }
 
-    function runCallback(err, code) {
-      if(modalCallback) return modalCallback(err, code);
+    function stopCameraStream() {
+      if(cameraStream) {
+        var tracks = cameraStream.getTracks();
+        var i;
+        for(i=0; i < tracks.length; i++) {
+          tracks[i].stop();
+        }
+        cameraStream = null
+      }
     }
+
+    function runCallback(err, code) {
+      stopCameraStream();
+      if(modalCallback) return modalCallback(err, code);
+
+      window.location.href = '/p/' + code;
+    }
+
+    this.on('before-unmount', function() {
+      stopCameraStream();
+    });
 
     this.on('mount', function() {
       modalCallback = this.opts.cb
@@ -132,7 +151,7 @@
         $('#cameraAccessMsg').css('display', 'none');
         if(err) {
           if(err.name === 'DevicesNotFoundError') {
-            scanError("Hmm, looks like your device doesn't have a camera.");
+            scanError("Hmm, looks like your device doesn't have a camera.<br/>You can still use the hand-held USB scanner.");
           } else if(err.name === 'InternalError') {
             scanError("Could not access your camera. Is another application using it?");
           } else {
@@ -140,6 +159,7 @@
           }
           return;
         }
+        cameraStream = stream
 
         $(self.scanVideo).css('visibility', 'visible');
         self.scanVideo.src = window.URL.createObjectURL(stream);

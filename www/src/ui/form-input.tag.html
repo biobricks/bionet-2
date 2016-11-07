@@ -7,6 +7,17 @@
   </div>
 </form-text-input>
 
+<form-select-input>
+  <div class="row">
+    <div class="input-field col s12">
+      <select id={opts.name} name={opts.name} type="select">
+        <option>Select {opts.label || 'option'}</option>
+        <option each={option, index in opts.options} value={option.value} {selected: (option.value === opts.value)}>{option.label}</option>
+      </select>
+    </div>
+  </div>
+</form-select-input>
+
 <search-input>
   <div class="row">
     <div class="col s3 m3 l3" />

@@ -1,8 +1,8 @@
 <create-form>
   
-  <content-container style="padding-top:100px;">
+  <div class="container" style="padding-top:100px;">
 
-    <form name="createForm">
+    <form name="createForm" onsubmit={submitForm}>
       <div>What would you like to add?</div>
       <div>
         <div id="selectedTypeContainer" class="selected-type">
@@ -15,34 +15,39 @@
       <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
       <ul id="matchList">
         <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-        <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType : ''}</li>
+        <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
       </ul>
     </form>
-  </content-container>
+  </div>
   <script>
 
+   this.submitForm = function(e) {
+     e.preventDefault();
+
+//     self.selectCurrent();
+     var val = self.createForm.q.value.trim()
+
+     if(val) {
+       // TODO use ID instead
+       // check if the entry has an ID, if not, just uriencode it
+       riot.route('/create-physical/' + encodeURIComponent(val)); 
+     } else if(selectedType) {
+       if(selectedType.virtual) {
+         riot.route('/create/' + encodeURIComponent(selectedType.name));
+       } else {
+         riot.route('/create-physical/' + encodeURIComponent(selectedType.name));
+       }
+     } else {
+       // do nothing
+     }
+   };
     
-   function query(type, s) {
-    s = s.trim();
-    if(!s) return null;
-    s = s.replace(/\s+/g, ' ')
-    s = new RegExp(s, 'i')
-    var a =  [
-      { pre: "type", name: "plasmid", extraClass: 'type'},
-      { pre: "type", name: "-80 freezer", extraClass: 'type'},
-      { pre: "type", name: "dna", extraClass: 'type last-type'},
-      { pre: "plasmid", name: "p1204"},
-      { pre: "plasmid", name: "p1208"}
-        ]
-    var ret = [];
-    var i;
-    for(i=0; i < a.length; i++) {
-      if(a[i].name.match(s)) {
-        if(type && a[i].pre !== type) continue;
-        ret.push(a[i]);
-      }
-    }
-    return ret;
+   function query(type, q, cb) {
+   
+     app.remote.createAutocomplete(type, q, function(err, results) {
+       if(err) return cb(err)
+       cb(null, results)
+     });
    }
 
     self.selected = null
@@ -59,7 +64,7 @@
       self.selectCurrent = function() {
         var sel = self.matches[self.selected]
         if(sel.pre === 'type') {
-          self.setSelectedType(sel.name)
+          self.setSelectedType(sel)
           self.createForm.q.value = ''
         } else {
           self.createForm.q.value = sel.name
@@ -73,7 +78,7 @@
           $(self.selectedTypeContainer).css('display', 'none')
         } else {
           self.selectedType = type
-          self.selectedTypeLabel.innerHTML = type
+          self.selectedTypeLabel.innerHTML = type.name
           $(self.selectedTypeContainer).css('display', 'block')
         }
         self.updateMatchListPosition()
@@ -128,7 +133,7 @@
       $(self.createForm.q).keyup(function(e) {
         if(e.keyCode === 8 || e.keyCode === 46) { // backspace or delete
           var hasQueryNow = !!self.createForm.q.value.replace(/\s+/g, '')
-          console.log('UUUUUUU', e.keyCode, hadQueryBeforeKeydown, hasQueryNow)
+
           if(!hadQueryBeforeKeydown && !hasQueryNow) {
             self.setSelectedType()
           }
@@ -137,15 +142,34 @@
 
       $(self.createForm.q).on('input', function(e) {
         
-        self.matches = query(self.selectedType, self.createForm.q.value);
+        self.matches = [];
 
-        if(self.matches && self.matches.length) {
-          selected = 0;
-        } else {
-          selected = null
-        }
-        this.update()
-       
+        query(self.selectedType, self.createForm.q.value, function(err, results) {
+          if(err) return app.ui.toast(err); // TODO better error handling
+          
+          var i;
+          for(i=0; i < results.types.length; i++) {
+            self.matches.push({
+              pre: "type",
+              name: results.types[i].name, 
+              extraClass: 'type',
+              virtual: results.types[i].virtual
+            });
+          }
+          for(i=0; i < results.virtuals.length; i++) {
+            self.matches.push({
+              pre: "virtual",
+              name: results.virtuals[i].partName
+            });
+          }
+          
+          if(self.matches && self.matches.length) {
+            selected = 0;
+          } else {
+            selected = null
+          }
+          this.update()
+        }.bind(this))
 
       }.bind(this))
     })

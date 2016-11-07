@@ -1,0 +1,115 @@
+<print>
+  <div class="print">
+    <canvas id="labelPreview" class="labelPreview tab" width="560" height="174"></canvas>
+    <form name="createLabelForm" class="col s12" onsubmit={submitForm}>
+      <form-text-input label="Title" name="title" value={formData.title} />
+      <form-textarea-input label="Additional text" name="text" value={formData.text} />
+      <form-text-input label="Storage temperature" name="temperature" value={formData.temperature} />
+
+      <div class="top-right-submit">
+        <a onclick={submitForm} class="waves-effect waves-light btn darken-1">save</a>
+      </div>
+
+      <input type="submit" style="visibility:hidden;height:0" />
+    </form>
+  </div>
+  <script>
+    var settings = require('../settings.js');
+    var LabelMaker = require('../labelmaker.js');
+    var waitForFontLoad = require('../wait_for_font_load.js');
+    var labelMaker;
+
+    var modalCallback;
+
+    // get a unique human-readable ID for the label if it doesn't have one
+    function finalizeLabel(cb) {
+      if(self.humanID) {
+        process.nextTick(function() {
+          cb(null, humanID);
+        })
+        return;
+      }
+
+      // TODO this should be set on the server at creation
+      // but that means the server would have to create the label
+      // grrr...
+      app.remote.getID(function(err, humanID) {
+        if(err) {
+          app.ui.toast("Error creating physical: " + err); // TODO handle error
+          return cb(err);
+        }
+        self.humanID = humanID
+        updateLabel(function() {
+          cb(null, humanID);
+        });
+      })
+    }
+
+    function updateLabel(cb) {
+      cb = cb || function(){}
+
+      var pre = ""
+      pre += "ID: " + (self.humanID || '?') + "\n";
+      pre +=  $(self.createLabelForm.title).val() + "\n";
+
+      var txt = $(self.createLabelForm.text).val()
+      var temperature = $(self.createLabelForm.temperature).val()
+
+      var o = {
+        temperature: temperature,
+        bsl: self.formData.bsl || 0
+      };
+    
+      if(o.bsl > 1) {
+        o.biohazard = true;
+      }
+      labelMaker.drawLabel('labelPreview', settings.base_url+"/p/"+self.humanID, pre+txt, o, cb);
+    }
+
+    this.submitForm = function(e) {
+      if(!modalCallback) return;
+      finalizeLabel(function(err, humanID) {
+        if(err) return;
+        var formData = $.formToObject(self.createLabelForm);
+        formData.humanID = self.humanID
+        formData.bsl = self.formData.bsl
+        var imageData = labelMaker.getDataURL();
+        modalCallback(null, formData, imageData);
+      });
+    }.bind(this);
+
+      self.formData = this.opts.label || {}
+    this.on('mount', function() {
+      modalCallback = this.opts.cb
+     
+      labelMaker = new LabelMaker({
+        symbolPath: settings.symbolPath,
+        lineMargins: {
+          2: 15
+        }
+      });
+
+      // if this isn't in a settimeout it doesn't work :/
+      setTimeout(function() {
+        $(self.createLabelForm.text).focus()
+      }, 1)
+
+      $(self.createLabelForm.title).on('input', function(e) {
+        updateLabel()
+      }.bind(this))
+
+      $(self.createLabelForm.text).on('input', function(e) {
+        updateLabel()
+      }.bind(this))
+
+      $(self.createLabelForm.temperature).on('input', function(e) {
+        updateLabel()
+      }.bind(this))
+
+      waitForFontLoad(['FiraSans-Regular', 'FiraSans-Bold', 'FiraSans-Bold'], function() {
+        updateLabel()
+      }.bind(this));
+    });
+
+  </script>
+</print>
