@@ -242,6 +242,12 @@ You can dump the entire database of the running bionet app to a JSON file using:
 
 It is recommended to run this e.g. every hour using a cron job such that other backup systems that image the entire filesystem won't end up with a copy of the database that is in an inconsistant state (if for example the filesystem was copied during a large batch write to the database). 
 
+You can restore from a backup by first deleting the old database (obviously be careful) using `rm -rf bionet/db` and then running:
+
+```
+./bin/db.js import ./myfile.json
+```
+
 # ToDo
 
 ## Build system
