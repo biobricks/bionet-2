@@ -10,7 +10,7 @@ var websocket = require('websocket-stream');
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 var auth = require('rpc-multiauth'); // auth
 var level = require('level'); // leveldb database
-var multilevel = require('multilevel'); // share one leveldb between processes
+var multilevel = require('multileveldown'); // share one leveldb between processes
 var sublevel = require('subleveldown'); // leveldb multiplexing
 var accountdown = require('accountdown'); // user/login management
 var uuid = require('uuid').v4;
@@ -67,31 +67,33 @@ var userStatic = require('ecstatic')({
 });
 settings.labelImageFilePath = path.resolve(path.join(settings.userFilePath, settings.labelImageFilePath));
 
-var bioDB = level('./db/bio');
+var db = level('./db');
+var bioDB = sublevel(db, 'b');
 
 // Start multilevel server for low level db access (e.g. backups)
-// TODO use single db for everything so we can expose it via multilevel
 var multiLevelServer = net.createServer(function(con) {
-  con.pipe(multilevel.server(bioDB)).pipe(con);
+  con.pipe(multilevel.server(db)).pipe(con);
   con.on('error', function(err) {
+    con.destroy();
     console.error("multilevel client error:", err);
   });
 }).listen(settings.dbPort || 13377);
+
 multiLevelServer.on('error', function(err) {
     console.error("multilevel server error:", err);
 })
 
-var uDB = level('./db/users');
-var userDB = sublevel(uDB, 'accountdown', { valueEncoding: 'json' });
+//var uDB = level('./db/users');
+var userDB = sublevel(db, 'accountdown', { valueEncoding: 'json' });
 var users = accountdown(userDB, {
     login: { basic: require('accountdown-basic') }
 });
 
 
-var indexDB = level('./db/indexes');
+var indexDB = sublevel(db, 'i');
 var recentDB = sublevel(indexDB, 'changed', { keyEncoding: 'utf8', valueEncoding: 'utf8' });
 
-var miscDB = level('./db/misc');
+var miscDB = sublevel(db, 'm');
 var idGenerator = new IDGenerator(miscDB);
 
 
