@@ -149,6 +149,14 @@ function Client(client, session) {
 
 var printServer = {
 
+    _server: null, 
+
+    stop: function(cb) {
+      cb = cb || function(){};
+      if(!this._server) return cb("No server running");
+      this._server.close(cb);
+    },
+
     start: function(settingsOpt, opts, cb) {
         if(typeof opts === 'function') {
             cb = opts;
@@ -160,7 +168,7 @@ var printServer = {
         
         var pubKey = ssh2.utils.genPublicKey(ssh2.utils.parseKey(fs.readFileSync(settings.printing.clientKey)));
         
-        var serv = new ssh2.Server({
+        this._server = new ssh2.Server({
             hostKeys: [fs.readFileSync(settings.printing.hostKey)]
         }, function(client) {
             log('client connected!');
@@ -197,9 +205,9 @@ var printServer = {
             
         });
         var listenHost = settings.printing.serverHost || settings.hostname;
-        serv.listen(settings.printing.serverPort, listenHost, function() {
+        this._server.listen(settings.printing.serverPort, listenHost, function() {
             log("listening on "+listenHost+":"+settings.printing.serverPort);
-            cb();
+            cb(null, this._server);
         });
     },
 

@@ -10,6 +10,9 @@ module.exports = {
   hostname: 'localhost', // bind to this hostname or IP (assumes all if undefined)
   port: 8000, // bind to this port
 
+  // Port for low-level access to db via multilevel.
+  dbPort: 13377, 
+
   // The url where this app is accessed
   // Used for generating email links
   base_url: 'http://localhost:8000',

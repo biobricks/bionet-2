@@ -232,6 +232,15 @@ service autossh start
 
 Your tunnel should now be establish and will re-establish on reboot or failure.
 
+# Backups
+
+You can dump the entire database of the running bionet app to a JSON file using:
+
+```
+./bin/db.js dump > ./myfile.json
+```
+
+It is recommended to run this e.g. every hour using a cron job such that other backup systems that image the entire filesystem won't end up with a copy of the database that is in an inconsistant state (if for example the filesystem was copied during a large batch write to the database). 
 
 # ToDo
 
