@@ -84,7 +84,7 @@ multiLevelServer.on('error', function(err) {
 })
 
 //var uDB = level('./db/users');
-var userDB = sublevel(db, 'accountdown', { valueEncoding: 'json' });
+var userDB = sublevel(db, 'u', { valueEncoding: 'json' });
 var users = accountdown(userDB, {
     login: { basic: require('accountdown-basic') }
 });
