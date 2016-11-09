@@ -74,6 +74,28 @@ module.exports = {
 
   },
 
+  dataTypes: 
+    [{
+      name: "-80 freezer",
+      fields: {
+        shelf: 'text',
+        rack: 'text',
+        box: 'text'
+      }
+    },{
+      name: "room",
+      fields: {
+        name: 'text'
+      }
+    },{
+      name: "plasmid",
+      virtual: true,
+    },{
+      name: "organism",
+      virtual: true
+    }],
+
+
    // the relative URL at which symbol files 
    // for the label generator are available
    symbolPath: '/static/symbols',
