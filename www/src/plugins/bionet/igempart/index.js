@@ -115,7 +115,8 @@ var igempart = {
     app.observe('getPartData', (id) => {
       app.getLocal(id, function (err, value) {
         if (err) {
-          console.log('error reading part:', id, err)
+          console.log('getPartData:error reading part:', id, err)
+          app.dispatch('error', err)
         } else {
           const item = JSON.parse(value)
           console.log('retrieved item:', JSON.stringify(item))
@@ -182,9 +183,7 @@ var igempart = {
         app.remote.getMaterial(id, function (err, data) {
           console.log('getMaterial 3:%s', err)
           if (err) {
-            riot.mount('div#content', 'err404', {
-              msg: err
-            })
+            app.dispatch('error', err)
             return
           }
           cb(data);
