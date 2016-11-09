@@ -217,7 +217,9 @@ var igempart = {
     */
 
     riot.route('/edit/*', function (partID) {
+
       getMaterial(partID, function (data) {
+        console.log('MATERIAL', data)
         app.state.editPart = data
         riot.mount('div#content', 'part-form', {
           partID

@@ -62,6 +62,8 @@
   <script>
     self.formData = app.state.editPart
 
+    console.log("NAAAAAAAAAAAAME", self.formData.name)
+
     $(this.editPartForm).change(function(e) {
       $.extend(app.state.editPart, $.formToObject(self.editPartForm))
     }.bind(this));
