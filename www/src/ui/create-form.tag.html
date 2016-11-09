@@ -135,7 +135,7 @@
 
       var hadQueryBeforeKeydown = false;
       $(self.createForm.q).keydown(function(e) {
-        console.log("KEYDOWN");
+
         if(e.keyCode === 38) { // up arrow
           e.preventDefault()
           if(self.selected !== null && self.selected > 0) self.selected--
@@ -167,7 +167,7 @@
       }.bind(this));
 
       $(self.createForm.q).on('input', function(e) {
-        console.log("INPUT");
+
         self.matches = [];
 
         var q = self.createForm.q.value.trim();

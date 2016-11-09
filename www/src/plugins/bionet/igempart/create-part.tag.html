@@ -14,10 +14,11 @@
         self.formData = {};
       }
       if(this.opts.query && this.opts.query.name && this.opts.query.name.trim()) {
-        self.formData.name = decodeURIComponent(this.opts.query.name);;
+        self.formData.name = decodeURIComponent(this.opts.query.name);
+        this.update();
+        saveState();
       }
 
-      this.update();
     });
 
 
@@ -80,8 +81,12 @@
     // probably because it needs to be run from within on('mount')
 
     $(this.createPartForm).change(function(e) {
-      $.extend(app.state.createPart, $.formToObject(self.createPartForm))
+      saveState();
     }.bind(this));
+
+    function saveState() {
+      $.extend(app.state.createPart, $.formToObject(self.createPartForm))
+    }
 
     submitForm(e) {
 

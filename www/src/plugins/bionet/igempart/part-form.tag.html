@@ -45,7 +45,7 @@
 
 <part-specification>
   <form name="editPartForm" class="col s12" onsubmit={submitForm}>
-    <form-text-input label="Part Name" name="partName" value={formData.partName}/>
+    <form-text-input label="Name" name="name" value={formData.name}/>
     <form-textarea-input label="Description" name="description" value={formData.description}/>
     <form-text-input label="Created by" name="creator" value={formData.creator}/>
     <form-text-input label="Created" name="created" value={formData.created}/>
@@ -72,7 +72,7 @@
         return;
       }
 
-      app.remote.saveMaterial(app.state.editPart, null, false, function(err, id) {
+      app.remote.save(app.state.editPart, null, false, function(err, id) {
         if(err) return app.ui.toast("Error: " + err) // TODO handle error
         
         app.ui.toast("Material saved with ID: " + id)

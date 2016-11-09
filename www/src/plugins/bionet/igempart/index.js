@@ -185,20 +185,23 @@ var igempart = {
         msg: "Missing ID field in URL"
       })
       if (app.state.editPart && app.state.editPart.id && app.state.editPart.id === id) {
-        console.log('getMaterial 1:%s', id)
+
         process.nextTick(function () {
           cb(app.state.editPart)
         });
       } else {
-        console.log('getMaterial 2:%s', id)
-        app.remote.getMaterial(id, function (err, data) {
-          console.log('getMaterial 3:%s', err)
-          if (err) {
-            app.dispatch('error', err)
-            return
-          }
-          cb(data);
-        })
+
+        // TODO this is very bad
+        setTimeout(function() {
+          app.remote.get(id, function (err, data) {
+
+            if (err) {
+              app.dispatch('error', err)
+              return
+            }
+            cb(data);
+          })
+        }, 500)
       }
     }
 
@@ -214,9 +217,7 @@ var igempart = {
     */
 
     riot.route('/edit/*', function (partID) {
-      console.log('edit part route B, partID:%s', partID)
       getMaterial(partID, function (data) {
-        console.log('edit part route B1:%s', JSON.stringify(data))
         app.state.editPart = data
         riot.mount('div#content', 'part-form', {
           partID
