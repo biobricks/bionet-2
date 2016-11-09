@@ -152,12 +152,23 @@ var igempart = {
     app.addStream('partsList')
 
 
-    riot.route('/create', function () {
+    riot.route('/create-virtual', function () {
       app.state.createPart = {}
       riot.mount('div#content', 'create-part')
       riot.mount('div#create-part-content', 'create-specification')
     })
 
+    riot.route('/create-virtual/*', function(type) {
+      riot.mount('div#content', 'create-part', {type: type, query: {}})
+    });
+    riot.route('/create-virtual/*/..', function(type) {
+      var q = riot.route.query()
+
+      var opts = {type: type, query: q || {}}
+      riot.mount('div#content', 'create-part', opts)
+    })
+
+/*
     riot.route('/create/*', function (section) {
       riot.mount('div#content', 'create-part')
       if (section == 'sequence') {
@@ -168,7 +179,7 @@ var igempart = {
         riot.mount('div#create-part-content', 'create-specification')
       }
     })
-
+*/
     function getMaterial(id, cb) {
       if (!id) return riot.mount('div#content', 'err404', {
         msg: "Missing ID field in URL"

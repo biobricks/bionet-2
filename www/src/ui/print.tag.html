@@ -2,9 +2,9 @@
   <div class="print">
     <canvas id="labelPreview" class="labelPreview tab" width="560" height="174"></canvas>
     <form name="createLabelForm" class="col s12" onsubmit={submitForm}>
-      <form-text-input label="Title" name="title" value={formData.title} />
-      <form-textarea-input label="Additional text" name="text" value={formData.text} />
-      <form-text-input label="Storage temperature" name="temperature" value={formData.temperature} />
+      <form-text-input label="Title" name="title" value={labelFormData.title} />
+      <form-textarea-input label="Additional text" name="text" value={labelFormData.text} />
+      <form-text-input label="Storage temperature" name="temperature" value={labelFormData.temperature} />
 
       <div class="top-right-submit">
         <a onclick={submitForm} class="waves-effect waves-light btn darken-1">save</a>
@@ -14,6 +14,7 @@
     </form>
   </div>
   <script>
+
     var settings = require('../../../settings.js');
     var LabelMaker = require('../labelmaker.js');
     var waitForFontLoad = require('../wait_for_font_load.js');
@@ -57,7 +58,7 @@
 
       var o = {
         temperature: temperature,
-        bsl: self.formData.bsl || 0
+        bsl: self.labelFormData.bsl || 0
       };
     
       if(o.bsl > 1) {
@@ -70,16 +71,17 @@
       if(!modalCallback) return;
       finalizeLabel(function(err, humanID) {
         if(err) return;
-        var formData = $.formToObject(self.createLabelForm);
-        formData.humanID = self.humanID
-        formData.bsl = self.formData.bsl
+        var labelFormData = $.formToObject(self.createLabelForm);
+        labelFormData.humanID = self.humanID
+        labelFormData.bsl = self.labelFormData.bsl
         var imageData = labelMaker.getDataURL();
-        modalCallback(null, formData, imageData);
+        modalCallback(null, labelFormData, imageData);
       });
     }.bind(this);
 
-      self.formData = this.opts.label || {}
+    self.labelFormData = this.opts.label || {}
     this.on('mount', function() {
+
       modalCallback = this.opts.cb
      
       labelMaker = new LabelMaker({

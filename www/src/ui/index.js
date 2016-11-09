@@ -20,7 +20,7 @@ stdThemePlugin.start = function () {
     action: '/inventory'
   }, {
     label: 'create',
-    action: '/create-form'
+    action: '/create'
   }, {
     label: 'scan',
     action: '/scan'

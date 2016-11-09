@@ -27,15 +27,30 @@
 //     self.selectCurrent();
      var val = self.createForm.q.value.trim()
 
-     if(val) {
-       // TODO use ID instead
-       // check if the entry has an ID, if not, just uriencode it
-       riot.route('/create-physical/' + encodeURIComponent(val)); 
-     } else if(selectedType) {
-       if(selectedType.virtual) {
-         riot.route('/create/' + encodeURIComponent(selectedType.name));
+     if(!self.selectedType && val) {
+       app.remote.getBy('name', val, function(err, o) {
+         if(err) return app.ui.toast("Error: " + err); // TODO handle better
+      
+         if(!o) {
+           riot.route('/create-unknown/' + encodeURIComponent(val)); 
+         } else {
+           riot.route('/create-physical/' + o.id); 
+         }
+       });
+       return;
+     } else if(self.selectedType) {
+       if(self.selectedType.virtual) {
+         var url = '/create-virtual/' + encodeURIComponent(self.selectedType.name);
+         if(val) {
+           url += '/?name=' + encodeURIComponent(val);
+         }
+         riot.route(url);
        } else {
-         riot.route('/create-physical/' + encodeURIComponent(selectedType.name));
+         var url = '/create-physical/' + encodeURIComponent(self.selectedType.name);
+         if(val) {
+           url += '/?name=' + encodeURIComponent(val);
+         }
+         riot.route(url);
        }
      } else {
        // do nothing
@@ -54,6 +69,8 @@
     self.selectedType = null
 
     this.on('mount', function() {
+     $(self.createForm.q).focus()
+
       self.updateMatchListPosition = function() {
         var pos = $(self.createForm.q).offset();
         pos.top += $(self.createForm.q).innerHeight() + 2;
@@ -144,23 +161,29 @@
         
         self.matches = [];
 
-        query(self.selectedType, self.createForm.q.value, function(err, results) {
+        var q = self.createForm.q.value.trim();
+
+        query(self.selectedType, q, function(err, results) {
           if(err) return app.ui.toast(err); // TODO better error handling
           
-          var i;
-          for(i=0; i < results.types.length; i++) {
-            self.matches.push({
-              pre: "type",
-              name: results.types[i].name, 
-              extraClass: 'type',
-              virtual: results.types[i].virtual
-            });
-          }
-          for(i=0; i < results.virtuals.length; i++) {
-            self.matches.push({
-              pre: "virtual",
-              name: results.virtuals[i].partName
-            });
+          if(!q) {
+            self.matches = null;
+          } else {
+            var i;
+            for(i=0; i < results.types.length; i++) {
+              self.matches.push({
+                pre: "type",
+                name: results.types[i].name, 
+                extraClass: 'type',
+                virtual: results.types[i].virtual
+              });
+            }
+            for(i=0; i < results.virtuals.length; i++) {
+              self.matches.push({
+                pre: "virtual",
+                name: results.virtuals[i].name
+              });
+            }
           }
           
           if(self.matches && self.matches.length) {
@@ -169,8 +192,8 @@
             selected = null
           }
           this.update()
-        }.bind(this))
 
+        }.bind(this))
       }.bind(this))
     })
 

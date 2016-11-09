@@ -3,6 +3,7 @@
   <div class="container" style="margin-top:100px">
     <h5 id="createPhysicalHeader"></h5>
     <form name="createPhysicalForm" class="col s12" onsubmit={submitForm}>
+      <form-text-input label="Name" name="name" value={formData.name}/>
       <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
       <p>
         Barcode: <span id="curBarcode"></span><a id="scanButton" class="waves-effect waves-light btn" onclick={scanItem}>scan</a> or <a id="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel}>create label</a>
@@ -168,6 +169,16 @@
     }
 
     this.on('mount', function() {
+
+      if(!self.formData) {
+        self.formData = {};
+      }
+      if(this.opts.query && this.opts.query.name && this.opts.query.name.trim()) {
+        self.formData.name = decodeURIComponent(this.opts.query.name);;
+      }
+
+      this.update();
+
       riot.mount('#autocomplete-container', 'autocomplete', {
         searchCallback: function(query, cb) {
           app.remote.physicalAutocomplete(query, cb);
@@ -181,7 +192,7 @@
             app.ui.toast(err); // TODO handle better
             return;
           }
-          self.printNameDefault = virtual.name
+          self.printNameDefault = $(self.createPhysicalForm.name).val().trim() || virtual.name
           $(self.createPhysicalHeader).html("New " + virtual.name)
 
           // TODO
@@ -208,7 +219,7 @@
           return;
         }
 
-        self.printNameDefault = type.name
+        self.printNameDefault = $(self.createPhysicalForm.name).val().trim() || type.name
         $(self.createPhysicalHeader).html("New " + type.name)
 
         // TODO

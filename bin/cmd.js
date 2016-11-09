@@ -329,10 +329,16 @@ websocket.createServer({server: server}, function(stream) {
               var s = bioDB.createReadStream({valueEncoding: 'json'});
   
               var out = s.pipe(through.obj(function(data, enc, cb) {
-                if((data.value.partName && data.value.partName.toLowerCase().match(q))) {
+                console.log("Got:", data.value.name);
+                if((data.value.name && data.value.name.toLowerCase().match(q))) {
                   if(!type || (type && data.value.type === type)) {
-                    if(results.virtuals.length <= 10)
-                      results.virtuals.push(data.value)
+                    if(results.virtuals.length <= 10) {
+                      results.virtuals.push(data.value) 
+                      if(results.virtuals.length >= 10) {
+                        s.destroy();
+                        return;
+                      }
+                    }
                   }
                 }
                 cb()
@@ -351,7 +357,7 @@ websocket.createServer({server: server}, function(stream) {
               });
             },
 
-            savePhysical: function(m, imageData, doPrint, cb) {
+            save: function(m, imageData, doPrint, cb) {
 
                 if(!m.id) m.id = uuid();
 
@@ -390,7 +396,7 @@ websocket.createServer({server: server}, function(stream) {
                 console.log("saving:", m);
             },
 
-            getMaterial: function(id, cb) {
+            get: function(id, cb) {
                 console.log("getting:", id);
                 bioDB.get(id, {valueEncoding: 'json'}, function(err, p) {
                     if(err) return cb(err);
@@ -398,8 +404,8 @@ websocket.createServer({server: server}, function(stream) {
                 });
             },
 
-            getMaterialByHumanID: function(humanID, cb) {
-
+            // TODO use indexes for this!
+            getByHumanID: function(humanID, cb) {
 
                 var s = bioDB.createReadStream({valueEncoding: 'json'});
                 var found = false;
@@ -408,6 +414,37 @@ websocket.createServer({server: server}, function(stream) {
                     if(data.value.label.humanID == humanID) {
                         found = true;
                         cb(null, data.value);
+                    } else {
+                        next();
+                    }
+                }));
+                
+                s.on('end', function() {
+                    if(!found) {
+                        found = true;
+                        cb(null, null);
+                    }
+                });
+
+                s.on('error', function(err) {
+                    if(!found) {
+                        found = true;
+                        cb(err);
+                    }
+                });
+            },
+
+            // TODO use indexes for this!
+            getBy: function(field, value, cb) {
+
+                var s = bioDB.createReadStream({valueEncoding: 'json'});
+                var found = false;
+                var out = s.pipe(through.obj(function(data, enc, next) {
+                    if(!data || !data.value || !data.value[field]) return next()
+                    if(data.value[field] == value) {
+                        found = true;
+                        cb(null, data.value);
+                        s.destroy();
                     } else {
                         next();
                     }

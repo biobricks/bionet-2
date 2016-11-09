@@ -35,7 +35,7 @@ riot.route('/create-unknown/*', function(name) {
   riot.mount('div#content', 'create-unknown')
 })
 
-riot.route('/create-form', function () {
+riot.route('/create', function () {
   app.dispatch(app.$.appBarConfig, {
     enableTopNav: true,
     enableBreadCrumbs: false,
@@ -77,14 +77,18 @@ riot.route('/print', function () {
   riot.mount('div#content', 'print')
 })
 
-riot.route('/create-physical/*', function(typeOrID) {
+
+function createPhysicalRoute(typeOrID, q) {
+
   app.dispatch(app.$.appBarConfig, {
     enableTopNav: true,
     enableBreadCrumbs: false,
     enableSubbar: false
   })
 
-  var opts = {}
+  var opts = {
+    query: q || {}
+  }
   typeOrID = decodeURIComponent(typeOrID).trim()
 
   opts.type = typeOrID
@@ -96,4 +100,11 @@ riot.route('/create-physical/*', function(typeOrID) {
   }
 
   riot.mount('div#content', 'create-physical', opts);
-})
+}
+
+riot.route('/create-physical/*', createPhysicalRoute);
+
+riot.route('/create-physical/*/..', function(typeOrID) {
+  var q = riot.route.query()
+  createPhysicalRoute(typeOrID, q);
+});
