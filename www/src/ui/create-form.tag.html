@@ -14,12 +14,13 @@
       </div>
       <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
       <ul id="matchList">
-        <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+        <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
         <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
       </ul>
     </form>
   </div>
   <script>
+
 
    this.submitForm = function(e) {
      e.preventDefault();
@@ -107,9 +108,16 @@
         this.update()
       }.bind(this)
 
+      self.clickSelect = function(e) {
+        console.log("CLICK SELECT");
+        self.selectCurrent();
+      }.bind(this)
+
+
       self.elementOver = function(e) {
+        console.log("MOUSE OVER");
         if($(e.target).hasClass('no-match')) return;
-          var lis = $(self.matchList).find('li');
+        var lis = $(self.matchList).find('li');
         var i;
         for(i=0; i < lis.length; i++) {
           if(lis[i] == e.target) {
@@ -119,7 +127,7 @@
         }
         this.update()
 
-     }.bind(this)
+      }.bind(this)
 
       self.updateMatchListPosition();
 
@@ -127,6 +135,7 @@
 
       var hadQueryBeforeKeydown = false;
       $(self.createForm.q).keydown(function(e) {
+        console.log("KEYDOWN");
         if(e.keyCode === 38) { // up arrow
           e.preventDefault()
           if(self.selected !== null && self.selected > 0) self.selected--
@@ -158,7 +167,7 @@
       }.bind(this));
 
       $(self.createForm.q).on('input', function(e) {
-        
+        console.log("INPUT");
         self.matches = [];
 
         var q = self.createForm.q.value.trim();
