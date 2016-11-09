@@ -26,15 +26,15 @@
     app.dispatch(app.$.secondaryNav, [{
         label: 'specifications',
         icon: undefined,
-        action: '/create/specs'
+        action: '/create-virtual/' + this.opts.type
     }, {
         label: 'sequence',
         icon: undefined,
-        action: '/create/sequence'
+        action: '/create-virtual/' + this.opts.type + '/?tab=sequence'
     }, {
         label: 'physical instance',
         icon: undefined,
-        action: '/create/instances'
+        action: '/create-virtual/' + this.opts.type + '/?tab=instances'
     }])
 
     // initialize breadcrumbs
