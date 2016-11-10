@@ -26,10 +26,7 @@ function changes(db, opts) {
   opts.gte = opts.gte || opts.start;
   opts.lte = opts.lte || opts.end;
 
-  var out = through.obj(function(obj, enc, cb) {
-    this.push(obj);
-    cb();
-  });
+  var out = through.obj();
 
   db.on('put', function(key, value) {
     if(opts.gte && key < opts.gte) return;
