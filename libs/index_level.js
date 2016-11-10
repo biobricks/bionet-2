@@ -1,8 +1,8 @@
 /*
-  TODO:
 
-  * Implement callbacks for build and rebuild functions
-  * Unit tests
+  An indexer for leveldb.
+
+  Based on level-changes.
 
   Usage:
 
@@ -20,6 +20,13 @@
       if(err) return console.error(err);
       console.log("key:", key, "value:", value);
     });
+
+  TODO:
+
+  * callbacks for build and rebuild functions
+  * Implement clearAll
+  * Easy simple indexes (index by object property or sub-property)
+  * Unit tests
 
 */
 
