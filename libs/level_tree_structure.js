@@ -4,9 +4,11 @@
 
   If you reference every value in your leveldb to its parent, e.g. by setting value.parentKey to the key of the parent, then level-tree-index will keep track of the full path for each value and allow you to look up parents and children and stream the entire tree or a part thereof.
 
-  This is useful for e.g. nested comments.
+  This is useful for implementing e.g. nested comments.
 
   level-tree-index works for all keyEncodings and works automatically for the json valueEncoding and for other valueEncodings if provide custom functions for the opts.pathProp and opts.parentProp options. level-tree-index works equally well with string and buffer paths.
+
+  Note that level-tree-index has no way to delay operations on your database, so when you run e.g. a .put on your database then you cannot expect the tree index to immediately be up to date. It wouldn't be too difficult to add .put, .del and .batch functions to level-tree-index that pass through to the underlying database but wait for the indexing to complete before calling the callback.
 
 */
 
