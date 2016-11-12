@@ -37,6 +37,8 @@
     "browserify": "^13.0.1",
     "browserify-shim": "^3.8.12",
     "buffer-equal-constant-time": "^1.0.1",
+    "buffer-replace": "^1.0.0",
+    "buffer-split": "^1.0.0",
     "colors": "^1.1.2",
     "cookie-auth": "^2.4.2",
     "cookie-cutter": "^0.1.1",
