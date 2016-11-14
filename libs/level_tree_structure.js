@@ -6,7 +6,7 @@
 
   This is useful for implementing e.g. nested comments.
 
-  level-tree-index works for all keyEncodings and works automatically for the json valueEncoding and for other valueEncodings if provide custom functions for the opts.pathProp and opts.parentProp options. level-tree-index works equally well with string and buffer paths.
+  level-tree-index works for all keyEncodings and works automatically for the json valueEncoding and for other valueEncodings if you provide custom functions for the opts.pathProp and opts.parentProp options. level-tree-index works equally well with string and buffer paths.
 
   Note that level-tree-index has no way to delay operations on your database, so when you run e.g. a .put on your database then you cannot expect the tree index to immediately be up to date. It wouldn't be too difficult to add .put, .del and .batch functions to level-tree-index that pass through to the underlying database but wait for the indexing to complete before calling the callback.
 
@@ -107,6 +107,8 @@ function treeIndexer(db, idb, opts) {
     parentProp: 'parentKey', // property that references key of parent
     sep: '.' // path separator
   }, opts || {});
+
+  if(opts.sep.length < 1) throw new Error("Seperator cannot be zero length");
 
   this.indexes = {};
 
