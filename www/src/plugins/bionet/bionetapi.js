@@ -201,6 +201,60 @@ var bionetapi = {
       cb(false, [], err.message)
     });
   },
+  partPhysicalSearch(q, cb) {
+    console.log('part physical search q:%s', q)
+    const indexName = 'physical';
+    const listingType = 'inlab';
+    this.esclient.search({
+      index: indexName,
+      type: listingType,
+      "size": 20,
+      body: {
+        "query": {
+          or: [
+            {
+              "match": {
+                "name": q
+              }
+          },
+            {
+              "match": {
+                "locationid": q
+              }
+          }
+        ]
+        }
+      }
+    }).then(function (resp) {
+      console.log('searching for physical part: %s', q);
+      //console.log(JSON.stringify(resp, null, 2));
+      //var hits = resp.hits.total;
+      var hits = resp.hits.hits.length;
+      if (hits > 0) console.log("physical part search %s (%d)", q, hits);
+      var response = [];
+      for (var i = 0; i < hits; i++) {
+        var result = resp.hits.hits[i];
+        var id = result._id;
+        //console.log(id);
+        var part = {
+            t: 'c',
+            id: result._source.id,
+            name: result._source.name,
+            cassetteid: result._source.cassetteid,
+            locationid: result._source.locationid
+          }
+          console.log('part class:',JSON.stringify(result._source))
+          //sudocms.route('searchResult', 'packet', 'class', part)
+        response.push(part)
+      }
+      cb(true, response, '')
+    }, function (err) {
+      console.trace(err.message);
+      cb(false, [], err.message)
+    })
+
+  },
+
 
   updateClassItem: function (id, classData, cb) {
     console.log('bionetapi.updateClassItem: id=%s classData=%s', id, JSON.stringify(classData, null, 2))

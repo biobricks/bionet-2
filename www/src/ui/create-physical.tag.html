@@ -88,7 +88,7 @@
       formData.label = self.labelFormData
       savePhysical(formData, self.labelImageData, function(err, id) {
         if(err) {
-          app.ui.toast("Error: " + err); // TODO improve
+          app.ui.toast("Error create-physical: " + err); // TODO improve
           return;
         }
         app.ui.toast("Saved to database")

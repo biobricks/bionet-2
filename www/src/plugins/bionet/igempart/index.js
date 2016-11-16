@@ -251,7 +251,11 @@ var igempart = {
         if (section == 'sequence') {
           riot.mount('div#edit-part-content', 'part-sequence', opts)
         } else if (section == 'instances') {
+          riot.mount('div#edit-part-content', 'part-instance', opts)
+        } else if (section == 'notes') {
           riot.mount('div#edit-part-content', 'part-notes', opts)
+        } else if (section == 'attachment') {
+          riot.mount('div#edit-part-content', 'part-attachment', opts)
         } else {
           riot.mount('div#edit-part-content', 'part-specification', opts)
         }

@@ -10,6 +10,7 @@ var partsearch = {
 
     app.addStream('bioClassQuery')
     app.addStream('bioInstanceQuery')
+    app.addStream('bioPhysicalQuery')
     const searchResult = app.addStreamRouter('searchResult')
     const searchCache = app.addStream('searchCache').init(undefined)
     const bioClassCache = app.addStream('bioClassCache').init(undefined)
@@ -106,6 +107,21 @@ var partsearch = {
           }
         })
       //}
+    })
+    
+    app.observe('bioPhysicalQuery', (q) => {
+
+      // initialize search result stream
+      app.getStream('searchCache').init(undefined)
+
+      bionetapi.partPhysicalSearch(q, (result, data, msg) => {
+        if (result) {
+          app.route('searchResult', 'list', 'physical', data)
+          app.dispatch('bioInstanceCache', searchResult.getModel())
+        } else {
+          app.getThemeMethod().toast(msg)
+        }
+      })
     })
 
     //---------------------------------------------------------------------

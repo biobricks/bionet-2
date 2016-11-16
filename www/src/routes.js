@@ -20,7 +20,7 @@ riot.route('/logout', function () {
   console.log("logout route...");
   app.logout(function(err) {
     if(err) {
-      app.ui.toast("Error: " + err) // TODO handle better
+      app.ui.toast("Error logout route: " + err) // TODO handle better
     }
     riot.route('/');
   });

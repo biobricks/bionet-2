@@ -18,6 +18,14 @@
         icon: undefined,
         action: '/edit/'+opts.partID+'/sequence'
     }, {
+        label: 'attachments',
+        icon: undefined,
+        action: '/edit/'+opts.partID+'/attachment'
+    }, {
+        label: 'notes',
+        icon: undefined,
+        action: '/edit/'+opts.partID+'/notes'
+    }, {
         label: 'physical instance',
         icon: undefined,
         action: '/edit/'+opts.partID+'/instances'
@@ -92,23 +100,69 @@
   </script>
 </part-notes>
 
+<part-attachment>
+  <form-textarea-input label="Attachments" name="attachment" value={formData.notes}/>
+  <div id="dropZone" style="width: 100%; height: 200px; border-style: dashed; border-width:7px; border-color:#b0b0b0;">
+    <div class="valign-wrapper" style="width:100%; height:100%">
+      <h5 class="valign center-align" style="color:#404040; width:100%">Drag and drop files to upload...</h5>
+    </div>
+  </div>
+  <script>
+    var formData = app.getModel('partData')
+    this.on('mount', function() {
+      console.log('part notes mounted')
+
+      var dropZone = document.getElementById('dropZone');
+      if (dropZone === null || dropZone === undefined) {
+        console.log('null dropzone')
+        return
+      }
+      // Optional.   Show the copy icon when dragging over.  Seems to only work for chrome.
+      dropZone.addEventListener('dragover', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+      });
+
+      // Get file data on drop
+      dropZone.addEventListener('drop', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var files = e.dataTransfer.files; // Array of all files
+        for (var i = 0, file; file = files[i]; i++) {
+          if (file.type.match(/image.*/)) {
+            var reader = new FileReader();
+            reader.onload = function(e2) { // finished reading file data.
+              var img = document.createElement('img');
+              img.src = e2.target.result;
+              document.body.appendChild(img);
+            }
+            reader.readAsDataURL(file); // start reading the file data.
+          }
+        }
+      });
+    })
+
+  </script>
+</part-attachment>
+
 <part-sequence>
   <form-container>
-    <div style="height:500px">
-<!--
-      <object width="100%" height="100%" type="application/x-shockwave-flash" data="static/assets/bioux/plasmid_viewer.swf" id="plasmid_viewer" style="visibility: inherit; border:0px;">
-        <param name='allowfullscreen' value='true' />
-        <param name='allowscriptaccess' value='always' />
         <!-- The initial sequence can be loaded using the flashvars parameter and URL-encoded JSON  -->
         <!-- This will fail if the JSON is not 100% correct. E.g. remember that hashes are formatted -->
         <!-- like: {"key": "value"} and _not_ like: {key: "value"} -->
         <!-- Also note the "json=" at the beginning of the value. This is required. -->
+<!--
+    <div style="height:500px">
+      <object width="100%" height="100%" type="application/x-shockwave-flash" data="static/assets/bioux/plasmid_viewer.swf" id="plasmid_viewer" style="visibility: inherit; border:0px;">
+        <param name='allowfullscreen' value='true' />
+        <param name='allowscriptaccess' value='always' />
         <param name='flashvars' value='{gfpSeqString}' />
       </object>
     </div>
+-->
     <form-textarea-input label="Sequence" name="sequence" value={formData.sequence}/>
     <std-button action={submitForm} label="submit" />
--->
   </form-container>
   <script>
 /*
@@ -143,3 +197,75 @@
 
   </script>
 </part-sequence>
+
+<part-instance>
+  <form-container>
+    <form-text-input label="Physical Location Code" name="locationid" value={formData.location}/>
+    <form-text-input label="Datamatrix Code" name="datamatrix" value={formData.qrcode}/>
+    <form-text-input label="Cassette Code" name="cassette" value={}/>
+    <std-button action={submitForm} label="add physical" />
+    <div class="row">
+    </div>
+  </form-container>
+  <list-container>
+    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}>
+      <span>
+        <select style="display:inline-block; width:30%">
+        <option value="" selected disabled>Select action</option>
+        <option value="1">Delete</option>
+        <option value="2">Edit</option>
+        <option value="3">Update</option>
+      </select>
+      </span>
+      <span>
+        <a class="waves-effect waves-light btn  darken-1">update</a>
+      </span>
+    </list-header>
+    <form>
+      <list-item no-reorder each={item in searchresult} item={item}>
+        <div>
+          <input type="checkbox" id="{item.data.id}" />
+          <label for="{item.data.id}"></label>
+        </div>
+      </list-item>
+    </form>
+  </list-container>
+
+  <script>
+    const tag = this
+    self.formData = app.getModel('createPart')
+    app.dispatch('bioPhysicalQuery', self.formData.name)
+    self.searchresult = []
+    self.primaryHeader = ''
+    self.secondaryHeader = ''
+    self.clickphysical = function(itemData) {
+      console.log('clickphysical', JSON.stringify(itemData))
+      self.locationid.value = itemData.locationid
+      self.datamatrix.value = itemData.id
+      self.cassette.value = itemData.cassetteid
+      tag.update()
+    }
+
+    self.submitForm = function() {
+      const partData = JSON.parse(JSON.stringify(self.formData))
+      partData.locationid = self.locationid.value
+      partData.datamatrix = self.datamatrix.value
+      partData.cassetteid = self.cassette.value
+      console.log('create instance:', JSON.stringify(partData))
+      app.route('partDataAccessor', 'storePhysical', 'toPhysicalItem', partData)
+    }
+
+    app.addRouteDestination('searchResult', 'list', function(list) {
+      console.log('physical part search result, tag:', JSON.stringify(list))
+      self.secondaryHeader = list.length + ' Physical instances'
+      self.searchresult = list
+      for (var i = 0; i < list.length; i++) {
+        list[i].click = self.clickphysical
+      }
+      tag.update()
+      app.dispatch('searchCache', list)
+    })
+
+  </script>
+</part-instance>
+
