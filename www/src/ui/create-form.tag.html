@@ -1,76 +1,75 @@
 <create-form>
-  
-  <div class="container" style="padding-top:100px;">
-
-    <form name="createForm" onsubmit={submitForm}>
-      <div>What would you like to add?</div>
-      <div>
-        <div id="selectedTypeContainer" class="selected-type">
-          <span id="selectedTypeLabel">plasmid</span>
-        </div>
-        <div class="query-container">
-          <input type="text" name="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
-        </div>
-      </div>
-      <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
-      <ul id="matchList">
-        <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-        <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
-      </ul>
-    </form>
-  </div>
+  <content-container style="padding-top:100px;">
+    <section-container>
+        <form name="createForm" onsubmit={submitForm2}>
+          <div>What would you like to add?</div>
+          <div>
+            <div id="selectedTypeContainer" class="selected-type">
+              <span id="selectedTypeLabel">plasmid</span>
+            </div>
+            <div class="query-container">
+              <input type="text" name="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+            </div>
+          </div>
+          <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
+          <ul id="matchList">
+            <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+            <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
+          </ul>
+        </form>
+    </section-container>
+  </content-container>
   <script>
+    self.submitForm2 = function(e) {
+      console.log('create-form submitForm')
+      e.preventDefault();
 
+      //     self.selectCurrent();
+      var val = self.createForm.q.value.trim()
 
-   this.submitForm = function(e) {
-     e.preventDefault();
+      if (!self.selectedType && val) {
+        app.remote.getBy('name', val, function(err, o) {
+          if (err) return app.ui.toast("Error: " + err); // TODO handle better
 
-//     self.selectCurrent();
-     var val = self.createForm.q.value.trim()
+          if (!o) {
+            riot.route('/create-unknown/' + encodeURIComponent(val));
+          } else {
+            riot.route('/create-physical/' + o.id);
+          }
+        });
+        return;
+      } else if (self.selectedType) {
+        if (self.selectedType.virtual) {
+          var url = '/create-virtual/' + encodeURIComponent(self.selectedType.name);
+          if (val) {
+            url += '/?name=' + encodeURIComponent(val);
+          }
+          riot.route(url);
+        } else {
+          var url = '/create-physical/' + encodeURIComponent(self.selectedType.name);
+          if (val) {
+            url += '/?name=' + encodeURIComponent(val);
+          }
+          riot.route(url);
+        }
+      } else {
+        // do nothing
+      }
+    };
 
-     if(!self.selectedType && val) {
-       app.remote.getBy('name', val, function(err, o) {
-         if(err) return app.ui.toast("Error: " + err); // TODO handle better
-      
-         if(!o) {
-           riot.route('/create-unknown/' + encodeURIComponent(val)); 
-         } else {
-           riot.route('/create-physical/' + o.id); 
-         }
-       });
-       return;
-     } else if(self.selectedType) {
-       if(self.selectedType.virtual) {
-         var url = '/create-virtual/' + encodeURIComponent(self.selectedType.name);
-         if(val) {
-           url += '/?name=' + encodeURIComponent(val);
-         }
-         riot.route(url);
-       } else {
-         var url = '/create-physical/' + encodeURIComponent(self.selectedType.name);
-         if(val) {
-           url += '/?name=' + encodeURIComponent(val);
-         }
-         riot.route(url);
-       }
-     } else {
-       // do nothing
-     }
-   };
-    
-   function query(type, q, cb) {
-   
-     app.remote.createAutocomplete(type, q, function(err, results) {
-       if(err) return cb(err)
-       cb(null, results)
-     });
-   }
+    function query(type, q, cb) {
+
+      app.remote.createAutocomplete(type, q, function(err, results) {
+        if (err) return cb(err)
+        cb(null, results)
+      });
+    }
 
     self.selected = null
     self.selectedType = null
 
     this.on('mount', function() {
-     $(self.createForm.q).focus()
+      $(self.createForm.q).focus()
 
       self.updateMatchListPosition = function() {
         var pos = $(self.createForm.q).offset();
@@ -81,7 +80,7 @@
 
       self.selectCurrent = function() {
         var sel = self.matches[self.selected]
-        if(sel.pre === 'type') {
+        if (sel.pre === 'type') {
           self.setSelectedType(sel)
           self.createForm.q.value = ''
         } else {
@@ -91,7 +90,7 @@
       }.bind(this)
 
       self.setSelectedType = function(type) {
-        if(!type) {
+        if (!type) {
           self.selectedType = null
           $(self.selectedTypeContainer).css('display', 'none')
         } else {
@@ -116,11 +115,11 @@
 
       self.elementOver = function(e) {
         console.log("MOUSE OVER");
-        if($(e.target).hasClass('no-match')) return;
+        if ($(e.target).hasClass('no-match')) return;
         var lis = $(self.matchList).find('li');
         var i;
-        for(i=0; i < lis.length; i++) {
-          if(lis[i] == e.target) {
+        for (i = 0; i < lis.length; i++) {
+          if (lis[i] == e.target) {
             self.selected = i
             break
           }
@@ -136,20 +135,20 @@
       var hadQueryBeforeKeydown = false;
       $(self.createForm.q).keydown(function(e) {
 
-        if(e.keyCode === 38) { // up arrow
+        if (e.keyCode === 38) { // up arrow
           e.preventDefault()
-          if(self.selected !== null && self.selected > 0) self.selected--
-          this.update();
-        } else if(e.keyCode === 40) { // down arrow
+          if (self.selected !== null && self.selected > 0) self.selected--
+            this.update();
+        } else if (e.keyCode === 40) { // down arrow
           e.preventDefault()
-          if(self.selected !== null && self.selected < self.matches.length-1) self.selected++
-          this.update();
-        } else if(e.keyCode === 27) { // escape
+          if (self.selected !== null && self.selected < self.matches.length - 1) self.selected++
+            this.update();
+        } else if (e.keyCode === 27) { // escape
           self.hideMatches()
-        } else if(e.keyCode === 9) { // tab
-          if(self.selected === null) return // normal operation if nothing selected
+        } else if (e.keyCode === 9) { // tab
+          if (self.selected === null) return // normal operation if nothing selected
           e.preventDefault();
-          self.selectCurrent()                                   
+          self.selectCurrent()
         } else {
           hadQueryBeforeKeydown = !!self.createForm.q.value.replace(/\s+/g, '')
         }
@@ -157,10 +156,10 @@
       }.bind(this));
 
       $(self.createForm.q).keyup(function(e) {
-        if(e.keyCode === 8 || e.keyCode === 46) { // backspace or delete
+        if (e.keyCode === 8 || e.keyCode === 46) { // backspace or delete
           var hasQueryNow = !!self.createForm.q.value.replace(/\s+/g, '')
 
-          if(!hadQueryBeforeKeydown && !hasQueryNow) {
+          if (!hadQueryBeforeKeydown && !hasQueryNow) {
             self.setSelectedType()
           }
         }
@@ -173,29 +172,29 @@
         var q = self.createForm.q.value.trim();
 
         query(self.selectedType, q, function(err, results) {
-          if(err) return app.ui.toast(err); // TODO better error handling
-          
-          if(!q) {
+          if (err) return app.ui.toast(err); // TODO better error handling
+
+          if (!q) {
             self.matches = null;
           } else {
             var i;
-            for(i=0; i < results.types.length; i++) {
+            for (i = 0; i < results.types.length; i++) {
               self.matches.push({
                 pre: "type",
-                name: results.types[i].name, 
+                name: results.types[i].name,
                 extraClass: 'type',
                 virtual: results.types[i].virtual
               });
             }
-            for(i=0; i < results.virtuals.length; i++) {
+            for (i = 0; i < results.virtuals.length; i++) {
               self.matches.push({
                 pre: "virtual",
                 name: results.virtuals[i].name
               });
             }
           }
-          
-          if(self.matches && self.matches.length) {
+
+          if (self.matches && self.matches.length) {
             selected = 0;
           } else {
             selected = null
@@ -207,7 +206,7 @@
     })
 
     this.on('updated', function() {
-      if(self.matches && self.matches.length) {
+      if (self.matches && self.matches.length) {
         $(self.matchList).css('border', '')
       } else {
         $(self.matchList).css('border', 'none')
@@ -218,22 +217,20 @@
 
       $(self.createForm.q).css('color', '');
 
-      if(self.matches) {
+      if (self.matches) {
 
         $(self.matchList).find('li').mouseover(function(e) {
 
         }.bind(this))
 
         // check for single exact match
-        if(self.matches.length === 1) {
-          if(self.matches[0].name.replace(/[^\w\d]+/g, '').toLowerCase() === q.replace(/[^\w\d]+/g, '')) {
+        if (self.matches.length === 1) {
+          if (self.matches[0].name.replace(/[^\w\d]+/g, '').toLowerCase() === q.replace(/[^\w\d]+/g, '')) {
             $(self.createForm.q).css('color', 'green')
           }
         }
       }
     })
-
-    
 
   </script>
 </create-form>

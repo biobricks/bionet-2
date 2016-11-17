@@ -67,7 +67,7 @@
       labelMaker.drawLabel('labelPreview', settings.base_url+"/p/"+self.humanID, pre+txt, o, cb);
     }
 
-    this.submitForm = function(e) {
+    self.submitForm = function(e) {
       if(!modalCallback) return;
       finalizeLabel(function(err, humanID) {
         if(err) return;

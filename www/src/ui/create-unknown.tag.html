@@ -18,6 +18,6 @@
       if (type.virtual === true) type.url = '/create-virtual/' + encodeURI(type.name)
       else type.url = '/create-physical/' + encodeURI(type.name)
     }
-
+    console.log("create unknown, types:%s",JSON.stringify(self.dataTypes))
   </script>
 </create-unknown>

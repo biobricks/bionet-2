@@ -76,7 +76,7 @@
       $.extend(app.state.editPart, $.formToObject(self.editPartForm))
     }.bind(this));
 
-    this.submitForm = function(e) {
+    self.submitForm = function(e) {
       if(!app.state.editPart.id) {
         app.ui.toast("Error: Missing part ID") // TODO better error handling
         return;
@@ -191,7 +191,7 @@
     self.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
       //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
 */
-    this.submitForm = function(e) {
+    self.submitForm = function(e) {
 
     }
 
