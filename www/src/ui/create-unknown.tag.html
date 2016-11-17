@@ -1,15 +1,23 @@
 <create-unknown>
-  <div class="create-unknown">
-    <h5>What would you like to create?</h5>
-    <ul>
-      <li><a href="/create-physical/-80%20freezer">-80 freezer</a></li>
-      <li><a href="/create-physical/room">room</a></li>
-      <li><a href="/create-virtual/plasmid">plasmid</a></li>
-      <li><a href="/create-virtual/strain">strain</a></li>
-    </ul>
-  </div>
-  <script>
+  <content-container style="padding-top:0px;">
+    <section-container>
+      <div class="create-unknown">
+        <h5>What would you like to create?</h5>
+        <ul>
+          <li each={item in dataTypes}><a href="{item.url}">{item.name}</a></li>
+        </ul>
+      </div>
+    </section-container>
+  </content-container>
 
+  <script>
+    const appSettings = app.getAppSettings()
+    self.dataTypes = appSettings.dataTypes
+    for (var i = 0; i < self.dataTypes.length; i++) {
+      const type = self.dataTypes[i]
+      if (type.virtual === true) type.url = '/create-virtual/' + encodeURI(type.name)
+      else type.url = '/create-physical/' + encodeURI(type.name)
+    }
 
   </script>
 </create-unknown>

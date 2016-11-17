@@ -5,7 +5,7 @@ import NanoStream from './NanoStream';
 import NanoRoute from './NanoRoute';
 const EventEmitter = require('events');
 import search from './search'
-
+var appSettings = require('../../../settings.js');
 
 class App extends EventEmitter {
 
@@ -264,6 +264,9 @@ class App extends EventEmitter {
 
   getThemeMethod() {
     return this.getTheme().method;
+  }
+  getAppSettings() {
+    return appSettings;
   }
 
 };
