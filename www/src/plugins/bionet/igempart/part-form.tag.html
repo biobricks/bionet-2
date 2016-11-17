@@ -248,6 +248,7 @@
 
     self.submitForm = function() {
       const partData = JSON.parse(JSON.stringify(self.formData))
+      partData.name = app.state.editPart.id
       partData.locationid = self.locationid.value
       partData.datamatrix = self.datamatrix.value
       partData.cassetteid = self.cassette.value

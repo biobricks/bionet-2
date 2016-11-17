@@ -278,19 +278,20 @@ var bionetapi = {
   },
 
   recentChanges: function (cb) {
-    cb(true, [], '')
+    cb(false, [], '')
   },
   getID(cb) {
-    cb(true, '', '')
+    cb(false, '', '')
   },
   getPhysical(id, cb) {
-    cb(true, {}, '')
+    cb(false, {}, '')
   },
-  savePhysical(m, imageData, doPrint, cb) {
-    cb(true, '')
+  savePhysical(m, cb) {
+    //todo: implement app.remote.savePhysical
+    cb(false, '')
   },
   delPhysical(id, cb) {
-    cb(true, '')
+    cb(false, '')
   }
 }
 module.exports = bionetapi
