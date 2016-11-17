@@ -7,17 +7,21 @@
         <form-text-input label="Name" name="name" value={formData.name}/>
         <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
         
+        <div each={field in fields}>
+          <form-text-input label={field.name} name={field.name} value="" />
+        </div>
+
         <div class="row">
           <div style="display:block;float:left">Barcode: <span id="curBarcode"></span><a id="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
           </div>
         </div>
-        
+
         <div class="row">
           <div style="display:block;float:left">Location: <span id="curContainerBarcode"></span><a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a> or </div>
           <div id="autocomplete-container" class="col s12" style="width:300px;padding-left:15px;float:left">
           </div>
         </div>
-        
+
         <std-button label="submit" action={submitForm} />
         <input type="submit" style="visibility:hidden" />
       </form>
@@ -29,45 +33,62 @@
   <script>
     /*
 
-       * ensure date/time and author are always saved
+               * ensure date/time and author are always saved
 
-       * make create-physical capable of editing
-       * make /p/id and /p/humanID routes work
-       * get /scan working
-       ** and link it from top menu
+               * make create-physical capable of editing
+               * make /p/id and /p/humanID routes work
+               * get /scan working
+               ** and link it from top menu
 
-       * test printing
-       * link create-physical from create-form
-       * link create (virtual) from create-form
-
-
-       * get normal search working
-       * make create-form talk to database
-       * get inventory search working
-       * get create-physical autocomplete working
+               * test printing
+               * link create-physical from create-form
+               * link create (virtual) from create-form
 
 
-       # To Bring
-
-       * raspi/bbb + sd card for printer
-       ** all cables for this
-       * raspberry pi + touchscreen combo
-       ** cable for raspi to touchscreen connection
-       ** power adapter and long microusb cable
-       * flatbed scanner
-       * tablets and eyepieces
+               * get normal search working
+               * make create-form talk to database
+               * get inventory search working
+               * get create-physical autocomplete working
 
 
-       # Thursday + Friday
+               # To Bring
 
-       * ensure access control works
+               * raspi/bbb + sd card for printer
+               ** all cables for this
+               * raspberry pi + touchscreen combo
+               ** cable for raspi to touchscreen connection
+               ** power adapter and long microusb cable
+               * flatbed scanner
+               * tablets and eyepieces
 
-       * add Tim's physicals list to materials
-       * request part feature
-       * global search feature
-       * get multi-tube scanner working
 
-    */
+               # Thursday + Friday
+
+               * ensure access control works
+
+               * add Tim's physicals list to materials
+               * request part feature
+               * global search feature
+               * get multi-tube scanner working
+
+            */
+
+    const appSettings = app.getAppSettings()
+    const dataTypes = appSettings.dataTypes
+    self.fields = []
+      //console.log('create physical, object=',JSON.stringify())
+    for (var i = 0; i < dataTypes.length; i++) {
+      const dataType = dataTypes[i]
+      if (opts.type === dataType.name && dataType.fields !== undefined) {
+        const fields = dataType.fields
+        Object.keys(fields).forEach(function(key, index) {
+          self.fields.push({
+            name: key,
+            value: fields[index]
+          })
+        });
+      }
+    }
 
     function savePhysical(p, labelImage, cb) {
       var doPrint = labelImage ? true : false
