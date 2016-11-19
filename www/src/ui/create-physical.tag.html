@@ -6,7 +6,7 @@
       <form name="createPhysicalForm" class="col s12" onsubmit={submitForm}>
         <form-text-input label="Name" name="name" value={formData.name}/>
         <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
-        
+
         <div each={field in fields}>
           <form-text-input label={field.name} name={field.name} value="" />
         </div>
@@ -33,45 +33,45 @@
   <script>
     /*
 
-               * ensure date/time and author are always saved
+                       * ensure date/time and author are always saved
 
-               * make create-physical capable of editing
-               * make /p/id and /p/humanID routes work
-               * get /scan working
-               ** and link it from top menu
+                       * make create-physical capable of editing
+                       * make /p/id and /p/humanID routes work
+                       * get /scan working
+                       ** and link it from top menu
 
-               * test printing
-               * link create-physical from create-form
-               * link create (virtual) from create-form
-
-
-               * get normal search working
-               * make create-form talk to database
-               * get inventory search working
-               * get create-physical autocomplete working
+                       * test printing
+                       * link create-physical from create-form
+                       * link create (virtual) from create-form
 
 
-               # To Bring
-
-               * raspi/bbb + sd card for printer
-               ** all cables for this
-               * raspberry pi + touchscreen combo
-               ** cable for raspi to touchscreen connection
-               ** power adapter and long microusb cable
-               * flatbed scanner
-               * tablets and eyepieces
+                       * get normal search working
+                       * make create-form talk to database
+                       * get inventory search working
+                       * get create-physical autocomplete working
 
 
-               # Thursday + Friday
+                       # To Bring
 
-               * ensure access control works
+                       * raspi/bbb + sd card for printer
+                       ** all cables for this
+                       * raspberry pi + touchscreen combo
+                       ** cable for raspi to touchscreen connection
+                       ** power adapter and long microusb cable
+                       * flatbed scanner
+                       * tablets and eyepieces
 
-               * add Tim's physicals list to materials
-               * request part feature
-               * global search feature
-               * get multi-tube scanner working
 
-            */
+                       # Thursday + Friday
+
+                       * ensure access control works
+
+                       * add Tim's physicals list to materials
+                       * request part feature
+                       * global search feature
+                       * get multi-tube scanner working
+
+                    */
 
     const appSettings = app.getAppSettings()
     const dataTypes = appSettings.dataTypes
@@ -90,7 +90,7 @@
       }
     }
 
-    function savePhysical(p, labelImage, cb) {
+    var savePhysical=function(p, labelImage, cb) {
       var doPrint = labelImage ? true : false
       app.remote.savePhysical(p, labelImage, doPrint, function(err, id) {
         if (err) {
@@ -123,18 +123,17 @@
       });
     }
 
-    this.createLabel = function() {
-
-      var labelOpts = {
+    self.createLabel = function() {
+      var tags=[]
+      var defaultLabelOpts = {
         title: self.printNameDefault,
         bsl: 1
       }
-
-      var opts = {
+      var labelOpts = {
         title: "Create label",
         subtitle: undefined,
         subTag: "print", // the tag to mount
-        label: self.labelFormData || labelOpts,
+        label: self.labelFormData || defaultLabelOpts,
         cb: function(err, formData, imageData) {
           self.labelFormData = formData;
           self.labelImageData = imageData;
@@ -142,7 +141,7 @@
           $(self.createLabelButton).html('edit label');
         }
       }
-      var tags = riot.mount('#printModal', 'modal-content', opts)
+      tags = riot.mount('#printModal', 'modal-content', labelOpts)
 
       $(self.printModal).openModal({
         complete: function() {
@@ -151,8 +150,10 @@
       })
     }
 
-    this.scanItem = function() {
-      var opts = {
+    self.scanItem = function() {
+      console.log('scanItem')
+      var tags=[]
+      var scanOpts = {
         title: "Scan",
         subtitle: "Scan the item's barcode",
         subTag: "scan", // the tag to mount
@@ -161,10 +162,11 @@
           $(self.curBarcode).html('  ' + id + '  ');
           $(self.scanButton).html('rescan');
           $(self.scanModal).closeModal();
+          console.log('scan item cb, tags:',tags)
           tags[0].unmount(true)
         }
       }
-      var tags = riot.mount('#scanModal', 'modal-content', opts)
+      tags = riot.mount('#scanModal', 'modal-content', scanOpts)
 
       $(self.scanModal).openModal({
         complete: function() {
@@ -173,23 +175,27 @@
       })
     }
 
-    this.scanContainer = function() {
-      var opts = {
+    self.scanContainer = function() {
+      console.log('scan container function')
+      var tags=[]
+      var scanOpts = {
         title: "Scan location",
         subtitle: "Scan the barcode of e.g. the box or freezer where you put this item",
         subTag: "scan",
         cb: function(err, id) {
+          console.log('scan container cb 1, tags:',tags)
           if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
           $(self.curContainerBarcode).html('  ' + id + '  ');
           $(self.containerScanButton).html('rescan container');
 
           $(self.scanModal).closeModal();
+          console.log('scan container cb 2, tags:',tags)
           tags[0].unmount(true)
         }
       }
-      var tags = riot.mount('#scanModal', 'modal-content', opts)
+      tags = riot.mount('#scanModal', 'modal-content', scanOpts)
 
-      $(self.scanModal).openModal({
+      $('#scanModal').openModal({
         complete: function() {
           tags[0].unmount(true)
         }
@@ -201,8 +207,8 @@
       if (!self.formData) {
         self.formData = {};
       }
-      if (this.opts.query && this.opts.query.name && this.opts.query.name.trim()) {
-        self.formData.name = decodeURIComponent(this.opts.query.name);;
+      if (opts.query && opts.query.name && opts.query.name.trim()) {
+        self.formData.name = decodeURIComponent(opts.query.name);;
       }
 
       this.update();
@@ -215,7 +221,7 @@
 
       if (opts.virtualID) {
         // create new physical instance of this material
-        app.remote.getMaterial(this.opts.virtualID, function(err, virtual) {
+        app.remote.getMaterial(opts.virtualID, function(err, virtual) {
           if (err) {
             app.ui.toast(err); // TODO handle better
             return;
@@ -229,12 +235,12 @@
         return;
       }
 
-      console.log("Creating:", this.opts.type);
-      app.remote.getType(this.opts.type, function(err, type) {
+      console.log("Creating:", opts.type);
+      app.remote.getType(opts.type, function(err, type) {
         if (err) {
           if (err.notFound) {
             // we are creating a material of unknown type
-            riot.route('/create-unknown/' + encodeURIComponent(this.opts.type))
+            riot.route('/create-unknown/' + encodeURIComponent(opts.type))
             return
           }
           return app.ui.toast(err); // TODO handle better
@@ -243,7 +249,7 @@
 
         if (type.virtual) {
           // this type needs to be a virtual that then has physicals associated
-          riot.route('/create/' + encodeURIComponent(this.opts.type));
+          riot.route('/create/' + encodeURIComponent(opts.type));
           return;
         }
 
@@ -277,7 +283,7 @@
     var tags;
 
     this.on('mount', function() {
-      tags = riot.mount('#modalContents', this.opts.subTag, this.opts);
+      tags = riot.mount('#modalContents', opts.subTag, opts);
     })
 
     this.on('before-unmount', function() {

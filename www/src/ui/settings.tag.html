@@ -42,7 +42,7 @@
     self.updateAccountSettings = function() {}
     this.on('before-mount', function() {
       //console.log('mpassword-form mount')
-      observer = app.addObserver(app.$.loginState, function(loginState) {
+      app.addObserver(app.$.loginState, function(loginState) {
         self.loggedin = loginState
         tag.update()
       })

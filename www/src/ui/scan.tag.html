@@ -33,7 +33,7 @@
 
     var dmdecode = require("datamatrix-decode");
     var datamatrix = require('../../../../biomatrix-scratch');
-
+    
     function getIDFromURL(url) {
       var m = url.match(new RegExp('^'+settings.base_url+'/p/(\\d+)'));
       if(!m || (m.length < 2)) return null;
@@ -168,6 +168,5 @@
         setTimeout(scan, 500);
       });
     });
-
   </script>
 </scan>

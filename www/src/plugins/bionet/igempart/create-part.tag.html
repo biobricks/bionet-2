@@ -84,7 +84,7 @@
       $.extend(app.state.createPart, $.formToObject(self.createPartForm))
     }.bind(this));
 
-    submitForm(e) {
+    self.submitForm = function(e) {
 
       app.remote.save(app.state.createPart, null, false, function(err, id) {
         if(err) return app.ui.toast("Error: " + err) // TODO handle error
@@ -109,7 +109,7 @@
   <script>
     app.state.createPart = app.state.createPart || {}
 
-    submitForm(e) {
+    self.submitForm = function(e) {
       console.log("SUBMIT seq");
     }
 
@@ -125,7 +125,7 @@
   </form-container>
   <script>
 
-//    this.submitForm = function() {
+//    self.submitForm = function() {
 
 //    }
 
