@@ -1,22 +1,22 @@
 <create-form>
   <content-container style="padding-top:100px;">
     <section-container>
-        <form name="createForm" onsubmit={submitForm2}>
-          <div>What would you like to add?</div>
-          <div>
-            <div id="selectedTypeContainer" class="selected-type">
-              <span id="selectedTypeLabel">plasmid</span>
+      <form name="createForm" onsubmit={submitForm2}>
+            <div>What would you like to add?</div>
+            <div>
+              <div id="selectedTypeContainer" class="selected-type">
+                <span id="selectedTypeLabel">plasmid</span>
+              </div>
+              <div class="query-container">
+                <input type="text" name="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+              </div>
             </div>
-            <div class="query-container">
-              <input type="text" name="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
-            </div>
-          </div>
-          <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
-          <ul id="matchList">
-            <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-            <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
-          </ul>
-        </form>
+            <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
+            <ul id="matchList">
+              <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+              <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
+            </ul>
+      </form>
     </section-container>
   </content-container>
   <script>
@@ -77,6 +77,10 @@
         pos.width = $(self.createForm.q).innerWidth();
         $(self.matchList).css(pos)
       }.bind(this)
+      
+      $(window).resize(function() {
+        self.updateMatchListPosition();
+      })
 
       self.selectCurrent = function() {
         var sel = self.matches[self.selected]
