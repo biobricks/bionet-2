@@ -29,7 +29,7 @@
   </form>
   <form if={!app.user} onsubmit={signupAction} class="col center">
       <div class="center">OR</div>
-      <form-text-input-empty label="enter invitation code, hint:bionet" name="mpassword" value={mpasswordInit}/>
+      <form-text-input-empty label="enter invitation code, hint:code" name="mpassword" value={mpasswordInit}/>
       <std-button label="sign up" action={signupAction}/>
   </form>
 

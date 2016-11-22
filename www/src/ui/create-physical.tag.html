@@ -1,7 +1,6 @@
 <create-physical>
-  <content-container style="padding-top:100px;">
-    <section-container>
 
+    <div class="container" style="margin-top:100px">
       <h5 id="createPhysicalHeader"></h5>
       <form name="createPhysicalForm" class="col s12" onsubmit={submitForm}>
         <form-text-input label="Name" name="name" value={formData.name}/>
@@ -28,50 +27,8 @@
 
       <div id="scanModal" class="scanModal modal"></div>
       <div id="printModal" class="printModal modal"></div>
-    </section-container>
-  </content-container>
+    </div>
   <script>
-    /*
-
-                       * ensure date/time and author are always saved
-
-                       * make create-physical capable of editing
-                       * make /p/id and /p/humanID routes work
-                       * get /scan working
-                       ** and link it from top menu
-
-                       * test printing
-                       * link create-physical from create-form
-                       * link create (virtual) from create-form
-
-
-                       * get normal search working
-                       * make create-form talk to database
-                       * get inventory search working
-                       * get create-physical autocomplete working
-
-
-                       # To Bring
-
-                       * raspi/bbb + sd card for printer
-                       ** all cables for this
-                       * raspberry pi + touchscreen combo
-                       ** cable for raspi to touchscreen connection
-                       ** power adapter and long microusb cable
-                       * flatbed scanner
-                       * tablets and eyepieces
-
-
-                       # Thursday + Friday
-
-                       * ensure access control works
-
-                       * add Tim's physicals list to materials
-                       * request part feature
-                       * global search feature
-                       * get multi-tube scanner working
-
-                    */
 
     const appSettings = app.getAppSettings()
     const dataTypes = appSettings.dataTypes
@@ -96,10 +53,6 @@
         if (err) {
           return cb(err);
         }
-        if (!p.id) {
-          p.created = new Date();
-        }
-        p.updated = new Date();
 
         cb(null, id);
       })
@@ -108,7 +61,6 @@
     /*
        TODO:
          associate with virtual
-         save full inventory path 
     */
     self.submitForm = function(e) {
       e.preventDefault()
@@ -116,9 +68,12 @@
       formData.label = self.labelFormData
       savePhysical(formData, self.labelImageData, function(err, id) {
         if (err) {
-          app.ui.toast("Error create-physical: " + err); // TODO improve
+          app.ui.toast("Error: " + err); // TODO improve
           return;
         }
+        
+        
+                        
         app.ui.toast("Saved to database")
       });
     }
@@ -215,7 +170,10 @@
 
       riot.mount('#autocomplete-container', 'autocomplete', {
         searchCallback: function(query, cb) {
-          app.remote.physicalAutocomplete(query, cb);
+          app.remote.physicalAutocomplete(query, function(err, result) {
+            console.log(err, result);
+            cb(err, result);
+          })
         }
       });
 

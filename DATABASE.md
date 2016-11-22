@@ -25,7 +25,7 @@ Minimal structure for bioDB entries:
       at: <seconds since epoch>,
       by: <user_id>
     },
-    changed: {
+    updated: {
       at: <seconds since epoch>,
       by: <user_id>
     }
@@ -67,7 +67,7 @@ Class abbreviation is: p
   value: {
     id: p-<uuid>,
     type: <type>,
-    virtual_id: v-<uuid>, // the id of the parent virtual (if any)
+    virtual_id: <uuid>, // the id of the parent virtual (if any)
     name: <text>,
     description: <text>,
     parent: <physical_id>,

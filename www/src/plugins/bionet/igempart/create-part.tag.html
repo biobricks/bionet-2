@@ -86,7 +86,7 @@
 
     self.submitForm = function(e) {
 
-      app.remote.save(app.state.createPart, null, false, function(err, id) {
+      app.remote.saveVirtual(app.state.createPart, function(err, id) {
         if(err) return app.ui.toast("Error: " + err) // TODO handle error
         
         app.ui.toast("Virtual created with ID: " + id)

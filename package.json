@@ -4,6 +4,7 @@
   "scripts": {
     "postinstall": "cp node_modules/materialize-css/js/date_picker/picker.js node_modules/materialize-css/bin/",
     "watchify": "watchify -vd -p browserify-hmr -e www/src/main.js -o www/js/bionet.js",
+    "watch": "watchify -vd -e www/src/main.js -o www/js/bionet.js",
     "serve": "http-server ./www -c 1 -a localhost",
     "dev": "npm-run-all --parallel watchify",
     "build": "cross-env NODE_ENV=production browserify -e www/src/main.js -m -o www/js/bionet.js",
@@ -53,6 +54,7 @@
     "less": "^2.7.1",
     "level": "^1.3.0",
     "level-changes": "0.0.1",
+    "level-tree-index": "0.0.5",
     "levelup": "^1.3.3",
     "materialize-css": "^0.97.7",
     "minimist": "^1.2.0",
