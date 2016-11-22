@@ -11,12 +11,12 @@
         </div>
 
         <div class="row">
-          <div style="display:block;float:left">Barcode: <span id="curBarcode"></span><a id="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+          <div style="display:block;float:left">Barcode: <input type="text" id="curBarcode" name="barcode" /><a id="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
           </div>
         </div>
 
         <div class="row">
-          <div style="display:block;float:left">Location: <span id="curContainerBarcode"></span><a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a> or </div>
+          <div style="display:block;float:left">Location ID: <input type="text" id="curContainerBarcode" name="parent_id" /><a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a> or </div>
           <div id="autocomplete-container" class="col s12" style="width:300px;padding-left:15px;float:left">
           </div>
         </div>
@@ -51,10 +51,13 @@
       var doPrint = labelImage ? true : false
       app.remote.savePhysical(p, labelImage, doPrint, function(err, id) {
         if (err) {
-          return cb(err);
+          app.ui.toast("Error: " + err); // TODO improve
+          if(cb) cb(err)
+          return;
         }
 
-        cb(null, id);
+        app.ui.toast("Saved to database")
+        if(cb) cb();
       })
     }
 
@@ -65,17 +68,26 @@
     self.submitForm = function(e) {
       e.preventDefault()
       var formData = $.formToObject(self.createPhysicalForm) || {};
-      formData.label = self.labelFormData
-      savePhysical(formData, self.labelImageData, function(err, id) {
-        if (err) {
-          app.ui.toast("Error: " + err); // TODO improve
+      formData.label = self.labelFormData;
+
+      if(!formData.parent_id || !formData.parent_id.length) {
+        if(formData.parent_name) {
+          app.remote.getBy('name', formData.parent_name, function(err, m) {
+            if(err) return app.ui.toast("Error:" + err);
+
+            formData.parent_name = '';
+            if(!m) {
+              app.ui.toast("Warning: Invalid container");
+            } else {
+              formData.parent_id = m.id;
+            }
+            savePhysical(formData, self.labelImageData);
+          })
           return;
         }
-        
-        
-                        
-        app.ui.toast("Saved to database")
-      });
+      }
+
+      savePhysical(formData, self.labelImageData);
     }
 
     self.createLabel = function() {
@@ -114,7 +126,7 @@
         subTag: "scan", // the tag to mount
         cb: function(err, id) {
           if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
-          $(self.curBarcode).html('  ' + id + '  ');
+          $(self.curBarcode).val(id);
           $(self.scanButton).html('rescan');
           $(self.scanModal).closeModal();
           console.log('scan item cb, tags:',tags)
@@ -138,13 +150,17 @@
         subtitle: "Scan the barcode of e.g. the box or freezer where you put this item",
         subTag: "scan",
         cb: function(err, id) {
-          console.log('scan container cb 1, tags:',tags)
           if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
-          $(self.curContainerBarcode).html('  ' + id + '  ');
-          $(self.containerScanButton).html('rescan container');
+          app.ui.toast("Looking up scanned item");
+          
+          app.remote.getBy('barcode', id, function(err, m) {
+            if(err) return app.ui.toast("Lookup failed. Item does not exist in database.");
+
+            $(self.curContainerBarcode).val(m.id);
+            $(self.containerScanButton).html('rescan container');
+          })
 
           $(self.scanModal).closeModal();
-          console.log('scan container cb 2, tags:',tags)
           tags[0].unmount(true)
         }
       }
@@ -162,19 +178,19 @@
       if (!self.formData) {
         self.formData = {};
       }
+
       if (opts.query && opts.query.name && opts.query.name.trim()) {
         self.formData.name = decodeURIComponent(opts.query.name);;
       }
 
       this.update();
-
       riot.mount('#autocomplete-container', 'autocomplete', {
         searchCallback: function(query, cb) {
           app.remote.physicalAutocomplete(query, function(err, result) {
-            console.log(err, result);
             cb(err, result);
           })
-        }
+        },
+        name: 'parent_name',
       });
 
       if (opts.virtualID) {

@@ -105,7 +105,13 @@
 
     self.keyboardScan = function(e) {
       e.preventDefault();
-      var code = self.keyboardInputForm.code.value
+      var code = self.keyboardInputForm.code.value;
+      code = code.replace(/[^\d]+/g, '');
+      if(code.length <= 0) {
+        $('#keyboardInput').val('');
+        app.ui.toast("Invalid scan..."); // TODO better errer handling
+        return;                       
+      }
       scanSuccess(code);
     }.bind(this);
 
@@ -152,12 +158,12 @@
       getUserMedia({video: true, audio: false}, function(err, stream) {
         $('#cameraAccessMsg').css('display', 'none');
         if(err) {
-          if(err.name === 'DevicesNotFoundError') {
+          if(err.name === 'DevicesNotFoundError' || err.name === 'NotFoundError') {
             scanError("Hmm, looks like your device doesn't have a camera.<br/>You can still use the hand-held USB scanner.");
           } else if(err.name === 'InternalError') {
             scanError("Could not access your camera. Is another application using it?");
           } else {
-            scanError("Unknown error: " + err.msg)
+            scanError("Unknown camera access error: " + err.msg)
           }
           return;
         }

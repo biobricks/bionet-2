@@ -1,9 +1,9 @@
 <list-item>
   <!-- avatar list item template -->
-  <div class="collection-item  avatar2 valign-wrapper {theme.style.color.background} {theme.style.color.text}" onclick={clickitem}>
+  <div class="collection-item  avatar2 valign-wrapper {theme.style.color.background} {theme.style.color.text}" style="padding-left:{item.indent ? item.indent * 15 : 0}px" onclick={clickitem}>
     <img if={item.avatar} class="circle" src={item.avatar} alt="" />
     <div class="left" style="display: inline-block; width:70%">
-      <div class="left" style="cursor: pointer; cursor: hand;">{item.primary_text}</div><br/>
+      <div class="left" style="cursor: pointer; cursor: hand; {item.highlight ? 'color:green' : ''}">{item.primary_text}</div><br/>
       <div class="left" style="cursor: pointer; cursor: hand;">{item.secondary_text}</div>
     </div>
     <div class="right" style="display: inline-block; width:30%">
@@ -15,22 +15,16 @@
 
   <script>
     self.item = opts.item
-    self.clickitem = function() {
-      var itemData = {}
-      try {
-        itemData = JSON.parse(opts.item.data)
-      } catch(e) {   
-      }
 
-      app.route('partDataAccessor','cache','fromSearchItem',itemData)
-      riot.route(opts.item.url,opts.item.url,true)
-      //window.location = opts.item.url
+    self.clickitem = function(e) {
+      e.stopPropagation()
+        app.ui.toast("Not implemented: Edit physical " + opts.item.id);
+      return false;
     }
 
     self.clickavailability = function(e) {
       e.stopPropagation()
-      riot.route(opts.item.secondary_url,opts.item.secondary_url,true)
-      //window.location = opts.item.secondary_url
+      return false;
     }
 
   </script>

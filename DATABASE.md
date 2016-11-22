@@ -70,7 +70,8 @@ Class abbreviation is: p
     virtual_id: <uuid>, // the id of the parent virtual (if any)
     name: <text>,
     description: <text>,
-    parent: <physical_id>,
+    barcode: <barcode>, // barcode as string (If any. Only for DataMatrix)
+    parent_id: <physical_id>,
     files: [
       fileName: <generated_unique_name_on_disk>,
       fileType: <detected_file_type>,

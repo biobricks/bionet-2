@@ -1,127 +1,123 @@
 <parts-inventory>
   <content-container style="padding-top:100px;">
     <section-container>
-      <search-input label="search inventory" name="searchbio" action={searchclick} value={searchbioInit}/>
+      <form onsubmit={self.submitForm}>
+        <search-input label="search inventory" name="searchbio" action={searchclick}/>
+        <input type="submit" style="display:none" />
+      </div>
       <div id="part-inventory-content" class="{theme.style.color.background} {theme.style.color.text}">
-        <inventory-treeview labid={labid}/>
+        <inventory-treeview nodes={self.nodes} />
       </div>
     </section-container>
   </content-container>
   <script>
     const tag = this
-    self.searchbioInit = ''
-    
-    self.labid = 'LAB180'
-      //self.labid='LAB4133'
-    const q = {
-      locationid: self.labid
+ 
+    self.nodes = [];
+
+    self.submitForm = function() {
+
+      riot.route('/inventory?q='+encodeURIComponent(self.searchbio.value))
     }
-    app.dispatch('inventoryQuery', q)
-  
-    const getParam = function(q, token) {
-      var value = '';
-      if (q.indexOf(token) >= 0) {
-        var pos = q.indexOf(token)
-        value = q.substr(pos + 2)
-        pos = value.indexOf(' ')
-        if (pos > 0) {
-          value = value.substr(0, pos - 1)
-        }
-      } else {
-        value = undefined
+
+
+    this.on('mount', function() {
+      if(!this.opts.q) return;
+      var q = decodeURIComponent(this.opts.q);
+      self.searchbio.value = q;
+
+      this.update();
+
+      q = new RegExp(q.replace(/\s+/, '.*'), 'i');
+
+
+      function itemFromNode(node) {
+
       }
-      return value
-    }
-    
-    self.searchclick = function() {
-      var partid = self.searchbio.value
-      var distance = getParam(partid, 'd:')
-      var locationid = getParam(partid, 'l:')
-      if (locationid === undefined) {
-        locationid = self.labid
-      } else {
-        self.labid=locationid
-        tag.update()
-      }
-      const pos = partid.indexOf(':')
-      if (pos >= 0) {
-        if (pos === 1) partid = undefined
-        else partid = partid.substr(0, pos - 2)
-      }
-      const q = {
-        q: self.searchbio.value,
-        partid: partid,
-        locationid: locationid,
-        distance: distance
-      }
-      app.dispatch('inventoryQuery', q)
-    }
+
+      // TODO remove settimeout
+      setTimeout(function() {
+
+        app.remote.inventoryTree(function(err, children) {
+          if(err) return console.error(err);
+
+          // TODO rewrite this matching algorithm 
+          //      so we can do single-pass matching
+          //      so we can use a stream
+   
+          var matches = [];
+          self.nodes = [];
+
+          var i, cur, indent, a;
+          for(i=0; i < children.length; i++) {
+            cur = children[i].path;
+            if(cur.match(q)) matches.push(cur);
+          }
+
+          var j, m, add, perfect;
+          for(i=0; i < children.length; i++) {
+            cur = children[i].path; 
+            a = cur.split('.');
+            indent = a.length - 1;
+            add = false
+            perfect = false
+            for(j=0; j < matches.length; j++) {
+              m = matches[j];
+              if(m.indexOf(cur) === 0) {
+                add = true;
+                if(m.length === cur.length) perfect = true;
+                break;
+              }
+            }
+            if(add) {
+              self.nodes.push({
+                indent: indent,
+                primary_text: a[a.length-1],
+                id: children[i].key,
+                highlight: perfect
+              });
+            }
+          }          
+
+          tag.update();
+
+        });
+      }, 500);
+    })
 
 
   </script>
 </parts-inventory>
 
-<treeview>
-
-  <ul style="margin:0 0 0 1em;position:relative">
-    <li style="padding:0 1.5em;">
-      <list-item item={item}/>
-      <treeview each={item in subitems} item={item}/>
-    </li>
-  </ul>
-  <script>
-    var item = opts.item
-      //console.log('treeview item: %s', JSON.stringify(item,null,2))
-
-    var subitems = [];
-
-    var inventoryType = {
-      F: 'Freezer',
-      S: 'Shelf',
-      C: 'Cassette'
-    }
-    const subitem = item.subitem
-    for (var key in subitem) {
-      if (subitem.hasOwnProperty(key)) {
-
-        const lcode = key.charAt(0)
-        if (inventoryType[lcode] !== undefined) {
-          var stext = ''
-          if (lcode === 'C') {
-            stext = subitem[key].data.partid
-            console.log('subitem: %s st:%s', JSON.stringify(subitem, null, 2), stext)
-          }
-          var ditem = {
-            primary_text: inventoryType[lcode] + ' ' + key,
-            secondary_text: stext,
-            subitem: subitem[key]
-          }
-          subitems.push(ditem)
-          console.log("treeview key=%s", key)
-        }
-      }
-    }
-    self.subitems = subitems
-
-  </script>
-</treeview>
-
 <inventory-treeview>
 
   <list-container>
-    <treeview each={item in subitems} item={item}/>
+    <ul style="margin:0 0 0 1em;position:relative">
+      <li style="padding:0 1.5em;">
+        <list-item each={node in nodes} item={node} />
+      </li>
+    </ul>
   </list-container>
 
   <script>
     /*
     <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
     */
-    const labid = opts.labid
-    self.primaryHeader = 'Lab ' + labid + ' inventory'
+    const tag = this;
+
+
+    this.on('mount', function() {
+
+    });
+
+    this.on('updated', function() {
+      
+    });
+
+/*
+    self.primaryHeader = 'Lab inventory'
     const tag = this
     self.subitems = []
-
-    self.searchresult = app.getModel('inventory') || []
 
     app.observe('inventory', function(list) {
       self.secondaryHeader = ''
@@ -143,6 +139,7 @@
       tag.update()
     })
 
+*/
   </script>
 
 </inventory-treeview>

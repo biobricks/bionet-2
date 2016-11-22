@@ -1,7 +1,7 @@
 <autocomplete>
   <div>
     <div>
-      <input type="text" id="q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
+      <input type="text" id="q" name={opts.name} placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
     </div>
     <ul id="matchList">
       <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.text}</li>

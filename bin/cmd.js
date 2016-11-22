@@ -95,7 +95,15 @@ var users = accountdown(userDB, {
 
 var indexDB = sublevel(db, 'i');
 var recentDB = sublevel(indexDB, 'changed', { keyEncoding: 'utf8', valueEncoding: 'utf8' });
-var physicalTree = treeIndex(physicalDB, sublevel(indexDB, 't'));
+var physicalTree = treeIndex(physicalDB, sublevel(indexDB, 't'), {
+  parentProp: 'parent_id'
+});
+
+// TODO for debug only
+physicalTree.rebuild(function(err) {
+  if(err) return console.error("inventory tree rebuild error:", err);
+  console.log("Finished rebuild");
+});
 
 var miscDB = sublevel(db, 'm');
 var idGenerator = new IDGenerator(miscDB);
@@ -180,7 +188,7 @@ function changeInfo(user) {
 }
 
 function saveMaterialInDB(m, user, dbType, cb) {
-  if(!m.name.trim()) return cb("Name must be specified");
+  if(!m.name || !m.name.trim()) return cb("Name must be specified");
 
   idGenerator.getCur(function(err, curID) {
     if(err) return cb(err);
@@ -444,12 +452,26 @@ websocket.createServer({server: server}, function(stream) {
                 console.log("saving:", m);
             },
 
+            inventoryTree: function(curUser, cb) {
+              physicalTree.children(null, cb);
+            },
+
+
             get: function(curUser, id, cb) {
-                console.log("getting:", id);
-                bioDB.get(id, {valueEncoding: 'json'}, function(err, p) {
-                    if(err) return cb(err);
-                    cb(null, p);
-                });
+              console.log("getting:", id);
+              var first = id[0];
+              var db;
+              if(first === 'p') {
+                db = physicalDB;
+              } else if(first === 'v') {
+                db = virtualDB;
+              } else {
+                return cb(new Error("Unknown material class"));
+              }
+              db.get(id, {valueEncoding: 'json'}, function(err, p) {
+                if(err) return cb(err);
+                cb(null, p);
+              });
             },
 
             // TODO use indexes for this!
