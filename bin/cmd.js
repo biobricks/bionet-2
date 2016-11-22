@@ -15,6 +15,7 @@ var sublevel = require('subleveldown'); // leveldb multiplexing
 var accountdown = require('accountdown'); // user/login management
 var uuid = require('uuid').v4;
 var through = require('through2');
+var treeIndex = require('level-tree-index');
 var accounts = require('../libs/user_accounts.js');
 var printServer = require('../libs/print_server.js');
 var Mailer = require('../libs/mailer.js');
@@ -69,6 +70,8 @@ settings.labelImageFilePath = path.resolve(path.join(settings.userFilePath, sett
 
 var db = level('./db');
 var bioDB = sublevel(db, 'b');
+var virtualDB = sublevel(bioDB, 'v-', {valueEncoding: 'json'});
+var physicalDB = sublevel(bioDB, 'p-', {valueEncoding: 'json'});
 
 // Start multilevel server for low level db access (e.g. backups)
 var multiLevelServer = net.createServer(function(con) {
@@ -92,6 +95,7 @@ var users = accountdown(userDB, {
 
 var indexDB = sublevel(db, 'i');
 var recentDB = sublevel(indexDB, 'changed', { keyEncoding: 'utf8', valueEncoding: 'utf8' });
+var physicalTree = treeIndex(physicalDB, sublevel(indexDB, 't'));
 
 var miscDB = sublevel(db, 'm');
 var idGenerator = new IDGenerator(miscDB);
@@ -168,7 +172,16 @@ printServer.start(settings, function(err) {
 });
 
 
-function createMaterialInDB(m, cb) {
+function changeInfo(user) {
+  return {
+    user: user.email,
+    time: unixEpochTime()
+  };
+}
+
+function saveMaterialInDB(m, user, dbType, cb) {
+  if(!m.name.trim()) return cb("Name must be specified");
+
   idGenerator.getCur(function(err, curID) {
     if(err) return cb(err);
 
@@ -177,11 +190,20 @@ function createMaterialInDB(m, cb) {
 //    return cb("missing or invalid human readable ID");
 //  }
 
-    // TODO should we ever generate these on the server?
-    m.id = m.id || uuid();
-    m.updated = m.updated || new Date()
+    m.id = m.id || dbType+'-'+uuid();
 
-    bioDB.put(m.id, m, {valueEncoding: 'json'}, function(err) {
+    var db;
+    if(dbType === 'v') {
+      db = virtualDB;
+    } else if(dbType === 'p') {
+      db = physicalDB;
+    }
+
+    var c = changeInfo(user);
+    m.created = m.created || c;
+    m.updated = c;
+
+    db.put(m.id, m, {valueEncoding: 'json'}, function(err) {
       if(err) return cb(err);
       addToIndex(m);
       cb(null, m.id);
@@ -192,6 +214,7 @@ function createMaterialInDB(m, cb) {
 websocket.createServer({server: server}, function(stream) {
 
     var rpcServer = rpc(auth({
+        userDataAsFirstArgument: true, 
         secret: settings.loginToken.secret,
         login: function(loginData, cb) {
             console.log("login attempt:", loginData);
@@ -214,20 +237,20 @@ websocket.createServer({server: server}, function(stream) {
         }
     }, {
         
-        foo: function(cb) {
+        foo: function(curUser, user, cb) {
             console.log("foo called");
             cb(null, "foo says hi");
         },
 
-        checkMasterPassword: function(password, cb) {
-        console.log('checkMasterPassword:%s:',settings.userSignupPassword);
+        checkMasterPassword: function(curUser, password, cb) {
+
             if(password != settings.userSignupPassword) {
                 return cb("Invalid master password");
             }
             cb();
         },
 
-        createUser: function(email, password, opts, cb) {
+        createUser: function(curUser, email, password, opts, cb) {
             if(typeof opts === 'function') {
                 cb = opts;
                 opts = {};
@@ -241,49 +264,72 @@ websocket.createServer({server: server}, function(stream) {
             accounts.create(users, user, password, mailer, cb);
         }, 
 
-        verifyUser: function(code, cb) {
+        verifyUser: function(curUser, code, cb) {
             accounts.verify(users, code, cb);
         }, 
 
-        requestPasswordReset: function(emailOrName, cb) {
+        requestPasswordReset: function(curUser, emailOrName, cb) {
             accounts.requestPasswordReset(users, mailer, emailOrName, cb);
         }, 
 
-        checkPasswordResetCode: function(resetCode, cb) {
+        checkPasswordResetCode: function(curUser, resetCode, cb) {
             accounts.checkPasswordResetCode(users, resetCode, cb);
         },
 
-        completePasswordReset: function(resetCode, password, cb) {
+        completePasswordReset: function(curUser, resetCode, password, cb) {
             accounts.completePasswordReset(users, resetCode, password, cb);
         },
 
         user: { // only users in the group 'user' can access this namespace
-            secret: function(cb) {
+            secret: function(curUser, cb) {
                 cb(null, "Sneeple are real!");
             },
 
-            getID: function(cb) {
+            getID: function(curUser, cb) {
                 idGenerator.next(cb);
             },
 
-            delMaterial: function(id, cb) {
+            delMaterial: function(curUser, id, cb) {
                 if(!id) return cb("Missing id");
                 
                 bioDB.del(id, cb);
             },
 
-            physicalAutocomplete: function(query, cb) {
+            physicalAutocomplete: function(curUser, query, cb) {
 
-              // TODO 
+              query = query.trim().toLowerCase();
+              var a = [];
+
+              // TODO improve
+              var s = physicalDB.createReadStream();
+              
+              s.on('data', function(data) {
+                if(!data.value.name.toLowerCase().match(query)) return;
+                a.push({
+                  text: data.value.name,
+                  id: data.key
+                });
+              });
+
+              s.on('error', function(err) {
+                return cb(err);
+              });
+
+              s.on('end', function() {
+                return cb(null, a);
+              });
+
+/*
               cb(null, [
                 {text: "Room 231"},
                 {text: "Room 251"},
                 {text: "Room 101"},
                 {text: "Room 310"}
               ]);
+*/
             },
 
-            getType: function(name, cb) {
+            getType: function(curUser, name, cb) {
                 name = name.toLowerCase().trim().replace(/\s+/g, ' ')
                 process.nextTick(function() {
                   var i;
@@ -299,7 +345,7 @@ websocket.createServer({server: server}, function(stream) {
                 })
             },
 
-            createAutocomplete: function(type, q, cb) {
+            createAutocomplete: function(curUser, type, q, cb) {
               var results = {
                 types: [],
                 virtuals: []
@@ -311,8 +357,6 @@ websocket.createServer({server: server}, function(stream) {
 
               q = q.replace(/\s+/g, '.*')
               q = new RegExp(q);
-
-
 
               // type not already specified so return type hits
               if(!type) {
@@ -329,7 +373,7 @@ websocket.createServer({server: server}, function(stream) {
               var s = bioDB.createReadStream({valueEncoding: 'json'});
   
               var out = s.pipe(through.obj(function(data, enc, cb) {
-                console.log("Got:", data.value.name);
+
                 if((data.value.name && data.value.name.toLowerCase().match(q))) {
                   if(!type || (type && data.value.type === type)) {
                     if(results.virtuals.length <= 10) {
@@ -357,13 +401,21 @@ websocket.createServer({server: server}, function(stream) {
               });
             },
 
-            save: function(m, imageData, doPrint, cb) {
+            saveVirtual: function(curUser, m, cb) {
+              
+              console.log("saving:", m);
 
-                if(!m.id) m.id = uuid();
+              saveMaterialInDB(m, curUser, 'v', function(err, id) {
+                if(err) return cb(err);
+                
+                return cb(null, id);
+              });
+            },
+
+            savePhysical: function(curUser, m, imageData, doPrint, cb) {
 
                 var mtch;
                 if(imageData && (mtch = imageData.match(/^data:image\/png;base64,(.*)/))) {
-
 
                     var imageBuffer = new Buffer(mtch[1], 'base64');
                     // TODO size check
@@ -372,12 +424,8 @@ websocket.createServer({server: server}, function(stream) {
                         if(err) return cb(err);
 
                        m.labelImagePath = imagePath; 
-//                        m.newPhysical.labelImagePath = imagePath;
-//                        m.physicals = m.physicals || [];
-//                        m.physicals.push(m.newPhysical);
-//                        delete m.newPhysical
 
-                        createMaterialInDB(m, function(err, id) {
+                        saveMaterialInDB(m, curUser, 'p', function(err, id) {
                             if(err) return cb(err);
                             if(!doPrint) return cb(null, id);
                             
@@ -389,14 +437,14 @@ websocket.createServer({server: server}, function(stream) {
                         console.log("saved with file", imagePath);
                     });
                 } else {
-                    createMaterialInDB(m, cb);
+                    saveMaterialInDB(m, curUser, 'p', cb);
                     console.log("saved with no file");
                 }
                 
                 console.log("saving:", m);
             },
 
-            get: function(id, cb) {
+            get: function(curUser, id, cb) {
                 console.log("getting:", id);
                 bioDB.get(id, {valueEncoding: 'json'}, function(err, p) {
                     if(err) return cb(err);
@@ -405,7 +453,7 @@ websocket.createServer({server: server}, function(stream) {
             },
 
             // TODO use indexes for this!
-            getByHumanID: function(humanID, cb) {
+            getByHumanID: function(curUser, humanID, cb) {
 
                 var s = bioDB.createReadStream({valueEncoding: 'json'});
                 var found = false;
@@ -435,7 +483,7 @@ websocket.createServer({server: server}, function(stream) {
             },
 
             // TODO use indexes for this!
-            getBy: function(field, value, cb) {
+            getBy: function(curUser, field, value, cb) {
 
                 var s = bioDB.createReadStream({valueEncoding: 'json'});
                 var found = false;
@@ -471,7 +519,7 @@ websocket.createServer({server: server}, function(stream) {
 
                 var count = 0;
                 var out = s.pipe(through(function(data, enc, cb) {
-                    console.log("data.value", data.value);
+
                     bioDB.get(data.value, function(err, p) {
                         if(!err && p) {
                             this.push(JSON.stringify(p));
@@ -490,7 +538,7 @@ websocket.createServer({server: server}, function(stream) {
                 return out;
             }),
 
-            search: rpc.syncStream(function(q) {
+            search: rpc.syncStream(function(curUser, q) {
                 var s = bioDB.createReadStream({valueEncoding: 'json'});
 
 
