@@ -14,8 +14,7 @@
   <script>
     const tag = this
     // todo: store search query somewhere else
-    const q = app.getModel('bioClassQuery')
-    self.primaryHeader = 'Search results for "' + q.q + '"'
+    self.primaryHeader = 'Search results for "' + opts.terms + '"'
 
     self.pagination = [{
       url: '1',
@@ -34,54 +33,14 @@
       url: '5',
       label: '5'
     }]
+     
+//      self.searchresult = []
+//      self.secondaryHeader = self.searchresult.length + ' items'
+//      self.searchresult.push(streamItem)
 
-    //self.searchresult = []
-    self.searchresult = app.getModel('searchCache') || []
-    self.secondaryHeader = self.searchresult.length + ' items'
-    
-    /*
-    app.observe('searchCache', (result) => {
-      self.secondaryHeader = result.length + ' items'
-      self.searchresult = result
-      tag.update()
-    })
-    
-    // handle begin stream message
-    app.addRouteDestination('searchResult', 'start', function() {
-      //console.log('searchResult start')
-      self.searchresult = []
-      //app.getStream('searchCache').init(undefined)
-    })
-
-    // handle end stream message
-    app.addRouteDestination('searchResult', 'end', function() {
-      //console.log('searchResult end')
-      //self.secondaryHeader = self.searchresult.length + ' items'
-      //app.dispatch('searchCache', self.searchresult)
-      //tag.update()
-    })
-
-    app.addRouteDestination('searchResult', 'packet', function(streamItem) {
-      //console.log('searchResult packet')
-      //console.log('search result: receiving packet %s', JSON.stringify(streamItem))
-      self.secondaryHeader = self.searchresult.length + ' items'
-      self.searchresult.push(streamItem)
-      tag.update()
-    })
-    */
-
-    // handle list message
-    app.addRouteDestination('searchResult', 'list', function(list) {
-      self.secondaryHeader = list.length + ' items'
-      self.searchresult = list
-      tag.update()
-      app.dispatch('searchCache', list)
-    })
-                                
 
     this.on('unmount', function() {
       self.searchresult = undefined
-      app.removeRouteDestination('searchResult', 'list')
     })
 
   </script>
