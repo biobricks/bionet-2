@@ -48,9 +48,6 @@
 </login>
 
 <login-button>
-    <!--
-        <a id="login-slideout" data-activates="login-slideout2" class="right {theme.style.color.navButton}" style="margin:0;display:{loggedIn ? 'none' : 'inline'}">login</a>
-    -->
     <li>
         <a if={!loggedIn} id="login-slideout" data-activates="login-slideout2" class="right {theme.style.color.navButton}" style="margin:0;display:inline">login</a>
         <a if={loggedIn} href="/logout" class="right {theme.style.color.navButton}">logout</a>

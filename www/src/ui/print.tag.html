@@ -1,7 +1,7 @@
 <print>
   <div class="print">
     <canvas id="labelPreview" class="labelPreview tab" width="560" height="174"></canvas>
-    <form name="createLabelForm" class="col s12" onsubmit={submitForm}>
+    <form id="createLabelForm" name="createLabelForm" class="col s12" onsubmit={submitForm}>
       <form-text-input label="Title" name="title" value={labelFormData.title} />
       <form-textarea-input label="Additional text" name="text" value={labelFormData.text} />
       <form-text-input label="Storage temperature" name="temperature" value={labelFormData.temperature} />
@@ -71,7 +71,7 @@
       if(!modalCallback) return;
       finalizeLabel(function(err, humanID) {
         if(err) return;
-        var labelFormData = $.formToObject(this.createLabelForm);
+        var labelFormData = $.formToObject('createLabelForm');
         labelFormData.humanID = this.humanID
         labelFormData.bsl = this.labelFormData.bsl
         var imageData = labelMaker.getDataURL();

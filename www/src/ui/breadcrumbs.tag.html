@@ -8,10 +8,9 @@
   </div>
   <script>
     const tag = this
-    const thisSelf = self
     app.observe(app.$.breadcrumbs, function(breadcrumbs) {
       this.items = breadcrumbs
       tag.update();
-    })
+    }.bind(this))
   </script>
 </breadcrumbs>

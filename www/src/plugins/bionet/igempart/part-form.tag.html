@@ -52,7 +52,7 @@
 </part-form>
 
 <part-specification>
-  <form name="editPartForm" class="col s12" onsubmit={submitForm}>
+  <form id="editPartForm" name="editPartForm" class="col s12" onsubmit={submitForm}>
     <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
     <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
     <form-text-input label="Created by" ref="creator" name="creator" value={formData.creator}/>
@@ -73,7 +73,7 @@
     console.log("NAAAAAAAAAAAAME", this.formData.name)
 
     $(this.editPartForm).change(function(e) {
-      $.extend(app.state.editPart, $.formToObject(this.editPartForm))
+      $.extend(app.state.editPart, $.formToObject('editPartForm'))
     }.bind(this));
 
     this.submitForm = function(e) {
