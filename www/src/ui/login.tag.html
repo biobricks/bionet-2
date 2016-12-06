@@ -37,7 +37,7 @@
                 this.refs.loginpassword.value = ''
                 this.closeLogin()
                 app.dispatch(app.$.loginState, true)
-            });
+            }.bind(this));
         }.bind(this)
 
         this.forgotPassword = function() {
@@ -48,8 +48,11 @@
 </login>
 
 <login-button>
-    <li>
+    <!--
         <a id="login-slideout" data-activates="login-slideout2" class="right {theme.style.color.navButton}" style="margin:0;display:{loggedIn ? 'none' : 'inline'}">login</a>
+    -->
+    <li>
+        <a if={!loggedIn} id="login-slideout" data-activates="login-slideout2" class="right {theme.style.color.navButton}" style="margin:0;display:inline">login</a>
         <a if={loggedIn} href="/logout" class="right {theme.style.color.navButton}">logout</a>
     </li>
     <script>
@@ -61,11 +64,11 @@
         this.on('before-mount', function() {
             //console.log('login-button mount')
             observer = app.addObserver(app.$.loginState, function(loggedIn) {
-                console.log("!!!!! loginstate change");
+                console.log("login-button: %b", loggedIn);
                 //console.log('loginState, login.js')
                 this.loggedIn = loggedIn
                 tag.update()
-            })
+            }.bind(this))
         })
 
         this.on('mount', function() {
