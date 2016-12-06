@@ -1,0 +1,58 @@
+<settings>
+  <div id="settings-slideout2" class="side-nav" style="position:fixed;top:0px;width:300px;z-index:9999">
+    <close-button action={closeSettings} color='black' />
+    <div style="margin-left:16px">
+      <div style="margin-top:48px" />
+      <form-switch onmouseup={configureColorScheme} label="Color:" name="colorSettings" value={colorSettingsInit} options={[ 'Light', 'Dark']}/>
+      <form-image imagesrc="static/images/std-theme.png" label="Theme:" height="200px" />
+      <div class="center">bionet</div><br/>
+    </div>
+    <div if={loggedin}>
+      <div class="divider"></div>
+      <div style="margin-left:16px;margin-top:20px">
+        <div class="center">account settings</div>
+        <form-text-input label="password" ref="password1a" name="password1a" value={password1}/>
+        <form-text-input label="enter password again" ref="password2a" name="password2a" value={password2}/>
+        <std-button action={updateAccountSettings} label="update account" />
+      </div>
+    </div>
+  </div>
+  <script>
+    const tag = this
+    this.theme = app.getTheme()
+    this.loggedin = app.getLoginState()
+    const settings = app.getSettings()
+    
+    this.colorSettingsInit = (settings.colorScheme==='light') ? false : true
+    this.password1 = ''
+    this.password2 = ''
+    this.closeSettings = function() {
+      $('#settings-slideout').sideNav('hide');
+    }
+
+    this.configureColorScheme = function(e) {
+      var checkedValue = $('#colorSettings:checked').is(":checked");
+      var colorScheme=(checkedValue) ? 'light' : 'dark'
+      app.putSetting({
+        setting:'colorScheme',
+        value:colorScheme
+      })
+    }
+
+    this.updateAccountSettings = function() {}
+    this.on('before-mount', function() {
+      //console.log('mpassword-form mount')
+      app.addObserver(app.$.loginState, function(loginState) {
+        this.loggedin = loginState
+        tag.update()
+      })
+    })
+
+    //<div class="{theme.style.color.background}" style="margin:0;padding:10px">
+
+  </script>
+</settings>
+
+<settings-button>
+  <li><a id="settings-slideout" data-activates="settings-slideout2"><i class="material-icons left grey-text">settings</i></a></li>
+</settings-button>

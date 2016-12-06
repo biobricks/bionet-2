@@ -1,0 +1,128 @@
+<form-text-input>
+    <div class="row">
+        <div class="input-field col s12">
+            <input id={opts.name} ref={opts.name} type="text" value={opts.value}>
+            <label for={opts.name} class="active">{opts.label}</label>
+        </div>
+    </div>
+    <script>
+        Object.defineProperty(this, "value", {
+            get: function() {
+                return this.refs[opts.name].value;
+            }
+        });
+    </script>
+</form-text-input>
+
+<form-select-input>
+    <div class="row">
+        <div class="input-field col s12">
+            <select id={opts.name} ref={opts.name} type="select">
+                <option>Select {opts.label || 'option'}</option>
+                <option each={option, index in opts.options} value={option.value} {selected: (option.value===o pts.value)}>{option.label}</option>
+            </select>
+        </div>
+    </div>
+    <script>
+        Object.defineProperty(this, "value", {
+            get: function() {
+                return this.refs[opts.name].value;
+            }
+        });
+    </script>
+</form-select-input>
+
+<search-input>
+    <div class="row">
+        <div class="col s3 m3 l3" />
+        <div class="input-field col s6 m6 l6">
+            <i class="material-icons postfix" onclick={opts.action}>search</i>
+            <input id={opts.name} ref={opts.name} type="text" />
+            <label for={opts.name}>{opts.label}</label>
+        </div>
+    </div>
+    <script>
+        Object.defineProperty(this, "value", {
+            get: function() {
+                return this.refs[opts.name].value;
+            }
+        });
+    </script>
+</search-input>
+
+<form-text-input-empty>
+    <div class="row">
+        <div class="col s3 m3 l3" />
+        <div class="input-field col s6 m6 l6">
+            <yield/>
+            <input id={opts.name} ref={opts.name} type="text">
+            <label for={opts.name}>{opts.label}</label>
+        </div>
+    </div>
+    <script>
+        Object.defineProperty(this, "value", {
+            get: function() {
+                return this.refs[opts.name].value;
+            }
+        });
+    </script>
+</form-text-input-empty>
+
+<password-text-input-empty>
+    <div class="row">
+        <div class="col s3 m3 l3" />
+        <div class="input-field col s6 m6 l6">
+            <input id={opts.name} ref={opts.name} type="password">
+            <label for={opts.name}>{opts.label}</label>
+        </div>
+    </div>
+    <script>
+        Object.defineProperty(this, "value", {
+            get: function() {
+                return this.refs[opts.name].value;
+            }
+        });
+    </script>
+</password-text-input-empty>
+
+<form-textarea-input>
+    <div class="row">
+        <div class="input-field col s12">
+            <textarea id={opts.name} ref={opts.name} type="text" value={opts.value} class="materialize-textarea"></textarea>
+            <label for={opts.name} class="active">{opts.label}</label>
+        </div>
+    </div>
+    <script>
+        Object.defineProperty(this, "value", {
+            get: function() {
+                return this.refs[opts.name].value;
+            }
+        });
+    </script>
+</form-textarea-input>
+
+<form-switch>
+    <div class="row">
+        <div class="input-field col s12">
+            <div class="switch">
+                <label class="active">
+                    {opts.label}&nbsp; {opts.options[0]}
+                    <input if={opts.value} ref={opts.name} type="checkbox" id={opts.name} checked />
+                    <input if={!opts.value} ref={opts.name} type="checkbox" id={opts.name} />
+                    <span class="lever"></span> {opts.options[1]}
+                </label>
+            </div>
+        </div>
+    </div>
+</form-switch>
+
+<form-image>
+    <div class="row">
+        <br/>
+        <div class="input-field col s12">
+            <br/>
+            <img id={opts.label} height={opts.height} src={opts.imagesrc} alt="" class="materialboxed" />
+            <label for={opts.label} class="active">{opts.label}</label>
+        </div>
+    </div>
+</form-image>

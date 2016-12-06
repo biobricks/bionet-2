@@ -1,0 +1,248 @@
+<create-form-container>
+    <content-container style="padding-top:100px;">
+        <section-container>
+            <create-form/>
+        </section-container>
+    </content-container>
+</create-form-container>
+
+<create-form>
+    <form ref="createForm" onsubmit={submitForm2}>
+        <div>What would you like to add?</div>
+        <div>
+            <div id="selectedTypeContainer" class="selected-type">
+                <span id="selectedTypeLabel">plasmid</span>
+            </div>
+            <div class="query-container">
+                <input type="text" id="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+            </div>
+        </div>
+        <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
+        <ul id="matchList">
+            <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+            <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
+        </ul>
+    </form>
+
+    <script>
+        this.submitForm2 = function(e) {
+            console.log('create-form submitForm')
+            e.preventDefault();
+
+            //     this.selectCurrent();
+            var val = this.refs.q.value.trim()
+
+            if (!this.selectedType && val) {
+                app.remote.getBy('name', val, function(err, o) {
+                    if (err) return app.ui.toast("Error: " + err); // TODO handle better
+
+                    if (!o) {
+                        route('/create-unknown/' + encodeURIComponent(val));
+                    } else {
+                        route('/create-physical/' + o.id);
+                    }
+                });
+                return;
+            } else if (this.selectedType) {
+                if (this.selectedType.virtual) {
+                    var url = '/create-virtual/' + encodeURIComponent(this.selectedType.name);
+                    if (val) {
+                        url += '/?name=' + encodeURIComponent(val);
+                    }
+                    route(url);
+                } else {
+                    var url = '/create-physical/' + encodeURIComponent(this.selectedType.name);
+                    if (val) {
+                        url += '/?name=' + encodeURIComponent(val);
+                    }
+                    route(url);
+                }
+            } else {
+                // do nothing
+            }
+        };
+
+        function query(type, q, cb) {
+
+            app.remote.createAutocomplete(type, q, function(err, results) {
+                if (err) return cb(err)
+                cb(null, results)
+            });
+        }
+
+        this.selected = null
+        this.selectedType = null
+
+        this.on('mount', function() {
+            console.log('create-form mount')
+            $('#q').focus()
+
+            this.updateMatchListPosition = function() {
+                var pos = $('#q').offset();
+                if (pos === undefined) return
+                pos.top += $('#q').innerHeight() + 2;
+                pos.width = $('#q').innerWidth();
+                $('#matchList').css(pos)
+            }.bind(this)
+
+            $(window).resize(function() {
+                this.updateMatchListPosition();
+            }.bind(this))
+
+            this.selectCurrent = function() {
+                var sel = this.matches[this.selected]
+                if (sel.pre === 'type') {
+                    this.setSelectedType(sel)
+                    this.refs.q.value = ''
+                } else {
+                    this.refs.q.value = sel.name
+                }
+                this.hideMatches()
+            }.bind(this)
+
+            this.setSelectedType = function(type) {
+                if (!type) {
+                    this.selectedType = null
+                    $('#selectedTypeContainer').css('display', 'none')
+                } else {
+                    this.selectedType = type
+                    $('#selectedTypeLabel').text(type.name)
+                    $('#selectedTypeContainer').css('display', 'block')
+                }
+                this.updateMatchListPosition()
+            }.bind(this)
+
+            this.hideMatches = function(e) {
+                this.matches = null
+                this.selected = null
+                this.update()
+            }.bind(this)
+
+            this.clickSelect = function(e) {
+                console.log("CLICK SELECT");
+                this.selectCurrent();
+            }.bind(this)
+
+
+            this.elementOver = function(e) {
+                console.log("MOUSE OVER");
+                if ($(e.target).hasClass('no-match')) return;
+                var lis = $('#matchList').find('li');
+                var i;
+                for (i = 0; i < lis.length; i++) {
+                    if (lis[i] == e.target) {
+                        this.selected = i
+                        break
+                    }
+                }
+                this.update()
+
+            }.bind(this)
+
+            this.updateMatchListPosition();
+
+            this.matches = []
+
+            var hadQueryBeforeKeydown = false;
+            $('#q').keydown(function(e) {
+                console.log('create form q keydown')
+
+                if (e.keyCode === 38) { // up arrow
+                    e.preventDefault()
+                    if (this.selected !== null && this.selected > 0) this.selected--
+                        this.update();
+                } else if (e.keyCode === 40) { // down arrow
+                    e.preventDefault()
+                    if (this.selected !== null && this.selected < this.matches.length - 1) this.selected++
+                        this.update();
+                } else if (e.keyCode === 27) { // escape
+                    this.hideMatches()
+                } else if (e.keyCode === 9) { // tab
+                    if (this.selected === null) return // normal operation if nothing selected
+                    e.preventDefault();
+                    this.selectCurrent()
+                } else {
+                    hadQueryBeforeKeydown = !!this.refs.q.value.replace(/\s+/g, '')
+                }
+
+            }.bind(this));
+
+            $('#q').keyup(function(e) {
+                if (e.keyCode === 8 || e.keyCode === 46) { // backspace or delete
+                    var hasQueryNow = !!this.refs.q.value.replace(/\s+/g, '')
+
+                    if (!hadQueryBeforeKeydown && !hasQueryNow) {
+                        this.setSelectedType()
+                    }
+                }
+            }.bind(this));
+
+            $('#q').on('input', function(e) {
+
+                this.matches = [];
+
+                var q = this.refs.q.value.trim();
+
+                query(this.selectedType, q, function(err, results) {
+                    if (err) return app.ui.toast(err); // TODO better error handling
+
+                    if (!q) {
+                        this.matches = null;
+                    } else {
+                        var i;
+                        for (i = 0; i < results.types.length; i++) {
+                            this.matches.push({
+                                pre: "type",
+                                name: results.types[i].name,
+                                extraClass: 'type',
+                                virtual: results.types[i].virtual
+                            });
+                        }
+                        for (i = 0; i < results.virtuals.length; i++) {
+                            this.matches.push({
+                                pre: "virtual",
+                                name: results.virtuals[i].name
+                            });
+                        }
+                    }
+
+                    if (this.matches && this.matches.length) {
+                        selected = 0;
+                    } else {
+                        selected = null
+                    }
+                    this.update()
+
+                }.bind(this))
+            }.bind(this))
+        })
+
+        this.on('updated', function() {
+            if (this.matches && this.matches.length) {
+                $('#matchList').css('border', '')
+            } else {
+                $('#matchList').css('border', 'none')
+            }
+            var q = this.refs.q.value
+            q = q.trim();
+            q = q.replace(/\s+/g, ' ').toLowerCase()
+
+            $('#q').css('color', '');
+
+            if (this.matches) {
+
+                $('#matchList').find('li').mouseover(function(e) {
+
+                }.bind(this))
+
+                // check for single exact match
+                if (this.matches.length === 1) {
+                    if (this.matches[0].name.replace(/[^\w\d]+/g, '').toLowerCase() === q.replace(/[^\w\d]+/g, '')) {
+                        $('#q').css('color', 'green')
+                    }
+                }
+            }
+        })
+
+    </script>
+</create-form>

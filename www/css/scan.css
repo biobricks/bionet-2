@@ -1,0 +1,38 @@
+
+.scan {
+
+}
+
+.scan .error {
+  color: red;
+}
+
+.scan .scanCanvas {
+    display: none;  
+}
+
+.scan .scanVideo {
+  margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  visibility: hidden;
+}
+
+.scan .keyboard-form {
+  display: block;
+  height: 0; 
+  overflow: hidden;
+}
+
+
+#curBarcode {
+  padding: 10px;
+  color: green;
+  font-weight: bold;
+}
+
+#curContainerBarcode {
+  padding: 10px;
+  color: green;
+  font-weight: bold;
+}

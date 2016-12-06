@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1488"
+   height="1052"
+   viewBox="0 0 1488 1052"
+   id="svg4039"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="closeButton.svg"
+   enable-background="new">
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.6378327"
+     inkscape:cx="449.25186"
+     inkscape:cy="526"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer19"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1600"
+     inkscape:window-height="838"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     gridtolerance="1"
+     guidetolerance="1"
+     objecttolerance="1"
+     showguides="true" />
+  <defs
+     id="defs4041" />
+  <metadata
+     id="metadata4044">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer19"
+     inkscape:label="close"
+     style="display:inline">
+    <path
+       glyph-name="clear"
+       unicode="clear"
+       d="m 27.6206,1027.1599 -11.0297,11.0298 11.0297,11.0297 L 24.84,1052 13.8102,1040.9703 2.7805,1052 0,1049.2194 11.0296,1038.1897 0,1027.1599 l 2.7805,-2.7806 11.0297,11.0298 11.0298,-11.0298 z"
+       id="path13447"
+       inkscape:connector-curvature="0"
+       style="display:inline;opacity:1;fill:#ffffff" />
+  </g>
+</svg>

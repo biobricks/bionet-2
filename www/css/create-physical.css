@@ -1,0 +1,22 @@
+
+
+.scanModal {
+  width: 75% !important;
+  max-height: 100% !important;
+}
+
+.printModal {
+/*
+  width: 75% !important;
+*/
+  
+  max-height: 85% !important;
+
+}
+
+.top-right-submit {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+}

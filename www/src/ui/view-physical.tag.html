@@ -1,0 +1,94 @@
+<view-physical>
+
+    <div class="container" style="margin-top:100px">
+        <h5 id="createPhysicalHeader"></h5>
+        <form name="createPhysicalForm" class="col s12">
+            <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
+
+            <img src={this.imgPath} width="600" />
+        </form>
+    </div>
+    <script>
+        var path = require('path');
+
+        this.createLabel = function() {
+
+            var labelOpts = {
+                title: this.printNameDefault,
+                bsl: 1
+            }
+
+            var opts = {
+                title: "Create label",
+                subtitle: undefined,
+                subTag: "print", // the tag to mount
+                label: this.labelFormData || labelOpts,
+                cb: function(err, formData, imageData) {
+                    this.labelFormData = formData;
+                    this.labelImageData = imageData;
+                    $(this.printModal).closeModal();
+                    $(this.createLabelButton).html('edit label');
+                }
+            }
+            var tags = riot.mount('#printModal', 'modal-content', opts)
+
+            $(this.printModal).openModal({
+                complete: function() {
+                    tags[0].unmount(true)
+                }
+            })
+        }
+
+        this.scanItem = function() {
+            var opts = {
+                title: "Scan",
+                subtitle: "Scan the item's barcode",
+                subTag: "scan", // the tag to mount
+                cb: function(err, id) {
+                    if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
+                    $(this.curBarcode).html('  ' + id + '  ');
+                    $(this.scanButton).html('rescan');
+                    $(this.scanModal).closeModal();
+                    tags[0].unmount(true)
+                }
+            }
+            var tags = riot.mount('#scanModal', 'modal-content', opts)
+
+            $(this.scanModal).openModal({
+                complete: function() {
+                    tags[0].unmount(true)
+                }
+            })
+        }
+
+        this.scanContainer = function() {
+            var opts = {
+                title: "Scan location",
+                subtitle: "Scan the barcode of e.g. the box or freezer where you put this item",
+                subTag: "scan",
+                cb: function(err, id) {
+                    if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
+                    $(this.curContainerBarcode).html('  ' + id + '  ');
+                    $(this.containerScanButton).html('rescan container');
+
+                    $(this.scanModal).closeModal();
+                    tags[0].unmount(true)
+                }
+            }
+            var tags = riot.mount('#scanModal', 'modal-content', opts)
+
+            $(this.scanModal).openModal({
+                complete: function() {
+                    tags[0].unmount(true)
+                }
+            })
+        }
+
+        this.on('mount', function() {
+            this.formData = this.opts
+            this.imgPath = '/static/labels/' + path.basename(formData.labelImagePath)
+            this.update()
+        }.bind(this));
+
+    </script>
+</view-physical>

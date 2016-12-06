@@ -1,0 +1,288 @@
+<create-physical>
+
+    <div class="container" style="margin-top:100px">
+        <h5 id="createPhysicalHeader"></h5>
+        <form name="createPhysicalForm" class="col s12" onsubmit={submitForm}>
+            <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+            <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
+<!--
+            <div each={field in fields}>
+                <form-text-input label={field.name} ref={field.name} name={field.name} value="" />
+            </div>
+-->
+            <div class="row">
+                <div style="display:block;float:left">Barcode:
+                    <input type="text" id="curBarcode" ref="barcode"  name="barcode"/><a id="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div style="display:block;float:left">Location ID:
+                    <input type="text" id="curContainerBarcode" ref="parent_id" name="parent_id"/><a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a> or </div>
+                <div id="autocomplete-container" class="col s12" style="width:300px;padding-left:15px;float:left">
+                </div>
+            </div>
+
+            <std-button label="submit" action={submitForm} />
+            <input type="submit" style="visibility:hidden" />
+        </form>
+
+        <div id="scanModal" class="scanModal modal"></div>
+        <div id="printModal" class="printModal modal"></div>
+    </div>
+    <script>
+        console.log("create physical tag, opts:%s",JSON.stringify(opts))
+        const appSettings = app.getAppSettings()
+        const dataTypes = appSettings.dataTypes
+        this.formData={
+            name:'',
+            notes:''
+        }
+        this.fields = []
+            //console.log('create physical, object=',JSON.stringify())
+        for (var i = 0; i < dataTypes.length; i++) {
+            const dataType = dataTypes[i]
+            if (opts.type === dataType.name && dataType.fields !== undefined) {
+                const fields = dataType.fields
+                Object.keys(fields).forEach(function(key, index) {
+                    this.fields.push({
+                        name: key,
+                        value: fields[index]
+                    })
+                }.bind(this));
+            }
+        }
+
+        var savePhysical = function(p, labelImage, cb) {
+            var doPrint = labelImage ? true : false
+            app.remote.savePhysical(p, labelImage, doPrint, function(err, id) {
+                if (err) {
+                    app.ui.toast("Error: " + err); // TODO improve
+                    if (cb) cb(err)
+                    return;
+                }
+
+                app.ui.toast("Saved to database")
+                if (cb) cb();
+            })
+        }
+
+        /*
+           TODO:
+             associate with virtual
+        */
+        this.submitForm = function(e) {
+            e.preventDefault()
+            var formData = $.formToObject(this.createPhysicalForm) || {};
+            formData.label = this.labelFormData;
+            var parent_id = formData.refs.parent_id.value;
+            var parent_name = formData.refs.parent_name.value;
+
+            if (!parent_id || !parent_id.length) {
+                if (parent_name) {
+                    app.remote.getBy('name', parent_name, function(err, m) {
+                        if (err) return app.ui.toast("Error:" + err);
+
+                        parent_name = '';
+                        if (!m) {
+                            app.ui.toast("Warning: Invalid container");
+                        } else {
+                            parent_id = m.id;
+                        }
+                        savePhysical(formData, this.labelImageData);
+                    })
+                    return;
+                }
+            }
+
+            savePhysical(formData, this.labelImageData);
+        }
+
+        this.createLabel = function() {
+            var tags = []
+            var defaultLabelOpts = {
+                title: this.printNameDefault,
+                bsl: 1
+            }
+            var labelOpts = {
+                title: "Create label",
+                subtitle: undefined,
+                subTag: "print", // the tag to mount
+                label: this.labelFormData || defaultLabelOpts,
+                cb: function(err, formData, imageData) {
+                    this.labelFormData = formData;
+                    this.labelImageData = imageData;
+                    $(this.printModal).closeModal();
+                    $(this.createLabelButton).html('edit label');
+                }
+            }
+            tags = riot.mount('#printModal', 'modal-content', labelOpts)
+
+            $(this.printModal).openModal({
+                complete: function() {
+                    tags[0].unmount(true)
+                }
+            })
+        }
+
+        this.scanItem = function() {
+            console.log('scanItem')
+            var tags = []
+            var scanOpts = {
+                title: "Scan",
+                subtitle: "Scan the item's barcode",
+                subTag: "scan", // the tag to mount
+                cb: function(err, id) {
+                    if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
+                    $(this.curBarcode).val(id);
+                    $(this.scanButton).html('rescan');
+                    $(this.scanModal).closeModal();
+                    console.log('scan item cb, tags:', tags)
+                    tags[0].unmount(true)
+                }
+            }
+            tags = riot.mount('#scanModal', 'modal-content', scanOpts)
+
+            $(this.scanModal).openModal({
+                complete: function() {
+                    tags[0].unmount(true)
+                }
+            })
+        }
+
+        this.scanContainer = function() {
+            console.log('scan container function')
+            var tags = []
+            var scanOpts = {
+                title: "Scan location",
+                subtitle: "Scan the barcode of e.g. the box or freezer where you put this item",
+                subTag: "scan",
+                cb: function(err, id) {
+                    if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
+                    app.ui.toast("Looking up scanned item");
+
+                    app.remote.getBy('barcode', id, function(err, m) {
+                        if (err) return app.ui.toast("Lookup failed. Item does not exist in database.");
+
+                        $(this.curContainerBarcode).val(m.id);
+                        $(this.containerScanButton).html('rescan container');
+                    })
+
+                    $(this.scanModal).closeModal();
+                    tags[0].unmount(true)
+                }
+            }
+            tags = riot.mount('#scanModal', 'modal-content', scanOpts)
+
+            $('#scanModal').openModal({
+                complete: function() {
+                    tags[0].unmount(true)
+                }
+            })
+        }
+
+        this.on('mount', function() {
+
+            if (!this.formData) {
+                this.formData = {};
+            }
+
+            if (opts.query && opts.query.name && opts.query.name.trim()) {
+                this.refs.name.value = decodeURIComponent(opts.query.name);;
+            }
+
+            this.update();
+            // todo: was opts.id but apparently riot uses opts.id for something else
+            if (opts.uuid !== undefined) {
+                app.remote.get(opts.uuid, function(err, data) {
+                    if (err) {
+                        app.dispatch('error', err)
+                        return
+                    }
+                    this.formData=data
+                    this.update()
+                }.bind(this))
+            }
+
+            riot.mount('#autocomplete-container', 'autocomplete', {
+                searchCallback: function(query, cb) {
+                    app.remote.physicalAutocomplete(query, function(err, result) {
+                        cb(err, result);
+                    })
+                },
+                name: 'parent_name',
+            });
+
+            if (opts.virtualID) {
+                // create new physical instance of this material
+                app.remote.getMaterial(opts.virtualID, function(err, virtual) {
+                    if (err) {
+                        app.ui.toast(err); // TODO handle better
+                        return;
+                    }
+                    this.printNameDefault = $(this.createPhysicalForm.name).val().trim() || virtual.name
+                    $(this.createPhysicalHeader).html("New " + virtual.name)
+
+                    // TODO
+
+                }.bind(this));
+                return;
+            }
+
+            console.log("Creating:", opts.type);
+            app.remote.getType(opts.type, function(err, type) {
+                if (err) {
+                    if (err.notFound) {
+                        // we are creating a material of unknown type
+                        route('/create-unknown/' + encodeURIComponent(opts.type))
+                        return
+                    }
+                    return app.ui.toast(err); // TODO handle better
+                }
+                // We are creating a new material of type: opts.type
+
+                if (type.virtual) {
+                    // this type needs to be a virtual that then has physicals associated
+                    route('/create/' + encodeURIComponent(opts.type));
+                    return;
+                }
+
+                this.printNameDefault = $(this.createPhysicalForm.name).val().trim() || type.name
+                $(this.createPhysicalHeader).html("New " + type.name)
+
+                // TODO
+
+            }.bind(this));
+        }.bind(this));
+
+    </script>
+</create-physical>
+
+
+<modal-content>
+    <div>
+        <div class="modal-content">
+            <h4>{opts.title}</h4>
+            <p>{opts.subtitle}</p>
+            <div id="modalContents"></div>
+        </div>
+        <!--
+    <div class="modal-footer">
+      <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+    </div>
+-->
+    </div>
+
+    <script>
+        var tags;
+
+        this.on('mount', function() {
+            tags = riot.mount('#modalContents', opts.subTag, opts);
+        })
+
+        this.on('before-unmount', function() {
+            tags[0].unmount()
+        })
+
+    </script>
+</modal-content>

@@ -1,0 +1,116 @@
+{
+  "name": "bionet",
+  "version": "0.0.1",
+  "scripts": {
+    "postinstall": "cp node_modules/materialize-css/js/date_picker/picker.js node_modules/materialize-css/bin/",
+    "watchify": "watchify -vd -p browserify-hmr -e www/src/main.js -o www/js/bionet.js",
+    "watch": "watchify -vd -e www/src/main.js -o www/js/bionet.js",
+    "serve": "http-server ./www -c 1 -a localhost",
+    "dev": "npm-run-all --parallel watchify",
+    "build": "cross-env NODE_ENV=production browserify -t babelify --presets es2015-riot -e www/src/main.js -m -o www/js/bionet.js",
+    "lint": "eslint --ext .js www/src test/unit",
+    "test": "karma start karma.conf.js",
+    "start": "./bin/cmd.js"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "es2015-riot"
+          ]
+        }
+      ],
+      [
+        "riotify",
+        {
+          "ext": "html"
+        }
+      ]
+    ]
+  },
+  "dependencies": {
+    "JSONStream": "^1.2.1",
+    "accountdown": "^4.1.0",
+    "accountdown-basic": "^1.1.0",
+    "async": "^2.0.0-rc.6",
+    "browserify": "^13.0.1",
+    "browserify-shim": "^3.8.12",
+    "buffer-equal-constant-time": "^1.0.1",
+    "buffer-replace": "^1.0.0",
+    "buffer-split": "^1.0.0",
+    "colors": "^1.1.2",
+    "cookie-auth": "^2.4.2",
+    "cookie-cutter": "^0.1.1",
+    "datamatrix-decode": "0.0.2",
+    "ecstatic": "^0.8.0",
+    "email-validator": "^1.0.7",
+    "form_to_object": "^1.0.8",
+    "getusermedia": "^2.0.0",
+    "index-level": "0.0.1",
+    "jquery": "^3.1.1",
+    "jsonwebtoken": "^5.7.0",
+    "less": "^2.7.1",
+    "level": "^1.3.0",
+    "level-changes": "0.0.1",
+    "level-tree-index": "0.0.5",
+    "levelup": "^1.3.3",
+    "materialize-css": "^0.97.7",
+    "minimist": "^1.2.0",
+    "multileveldown": "^2.2.0",
+    "ndjson": "^1.4.3",
+    "nodemailer": "^2.4.0",
+    "nodemailer-smtp-transport": "^2.5.0",
+    "qrcode-generator": "^1.0.5",
+    "qrcode-reader": "^0.2.2",
+    "reconnect-core": "^1.0.1",
+    "recursive-readdir": "^2.0.0",
+    "routes": "^2.1.0",
+    "rpc-multiauth": "0.0.1",
+    "rpc-multistream": "^0.9.2",
+    "shoe": "0.0.15",
+    "ssh2": "^0.5.0",
+    "subleveldown": "^2.0.0",
+    "through2": "^2.0.1",
+    "uuid": "^2.0.2",
+    "watchify": "^3.7.0",
+    "websocket-stream": "^3.1.0",
+    "xtend": "^4.0.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.0.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.18.0",
+    "babel-plugin-transform-runtime": "^6.0.0",
+    "babel-preset-es2015": "^6.0.0",
+    "babel-preset-es2015-riot": "^1.1.0",
+    "babel-preset-stage-2": "^6.0.0",
+    "babel-runtime": "^6.0.0",
+    "babelify": "^7.2.0",
+    "browserify-hmr": "^0.3.1",
+    "cross-env": "^1.0.5",
+    "elasticsearch": "^11.0.1",
+    "eslint": "^1.10.3",
+    "eslint-plugin-html": "^1.1.0",
+    "getusermedia": "^1.3.7",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.15",
+    "karma-browserify": "^4.4.2",
+    "karma-jasmine": "^0.3.6",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-spec-reporter": "0.0.23",
+    "level-js": "^2.2.4",
+    "lodash": "^4.16.4",
+    "npm-run-all": "^1.6.0",
+    "phantomjs-prebuilt": "^2.1.3",
+    "proxyquireify": "^3.0.1",
+    "qrcode-generator": "1.0.0",
+    "qrcode-reader": "^0.1.1",
+    "request": "^2.75.0",
+    "riot": "^3.0.0",
+    "riot-compiler": "^3.0.0",
+    "riot-route": "^3.0.1",
+    "riotify": "^2.0.0"
+  },
+  "license": "AGPL-3.0"
+}
