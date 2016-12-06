@@ -11,26 +11,26 @@
       <div class="divider"></div>
       <div style="margin-left:16px;margin-top:20px">
         <div class="center">account settings</div>
-        <form-text-input label="password" name="password1a" value={password1}/>
-        <form-text-input label="enter password again" name="password2a" value={password2}/>
+        <form-text-input label="password" ref="password1a" name="password1a" value={password1}/>
+        <form-text-input label="enter password again" ref="password2a" name="password2a" value={password2}/>
         <std-button action={updateAccountSettings} label="update account" />
       </div>
     </div>
   </div>
   <script>
     const tag = this
-    self.theme = app.getTheme()
-    self.loggedin = app.getLoginState()
+    this.theme = app.getTheme()
+    this.loggedin = app.getLoginState()
     const settings = app.getSettings()
     
-    self.colorSettingsInit = (settings.colorScheme==='light') ? false : true
-    self.password1 = ''
-    self.password2 = ''
-    self.closeSettings = function() {
+    this.colorSettingsInit = (settings.colorScheme==='light') ? false : true
+    this.password1 = ''
+    this.password2 = ''
+    this.closeSettings = function() {
       $('#settings-slideout').sideNav('hide');
     }
 
-    self.configureColorScheme = function(e) {
+    this.configureColorScheme = function(e) {
       var checkedValue = $('#colorSettings:checked').is(":checked");
       var colorScheme=(checkedValue) ? 'light' : 'dark'
       app.putSetting({
@@ -39,11 +39,11 @@
       })
     }
 
-    self.updateAccountSettings = function() {}
+    this.updateAccountSettings = function() {}
     this.on('before-mount', function() {
       //console.log('mpassword-form mount')
       app.addObserver(app.$.loginState, function(loginState) {
-        self.loggedin = loginState
+        this.loggedin = loginState
         tag.update()
       })
     })

@@ -14,9 +14,9 @@
   <script>
     const tag = this
     // todo: store search query somewhere else
-    self.primaryHeader = 'Search results for "' + opts.terms + '"'
+    this.primaryHeader = 'Search results for "' + opts.terms + '"'
 
-    self.pagination = [{
+    this.pagination = [{
       url: '1',
       label: '1',
       active: 'active blue darken-2'
@@ -34,13 +34,13 @@
       label: '5'
     }]
      
-//      self.searchresult = []
-//      self.secondaryHeader = self.searchresult.length + ' items'
-//      self.searchresult.push(streamItem)
+//      this.searchresult = []
+//      this.secondaryHeader = this.searchresult.length + ' items'
+//      this.searchresult.push(streamItem)
 
 
     this.on('unmount', function() {
-      self.searchresult = undefined
+      this.searchresult = undefined
     })
 
   </script>

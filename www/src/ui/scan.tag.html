@@ -13,8 +13,8 @@
     <div id="debug"></div>
     <div class="canvas-layers"></div>
     <div class="canvas-box"></div>
-    <form class="keyboard-form" name="keyboardInputForm" onsubmit={keyboardScan}>
-      <input id="keyboardInput" type="text" name="code" autocomplete="off" />
+    <form class="keyboard-form" ref="keyboardInputForm" onsubmit={keyboardScan}>
+      <input id="keyboardInput" type="text" ref="code" autocomplete="off" />
       <input type="submit" />
     </form>
   </div>
@@ -32,7 +32,7 @@
     var settings = require('../../../settings.js')
 
     var dmdecode = require("datamatrix-decode");
-    var datamatrix = require('../../../../biomatrix-scratch');
+//    var datamatrix = require('../../../../biomatrix-scratch');
     
     function getIDFromURL(url) {
       var m = url.match(new RegExp('^'+settings.base_url+'/p/(\\d+)'));
@@ -41,13 +41,13 @@
     }
 
     function decodeQrCode(cb) {
-      var data = self.scanCtx.getImageData(0, 0, self.scanCanvas.width, self.scanCanvas.height);
-      self.qr.callback = cb;
-      self.qr.decode(data);
+      var data = this.scanCtx.getImageData(0, 0, this.scanCanvas.width, this.scanCanvas.height);
+      this.qr.callback = cb;
+      this.qr.decode(data);
     }
 
     function decodeDMCode(cb) {
-      datamatrix(null, self.scanCanvas, {
+      datamatrix(null, this.scanCanvas, {
         debug: true
       }, function(err, data) {
         $('.canvas-layers').html(' '); // TODO tmp debug removal
@@ -70,7 +70,7 @@
       if(!keepScanning) return;
       delay = delay || 500; // delay between frames in ms
 
-      self.scanCtx.drawImage(self.scanVideo, 0, 0);
+      this.scanCtx.drawImage(this.scanVideo, 0, 0);
       console.log("scanning...")
       decodeQrCode(function(data) {
         if(!data) {
@@ -103,9 +103,9 @@
       keepScanning = false;
     })
 
-    self.keyboardScan = function(e) {
+    this.keyboardScan = function(e) {
       e.preventDefault();
-      var code = self.keyboardInputForm.code.value;
+      var code = this.keyboardInputForm.code.refs.value;
       code = code.replace(/[^\d]+/g, '');
       if(code.length <= 0) {
         $('#keyboardInput').val('');
@@ -120,7 +120,7 @@
 
       setTimeout(function() {
         $('#keyboardInput').focus()
-        $(self.keyboardInputForm.code).blur(function(e) {
+        $(this.keyboardInputForm.code).blur(function(e) {
           $('#keyboardInput').focus()
         });
       }, 1)
@@ -150,8 +150,8 @@
 
     this.on('mount', function() {
       modalCallback = this.opts.cb
-      self.qr = new QrCode();
-      self.scanCtx = self.scanCanvas.getContext("2d");
+      this.qr = new QrCode();
+      this.scanCtx = this.scanCanvas.getContext("2d");
 
       initKeyboardCapture()
 
@@ -169,9 +169,9 @@
         }
         cameraStream = stream
 
-        $(self.scanVideo).css('visibility', 'visible');
-        self.scanVideo.src = window.URL.createObjectURL(stream);
-        self.scanVideo.play();
+        $(this.scanVideo).css('visibility', 'visible');
+        this.scanVideo.src = window.URL.createObjectURL(stream);
+        this.scanVideo.play();
 
         setTimeout(scan, 500);
       });

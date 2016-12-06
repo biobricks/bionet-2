@@ -1,4 +1,4 @@
-import riot from 'riot'
+const riot=require('riot')
 //import request from 'request'
 import bionetapi from '../bionetapi'
 
@@ -153,19 +153,29 @@ var igempart = {
 
 
 /*
-    riot.route('/create-virtual', function () {
+    route('/create-virtual', function () {
       app.state.createPart = {}
       riot.mount('div#content', 'create-part')
       riot.mount('div#create-part-content', 'create-specification')
     })
+
 */
-    riot.route('/create-virtual/*', function(type) {
-      app.state.createPart = {}
+    route('/create-virtual/*', function(type) {
+      app.state.createPart = {
+          name:'',
+          description:'',
+          creator:'',
+          created:'',
+          temperature:'',
+          bsl:'',
+          biohazard:'',
+          avatar:''
+      }
       riot.mount('div#content', 'create-part', {type: type, query: {}})
 
     });
-    riot.route('/create-virtual/*/..', function(type) {
-      var q = riot.route.query()
+    route('/create-virtual/*/..', function(type) {
+      var q = route.query()
 
       var opts = {type: type, query: q || {}}
       riot.mount('div#content', 'create-part', opts)
@@ -180,7 +190,7 @@ var igempart = {
     })
 
 /*
-    riot.route('/create/*', function (section) {
+    route('/create/*', function (section) {
       riot.mount('div#content', 'create-part')
       if (section == 'sequence') {
         riot.mount('div#create-part-content', 'create-sequence')
@@ -217,7 +227,7 @@ var igempart = {
     }
 
     /*
-    riot.route('/edit...', function(partID) {
+    route('/edit...', function(partID) {
       console.log('edit part route A, partID:%s',partID)
       getMaterial(partID, function(data) {
         app.state.editPart = data
@@ -227,7 +237,7 @@ var igempart = {
     })
     */
 
-    riot.route('/edit/*', function (partID) {
+    route('/edit/*', function (partID) {
 
       getMaterial(partID, function (data) {
         console.log('MATERIAL', data)
@@ -239,7 +249,7 @@ var igempart = {
 
     })
 
-    riot.route('/edit/*/*', function (partID, section) {
+    route('/edit/*/*', function (partID, section) {
 
       getMaterial(partID, function (data) {
         app.state.editPart = data

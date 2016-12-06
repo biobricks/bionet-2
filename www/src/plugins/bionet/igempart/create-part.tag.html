@@ -1,133 +1,143 @@
 <create-part>
-  <content-container style="padding-top:165px;">
-    <section-container>
-      <div id="create-part-content" class="{theme.style.color.background} {theme.style.color.text}">
-        <create-specification />
-      </div>
-    </section-container>
-  </content-container>
-  <script>
+    <content-container style="padding-top:165px;">
+        <section-container>
+            <div id="create-part-content" class={themeClass}>
+                <create-specification />
+            </div>
+        </section-container>
+    </content-container>
+    <script>
+        const theme = app.getTheme()
+        this.themeClass = theme.style.color.background+' '+theme.style.color.text
+        this.on('mount', function() {
 
-    this.on('mount', function() {
+            if (!this.formData) {
+                this.formData = {};
+            }
+            if (this.opts.query && this.opts.query.name && this.opts.query.name.trim()) {
+                this.formData.name = decodeURIComponent(this.opts.query.name);
+                this.update();
+                $.extend(app.state.createPart, $.formToObject(this.createPartForm))
+            }
 
-      if(!self.formData) {
-        self.formData = {};
-      }
-      if(this.opts.query && this.opts.query.name && this.opts.query.name.trim()) {
-        self.formData.name = decodeURIComponent(this.opts.query.name);
-        this.update();
-        $.extend(app.state.createPart, $.formToObject(self.createPartForm))
-      }
-
-    });
-
-
-    // setup secondary nav
-    app.dispatch(app.$.secondaryNav, [{
-        label: 'specifications',
-        icon: undefined,
-        action: '/create-virtual/' + this.opts.type
-    }, {
-        label: 'sequence',
-        icon: undefined,
-        action: '/create-virtual/' + this.opts.type + '/?tab=sequence'
-    }, {
-        label: 'physical instance',
-        icon: undefined,
-        action: '/create-virtual/' + this.opts.type + '/?tab=instances'
-    }])
-
-    // initialize breadcrumbs
-    app.dispatch(app.$.breadcrumbs, [{
-      'label': 'inventory',
-      'url': '/'
-      }, {
-      'label': 'create part',
-      'url': '#'
-    }]);
-
-    // configure app bar
-    app.dispatch(app.$.appBarConfig, {
-      enableTopNav: true,
-      enableBreadCrumbs: true,
-      enableSubbar: true
-    })
+        });
 
 
+        // setup secondary nav
+        app.dispatch(app.$.secondaryNav, [{
+            label: 'specifications',
+            icon: undefined,
+            action: '/create-virtual/' + this.opts.type
+        }, {
+            label: 'sequence',
+            icon: undefined,
+            action: '/create-virtual/' + this.opts.type + '/?tab=sequence'
+        }, {
+            label: 'physical instance',
+            icon: undefined,
+            action: '/create-virtual/' + this.opts.type + '/?tab=instances'
+        }])
 
-  </script>
+        // initialize breadcrumbs
+        app.dispatch(app.$.breadcrumbs, [{
+            'label': 'inventory',
+            'url': '/'
+        }, {
+            'label': 'create part',
+            'url': '#'
+        }]);
+
+        // configure app bar
+        app.dispatch(app.$.appBarConfig, {
+            enableTopNav: true,
+            enableBreadCrumbs: true,
+            enableSubbar: true
+        })
+
+    </script>
 </create-part>
 
 <create-specification>
-  <form name="createPartForm" class="col s12" onsubmit={submitForm}>
-    <form-text-input label="Part Name" name="name" value={formData.name}/>
-    <form-textarea-input label="Description" name="description" value={formData.description}/>
-    <form-text-input label="Created by" name="creator" value={formData.creator}/>
-    <form-text-input label="Created" name="created" value={formData.created}/>
-    <form-text-input label="Storage temperature" name="temperature" value={formData.temperature}/>
-    <form-textarea-input label="Biosafety level" name="bsl" value={formData.bsl}/>
-    <form-switch label="Biohazardous?" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
-    <form-image imagesrc={formData.avatar} label="Avatar" height="60px" />
-    <form-text-input label="" name="avatar" value={formData.avatar}/>
-    <std-button label="submit" action={submitForm} />
-    <input type="submit" style="visibility:hidden" />
-  </form>
-  <script>
+    <form name="createPartForm" class="col s12" onsubmit={submitForm}>
+        <form-text-input label="Part Name" ref="name" name="name" value={formData.name}/>
+        <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
+        <form-text-input label="Created by" ref="creator" name="creator" value={formData.creator}/>
+        <form-text-input label="Created" ref="created" name="created" value={formData.created}/>
+        <form-text-input label="Storage temperature" ref="temperature" name="temperature" value={formData.temperature}/>
+        <form-textarea-input label="Biosafety level" ref="bsl" name="bsl" value={formData.bsl}/>
+        <form-switch label="Biohazardous?" ref="biohazard" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
+        <form-image imagesrc={formData.avatar} label="Avatar" height="60px" />
+        <form-text-input label="" ref="avatar" name="avatar" value={formData.avatar}/>
+        <std-button label="submit" action={submitForm} />
+        <input type="submit" style="visibility:hidden" />
+    </form>
+    <script>
+        this.formData = app.state.createPart
+        if (!this.formData || this.formData.name === undefined) {
+            this.formData = {
+                name: '',
+                description: '',
+                creator: '',
+                created: '',
+                temperature: '',
+                bsl: '',
+                biohazard: '',
+                avatar: ''
+            }
 
-    self.formData = app.state.createPart
-    app.state.createPart = app.state.createPart || {}
+        }
+        app.state.createPart = app.state.createPart || {}
 
-    // TODO JUUl this doesn't work if using $(self.createPartForm)
-    // probably because it needs to be run from within on('mount')
+        // TODO JUUl this doesn't work if using $(this.createPartForm)
+        // probably because it needs to be run from within on('mount')
 
-    $(this.createPartForm).change(function(e) {
-      $.extend(app.state.createPart, $.formToObject(self.createPartForm))
-    }.bind(this));
+        $(this.createPartForm).change(function(e) {
+            $.extend(app.state.createPart, $.formToObject(this.createPartForm))
+        }.bind(this));
 
-    self.submitForm = function(e) {
+        this.submitForm = function(e) {
 
-      app.remote.saveVirtual(app.state.createPart, function(err, id) {
-        if(err) return app.ui.toast("Error: " + err) // TODO handle error
-        
-        app.ui.toast("Virtual created with ID: " + id)
+            app.remote.saveVirtual(app.state.createPart, function(err, id) {
+                if (err) return app.ui.toast("Error: " + err) // TODO handle error
 
-        riot.route('/edit/' + id);
-      });
+                app.ui.toast("Virtual created with ID: " + id)
 
-    }
+                route('/edit/' + id);
+            });
 
-  </script>
+        }
+
+    </script>
 </create-specification>
 
 
 <create-sequence>
-  <form-container action={submitForm}>
-    <form-textarea-input label="DNA Sequence" name="sequence" value={formData.sequence}/>
-    <std-button action={parent.submitForm} label="submit" />
-    <input type="submit" style="visibility:hidden" />
-  </form-container>
-  <script>
-    app.state.createPart = app.state.createPart || {}
+    <form-container action={submitForm}>
+        <form-textarea-input label="DNA Sequence" name="sequence" value={formData.sequence}/>
+        <std-button action={parent.submitForm} label="submit" />
+        <input type="submit" style="visibility:hidden" />
+    </form-container>
+    <script>
+        app.state.createPart = app.state.createPart || {}
 
-    self.submitForm = function(e) {
-      console.log("SUBMIT seq");
-    }
+        this.submitForm = function(e) {
+            console.log("SUBMIT seq");
+        }
 
-  </script>
+    </script>
 </create-sequence>
 
 <create-instance>
-  <form-container>
-    <form-text-input label="Physical Location Code" name="location" value={formData.location}/>
-    <form-text-input label="Datamatrix Code" name="datamatrix" value={formData.qrcode}/>
-    <form-image imagesrc={formData.qrcode} label="Datamatrix code" height="140px" />
-    <std-button action={submitForm3} label="submit" />
-  </form-container>
-  <script>
+    <form-container>
+        <form-text-input label="Physical Location Code" ref="location" name="location" value={formData.location}/>
+        <form-text-input label="Datamatrix Code" ref="datamatrix" name="datamatrix" value={formData.qrcode}/>
+        <form-image imagesrc={formData.qrcode} label="Datamatrix code" height="140px" />
+        <std-button action={submitForm3} label="submit" />
+    </form-container>
+    <script>
+        //    this.submitForm = function() {
 
-//    self.submitForm = function() {
+        //    }
 
-//    }
-
-  </script>
+    </script>
 </create-instance>

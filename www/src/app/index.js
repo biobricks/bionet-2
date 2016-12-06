@@ -1,4 +1,4 @@
-import riot from 'riot';
+//const riot=require('riot');
 import Plugin from './plugin';
 import Persist from './persist'
 import NanoStream from './NanoStream';
@@ -6,6 +6,12 @@ import NanoRoute from './NanoRoute';
 const EventEmitter = require('events');
 import search from './search'
 var appSettings = require('../../../settings.js');
+
+const riot = require('riot');
+window.riot=riot
+
+import route from 'riot-route'
+window.route = route;
 
 class App extends EventEmitter {
 
@@ -148,11 +154,12 @@ class App extends EventEmitter {
   startRouter() {
 
     // mount root component
+    console.log('mounting app tag:, riot=',riot)
     riot.mount('div#app', 'app')
 
     // initialize and start router
-    riot.route.base('/')
-    riot.route.start(true)
+    route.base('/')
+    route.start(true)
 
     console.log('app started')
   }
@@ -238,7 +245,7 @@ class App extends EventEmitter {
 
   // route methods
   addRoute(path, router) {
-    riot.route(path, router);
+    route(path, router);
   }
 
   // settings methods

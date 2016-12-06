@@ -1,5 +1,5 @@
 // bionet app plugin
-import riot from 'riot'
+const riot=require('riot')
 import bionetapi from './bionetapi'
 
 // modules

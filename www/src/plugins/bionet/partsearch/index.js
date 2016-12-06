@@ -1,4 +1,4 @@
-import riot from 'riot'
+const riot=require('riot')
 import bionetapi from '../bionetapi'
 
 var partsearch = {
@@ -40,7 +40,7 @@ var partsearch = {
       })
 
       // todo: handle pagination
-      const q = riot.route.query()
+      const q = route.query()
       if (q.page !== undefined) {
         console.log('search result page: ' + q.page)
       }

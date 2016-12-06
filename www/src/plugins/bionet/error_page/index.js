@@ -1,4 +1,4 @@
-import riot from 'riot'
+const riot=require('riot')
 import bionetapi from '../bionetapi'
 
 var error = {

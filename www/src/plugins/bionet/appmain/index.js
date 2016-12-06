@@ -1,4 +1,4 @@
-import riot from 'riot'
+const riot=require('riot')
 import bionetapi from '../bionetapi'
 
 var appmain = {
@@ -152,7 +152,7 @@ var appmain = {
       app.logout(function() {
         console.log("logged out");
         app.dispatch(app.$.loginState, false)
-        riot.route('/')
+        route('/')
       });
     })
   },

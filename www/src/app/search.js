@@ -32,7 +32,7 @@ var search = {
       app.dispatch('bioClassQuery', q)
       console.log('search query:',JSON.stringify(q))
       app.dispatch('bioClassCache', [])
-      riot.route('q?terms='+encodeURIComponent(self.searchbio.value))
+      route('q?terms='+encodeURIComponent(this.searchbio.value))
 
   }
   

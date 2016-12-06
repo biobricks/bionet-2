@@ -1,4 +1,4 @@
-import riot from 'riot'
+const riot=require('riot')
 import bionetapi from '../bionetapi'
 import _ from 'lodash'
 
@@ -9,8 +9,8 @@ var partsInventory = {
 
 
 
-    riot.route('/inventory..', function () {
-      var q = riot.route.query()
+    route('/inventory..', function () {
+      var q = route.query()
 
       app.dispatch(app.$.appBarConfig, {
         enableTopNav: true,

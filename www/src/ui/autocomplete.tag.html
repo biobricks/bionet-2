@@ -1,7 +1,7 @@
 <autocomplete>
   <div>
     <div>
-      <input type="text" id="q" name={opts.name} placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
+      <input type="text" ref="q" id={opts.name} placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
     </div>
     <ul id="matchList">
       <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.text}</li>
@@ -21,81 +21,82 @@
       searchCallback(s, cb)
     }
 
-    self.selected = null
+    this.selected = null
 
     this.on('mount', function() {
 
       searchCallback = this.opts.searchCallback;
 
-      self.updateMatchListPosition = function() {
-        var pos = $(self.q).position();
-        pos.top += $(self.q).innerHeight() + 2;
+      this.updateMatchListPosition = function() {
+        var pos = $(this.q).position();
+        if (pos===undefined) return
+        pos.top += $(this.q).innerHeight() + 2;
         pos.left -= 7 // TODO why?
-        pos.width = $(self.q).innerWidth();
-        $(self.matchList).css(pos)
+        pos.width = $(this.q).innerWidth();
+        $(this.matchList).css(pos)
       }.bind(this)
       
       $(window).resize(function() {
-        self.updateMatchListPosition();
-      })
+        this.updateMatchListPosition();
+      }.bind(this))
 
-      self.selectCurrent = function() {
-        var sel = self.matches[self.selected]
-        self.q.value = sel.text
-        self.hideMatches()
+      this.selectCurrent = function() {
+        var sel = this.matches[this.selected]
+        this.q.value = sel.text
+        this.hideMatches()
       }.bind(this)
 
 
-      self.hideMatches = function(e) {
-        self.matches = null
-        self.selected = null
+      this.hideMatches = function(e) {
+        this.matches = null
+        this.selected = null
         this.update()
       }.bind(this)
 
-      self.elementOver = function(e) {
+      this.elementOver = function(e) {
         if($(e.target).hasClass('no-match')) return;
-          var lis = $(self.matchList).find('li');
+          var lis = $(this.matchList).find('li');
         var i;
         for(i=0; i < lis.length; i++) {
           if(lis[i] == e.target) {
-            self.selected = i
+            this.selected = i
             break
           }
         }
         this.update()
      }.bind(this)
 
-      self.updateMatchListPosition();
+      this.updateMatchListPosition();
 
-      self.matches = []
+      this.matches = []
 
-      $(self.q).keydown(function(e) {
+      $(this.q).keydown(function(e) {
         if(e.keyCode === 38) { // up arrow
           e.preventDefault()
-          if(self.selected !== null && self.selected > 0) self.selected--
+          if(this.selected !== null && this.selected > 0) this.selected--
           this.update();
         } else if(e.keyCode === 40) { // down arrow
           e.preventDefault()
-          if(self.selected !== null && self.selected < self.matches.length-1) self.selected++
+          if(this.selected !== null && this.selected < this.matches.length-1) this.selected++
           this.update();
         } else if(e.keyCode === 27) { // escape
-          self.hideMatches()
+          this.hideMatches()
         } else if(e.keyCode === 9 || e.keyCode === 13) { // tab or enter
-          if(self.selected === null) return // normal operation if nothing selected
+          if(this.selected === null) return // normal operation if nothing selected
           e.preventDefault();
-          self.selectCurrent()
+          this.selectCurrent()
         }
 
       }.bind(this));
 
-      $(self.q).on('input', function(e) {
+      $(this.q).on('input', function(e) {
         
-        query(self.q.value, function(err, results) {
+        query(this.q.refs.value, function(err, results) {
           if(err) return; // TODO handle
 
-          self.matches = results;
+          this.matches = results;
 
-          if(self.matches && self.matches.length) {
+          if(this.matches && this.matches.length) {
             selected = 0;
           } else {
             selected = null
@@ -107,16 +108,16 @@
     })
 
     this.on('updated', function() {
-      if(self.matches && self.matches.length) {
-        $(self.matchList).css('border', '')
+      if(this.matches && this.matches.length) {
+        $(this.matchList).css('border', '')
       } else {
-        $(self.matchList).css('border', 'none')
+        $(this.matchList).css('border', 'none')
       }
-      var q = self.q.value
+      var q = this.q.refs.value
       q = q.trim();
       q = q.replace(/\s+/g, ' ').toLowerCase()
 
-      $(self.q).css('color', '');
+      $(this.q).css('color', '');
 
     })
 

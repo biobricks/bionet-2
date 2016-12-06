@@ -7,7 +7,7 @@
     "watch": "watchify -vd -e www/src/main.js -o www/js/bionet.js",
     "serve": "http-server ./www -c 1 -a localhost",
     "dev": "npm-run-all --parallel watchify",
-    "build": "cross-env NODE_ENV=production browserify -e www/src/main.js -m -o www/js/bionet.js",
+    "build": "cross-env NODE_ENV=production browserify -t babelify --presets es2015-riot -e www/src/main.js -m -o www/js/bionet.js",
     "lint": "eslint --ext .js www/src test/unit",
     "test": "karma start karma.conf.js",
     "start": "./bin/cmd.js"
@@ -15,17 +15,17 @@
   "browserify": {
     "transform": [
       [
-        "riotify",
-        {
-          "ext": "html"
-        }
-      ],
-      [
         "babelify",
         {
           "presets": [
-            "es2015"
+            "es2015-riot"
           ]
+        }
+      ],
+      [
+        "riotify",
+        {
+          "ext": "html"
         }
       ]
     ]
@@ -107,8 +107,10 @@
     "qrcode-generator": "1.0.0",
     "qrcode-reader": "^0.1.1",
     "request": "^2.75.0",
-    "riot": "2.6.4",
-    "riotify": "^1.0.0"
+    "riot": "^3.0.0",
+    "riot-compiler": "^3.0.0",
+    "riot-route": "^3.0.1",
+    "riotify": "^2.0.0"
   },
   "license": "AGPL-3.0"
 }

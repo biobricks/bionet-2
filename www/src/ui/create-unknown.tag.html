@@ -12,12 +12,12 @@
 
   <script>
     const appSettings = app.getAppSettings()
-    self.dataTypes = appSettings.dataTypes
-    for (var i = 0; i < self.dataTypes.length; i++) {
-      const type = self.dataTypes[i]
+    this.dataTypes = appSettings.dataTypes
+    for (var i = 0; i < this.dataTypes.length; i++) {
+      const type = this.dataTypes[i]
       if (type.virtual === true) type.url = '/create-virtual/' + encodeURI(type.name)
       else type.url = '/create-physical/' + encodeURI(type.name)
     }
-    console.log("create unknown, types:%s",JSON.stringify(self.dataTypes))
+    console.log("create unknown, types:%s",JSON.stringify(this.dataTypes))
   </script>
 </create-unknown>

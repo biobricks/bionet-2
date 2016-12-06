@@ -1,7 +1,8 @@
 var $ = window.$
 
-import app from './app'
 
+
+import app from './app'
 window.app = app // our one global variable
 app.initialize()
 

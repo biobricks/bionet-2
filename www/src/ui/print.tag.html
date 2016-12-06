@@ -24,7 +24,7 @@
 
     // get a unique human-readable ID for the label if it doesn't have one
     function finalizeLabel(cb) {
-      if(self.humanID) {
+      if(this.humanID) {
         process.nextTick(function() {
           cb(null, humanID);
         })
@@ -39,7 +39,7 @@
           app.ui.toast("Error creating physical: " + err); // TODO handle error
           return cb(err);
         }
-        self.humanID = humanID
+        this.humanID = humanID
         updateLabel(function() {
           cb(null, humanID);
         });
@@ -50,36 +50,36 @@
       cb = cb || function(){}
 
       var pre = ""
-      pre += "ID: " + (self.humanID || '?') + "\n";
-      pre +=  $(self.createLabelForm.title).val() + "\n";
+      pre += "ID: " + (this.humanID || '?') + "\n";
+      pre +=  $(this.createLabelForm.title).val() + "\n";
 
-      var txt = $(self.createLabelForm.text).val()
-      var temperature = $(self.createLabelForm.temperature).val()
+      var txt = $(this.createLabelForm.text).val()
+      var temperature = $(this.createLabelForm.temperature).val()
 
       var o = {
         temperature: temperature,
-        bsl: self.labelFormData.bsl || 0
+        bsl: this.labelFormData.bsl || 0
       };
     
       if(o.bsl > 1) {
         o.biohazard = true;
       }
-      labelMaker.drawLabel('labelPreview', settings.base_url+"/p/"+self.humanID, pre+txt, o, cb);
+      labelMaker.drawLabel('labelPreview', settings.base_url+"/p/"+this.humanID, pre+txt, o, cb);
     }
 
-    self.submitForm = function(e) {
+    this.submitForm = function(e) {
       if(!modalCallback) return;
       finalizeLabel(function(err, humanID) {
         if(err) return;
-        var labelFormData = $.formToObject(self.createLabelForm);
-        labelFormData.humanID = self.humanID
-        labelFormData.bsl = self.labelFormData.bsl
+        var labelFormData = $.formToObject(this.createLabelForm);
+        labelFormData.humanID = this.humanID
+        labelFormData.bsl = this.labelFormData.bsl
         var imageData = labelMaker.getDataURL();
         modalCallback(null, labelFormData, imageData);
       });
     }.bind(this);
 
-    self.labelFormData = this.opts.label || {}
+    this.labelFormData = this.opts.label || {}
     this.on('mount', function() {
 
       modalCallback = this.opts.cb
@@ -93,18 +93,18 @@
 
       // if this isn't in a settimeout it doesn't work :/
       setTimeout(function() {
-        $(self.createLabelForm.text).focus()
+        $(this.createLabelForm.text).focus()
       }, 1)
 
-      $(self.createLabelForm.title).on('input', function(e) {
+      $(this.createLabelForm.title).on('input', function(e) {
         updateLabel()
       }.bind(this))
 
-      $(self.createLabelForm.text).on('input', function(e) {
+      $(this.createLabelForm.text).on('input', function(e) {
         updateLabel()
       }.bind(this))
 
-      $(self.createLabelForm.temperature).on('input', function(e) {
+      $(this.createLabelForm.temperature).on('input', function(e) {
         updateLabel()
       }.bind(this))
 

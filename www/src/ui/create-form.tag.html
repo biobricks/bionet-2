@@ -1,240 +1,248 @@
+<create-form-container>
+    <content-container style="padding-top:100px;">
+        <section-container>
+            <create-form/>
+        </section-container>
+    </content-container>
+</create-form-container>
+
 <create-form>
-  <content-container style="padding-top:100px;">
-    <section-container>
-      <form name="createForm" onsubmit={submitForm2}>
-            <div>What would you like to add?</div>
-            <div>
-              <div id="selectedTypeContainer" class="selected-type">
+    <form ref="createForm" onsubmit={submitForm2}>
+        <div>What would you like to add?</div>
+        <div>
+            <div id="selectedTypeContainer" class="selected-type">
                 <span id="selectedTypeLabel">plasmid</span>
-              </div>
-              <div class="query-container">
-                <input type="text" name="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
-              </div>
             </div>
-            <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
-            <ul id="matchList">
-              <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-              <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
-            </ul>
-      </form>
-    </section-container>
-  </content-container>
-  <script>
-    self.submitForm2 = function(e) {
-      console.log('create-form submitForm')
-      e.preventDefault();
+            <div class="query-container">
+                <input type="text" id="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+            </div>
+        </div>
+        <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
+        <ul id="matchList">
+            <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+            <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
+        </ul>
+    </form>
 
-      //     self.selectCurrent();
-      var val = self.createForm.q.value.trim()
+    <script>
+        this.submitForm2 = function(e) {
+            console.log('create-form submitForm')
+            e.preventDefault();
 
-      if (!self.selectedType && val) {
-        app.remote.getBy('name', val, function(err, o) {
-          if (err) return app.ui.toast("Error: " + err); // TODO handle better
+            //     this.selectCurrent();
+            var val = this.refs.q.value.trim()
 
-          if (!o) {
-            riot.route('/create-unknown/' + encodeURIComponent(val));
-          } else {
-            riot.route('/create-physical/' + o.id);
-          }
-        });
-        return;
-      } else if (self.selectedType) {
-        if (self.selectedType.virtual) {
-          var url = '/create-virtual/' + encodeURIComponent(self.selectedType.name);
-          if (val) {
-            url += '/?name=' + encodeURIComponent(val);
-          }
-          riot.route(url);
-        } else {
-          var url = '/create-physical/' + encodeURIComponent(self.selectedType.name);
-          if (val) {
-            url += '/?name=' + encodeURIComponent(val);
-          }
-          riot.route(url);
-        }
-      } else {
-        // do nothing
-      }
-    };
+            if (!this.selectedType && val) {
+                app.remote.getBy('name', val, function(err, o) {
+                    if (err) return app.ui.toast("Error: " + err); // TODO handle better
 
-    function query(type, q, cb) {
-
-      app.remote.createAutocomplete(type, q, function(err, results) {
-        if (err) return cb(err)
-        cb(null, results)
-      });
-    }
-
-    self.selected = null
-    self.selectedType = null
-
-    this.on('mount', function() {
-      $(self.createForm.q).focus()
-
-      self.updateMatchListPosition = function() {
-        var pos = $(self.createForm.q).offset();
-        pos.top += $(self.createForm.q).innerHeight() + 2;
-        pos.width = $(self.createForm.q).innerWidth();
-        $(self.matchList).css(pos)
-      }.bind(this)
-      
-      $(window).resize(function() {
-        self.updateMatchListPosition();
-      })
-
-      self.selectCurrent = function() {
-        var sel = self.matches[self.selected]
-        if (sel.pre === 'type') {
-          self.setSelectedType(sel)
-          self.createForm.q.value = ''
-        } else {
-          self.createForm.q.value = sel.name
-        }
-        self.hideMatches()
-      }.bind(this)
-
-      self.setSelectedType = function(type) {
-        if (!type) {
-          self.selectedType = null
-          $(self.selectedTypeContainer).css('display', 'none')
-        } else {
-          self.selectedType = type
-          self.selectedTypeLabel.innerHTML = type.name
-          $(self.selectedTypeContainer).css('display', 'block')
-        }
-        self.updateMatchListPosition()
-      }.bind(this)
-
-      self.hideMatches = function(e) {
-        self.matches = null
-        self.selected = null
-        this.update()
-      }.bind(this)
-
-      self.clickSelect = function(e) {
-        console.log("CLICK SELECT");
-        self.selectCurrent();
-      }.bind(this)
-
-
-      self.elementOver = function(e) {
-        console.log("MOUSE OVER");
-        if ($(e.target).hasClass('no-match')) return;
-        var lis = $(self.matchList).find('li');
-        var i;
-        for (i = 0; i < lis.length; i++) {
-          if (lis[i] == e.target) {
-            self.selected = i
-            break
-          }
-        }
-        this.update()
-
-      }.bind(this)
-
-      self.updateMatchListPosition();
-
-      self.matches = []
-
-      var hadQueryBeforeKeydown = false;
-      $(self.createForm.q).keydown(function(e) {
-
-        if (e.keyCode === 38) { // up arrow
-          e.preventDefault()
-          if (self.selected !== null && self.selected > 0) self.selected--
-            this.update();
-        } else if (e.keyCode === 40) { // down arrow
-          e.preventDefault()
-          if (self.selected !== null && self.selected < self.matches.length - 1) self.selected++
-            this.update();
-        } else if (e.keyCode === 27) { // escape
-          self.hideMatches()
-        } else if (e.keyCode === 9) { // tab
-          if (self.selected === null) return // normal operation if nothing selected
-          e.preventDefault();
-          self.selectCurrent()
-        } else {
-          hadQueryBeforeKeydown = !!self.createForm.q.value.replace(/\s+/g, '')
-        }
-
-      }.bind(this));
-
-      $(self.createForm.q).keyup(function(e) {
-        if (e.keyCode === 8 || e.keyCode === 46) { // backspace or delete
-          var hasQueryNow = !!self.createForm.q.value.replace(/\s+/g, '')
-
-          if (!hadQueryBeforeKeydown && !hasQueryNow) {
-            self.setSelectedType()
-          }
-        }
-      }.bind(this));
-
-      $(self.createForm.q).on('input', function(e) {
-
-        self.matches = [];
-
-        var q = self.createForm.q.value.trim();
-
-        query(self.selectedType, q, function(err, results) {
-          if (err) return app.ui.toast(err); // TODO better error handling
-
-          if (!q) {
-            self.matches = null;
-          } else {
-            var i;
-            for (i = 0; i < results.types.length; i++) {
-              self.matches.push({
-                pre: "type",
-                name: results.types[i].name,
-                extraClass: 'type',
-                virtual: results.types[i].virtual
-              });
+                    if (!o) {
+                        route('/create-unknown/' + encodeURIComponent(val));
+                    } else {
+                        route('/create-physical/' + o.id);
+                    }
+                });
+                return;
+            } else if (this.selectedType) {
+                if (this.selectedType.virtual) {
+                    var url = '/create-virtual/' + encodeURIComponent(this.selectedType.name);
+                    if (val) {
+                        url += '/?name=' + encodeURIComponent(val);
+                    }
+                    route(url);
+                } else {
+                    var url = '/create-physical/' + encodeURIComponent(this.selectedType.name);
+                    if (val) {
+                        url += '/?name=' + encodeURIComponent(val);
+                    }
+                    route(url);
+                }
+            } else {
+                // do nothing
             }
-            for (i = 0; i < results.virtuals.length; i++) {
-              self.matches.push({
-                pre: "virtual",
-                name: results.virtuals[i].name
-              });
-            }
-          }
+        };
 
-          if (self.matches && self.matches.length) {
-            selected = 0;
-          } else {
-            selected = null
-          }
-          this.update()
+        function query(type, q, cb) {
 
-        }.bind(this))
-      }.bind(this))
-    })
-
-    this.on('updated', function() {
-      if (self.matches && self.matches.length) {
-        $(self.matchList).css('border', '')
-      } else {
-        $(self.matchList).css('border', 'none')
-      }
-      var q = self.createForm.q.value
-      q = q.trim();
-      q = q.replace(/\s+/g, ' ').toLowerCase()
-
-      $(self.createForm.q).css('color', '');
-
-      if (self.matches) {
-
-        $(self.matchList).find('li').mouseover(function(e) {
-
-        }.bind(this))
-
-        // check for single exact match
-        if (self.matches.length === 1) {
-          if (self.matches[0].name.replace(/[^\w\d]+/g, '').toLowerCase() === q.replace(/[^\w\d]+/g, '')) {
-            $(self.createForm.q).css('color', 'green')
-          }
+            app.remote.createAutocomplete(type, q, function(err, results) {
+                if (err) return cb(err)
+                cb(null, results)
+            });
         }
-      }
-    })
 
-  </script>
+        this.selected = null
+        this.selectedType = null
+
+        this.on('mount', function() {
+            console.log('create-form mount')
+            $('#q').focus()
+
+            this.updateMatchListPosition = function() {
+                var pos = $('#q').offset();
+                if (pos === undefined) return
+                pos.top += $('#q').innerHeight() + 2;
+                pos.width = $('#q').innerWidth();
+                $('#matchList').css(pos)
+            }.bind(this)
+
+            $(window).resize(function() {
+                this.updateMatchListPosition();
+            }.bind(this))
+
+            this.selectCurrent = function() {
+                var sel = this.matches[this.selected]
+                if (sel.pre === 'type') {
+                    this.setSelectedType(sel)
+                    this.refs.q.value = ''
+                } else {
+                    this.refs.q.value = sel.name
+                }
+                this.hideMatches()
+            }.bind(this)
+
+            this.setSelectedType = function(type) {
+                if (!type) {
+                    this.selectedType = null
+                    $('#selectedTypeContainer').css('display', 'none')
+                } else {
+                    this.selectedType = type
+                    $('#selectedTypeLabel').text(type.name)
+                    $('#selectedTypeContainer').css('display', 'block')
+                }
+                this.updateMatchListPosition()
+            }.bind(this)
+
+            this.hideMatches = function(e) {
+                this.matches = null
+                this.selected = null
+                this.update()
+            }.bind(this)
+
+            this.clickSelect = function(e) {
+                console.log("CLICK SELECT");
+                this.selectCurrent();
+            }.bind(this)
+
+
+            this.elementOver = function(e) {
+                console.log("MOUSE OVER");
+                if ($(e.target).hasClass('no-match')) return;
+                var lis = $('#matchList').find('li');
+                var i;
+                for (i = 0; i < lis.length; i++) {
+                    if (lis[i] == e.target) {
+                        this.selected = i
+                        break
+                    }
+                }
+                this.update()
+
+            }.bind(this)
+
+            this.updateMatchListPosition();
+
+            this.matches = []
+
+            var hadQueryBeforeKeydown = false;
+            $('#q').keydown(function(e) {
+                console.log('create form q keydown')
+
+                if (e.keyCode === 38) { // up arrow
+                    e.preventDefault()
+                    if (this.selected !== null && this.selected > 0) this.selected--
+                        this.update();
+                } else if (e.keyCode === 40) { // down arrow
+                    e.preventDefault()
+                    if (this.selected !== null && this.selected < this.matches.length - 1) this.selected++
+                        this.update();
+                } else if (e.keyCode === 27) { // escape
+                    this.hideMatches()
+                } else if (e.keyCode === 9) { // tab
+                    if (this.selected === null) return // normal operation if nothing selected
+                    e.preventDefault();
+                    this.selectCurrent()
+                } else {
+                    hadQueryBeforeKeydown = !!this.refs.q.value.replace(/\s+/g, '')
+                }
+
+            }.bind(this));
+
+            $('#q').keyup(function(e) {
+                if (e.keyCode === 8 || e.keyCode === 46) { // backspace or delete
+                    var hasQueryNow = !!this.refs.q.value.replace(/\s+/g, '')
+
+                    if (!hadQueryBeforeKeydown && !hasQueryNow) {
+                        this.setSelectedType()
+                    }
+                }
+            }.bind(this));
+
+            $('#q').on('input', function(e) {
+
+                this.matches = [];
+
+                var q = this.refs.q.value.trim();
+
+                query(this.selectedType, q, function(err, results) {
+                    if (err) return app.ui.toast(err); // TODO better error handling
+
+                    if (!q) {
+                        this.matches = null;
+                    } else {
+                        var i;
+                        for (i = 0; i < results.types.length; i++) {
+                            this.matches.push({
+                                pre: "type",
+                                name: results.types[i].name,
+                                extraClass: 'type',
+                                virtual: results.types[i].virtual
+                            });
+                        }
+                        for (i = 0; i < results.virtuals.length; i++) {
+                            this.matches.push({
+                                pre: "virtual",
+                                name: results.virtuals[i].name
+                            });
+                        }
+                    }
+
+                    if (this.matches && this.matches.length) {
+                        selected = 0;
+                    } else {
+                        selected = null
+                    }
+                    this.update()
+
+                }.bind(this))
+            }.bind(this))
+        })
+
+        this.on('updated', function() {
+            if (this.matches && this.matches.length) {
+                $('#matchList').css('border', '')
+            } else {
+                $('#matchList').css('border', 'none')
+            }
+            var q = this.refs.q.value
+            q = q.trim();
+            q = q.replace(/\s+/g, ' ').toLowerCase()
+
+            $('#q').css('color', '');
+
+            if (this.matches) {
+
+                $('#matchList').find('li').mouseover(function(e) {
+
+                }.bind(this))
+
+                // check for single exact match
+                if (this.matches.length === 1) {
+                    if (this.matches[0].name.replace(/[^\w\d]+/g, '').toLowerCase() === q.replace(/[^\w\d]+/g, '')) {
+                        $('#q').css('color', 'green')
+                    }
+                }
+            }
+        })
+
+    </script>
 </create-form>

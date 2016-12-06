@@ -1,70 +1,72 @@
 <content-container>
-  <div id="content-container" class="container {opts.class} {theme.style.color.background} {theme.style.color.text}" style={opts.style}>
-    <yield/>
-  </div>
-  <div style="height:48px"></div>
-  <script>
-    const tag = this
-    self.theme = app.getTheme();
-    var observer = {}
-    this.on('before-mount', function() {
-      observer = app.addObserver(app.$.theme, function(theme) {
-        self.theme = theme
-        tag.update()
-      })
-    })
-    this.on('mount', function() {
-      $('#content-container').css('display', 'none')
-      $('#content-container').fadeIn(300)
-    })
-    this.on('before-unmount', function() {
-      $('#content-container').fadeOut(300)
-    })
-    this.on('unmount', function() {
-      app.removeObserver(app.$.theme, observer)
-    })
+    <div id="content-container" class="container {class} {theme.style.color.background} {theme.style.color.text}" style={style}>
+        <yield/>
+    </div>
+    <div style="height:48px"></div>
+    <script>
+        const tag = this
+        this.theme = app.getTheme()
+        this.class = opts.class
+        this.style = opts.style
+        var observer = {}
+        this.on('before-mount', function() {
+            observer = app.addObserver(app.$.theme, function(theme) {
+                this.theme = theme
+                tag.update()
+            })
+        })
+        this.on('mount', function() {
+            $('#content-container').css('display', 'none')
+            $('#content-container').fadeIn(300)
+        })
+        this.on('before-unmount', function() {
+            $('#content-container').fadeOut(300)
+        })
+        this.on('unmount', function() {
+            app.removeObserver(app.$.theme, observer)
+        })
 
-  </script>
+    </script>
 </content-container>
 
 <section-container>
-  <div class="section">
-    <yield/>
-  </div>
+    <div class="section">
+        <yield/>
+    </div>
 </section-container>
 
 <form-container>
-  <form class="col s12" onsubmit={opts.action}>
-    <yield/>
-  </form>
+    <form class="col s12" onsubmit={opts.action}>
+        <yield/>
+    </form>
 </form-container>
 
 <form-input-container>
-  <div class="row">
-    <div class="input-field col s12">
-      <yield/>
+    <div class="row">
+        <div class="input-field col s12">
+            <yield/>
+        </div>
     </div>
-  </div>
 </form-input-container>
 
 <list-container>
-  <div class="collection with-header z-depth-1 {theme.style.color.background} {theme.style.color.text}">
-    <yield/>
-  </div>
+    <div class="collection with-header z-depth-1 {theme.style.color.background} {theme.style.color.text}">
+        <yield/>
+    </div>
 </list-container>
 
 <appbar-container>
-  <div id="appbar" class="pinned" style="top:0px; width:100%;z-index:1000">
-    <yield/>
-  </div>
+    <div id="appbar" class="pinned" style="top:0px; width:100%;z-index:1000">
+        <yield/>
+    </div>
 </appbar-container>
 
 <topnav-container>
-  <div id="top-nav">
-    <nav class="{theme.style.color.navBackground}">
-      <div class="nav-wrapper container">
-        <yield/>
-      </div>
-    </nav>
-  </div>
+    <div id="top-nav">
+        <nav class="{theme.style.color.navBackground}">
+            <div class="nav-wrapper container">
+                <yield/>
+            </div>
+        </nav>
+    </div>
 </topnav-container>

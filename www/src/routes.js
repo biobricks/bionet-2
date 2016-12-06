@@ -1,110 +1,141 @@
-
-import riot from 'riot'
+const riot =require('riot')
+const route =require('riot-route')
 
 // is this string formatted like a UUID?
 function isUUID(str) {
-  return !!str.toLowerCase().match(/^[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}$/)
+    return !!str.toLowerCase().match(/^[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}$/)
 }
 
-riot.route('/', function () {
-  app.dispatch(app.$.appBarConfig, {
-    enableTopNav: true,
-    enableBreadCrumbs: false,
-    enableSubbar: false
-  })
-  riot.mount('div#content', 'welcome')
+route('/', function () {
+    app.dispatch(app.$.appBarConfig, {
+        enableTopNav: true,
+        enableBreadCrumbs: false,
+        enableSubbar: false
+    })
+    riot.mount('div#content', 'welcome')
 })
 
 
-riot.route('/logout', function () {
-  console.log("logout route...");
-  app.logout(function(err) {
-    if(err) {
-      app.ui.toast("Error logout route: " + err) // TODO handle better
-    }
-    riot.route('/');
-  });
-})
-
-riot.route('/create-unknown/*', function(name) {
-  app.dispatch(app.$.appBarConfig, {
-    enableTopNav: true,
-    enableBreadCrumbs: false,
-    enableSubbar: false
-  })
-  riot.mount('div#content', 'create-unknown')
-})
-
-riot.route('/create', function () {
-  app.dispatch(app.$.appBarConfig, {
-    enableTopNav: true,
-    enableBreadCrumbs: false,
-    enableSubbar: false
-  })
-  riot.mount('div#content', 'create-form')
-})
-
-riot.route('/scan', function () {
-  app.dispatch(app.$.appBarConfig, {
-    enableTopNav: true,
-    enableBreadCrumbs: false,
-    enableSubbar: false
-  })
-  riot.mount('div#content', 'scan')
-})
-
-
-riot.route('/p/*', function (id) {
-  app.dispatch(app.$.appBarConfig, {
-    enableTopNav: true,
-    enableBreadCrumbs: false,
-    enableSubbar: false
-  })
-  setTimeout(function() {
-    app.remote.getMaterialByHumanID(id, function(err, m) {
-      riot.mount('div#content', 'view-physical', m)
+route('/logout', function () {
+    console.log("logout route...");
+    app.logout(function (err) {
+        if (err) {
+            app.ui.toast("Error logout route: " + err) // TODO handle better
+        }
+        route('/');
     });
-  }, 500);
+})
+
+route('/create-unknown/*', function (name) {
+    app.dispatch(app.$.appBarConfig, {
+        enableTopNav: true,
+        enableBreadCrumbs: false,
+        enableSubbar: false
+    })
+    riot.mount('div#content', 'create-unknown')
+})
+
+route('/create', function () {
+    app.dispatch(app.$.appBarConfig, {
+        enableTopNav: true,
+        enableBreadCrumbs: false,
+        enableSubbar: false
+    })
+    riot.mount('div#content', 'create-form-container')
+})
+
+route('/scan', function () {
+    app.dispatch(app.$.appBarConfig, {
+        enableTopNav: true,
+        enableBreadCrumbs: false,
+        enableSubbar: false
+    })
+    riot.mount('div#content', 'scan')
+})
+
+
+route('/p/*', function (id) {
+    app.dispatch(app.$.appBarConfig, {
+        enableTopNav: true,
+        enableBreadCrumbs: false,
+        enableSubbar: false
+    })
+    setTimeout(function () {
+        app.remote.getMaterialByHumanID(id, function (err, m) {
+            riot.mount('div#content', 'view-physical', m)
+        });
+    }, 500);
 })
 
 // TODO remove again
-riot.route('/print', function () {
-  app.dispatch(app.$.appBarConfig, {
-    enableTopNav: true,
-    enableBreadCrumbs: false,
-    enableSubbar: false
-  })
-  riot.mount('div#content', 'print')
+route('/print', function () {
+    app.dispatch(app.$.appBarConfig, {
+        enableTopNav: true,
+        enableBreadCrumbs: false,
+        enableSubbar: false
+    })
+    riot.mount('div#content', 'print')
 })
 
+function editPhysicalRoute(typeOrID, q) {
+
+    app.dispatch(app.$.appBarConfig, {
+        enableTopNav: true,
+        enableBreadCrumbs: false,
+        enableSubbar: false
+    })
+
+    var opts = {
+        query: q || {}
+    }
+    typeOrID = decodeURIComponent(typeOrID).trim()
+
+    opts.type = typeOrID
+
+    if (isUUID(typeOrID)) {
+        opts.virtualID = typeOrID
+    } else {
+        opts.type2 = typeOrID
+    }
+    opts.key = q.id
+    console.log("editPhysicalRoute, mounting component: %s",JSON.stringify(opts))
+    riot.mount('div#content', 'create-physical', opts);
+}
+
+route('edit-physical/*', editPhysicalRoute);
+
+route('edit-physical/*/..', function (typeOrID) {
+    var q = route.query()
+    editPhysicalRoute(typeOrID, q);
+});
 
 function createPhysicalRoute(typeOrID, q) {
 
-  app.dispatch(app.$.appBarConfig, {
-    enableTopNav: true,
-    enableBreadCrumbs: false,
-    enableSubbar: false
-  })
+    app.dispatch(app.$.appBarConfig, {
+        enableTopNav: true,
+        enableBreadCrumbs: false,
+        enableSubbar: false
+    })
 
-  var opts = {
-    query: q || {}
-  }
-  typeOrID = decodeURIComponent(typeOrID).trim()
+    var opts = {
+        query: q || {}
+    }
+    typeOrID = decodeURIComponent(typeOrID).trim()
 
-  opts.type = typeOrID
-
-  if(isUUID(typeOrID)) {
-    opts.virtualID = typeOrID
-  }  else {
     opts.type = typeOrID
-  }
 
-  riot.mount('div#content', 'create-physical', opts);
+    if (isUUID(typeOrID)) {
+        opts.virtualID = typeOrID
+    } else {
+        opts.type = typeOrID
+    }
+
+    riot.mount('div#content', 'create-physical', opts);
 }
 
-riot.route('/create-physical/*', createPhysicalRoute);
+route('/create-physical/*', createPhysicalRoute);
 
-riot.route('/create-physical/*/..', function(typeOrID) {
-  var q = riot.route.query()
-  createPhysicalRoute(typeOrID, q);
+route('/create-physical/*/..', function (typeOrID) {
+    var q = route.query()
+    createPhysicalRoute(typeOrID, q);
 });

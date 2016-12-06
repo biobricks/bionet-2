@@ -1,21 +1,22 @@
 <app>
+    <appbar/>
+    <div id="content" class="{theme.style.color.background+' '+theme.style.color.text}" />
+    <!--  <footer-tag background={theme.style.color.highlightBackground} /> -->
 
-  <appbar/>
-  <div id="content" class="{theme.style.color.background} {theme.style.color.text}" />
-<!--  <footer-tag background={theme.style.color.highlightBackground} /> -->
+    <script>
+        const tag = this
+        this.theme = app.getTheme()
+        $('body').addClass(this.theme.style.color.background);
 
-  <script>
-    const tag = this
-    self.theme = app.getTheme()
-    $('body').addClass(self.theme.style.color.background);
+        app.observe(app.$.theme, function(theme) {
+            // TODO theming should be done by loading and unloading css files (or sets of styles)
+            $('body').removeClass(this.theme.style.color.background)
+            $('body').addClass(theme.style.color.background)
+            this.theme = theme
+            tag.update();
+        });
 
-    app.observe(app.$.theme, function(theme) {
-    // TODO theming should be done by loading and unloading css files (or sets of styles)
-      $('body').removeClass(self.theme.style.color.background)
-      $('body').addClass(theme.style.color.background)
-      self.theme = theme
-      tag.update();
-    });
+        console.log('app tag initialization')
 
-  </script>
+    </script>
 </app>

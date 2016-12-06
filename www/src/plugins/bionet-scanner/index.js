@@ -1,4 +1,4 @@
-import riot from 'riot'
+const riot=require('riot')
 import nanoStream from '../../app/NanoStream';
 import scanner from './scanner'
 import bionetScannerApi from './bionetScannerApi'
@@ -61,7 +61,7 @@ bionetScanPlugin.runScanner = function () {
   s.plugin = new nanoStream();
 
   const thisModule = this
-  const q = riot.route.query()
+  const q = route.query()
   const config = {}
 
   if (q.id !== undefined) {
@@ -190,7 +190,7 @@ bionetScanPlugin.runScanner = function () {
       thisModule.running = false
       
       // route back to physical instance search result
-      riot.route('/q?partid='+config.q.partid)
+      route('/q?partid='+config.q.partid)
     },
     run: function () {
       thisModule.running = true

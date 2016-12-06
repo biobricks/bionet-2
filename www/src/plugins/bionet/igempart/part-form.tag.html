@@ -53,30 +53,30 @@
 
 <part-specification>
   <form name="editPartForm" class="col s12" onsubmit={submitForm}>
-    <form-text-input label="Name" name="name" value={formData.name}/>
-    <form-textarea-input label="Description" name="description" value={formData.description}/>
-    <form-text-input label="Created by" name="creator" value={formData.creator}/>
-    <form-text-input label="Created" name="created" value={formData.created}/>
-    <form-text-input label="Storage temperature" name="temperature" value={formData.temperature}/>
-    <form-textarea-input label="Biosafety level" name="bsl" value={formData.bsl}/>
-    <form-switch label="Biohazardous?" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
-    <form-textarea-input label="Sequence" name="sequence" value={formData.sequence}/>
+    <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+    <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
+    <form-text-input label="Created by" ref="creator" name="creator" value={formData.creator}/>
+    <form-text-input label="Created" ref="created" name="created" value={formData.created}/>
+    <form-text-input label="Storage temperature" ref="temperature" name="temperature" value={formData.temperature}/>
+    <form-textarea-input label="Biosafety level" ref="bsl" name="bsl" value={formData.bsl}/>
+    <form-switch label="Biohazardous?" ref="biohazard" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
+    <form-textarea-input label="Sequence" ref="sequence" name="sequence" value={formData.sequence}/>
     <form-image imagesrc={formData.avatar} label="Avatar" height="60px" />
-    <form-text-input label="" name="avatar" value={formData.avatar}/>
+    <form-text-input label="" ref="avatar" name="avatar" value={formData.avatar}/>
     <form-image imagesrc={formData.qrcode} label="Datamatrix code" height="140px" />
     <std-button action={submitForm} label="submit" />
     <input type="submit" style="visibility:hidden" />
   </form>
   <script>
-    self.formData = app.state.editPart
+    this.formData = app.state.editPart
 
-    console.log("NAAAAAAAAAAAAME", self.formData.name)
+    console.log("NAAAAAAAAAAAAME", this.formData.name)
 
     $(this.editPartForm).change(function(e) {
-      $.extend(app.state.editPart, $.formToObject(self.editPartForm))
+      $.extend(app.state.editPart, $.formToObject(this.editPartForm))
     }.bind(this));
 
-    self.submitForm = function(e) {
+    this.submitForm = function(e) {
       if(!app.state.editPart.id) {
         app.ui.toast("Error: Missing part ID") // TODO better error handling
         return;
@@ -86,7 +86,7 @@
         if(err) return app.ui.toast("Error: " + err) // TODO handle error
         
         app.ui.toast("Material saved with ID: " + id)
-        riot.route('/edit/' + id);
+        route('/edit/' + id);
       });
     }
 
@@ -161,7 +161,7 @@
       </object>
     </div>
 -->
-    <form-textarea-input label="Sequence" name="sequence" value={formData.sequence}/>
+    <form-textarea-input label="Sequence" ref="sequence" name="sequence" value={formData.sequence}/>
     <std-button action={submitForm} label="submit" />
   </form-container>
   <script>
@@ -188,10 +188,10 @@
       sequence: formData.sequence,
       features: features
     }
-    self.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
+    this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
       //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
 */
-    self.submitForm = function(e) {
+    this.submitForm = function(e) {
 
     }
 
@@ -200,9 +200,9 @@
 
 <part-instance>
   <form-container>
-    <form-text-input label="Physical Location Code" name="locationid" value={formData.location}/>
-    <form-text-input label="Datamatrix Code" name="datamatrix" value={formData.qrcode}/>
-    <form-text-input label="Cassette Code" name="cassette" value={}/>
+    <form-text-input label="Physical Location Code" ref="locationid" name="locationid" value={formData.location}/>
+    <form-text-input label="Datamatrix Code" ref="datamatrix" name="datamatrix" value={formData.qrcode}/>
+    <form-text-input label="Cassette Code" ref="cassette" name="cassette" value={}/>
     <std-button action={submitForm} label="add physical" />
     <div class="row">
     </div>
@@ -233,35 +233,35 @@
 
   <script>
     const tag = this
-    self.formData = app.getModel('createPart')
-    app.dispatch('bioPhysicalQuery', self.formData.name)
-    self.searchresult = []
-    self.primaryHeader = ''
-    self.secondaryHeader = ''
-    self.clickphysical = function(itemData) {
+    this.formData = app.getModel('createPart')
+    app.dispatch('bioPhysicalQuery', this.formData.name)
+    this.searchresult = []
+    this.primaryHeader = ''
+    this.secondaryHeader = ''
+    this.clickphysical = function(itemData) {
       console.log('clickphysical', JSON.stringify(itemData))
-      self.locationid.value = itemData.locationid
-      self.datamatrix.value = itemData.id
-      self.cassette.value = itemData.cassetteid
+      this.locationid.refs.value = itemData.locationid
+      this.datamatrix.refs.value = itemData.id
+      this.cassette.refs.value = itemData.cassetteid
       tag.update()
     }
 
-    self.submitForm = function() {
-      const partData = JSON.parse(JSON.stringify(self.formData))
+    this.submitForm = function() {
+      const partData = JSON.parse(JSON.stringify(this.formData))
       partData.name = app.state.editPart.id
-      partData.locationid = self.locationid.value
-      partData.datamatrix = self.datamatrix.value
-      partData.cassetteid = self.cassette.value
+      partData.locationid = this.locationid.refs.value
+      partData.datamatrix = this.datamatrix.refs.value
+      partData.cassetteid = this.cassette.refs.value
       console.log('create instance:', JSON.stringify(partData))
       app.route('partDataAccessor', 'storePhysical', 'toPhysicalItem', partData)
     }
 
     app.addRouteDestination('searchResult', 'list', function(list) {
       console.log('physical part search result, tag:', JSON.stringify(list))
-      self.secondaryHeader = list.length + ' Physical instances'
-      self.searchresult = list
+      this.secondaryHeader = list.length + ' Physical instances'
+      this.searchresult = list
       for (var i = 0; i < list.length; i++) {
-        list[i].click = self.clickphysical
+        list[i].click = this.clickphysical
       }
       tag.update()
       app.dispatch('searchCache', list)

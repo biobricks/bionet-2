@@ -5,10 +5,10 @@
     </section-container>
   </content-container>
   <script>
-    self.errorMessage=app.getModel('error')
+    this.errorMessage=app.getModel('error')
     app.observe('error', function(err) {
       console.log('error page: err=%s',err)
-      self.errorMessage = err
+      this.errorMessage = err
       tag.update()
     })
   </script>

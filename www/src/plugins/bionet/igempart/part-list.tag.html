@@ -12,11 +12,11 @@
 
   <script>
     const q = app.getModel('searchQuery')
-    self.primaryHeader = 'Search results for "' + JSON.stringify(q) + '"'
-    self.inventorylist = app.getModel('searchCache')
-    self.secondaryHeader = self.inventorylist.length + ' items'
+    this.primaryHeader = 'Search results for "' + JSON.stringify(q) + '"'
+    this.inventorylist = app.getModel('searchCache')
+    this.secondaryHeader = this.inventorylist.length + ' items'
 
-    self.pagination = [{
+    this.pagination = [{
       url: '1',
       label: '1'
     }, {
@@ -37,7 +37,7 @@
     /*
     const tag = this
     const partsListObserver = function(list) {
-      self.list = list
+      this.list = list
       tag.update();
     };
     app.observe('partsList', partsListObserver)
@@ -50,7 +50,7 @@
     */
 
     this.on('unmount', function() {
-      self.inventorylist = undefined
+      this.inventorylist = undefined
     })
 
   </script>
