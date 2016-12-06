@@ -11,6 +11,7 @@
                 return this.refs[opts.name].value;
             }
         });
+
     </script>
 </form-text-input>
 
@@ -29,6 +30,7 @@
                 return this.refs[opts.name].value;
             }
         });
+
     </script>
 </form-select-input>
 
@@ -42,11 +44,14 @@
         </div>
     </div>
     <script>
-        Object.defineProperty(this, "value", {
-            get: function() {
-                return this.refs[opts.name].value;
-            }
-        });
+        if (this.value === undefined) {
+            Object.defineProperty(this, "value", {
+                get: function() {
+                    return this.refs[opts.name].value;
+                }
+            });
+        }
+
     </script>
 </search-input>
 
@@ -65,6 +70,7 @@
                 return this.refs[opts.name].value;
             }
         });
+
     </script>
 </form-text-input-empty>
 
@@ -82,6 +88,7 @@
                 return this.refs[opts.name].value;
             }
         });
+
     </script>
 </password-text-input-empty>
 
@@ -98,6 +105,7 @@
                 return this.refs[opts.name].value;
             }
         });
+
     </script>
 </form-textarea-input>
 
