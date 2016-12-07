@@ -2,7 +2,7 @@
     <content-container style="padding-top:100px;">
         <section-container>
             <form onsubmit={this.submitForm}>
-                <search-input label="search inventory" name="searchbio" action={searchclick}/>
+                <search-input label="search inventory" name="searchinventory" action={searchclick}/>
                 <input type="submit" style="display:none" />
                 <div id="part-inventory-content" class="{theme.style.color.background} {theme.style.color.text}">
                     <inventory-treeview nodes={this.nodes} />
@@ -17,14 +17,14 @@
 
         this.submitForm = function() {
 
-            route('/inventory?q=' + encodeURIComponent(this.searchbio.refs.value))
+            route('/inventory?q=' + encodeURIComponent(this.refs.searchinventory.value))
         }
 
 
         this.on('mount', function() {
             if (!this.opts.q) return;
             var q = decodeURIComponent(this.opts.q);
-            this.searchbio.refs.value = q;
+            this.refs.searchinventory.value = q;
 
             this.update();
 

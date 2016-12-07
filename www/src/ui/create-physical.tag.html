@@ -7,7 +7,7 @@
             <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
             
             <div each={field in fields}>
-                <form-text-input label={field.name} ref={field.name} name={field.name} value="" />
+                <form-text-input label={field.name} ref={'field_'+field.name} name={field.name} value="" />
             </div>
 
             <div class="row">
@@ -189,7 +189,8 @@
             }
 
             if (opts.query && opts.query.name && opts.query.name.trim()) {
-                this.refs.name.value = decodeURIComponent(opts.query.name);;
+                this.formData.name = decodeURIComponent(opts.query.name);
+                //this.refs.name.value = decodeURIComponent(opts.query.name);;
             }
 
             this.update();
@@ -221,7 +222,7 @@
                         app.ui.toast(err); // TODO handle better
                         return;
                     }
-                    this.printNameDefault = $(this.createPhysicalForm.name).val().trim() || virtual.name
+                    this.printNameDefault = this.refs.name.value.trim() || virtual.name
                     $(this.createPhysicalHeader).html("New " + virtual.name)
 
                     // TODO
@@ -248,7 +249,7 @@
                     return;
                 }
 
-                this.printNameDefault = $(this.createPhysicalForm.name).val().trim() || type.name
+                this.printNameDefault = this.refs.name.value.trim() || type.name
                 $(this.createPhysicalHeader).html("New " + type.name)
 
                 // TODO
