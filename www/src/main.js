@@ -91,8 +91,9 @@ function connector(cb) {
   });
 
   rpcClient.pipe(stream).pipe(rpcClient);
-
-  rpcClient.on('error', failOnce);
+    
+  /// xxx traps all errors
+  //rpcClient.on('error', failOnce);
 
 
   rpcClient.on('methods', function (remote) {
