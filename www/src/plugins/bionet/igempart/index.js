@@ -156,10 +156,11 @@ var igempart = {
     route('/create-virtual', function () {
       app.state.createPart = {}
       riot.mount('div#content', 'create-part')
-      riot.mount('div#create-part-content', 'create-specification')
+      riot.mount('div#create-part-content', 'create-virtual-form')
     })
 
 */
+
     route('/create-virtual/*', function(type) {
       app.state.createPart = {
           name:'',
@@ -172,8 +173,8 @@ var igempart = {
           avatar:''
       }
       riot.mount('div#content', 'create-part', {type: type, query: {}})
-
     });
+
     route('/create-virtual/*/..', function(type) {
       var q = route.query()
 
@@ -185,7 +186,7 @@ var igempart = {
       } else if(q.tab === 'instances') {
         riot.mount('div#create-part-content', 'create-instances')
       } else {
-        riot.mount('div#create-part-content', 'create-specification')
+        riot.mount('div#create-part-content', 'create-virtual-form',opts)
       }
     })
 
@@ -197,7 +198,7 @@ var igempart = {
       } else if (section == 'instances') {
         riot.mount('div#create-part-content', 'create-instances')
       } else {
-        riot.mount('div#create-part-content', 'create-specification')
+        riot.mount('div#create-part-content', 'create-virtual-form')
       }
     })
 */

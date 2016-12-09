@@ -70,7 +70,7 @@
   <script>
     this.formData = app.state.editPart
 
-    console.log("NAAAAAAAAAAAAME", this.formData.name)
+    console.log("part-specification, name:", this.formData.name)
 
     $(this.editPartForm).change(function(e) {
       $.extend(app.state.editPart, $.formToObject('editPartForm'))

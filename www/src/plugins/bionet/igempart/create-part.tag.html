@@ -2,26 +2,15 @@
     <content-container style="padding-top:165px;">
         <section-container>
             <div id="create-part-content" class={themeClass}>
-                <create-specification />
+                <!--
+                <create-virtual-form query={opts.query}/>
+                -->
             </div>
         </section-container>
     </content-container>
     <script>
         const theme = app.getTheme()
         this.themeClass = theme.style.color.background+' '+theme.style.color.text
-        this.on('mount', function() {
-
-            if (!this.formData) {
-                this.formData = {};
-            }
-            if (this.opts.query && this.opts.query.name && this.opts.query.name.trim()) {
-                this.formData.name = decodeURIComponent(this.opts.query.name);
-                this.update();
-                $.extend(app.state.createPart, $.formToObject('createPartForm'))
-            }
-
-        });
-
 
         // setup secondary nav
         app.dispatch(app.$.secondaryNav, [{
@@ -57,7 +46,7 @@
     </script>
 </create-part>
 
-<create-specification>
+<create-virtual-form>
     <form name="createPartForm" class="col s12" onsubmit={submitForm}>
         <form-text-input label="Part Name" ref="name" name="name" value={formData.name}/>
         <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
@@ -72,6 +61,22 @@
         <input type="submit" style="visibility:hidden" />
     </form>
     <script>
+        console.log('create-virtual-form, opts:%s',JSON.stringify(this.opts))
+        this.on('mount', function() {
+
+            if (!this.formData) {
+                this.formData = {};
+            }
+            if (this.opts.query && this.opts.query.name && this.opts.query.name.trim()) {
+                //this.refs.name.value = decodeURIComponent(this.opts.query.name);
+                this.formData.name = decodeURIComponent(this.opts.query.name);
+                this.update();
+                $.extend(app.state.createPart, $.formToObject('createPartForm'))
+            }
+        console.log('create-virtual-form, formData:%s',JSON.stringify(this.formData))
+
+        });
+        
         this.formData = app.state.createPart
         if (!this.formData || this.formData.name === undefined) {
             this.formData = {
@@ -108,7 +113,7 @@
         }
 
     </script>
-</create-specification>
+</create-virtual-form>
 
 
 <create-sequence>
