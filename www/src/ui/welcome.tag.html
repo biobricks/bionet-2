@@ -26,11 +26,12 @@
     <form class="col center" onsubmit={searchclick}>
         <img class="center" src="static/images/home-bionet.png" height="220px" />
         <div style="height:40px" />
-
+        <input type="submit" style="display:none" />
         <search-input label="search biomaterials" ref="searchbio" name="searchbio" value={searchbioInit}/>
     </form>
     <form if={!app.user} onsubmit={signupAction} class="col center">
         <div class="center">OR</div>
+        <input type="submit" style="display:none" />
         <form-text-input-empty label="enter invitation code, hint:code" ref="mpassword" name="mpassword" value={mpasswordInit}/>
         <std-button label="sign up" action={signupAction}/>
     </form>

@@ -17,6 +17,7 @@
                 <input type="text" id="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
             </div>
         </div>
+        <input type="submit" style="display:none" />
         <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
         <ul id="matchList">
             <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
