@@ -98,6 +98,7 @@ function editPhysicalRoute(typeOrID, q) {
         opts.type2 = typeOrID
     }
     opts.key = q.id
+    opts.mode = 'edit'
     console.log("editPhysicalRoute, mounting component: %s",JSON.stringify(opts))
     riot.mount('div#content', 'create-physical', opts);
 }

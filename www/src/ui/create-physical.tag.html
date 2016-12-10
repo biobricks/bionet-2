@@ -194,16 +194,18 @@
 
             this.update();
             // todo: was opts.id but apparently riot uses opts.id for something else
-            if (opts.uuid !== undefined) {
-                app.remote.get(opts.uuid, function(err, data) {
+            if (opts.key !== undefined) {
+                app.remote.get(opts.key, function(err, data) {
                     if (err) {
                         app.dispatch('error', err)
                         return
                     }
                     this.formData = data
+                    console.log('create-physical mount, formData=',JSON.stringify(data))
                     this.update()
                 }.bind(this))
             }
+            if (opts.mode==='edit') return;
 
             riot.mount('#autocomplete-container', 'autocomplete', {
                 searchCallback: function(query, cb) {

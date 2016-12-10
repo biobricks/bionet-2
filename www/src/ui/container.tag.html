@@ -50,9 +50,12 @@
 </form-input-container>
 
 <list-container>
-    <div class="collection with-header z-depth-1 {theme.style.color.background} {theme.style.color.text}">
+    <div class="collection with-header z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
         <yield/>
     </div>
+    <script>
+        this.theme=app.getTheme()
+    </script>
 </list-container>
 
 <appbar-container>

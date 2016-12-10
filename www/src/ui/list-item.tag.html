@@ -1,6 +1,6 @@
 <list-item>
     <!-- avatar list item template -->
-    <div class="collection-item  avatar2 valign-wrapper {theme.style.color.background} {theme.style.color.text}" style="padding-left:{item.indent ? item.indent * 15 : 0}px" onclick={clickitem}>
+    <div class="collection-item  avatar2 valign-wrapper {theme.style.color.background+' '+theme.style.color.text}" style="padding-left:{item.indent ? item.indent * 15 : 0}px" onclick={clickitem}>
         <img if={item.avatar} class="circle" src={item.avatar} alt="" />
         <div class="left" style="display: inline-block; width:70%">
             <div class="left" style="cursor: pointer; cursor: hand; {item.highlight ? 'color:green' : ''}">{item.primary_text}</div>
@@ -16,11 +16,12 @@
 
     <script>
         this.item = opts.item
+        this.theme = app.getTheme()
 
         this.clickitem = function(e) {
             e.stopPropagation()
-            if (opts.item.url ===undefined ) {
-                console.log("list item, undefined route: id=%s",opts.item.id)
+            if (opts.item.url === undefined) {
+                console.log("list item, undefined route: id=%s", opts.item.id)
                 return
             }
             console.log("List item, routing to: ", opts.item.url);
@@ -37,7 +38,11 @@
 </list-item>
 
 <list-header>
-    <div class="collection-header {theme.style.color.background} {theme.style.color.text}">
+    <div class="collection-header {theme.style.color.background +' '+theme.style.color.text}">
         <div><span>{opts.primaryHeader}</span><span class="right">{opts.secondaryHeader}</span></div>
     </div>
+    <script>
+        this.theme = app.getTheme();
+
+    </script>
 </list-header>

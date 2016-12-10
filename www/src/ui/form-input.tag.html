@@ -6,10 +6,13 @@
         </div>
     </div>
     <script>
+        
+        this.on('update', function() {
+            this.data = this.opts.riotValue;
+        })
+                
         this.on('mount', function() {
             console.log("form-text-input, opts:", JSON.stringify(this.opts))
-            this.data = this.opts.riotValue;
-            this.update();
             Object.defineProperty(this, "value", {
                 get: function() {
                     return this.refs.inputTag.value;
@@ -35,9 +38,10 @@
         </div>
     </div>
     <script>
-        this.on('mount', function() {
+        this.on('update', function() {
             this.data = this.opts.riotValue;
-            this.update();
+        })
+        this.on('mount', function() {
             Object.defineProperty(this, "value", {
                 get: function() {
                     return this.refs.selectTag.value;
@@ -55,16 +59,17 @@
     <div class="row">
         <div class="col s3 m3 l3" />
         <div class="input-field col s6 m6 l6">
-            <i class="material-icons postfix" onclick={opts.action}>search</i>
+            <i class="material-icons postfix" style="cursor: pointer; cursor: hand; " onclick={opts.action}>search</i>
             <input id={opts.name} name={opts.name} ref="inputTag" type="text" value={data} />
             <label for={opts.name}>{opts.label}</label>
         </div>
     </div>
     <script>
         this.data = opts.value;
-        this.on('mount', function() {
+        this.on('update', function() {
             this.data = this.opts.riotValue;
-            this.update();
+        })
+        this.on('mount', function() {
             if (this.value === undefined) {
                 Object.defineProperty(this, "value", {
                     get: function() {
@@ -90,9 +95,10 @@
         </div>
     </div>
     <script>
-        this.on('mount', function() {
+        this.on('update', function() {
             this.data = this.opts.riotValue;
-            this.update();
+        })
+        this.on('mount', function() {
             Object.defineProperty(this, "value", {
                 get: function() {
                     return this.refs.inputTag.value;
@@ -116,9 +122,10 @@
         </div>
     </div>
     <script>
-        this.on('mount', function() {
+        this.on('update', function() {
             this.data = this.opts.riotValue;
-            this.update();
+        })
+        this.on('mount', function() {
             Object.defineProperty(this, "value", {
                 get: function() {
                     return this.refs.inputTag.value;
@@ -141,9 +148,10 @@
         </div>
     </div>
     <script>
-        this.on('mount', function() {
+        this.on('update', function() {
             this.data = this.opts.riotValue;
-            this.update();
+        })
+        this.on('mount', function() {
             Object.defineProperty(this, "value", {
                 get: function() {
                     return this.refs.inputTag.value;

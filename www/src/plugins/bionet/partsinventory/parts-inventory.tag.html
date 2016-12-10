@@ -1,27 +1,47 @@
 <parts-inventory>
     <content-container style="padding-top:100px;">
         <section-container>
-            <form onsubmit={this.submitForm}>
-                <search-input label="search inventory" name="searchinventory" action={searchclick}/>
-                <input type="submit" style="display:none" />
-                <div id="part-inventory-content" class="{theme.style.color.background} {theme.style.color.text}">
-                    <inventory-treeview nodes={this.nodes} />
-                </div>
-            </form>
+            <parts-inventory-form q={testvalue}/>
         </section-container>
     </content-container>
     <script>
+        this.on('mount', function() {
+            this.testvalue = "somevalue"
+            this.update();
+            console.log('parts-inventory: opts:', JSON.stringify(this.opts))
+        })
+
+    </script>
+</parts-inventory>
+
+<parts-inventory-form>
+    <div style="padding-top:100px;" />
+    <form onsubmit={submitForm}>
+        <search-input label="search inventory" ref="searchinventory" name="searchinventory" action={submitForm}/>
+        <input type="submit" style="display:none" />
+        <div id="part-inventory-content" class="{theme.style.color.background+' '+ theme.style.color.text}">
+            <list-container>
+                <inventory-treeview nodes={nodes} />
+            </list-container>
+        </div>
+    </form>
+    <script>
         const tag = this
+        this.theme = app.getTheme();
 
         this.nodes = [];
 
         this.submitForm = function() {
 
-            route('/inventory?q=' + encodeURIComponent(this.refs.searchinventory.value))
-        }
+            //route('/inventory/?q=' + encodeURIComponent(this.refs.searchinventory.value))
+            const iurl = '/inventory/' + encodeURIComponent(this.refs.searchinventory.value)
+            route(iurl)
+                //this.unmount(true)
+        }.bind(this)
 
 
         this.on('mount', function() {
+            console.log('parts-inventory-form: opts=', JSON.stringify(this.opts))
             if (!this.opts.q) return;
             var q = decodeURIComponent(this.opts.q);
             this.refs.searchinventory.value = q;
@@ -54,17 +74,17 @@
                         if (cur.match(q)) matches.push(cur);
                     }
 
-/*
-        return {
-          url: '/edit/' + x.id,
-          secondary_url: '/q?partid=' + x.id,
-          secondary_url_label: 'view availabilty',
-          righticon: 'star',
-          primary_text: x.id,
-          secondary_text: x.description,
-          starred: false,
-          data: x.data
-*/
+                    /*
+                            return {
+                              url: '/edit/' + x.id,
+                              secondary_url: '/q?partid=' + x.id,
+                              secondary_url_label: 'view availabilty',
+                              righticon: 'star',
+                              primary_text: x.id,
+                              secondary_text: x.description,
+                              starred: false,
+                              data: x.data
+                    */
                     var j, m, add, perfect;
                     for (i = 0; i < children.length; i++) {
                         cur = children[i].path;
@@ -83,7 +103,7 @@
                         if (add) {
                             this.nodes.push({
                                 indent: indent,
-                                url: 'edit-physical/'+children[i].path+"/?id="+children[i].key,
+                                url: 'edit-physical/' + children[i].path + "/?id=" + children[i].key,
                                 primary_text: a[a.length - 1],
                                 id: children[i].key,
                                 highlight: perfect
@@ -98,22 +118,20 @@
         })
 
     </script>
-</parts-inventory>
+</parts-inventory-form>
 
 <inventory-treeview>
 
-    <list-container>
-        <ul style="margin:0 0 0 1em;position:relative">
-            <li style="padding:0 1.5em;">
-                <list-item each={node in nodes} item={node} />
-            </li>
-        </ul>
-    </list-container>
+    <ul style="margin:0 0 0 1em;position:relative">
+        <li style="padding:0 1.5em;">
+            <list-item each={node in nodes} item={node} />
+        </li>
+    </ul>
 
     <script>
         /*
-            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-            */
+                                            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                            */
         const tag = this;
 
 
