@@ -34,8 +34,6 @@
         <form-text-input-empty label="enter invitation code, hint:code" ref="mpassword" name="mpassword" value={mpasswordInit}/>
         <std-button label="sign up" action={signupAction}/>
     </form>
-
-
     <script>
         const tag = this
         this.searchbioInit = ''
@@ -57,7 +55,7 @@
                 value = undefined
             }
             return value
-        }
+        }.bind(this)
         
         // submit search query and route to search results
         this.searchclick = function() {
@@ -77,7 +75,7 @@
             console.log('search query:', JSON.stringify(q))
             app.dispatch('bioClassCache', [])
             route('q?terms=' + encodeURIComponent(this.refs.searchbio.value))
-        }
+        }.bind(this)
 
 
         this.on('before-mount', function() {
@@ -109,7 +107,7 @@
                 // proceed to email entry
                 riot.mount('div#home-page-content', 'email-form')
             });
-        };
+        }.bind(this);
 
     </script>
 </mpassword-form>
@@ -129,7 +127,7 @@
         this.submitForm = function(e) {
             app.state.signup.email = this.refs.enteremail.value
             riot.mount('div#home-page-content', 'password-form')
-        }
+        }.bind(this)
 
     </script>
 </email-form>
@@ -175,7 +173,7 @@
                     route('inventory') // TODO probably not where we want to end up
                 })
             })
-        }
+        }.bind(this)
 
     </script>
 </password-form>
