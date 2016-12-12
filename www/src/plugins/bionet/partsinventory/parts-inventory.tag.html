@@ -20,8 +20,8 @@
         <search-input label="search inventory" ref="searchinventory" name="searchinventory" action={submitForm}/>
         <input type="submit" style="display:none" />
         <div id="part-inventory-content" class="{theme.style.color.background+' '+ theme.style.color.text}">
+            <inventory-treeview nodes={nodes} />
             <list-container>
-                <inventory-treeview nodes={nodes} />
             </list-container>
         </div>
     </form>
@@ -30,24 +30,13 @@
         this.theme = app.getTheme();
 
         this.nodes = [];
+        var q = ''
 
-        this.submitForm = function() {
-            e.preventDefault()
-
-            //route('/inventory/?q=' + encodeURIComponent(this.refs.searchinventory.value))
-            const iurl = '/inventory/' + encodeURIComponent(this.refs.searchinventory.value)
-            route(iurl)
-                //this.unmount(true)
-        }.bind(this)
-
-
-        this.on('mount', function() {
-            console.log('parts-inventory-form: opts=', JSON.stringify(this.opts))
-            if (!this.opts.q) return;
-            var q = decodeURIComponent(this.opts.q);
+        const updateInventoryTree = function() {
+            console.log('parts-inventory-form: q=', q)
+            if (q.length === 0) return;
+            //var q = decodeURIComponent(this.opts.q);
             this.refs.searchinventory.value = q;
-
-            this.update();
 
             q = new RegExp(q.replace(/\s+/, '.*'), 'i');
 
@@ -112,11 +101,21 @@
                         }
                     }
 
-                    tag.update();
+                    this.update();
 
-                });
-            }, 500);
-        })
+                }.bind(this));
+            }.bind(this), 500);
+        }.bind(this)
+
+        this.submitForm = function(e) {
+            e.preventDefault()
+
+            //route('/inventory/?q=' + encodeURIComponent(this.refs.searchinventory.value))
+            q = encodeURIComponent(this.refs.searchinventory.value)
+            const iurl = '/inventory/' + q
+            updateInventoryTree()
+                //route(iurl)
+        }.bind(this)
 
     </script>
 </parts-inventory-form>
@@ -125,14 +124,14 @@
 
     <ul style="margin:0 0 0 1em;position:relative">
         <li style="padding:0 1.5em;">
-            <list-item each={node in nodes} item={node} />
+            <list-item each={node in opts.nodes} item={node} />
         </li>
     </ul>
 
     <script>
         /*
-                                            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-                                            */
+                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                                    */
         const tag = this;
 
 
@@ -141,6 +140,7 @@
         });
 
         this.on('updated', function() {
+            console.log('inventory-treeview, opts:', JSON.stringify(opts))
 
         });
 
