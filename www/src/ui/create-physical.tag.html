@@ -65,7 +65,7 @@
                 app.ui.toast("Saved to database")
                 if (cb) cb();
             })
-        }
+        }.bind(this)
 
         /*
            TODO:
@@ -124,7 +124,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.scanItem = function() {
             console.log('scanItem')
@@ -149,7 +149,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.scanContainer = function() {
             console.log('scan container function')
@@ -180,7 +180,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.on('mount', function() {
 

@@ -87,7 +87,7 @@
                 app.ui.toast("Material saved with ID: " + id)
                 route('/edit/' + id);
             });
-        }
+        }.bind(this)
 
     </script>
 </part-specification>
@@ -244,7 +244,7 @@
             this.datamatrix.refs.value = itemData.id
             this.cassette.refs.value = itemData.cassetteid
             tag.update()
-        }
+        }.bind(this)
 
         this.submitForm = function() {
             const partData = JSON.parse(JSON.stringify(this.formData))
@@ -254,7 +254,7 @@
             partData.cassetteid = this.cassette.refs.value
             console.log('create instance:', JSON.stringify(partData))
             app.route('partDataAccessor', 'storePhysical', 'toPhysicalItem', partData)
-        }
+        }.bind(this)
 
         app.addRouteDestination('searchResult', 'list', function(list) {
             console.log('physical part search result, tag:', JSON.stringify(list))
@@ -265,7 +265,7 @@
             }
             tag.update()
             app.dispatch('searchCache', list)
-        })
+        }.bind(this))
 
     </script>
 </part-instance>

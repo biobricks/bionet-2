@@ -40,7 +40,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.scanItem = function() {
             var opts = {
@@ -62,7 +62,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.scanContainer = function() {
             var opts = {
@@ -85,7 +85,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.on('mount', function() {
             this.formData = this.opts
