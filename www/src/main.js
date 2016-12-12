@@ -71,7 +71,7 @@ function connector(cb) {
     var failed = false;
 
     function failOnce(err) {
-        console.log('main.js failOnce error:', (typeof err === 'object') ? JSON.stringify(err) : err);
+        console.log('main.js failOnce error:', (typeof err === 'object') ? err.message+' '+err.stack : err);
         if (!failed) {
             cb(err);
             failed = true;
