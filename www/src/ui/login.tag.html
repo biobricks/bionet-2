@@ -24,7 +24,8 @@
         this.closeLogin = function() {
             $('#login-slideout').sideNav('hide');
         }
-        this.submitLogin = function() {
+        this.submitLogin = function(e) {
+            e.preventDefault()
             console.log('submitlogin, name=', this.refs.username)
 
             app.login(this.refs.username.value, this.refs.loginpassword.value, function(err, user) {

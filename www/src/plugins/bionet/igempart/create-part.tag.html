@@ -101,6 +101,7 @@
         }.bind(this));
 
         this.submitForm = function(e) {
+            e.preventDefault()
 
             app.remote.saveVirtual(app.state.createPart, function(err, id) {
                 if (err) return app.ui.toast("Error: " + err) // TODO handle error

@@ -2,7 +2,7 @@
 
     <div class="container" style="margin-top:100px">
         <h5 id="createPhysicalHeader"></h5>
-        <form name="createPhysicalForm" class="col s12">
+        <form name="createPhysicalForm" class="col s12" onsubmit={submitForm}>
             <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
 
             <img src={this.imgPath} width="600" />
@@ -18,7 +18,9 @@
                 title: this.printNameDefault,
                 bsl: 1
             }
-
+            this.submitForm = function(e) {
+                e.preventDefault()
+            }
             var opts = {
                 title: "Create label",
                 subtitle: undefined,

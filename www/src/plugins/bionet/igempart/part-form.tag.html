@@ -1,158 +1,158 @@
 <part-form>
-  <content-container style="padding-top:165px;">
-    <section-container>
-      <div id="edit-part-content" class="{theme.style.color.background} {theme.style.color.text}">
-        <part-specification/>
-      </div>
-    </section-container>
-  </content-container>
-  <script>
+    <content-container style="padding-top:165px;">
+        <section-container>
+            <div id="edit-part-content" class="{theme.style.color.background} {theme.style.color.text}">
+                <part-specification/>
+            </div>
+        </section-container>
+    </content-container>
+    <script>
+        // setup secondary nav
+        app.dispatch(app.$.secondaryNav, [{
+            label: 'specifications',
+            icon: undefined,
+            action: '/edit/' + opts.partID + '/specs'
+        }, {
+            label: 'sequence',
+            icon: undefined,
+            action: '/edit/' + opts.partID + '/sequence'
+        }, {
+            label: 'attachments',
+            icon: undefined,
+            action: '/edit/' + opts.partID + '/attachment'
+        }, {
+            label: 'notes',
+            icon: undefined,
+            action: '/edit/' + opts.partID + '/notes'
+        }, {
+            label: 'physical instance',
+            icon: undefined,
+            action: '/edit/' + opts.partID + '/instances'
+        }])
 
-    // setup secondary nav
-    app.dispatch(app.$.secondaryNav, [{
-        label: 'specifications',
-        icon: undefined,
-        action: '/edit/'+opts.partID+'/specs'
-    }, {
-        label: 'sequence',
-        icon: undefined,
-        action: '/edit/'+opts.partID+'/sequence'
-    }, {
-        label: 'attachments',
-        icon: undefined,
-        action: '/edit/'+opts.partID+'/attachment'
-    }, {
-        label: 'notes',
-        icon: undefined,
-        action: '/edit/'+opts.partID+'/notes'
-    }, {
-        label: 'physical instance',
-        icon: undefined,
-        action: '/edit/'+opts.partID+'/instances'
-    }])
+        // initialize breadcrumbs
+        app.dispatch(app.$.breadcrumbs, [{
+            'label': 'inventory',
+            'url': '/'
+        }, {
+            'label': 'edit part',
+            'url': '#'
+        }]);
 
-    // initialize breadcrumbs
-    app.dispatch(app.$.breadcrumbs, [{
-      'label': 'inventory',
-      'url': '/'
-      }, {
-    'label': 'edit part',
-      'url': '#'
-    }]);
+        // configure app bar
+        app.dispatch(app.$.appBarConfig, {
+            enableTopNav: true,
+            enableBreadCrumbs: true,
+            enableSubbar: true
+        })
 
-    // configure app bar
-    app.dispatch(app.$.appBarConfig, {
-      enableTopNav: true,
-      enableBreadCrumbs: true,
-      enableSubbar: true
-    })
-
-
-  </script>
+    </script>
 </part-form>
 
 <part-specification>
-  <form id="editPartForm" name="editPartForm" class="col s12" onsubmit={submitForm}>
-    <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
-    <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
-    <form-text-input label="Created by" ref="creator" name="creator" value={formData.creator}/>
-    <form-text-input label="Created" ref="created" name="created" value={formData.created}/>
-    <form-text-input label="Storage temperature" ref="temperature" name="temperature" value={formData.temperature}/>
-    <form-textarea-input label="Biosafety level" ref="bsl" name="bsl" value={formData.bsl}/>
-    <form-switch label="Biohazardous?" ref="biohazard" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
-    <form-textarea-input label="Sequence" ref="sequence" name="sequence" value={formData.sequence}/>
-    <form-image imagesrc={formData.avatar} label="Avatar" height="60px" />
-    <form-text-input label="" ref="avatar" name="avatar" value={formData.avatar}/>
-    <form-image imagesrc={formData.qrcode} label="Datamatrix code" height="140px" />
-    <std-button action={submitForm} label="submit" />
-    <input type="submit" style="visibility:hidden" />
-  </form>
-  <script>
-    this.formData = app.state.editPart
+    <form id="editPartForm" name="editPartForm" class="col s12" onsubmit={submitForm}>
+        <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+        <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
+        <form-text-input label="Created by" ref="creator" name="creator" value={formData.creator}/>
+        <form-text-input label="Created" ref="created" name="created" value={formData.created}/>
+        <form-text-input label="Storage temperature" ref="temperature" name="temperature" value={formData.temperature}/>
+        <form-textarea-input label="Biosafety level" ref="bsl" name="bsl" value={formData.bsl}/>
+        <form-switch label="Biohazardous?" ref="biohazard" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
+        <form-textarea-input label="Sequence" ref="sequence" name="sequence" value={formData.sequence}/>
+        <form-image imagesrc={formData.avatar} label="Avatar" height="60px" />
+        <form-text-input label="" ref="avatar" name="avatar" value={formData.avatar}/>
+        <form-image imagesrc={formData.qrcode} label="Datamatrix code" height="140px" />
+        <std-button action={submitForm} label="submit" />
+        <input type="submit" style="visibility:hidden" />
+    </form>
+    <script>
+        this.formData = app.state.editPart
 
-    console.log("part-specification, name:", this.formData.name)
+        console.log("part-specification, name:", this.formData.name)
 
-    $(this.editPartForm).change(function(e) {
-      $.extend(app.state.editPart, $.formToObject('editPartForm'))
-    }.bind(this));
+        $(this.editPartForm).change(function(e) {
+            $.extend(app.state.editPart, $.formToObject('editPartForm'))
+        }.bind(this));
 
-    this.submitForm = function(e) {
-      if(!app.state.editPart.id) {
-        app.ui.toast("Error: Missing part ID") // TODO better error handling
-        return;
-      }
+        this.submitForm = function(e) {
+            e.preventDefault()
+            if (!app.state.editPart.id) {
+                app.ui.toast("Error: Missing part ID") // TODO better error handling
+                return;
+            }
 
-      app.remote.save(app.state.editPart, null, false, function(err, id) {
-        if(err) return app.ui.toast("Error: " + err) // TODO handle error
-        
-        app.ui.toast("Material saved with ID: " + id)
-        route('/edit/' + id);
-      });
-    }
+            app.remote.save(app.state.editPart, null, false, function(err, id) {
+                if (err) return app.ui.toast("Error: " + err) // TODO handle error
 
-  </script>
+                app.ui.toast("Material saved with ID: " + id)
+                route('/edit/' + id);
+            });
+        }
+
+    </script>
 </part-specification>
 
 <part-notes>
-  <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
-  <script>
+    <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
+    <script>
 
-  </script>
+
+    </script>
 </part-notes>
 
 <part-attachment>
-  <form-textarea-input label="Attachments" name="attachment" value={formData.notes}/>
-  <div id="dropZone" style="width: 100%; height: 200px; border-style: dashed; border-width:7px; border-color:#b0b0b0;">
-    <div class="valign-wrapper" style="width:100%; height:100%">
-      <h5 class="valign center-align" style="color:#404040; width:100%">Drag and drop files to upload...</h5>
+    <form-textarea-input label="Attachments" name="attachment" value={formData.notes}/>
+    <div id="dropZone" style="width: 100%; height: 200px; border-style: dashed; border-width:7px; border-color:#b0b0b0;">
+        <div class="valign-wrapper" style="width:100%; height:100%">
+            <h5 class="valign center-align" style="color:#404040; width:100%">Drag and drop files to upload...</h5>
+        </div>
     </div>
-  </div>
-  <script>
-    var formData = app.getModel('partData')
-    this.on('mount', function() {
-      console.log('part notes mounted')
+    <script>
+        var formData = app.getModel('partData')
+        this.on('mount', function() {
+            console.log('part notes mounted')
 
-      var dropZone = document.getElementById('dropZone');
-      if (dropZone === null || dropZone === undefined) {
-        console.log('null dropzone')
-        return
-      }
-      // Optional.   Show the copy icon when dragging over.  Seems to only work for chrome.
-      dropZone.addEventListener('dragover', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'copy';
-      });
-
-      // Get file data on drop
-      dropZone.addEventListener('drop', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        var files = e.dataTransfer.files; // Array of all files
-        for (var i = 0, file; file = files[i]; i++) {
-          if (file.type.match(/image.*/)) {
-            var reader = new FileReader();
-            reader.onload = function(e2) { // finished reading file data.
-              var img = document.createElement('img');
-              img.src = e2.target.result;
-              document.body.appendChild(img);
+            var dropZone = document.getElementById('dropZone');
+            if (dropZone === null || dropZone === undefined) {
+                console.log('null dropzone')
+                return
             }
-            reader.readAsDataURL(file); // start reading the file data.
-          }
-        }
-      });
-    })
+            // Optional.   Show the copy icon when dragging over.  Seems to only work for chrome.
+            dropZone.addEventListener('dragover', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+            });
 
-  </script>
+            // Get file data on drop
+            dropZone.addEventListener('drop', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                var files = e.dataTransfer.files; // Array of all files
+                for (var i = 0, file; file = files[i]; i++) {
+                    if (file.type.match(/image.*/)) {
+                        var reader = new FileReader();
+                        reader.onload = function(e2) { // finished reading file data.
+                            var img = document.createElement('img');
+                            img.src = e2.target.result;
+                            document.body.appendChild(img);
+                        }
+                        reader.readAsDataURL(file); // start reading the file data.
+                    }
+                }
+            });
+        })
+
+    </script>
 </part-attachment>
 
 <part-sequence>
-  <form-container>
+    <form-container>
         <!-- The initial sequence can be loaded using the flashvars parameter and URL-encoded JSON  -->
         <!-- This will fail if the JSON is not 100% correct. E.g. remember that hashes are formatted -->
         <!-- like: {"key": "value"} and _not_ like: {key: "value"} -->
         <!-- Also note the "json=" at the beginning of the value. This is required. -->
-<!--
+        <!--
     <div style="height:500px">
       <object width="100%" height="100%" type="application/x-shockwave-flash" data="static/assets/bioux/plasmid_viewer.swf" id="plasmid_viewer" style="visibility: inherit; border:0px;">
         <param name='allowfullscreen' value='true' />
@@ -161,55 +161,55 @@
       </object>
     </div>
 -->
-    <form-textarea-input label="Sequence" ref="sequence" name="sequence" value={formData.sequence}/>
-    <std-button action={submitForm} label="submit" />
-  </form-container>
-  <script>
-/*
-    var formData = app.getModel('partData')
-      //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
+        <form-textarea-input label="Sequence" ref="sequence" name="sequence" value={formData.sequence}/>
+        <std-button action={submitForm} label="submit" />
+    </form-container>
+    <script>
+        /*
+            var formData = app.getModel('partData')
+              //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
 
-    // map igem plasmid annotations to flash plasmid viewer component
-    var annotations = formData.plasmidAnnotations
-    var features = []
-    if (annotations !== undefined) {
-      for (var i = 0; i < annotations.length; i++) {
-        var annotation = annotations[i]
-        features.push({
-          name: annotation[3],
-          type: annotation[0],
-          from: annotation[1],
-          to: annotation[2]
-        })
-      }
-    }
-    var seq_obj = {
-      name: formData.name,
-      sequence: formData.sequence,
-      features: features
-    }
-    this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
-      //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
-*/
-    this.submitForm = function(e) {
+            // map igem plasmid annotations to flash plasmid viewer component
+            var annotations = formData.plasmidAnnotations
+            var features = []
+            if (annotations !== undefined) {
+              for (var i = 0; i < annotations.length; i++) {
+                var annotation = annotations[i]
+                features.push({
+                  name: annotation[3],
+                  type: annotation[0],
+                  from: annotation[1],
+                  to: annotation[2]
+                })
+              }
+            }
+            var seq_obj = {
+              name: formData.name,
+              sequence: formData.sequence,
+              features: features
+            }
+            this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
+              //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
+        */
+        this.submitForm = function(e) {
 
-    }
+        }
 
-  </script>
+    </script>
 </part-sequence>
 
 <part-instance>
-  <form-container>
-    <form-text-input label="Physical Location Code" ref="locationid" name="locationid" value={formData.location}/>
-    <form-text-input label="Datamatrix Code" ref="datamatrix" name="datamatrix" value={formData.qrcode}/>
-    <form-text-input label="Cassette Code" ref="cassette" name="cassette" value={}/>
-    <std-button action={submitForm} label="add physical" />
-    <div class="row">
-    </div>
-  </form-container>
-  <list-container>
-    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}>
-      <span>
+    <form-container>
+        <form-text-input label="Physical Location Code" ref="locationid" name="locationid" value={formData.location}/>
+        <form-text-input label="Datamatrix Code" ref="datamatrix" name="datamatrix" value={formData.qrcode}/>
+        <form-text-input label="Cassette Code" ref="cassette" name="cassette" value={}/>
+        <std-button action={submitForm} label="add physical" />
+        <div class="row">
+        </div>
+    </form-container>
+    <list-container>
+        <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}>
+            <span>
         <select style="display:inline-block; width:30%">
         <option value="" selected disabled>Select action</option>
         <option value="1">Delete</option>
@@ -217,56 +217,55 @@
         <option value="3">Update</option>
       </select>
       </span>
-      <span>
+            <span>
         <a class="waves-effect waves-light btn  darken-1">update</a>
       </span>
-    </list-header>
-    <form>
-      <list-item no-reorder each={item in searchresult} item={item}>
-        <div>
-          <input type="checkbox" id="{item.data.id}" />
-          <label for="{item.data.id}"></label>
-        </div>
-      </list-item>
-    </form>
-  </list-container>
+        </list-header>
+        <form>
+            <list-item no-reorder each={item in searchresult} item={item}>
+                <div>
+                    <input type="checkbox" id="{item.data.id}" />
+                    <label for="{item.data.id}"></label>
+                </div>
+            </list-item>
+        </form>
+    </list-container>
 
-  <script>
-    const tag = this
-    this.formData = app.getModel('createPart')
-    app.dispatch('bioPhysicalQuery', this.formData.name)
-    this.searchresult = []
-    this.primaryHeader = ''
-    this.secondaryHeader = ''
-    this.clickphysical = function(itemData) {
-      console.log('clickphysical', JSON.stringify(itemData))
-      this.locationid.refs.value = itemData.locationid
-      this.datamatrix.refs.value = itemData.id
-      this.cassette.refs.value = itemData.cassetteid
-      tag.update()
-    }
+    <script>
+        const tag = this
+        this.formData = app.getModel('createPart')
+        app.dispatch('bioPhysicalQuery', this.formData.name)
+        this.searchresult = []
+        this.primaryHeader = ''
+        this.secondaryHeader = ''
+        this.clickphysical = function(itemData) {
+            console.log('clickphysical', JSON.stringify(itemData))
+            this.locationid.refs.value = itemData.locationid
+            this.datamatrix.refs.value = itemData.id
+            this.cassette.refs.value = itemData.cassetteid
+            tag.update()
+        }
 
-    this.submitForm = function() {
-      const partData = JSON.parse(JSON.stringify(this.formData))
-      partData.name = app.state.editPart.id
-      partData.locationid = this.locationid.refs.value
-      partData.datamatrix = this.datamatrix.refs.value
-      partData.cassetteid = this.cassette.refs.value
-      console.log('create instance:', JSON.stringify(partData))
-      app.route('partDataAccessor', 'storePhysical', 'toPhysicalItem', partData)
-    }
+        this.submitForm = function() {
+            const partData = JSON.parse(JSON.stringify(this.formData))
+            partData.name = app.state.editPart.id
+            partData.locationid = this.locationid.refs.value
+            partData.datamatrix = this.datamatrix.refs.value
+            partData.cassetteid = this.cassette.refs.value
+            console.log('create instance:', JSON.stringify(partData))
+            app.route('partDataAccessor', 'storePhysical', 'toPhysicalItem', partData)
+        }
 
-    app.addRouteDestination('searchResult', 'list', function(list) {
-      console.log('physical part search result, tag:', JSON.stringify(list))
-      this.secondaryHeader = list.length + ' Physical instances'
-      this.searchresult = list
-      for (var i = 0; i < list.length; i++) {
-        list[i].click = this.clickphysical
-      }
-      tag.update()
-      app.dispatch('searchCache', list)
-    })
+        app.addRouteDestination('searchResult', 'list', function(list) {
+            console.log('physical part search result, tag:', JSON.stringify(list))
+            this.secondaryHeader = list.length + ' Physical instances'
+            this.searchresult = list
+            for (var i = 0; i < list.length; i++) {
+                list[i].click = this.clickphysical
+            }
+            tag.update()
+            app.dispatch('searchCache', list)
+        })
 
-  </script>
+    </script>
 </part-instance>
-

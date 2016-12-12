@@ -59,7 +59,8 @@
         }.bind(this)
         
         // submit search query and route to search results
-        this.searchclick = function() {
+        this.searchclick = function(e) {
+            e.preventDefault()
             var partid = this.refs.searchbio.value
             var distance = getParam(partid, 'd:')
             var locationid = getParam(partid, 'l:')
@@ -92,6 +93,7 @@
         // TODO on app.user change we need to update
 
         this.signupAction = function(e) {
+            e.preventDefault()
             var masterPassword = this.refs.mpassword.value
             console.log('signupAction: master password=%s', this.refs.mpassword.value)
             app.remote.checkMasterPassword(masterPassword, function(err) {
@@ -126,6 +128,7 @@
         this.enteremailInit = ''
 
         this.submitForm = function(e) {
+            e.preventDefault()
             app.state.signup.email = this.refs.enteremail.value
             riot.mount('div#home-page-content', 'password-form')
         }.bind(this)
@@ -145,6 +148,7 @@
 
     <script>
         this.submitForm = function(e) {
+            e.preventDefault()
 
             if (this.refs.enterpassword1.value !== this.refs.enterpassword2.value) {
                 app.emit('signupError', 'Passwords do not match.')

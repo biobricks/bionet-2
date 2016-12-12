@@ -32,6 +32,7 @@
         this.nodes = [];
 
         this.submitForm = function() {
+            e.preventDefault()
 
             //route('/inventory/?q=' + encodeURIComponent(this.refs.searchinventory.value))
             const iurl = '/inventory/' + encodeURIComponent(this.refs.searchinventory.value)
