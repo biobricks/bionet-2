@@ -105,7 +105,7 @@
 
     this.keyboardScan = function(e) {
       e.preventDefault();
-      var code = this.keyboardInputForm.code.refs.value;
+      var code = this.refs.code.value;
       code = code.replace(/[^\d]+/g, '');
       if(code.length <= 0) {
         $('#keyboardInput').val('');
@@ -120,7 +120,7 @@
 
       setTimeout(function() {
         $('#keyboardInput').focus()
-        $(this.keyboardInputForm.code).blur(function(e) {
+        $('#keyboardInput').blur(function(e) {
           $('#keyboardInput').focus()
         });
       }, 1)

@@ -3,24 +3,39 @@
     <div class="container" style="margin-top:100px">
         <h5 id="createPhysicalHeader"></h5>
         <form id="createPhysicalForm" ref="createPhysicalForm" class="col s12" onsubmit={submitForm}>
-            <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
-            <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
-            
+
+            <div class="row">
+                <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+            </div>
+
+            <div class="row">
+                <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
+            </div>
+
             <div each={field in fields}>
-                <form-text-input label={field.name} ref={'field_'+field.name} name={field.name} value="" />
-            </div>
-
-            <div class="row">
-                <div style="display:block;float:left">Barcode:
-                    <input type="text" id="curBarcode" ref="barcode" name="barcode" /><a id="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+                <div class="row">
+                    <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
                 </div>
             </div>
 
             <div class="row">
-                <div style="display:block;float:left">Location ID:
-                    <input type="text" id="curContainerBarcode" ref="parent_id" name="parent_id" /><a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a> or </div>
-                <div id="autocomplete-container" class="col s12" style="width:300px;padding-left:15px;float:left">
-                </div>
+                <form-text-input label="Barcode" ref="curBarcode" name="barcode" value={formData.barcode}/>
+            </div>
+
+            <div class="row">
+                <a id="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+            </div>
+
+            <div class="row">
+                <form-text-input label="Location ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
+            </div>
+
+            <div class="row">
+                <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a> or
+            </div>
+
+            <div class="row">
+                <div id="autocomplete-container" />
             </div>
 
             <std-button label="submit" action={submitForm} />
@@ -74,7 +89,7 @@
         this.submitForm = function(e) {
             e.preventDefault()
             var formData = $.formToObject('createPhysicalForm') || {};
-            console.log('create-physical, form=%s',JSON.stringify(formData))
+            console.log('create-physical, form=%s', JSON.stringify(formData))
             formData.label = this.labelFormData;
             var parent_id = formData.parent_id;
             var parent_name = formData.parent_name;
@@ -201,11 +216,11 @@
                         return
                     }
                     this.formData = data
-                    console.log('create-physical mount, formData=',JSON.stringify(data))
+                    console.log('create-physical mount, formData=', JSON.stringify(data))
                     this.update()
                 }.bind(this))
             }
-            if (opts.mode==='edit') return;
+            if (opts.mode === 'edit') return;
 
             riot.mount('#autocomplete-container', 'autocomplete', {
                 searchCallback: function(query, cb) {

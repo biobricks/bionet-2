@@ -26,19 +26,16 @@
         </div>
     </form>
     <script>
-        const tag = this
         this.theme = app.getTheme();
-
         this.nodes = [];
-        var q = ''
+        var q = (this.opts.q) ? decodeURIComponent(this.opts.q) : '';
+        console.log('parts-inventory-form: q=', q)
 
         const updateInventoryTree = function() {
-            console.log('parts-inventory-form: q=', q)
             if (q.length === 0) return;
-            //var q = decodeURIComponent(this.opts.q);
             this.refs.searchinventory.value = q;
 
-            q = new RegExp(q.replace(/\s+/, '.*'), 'i');
+            //q = new RegExp(q.replace(/\s+/, '.*'), 'i');
 
 
             function itemFromNode(node) {
@@ -107,14 +104,18 @@
             }.bind(this), 500);
         }.bind(this)
 
+        this.on('mount', function() {
+            updateInventoryTree()
+        });
+
         this.submitForm = function(e) {
             e.preventDefault()
-
-            //route('/inventory/?q=' + encodeURIComponent(this.refs.searchinventory.value))
             q = encodeURIComponent(this.refs.searchinventory.value)
+            //q = this.refs.searchinventory.value
             const iurl = '/inventory/' + q
             updateInventoryTree()
-                //route(iurl)
+            //route(iurl)
+                //route('/inventory/?q=' + encodeURIComponent(this.refs.searchinventory.value))
         }.bind(this)
 
     </script>
@@ -130,8 +131,8 @@
 
     <script>
         /*
-                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-                                                    */
+                                                            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                                            */
         const tag = this;
 
 
