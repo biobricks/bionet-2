@@ -78,14 +78,14 @@ module.exports = {
     [{
       name: "-80 freezer",
       fields: {
-        shelf: 'text',
-        rack: 'text',
-        box: 'text'
+        Shelf: 'text',
+        Rack: 'text',
+        Box: 'text'
       }
     },{
       name: "room",
       fields: {
-        name: 'text'
+        Description: 'text'
       }
     },{
       name: "plasmid",
