@@ -153,11 +153,12 @@
                         this.update();
                 } else if (e.keyCode === 40) { // down arrow
                     e.preventDefault()
-                    if (this.selected !== null && this.selected < this.matches.length - 1) this.selected++
+                    if (this.selected===null) this.selected=0
+                    else if (this.selected < this.matches.length - 1) this.selected++
                         this.update();
                 } else if (e.keyCode === 27) { // escape
                     this.hideMatches()
-                } else if (e.keyCode === 9) { // tab
+                } else if (e.keyCode === 9 || e.keyCode === 13) { // tab or enter
                     if (this.selected === null) return // normal operation if nothing selected
                     e.preventDefault();
                     this.selectCurrent()
