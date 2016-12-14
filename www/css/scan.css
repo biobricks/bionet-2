@@ -1,4 +1,8 @@
 
+.scan-container {
+  margin-top: 100px;
+}
+
 .scan {
 
 }
@@ -16,6 +20,10 @@
   margin-left: auto;
   margin-right: auto;
   visibility: hidden;
+
+  transform: rotateY(180deg);
+  -webkit-transform:rotateY(180deg);
+  -moz-transform:rotateY(180deg);
 }
 
 .scan .keyboard-form {
