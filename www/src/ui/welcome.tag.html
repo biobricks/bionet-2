@@ -80,7 +80,7 @@
 
         this.on('before-mount', function() {
             observer = app.addObserver(app.$.loginState, function(loginState) {
-                this.loggedin = loginState
+                tag.loggedin = loginState
                 tag.update()
             })
         })

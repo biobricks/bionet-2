@@ -1,5 +1,5 @@
-2016/12/13-15:29:19.910326 7f74bffff700 Recovering log #6
-2016/12/13-15:29:19.910441 7f74bffff700 Level-0 table #8: started
-2016/12/13-15:29:19.915178 7f74bffff700 Level-0 table #8: 873 bytes OK
-2016/12/13-15:29:19.923094 7f74bffff700 Delete type=3 #4
-2016/12/13-15:29:19.923318 7f74bffff700 Delete type=0 #6
+2016/12/14-15:03:33.552872 7fa6b6ffd700 Recovering log #9
+2016/12/14-15:03:33.553054 7fa6b6ffd700 Level-0 table #11: started
+2016/12/14-15:03:33.556544 7fa6b6ffd700 Level-0 table #11: 1224 bytes OK
+2016/12/14-15:03:33.562662 7fa6b6ffd700 Delete type=3 #7
+2016/12/14-15:03:33.562753 7fa6b6ffd700 Delete type=0 #9
