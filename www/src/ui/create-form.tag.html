@@ -1,21 +1,28 @@
 <create-form>
     <div style="padding-top:100px;">
         <form ref="createForm" onsubmit={submitForm2}>
-            <div>What would you like to add?</div>
-            <div>
-                <div id="selectedTypeContainer" class="selected-type">
-                    <span id="selectedTypeLabel">plasmid</span>
-                </div>
-                <div class="query-container">
-                    <input type="text" id="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+            <div class="row">
+                <div class="col s3 m3 l3" />
+                <div class="col s6 m6 l6">
+                    <div>What would you like to add?</div>
+                    <div id="selectedTypeContainer" class="selected-type">
+                        <span id="selectedTypeLabel">plasmid</span>
+                    </div>
+                    <div class="query-container">
+                        <input type="text" id="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+                        <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
+                    </div>
+                    <ul id="matchList" class="col s6 m6 l6">
+                        <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+                        <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
+                    </ul>
                 </div>
             </div>
+            <!--
+                    <div class="query-container">
+                    </div>
+                    -->
             <input type="submit" style="display:none" />
-            <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
-            <ul id="matchList">
-                <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-                <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
-            </ul>
         </form>
     </div>
 
