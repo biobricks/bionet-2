@@ -51,7 +51,7 @@ route('/scan', function () {
         enableBreadCrumbs: false,
         enableSubbar: false
     })
-    riot.mount('div#content', 'scan')
+    riot.mount('div#content', 'scan-page')
 })
 
 
