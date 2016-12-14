@@ -1,10 +1,11 @@
 <nav-group>
     <ul id={opts.tagid} class="{ opts.classname }" style="{stylename}">
-        <li each={ opts.navitems }><a class="{theme.style.color.navText}" href={action}><i if={icon} class="material-icons left">{icon}</i>{label}</a></li>
+        <li each={item in opts.navitems }><a class="{theme.style.color.navText}" onclick={navClick}><i if={item.icon} class="material-icons left">{item.icon}</i>{item.label}</a></li>
     </ul>
     <script>
-        const theme=app.getTheme()
-        this.theme=theme
-
+        this.theme=app.getTheme()
+        this.navClick = function() {
+            route(this.item.action)
+        }
     </script>
 </nav-group>

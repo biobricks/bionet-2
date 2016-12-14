@@ -41,7 +41,7 @@ route('/create', function () {
         enableBreadCrumbs: false,
         enableSubbar: false
     })
-    riot.mount('div#content', 'create-form-container')
+    riot.mount('div#content', 'create-form')
 })
 
 route('/scan', function () {

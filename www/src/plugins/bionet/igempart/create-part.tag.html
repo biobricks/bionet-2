@@ -1,16 +1,11 @@
 <create-part>
-    <content-container style="padding-top:165px;">
-        <section-container>
-            <div id="create-part-content" class={themeClass}>
-                <!--
-                <create-virtual-form query={opts.query}/>
-                -->
-            </div>
-        </section-container>
-    </content-container>
+    <div style="padding-top:165px;">
+        <div id="create-part-content" class={themeClass}>
+        </div>
+    </div>
     <script>
         const theme = app.getTheme()
-        this.themeClass = theme.style.color.background+' '+theme.style.color.text
+        this.themeClass = theme.style.color.background + ' ' + theme.style.color.text
 
         // setup secondary nav
         app.dispatch(app.$.secondaryNav, [{
@@ -43,6 +38,17 @@
             enableSubbar: true
         })
 
+        this.on('mount', function() {
+            const tab = opts.query.tab
+            if (tab === 'sequence') {
+                riot.mount('div#create-part-content', 'create-sequence')
+            } else if (tab === 'instances') {
+                riot.mount('div#create-part-content', 'create-instances')
+            } else {
+                riot.mount('div#create-part-content', 'create-virtual-form', opts)
+            }
+        })
+
     </script>
 </create-part>
 
@@ -61,7 +67,7 @@
         <input type="submit" style="visibility:hidden" />
     </form>
     <script>
-        console.log('create-virtual-form, opts:%s',JSON.stringify(this.opts))
+        console.log('create-virtual-form, opts:%s', JSON.stringify(this.opts))
         this.on('mount', function() {
 
             if (!this.formData) {
@@ -73,10 +79,10 @@
                 this.update();
                 $.extend(app.state.createPart, $.formToObject('createPartForm'))
             }
-        console.log('create-virtual-form, formData:%s',JSON.stringify(this.formData))
+            console.log('create-virtual-form, formData:%s', JSON.stringify(this.formData))
 
         });
-        
+
         this.formData = app.state.createPart
         if (!this.formData || this.formData.name === undefined) {
             this.formData = {
@@ -118,32 +124,41 @@
 
 
 <create-sequence>
-    <form-container action={submitForm}>
+    <form class="col s12" onsubmit={submitForm}>
         <form-textarea-input label="DNA Sequence" name="sequence" value={formData.sequence}/>
-        <std-button action={parent.submitForm} label="submit" />
+        <std-button action={submitForm} label="submit" />
         <input type="submit" style="visibility:hidden" />
-    </form-container>
+    </form>
     <script>
         app.state.createPart = app.state.createPart || {}
-
+        this.formData = {
+            sequence: ''
+        }
         this.submitForm = function(e) {
-            console.log("SUBMIT seq");
+            e.preventDefault()
+            console.log("SUBMIT sequence form");
         }
 
     </script>
 </create-sequence>
 
-<create-instance>
-    <form-container>
+<create-instances>
+    <form onsubmit={submitForm}>
         <form-text-input label="Physical Location Code" ref="location" name="location" value={formData.location}/>
         <form-text-input label="Datamatrix Code" ref="datamatrix" name="datamatrix" value={formData.qrcode}/>
         <form-image imagesrc={formData.qrcode} label="Datamatrix code" height="140px" />
         <std-button action={submitForm3} label="submit" />
-    </form-container>
+        <input type="submit" style="visibility:hidden" />
+    </form>
     <script>
-        //    this.submitForm = function() {
-
-        //    }
+        this.formData = {
+            location: '',
+            qrcode: ''
+        }
+        this.submitForm = function() {
+            e.preventDefault()
+            console.log("SUBMIT instance form");
+        }
 
     </script>
-</create-instance>
+</create-instances>

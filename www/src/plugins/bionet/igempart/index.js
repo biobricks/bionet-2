@@ -180,14 +180,6 @@ var igempart = {
 
       var opts = {type: type, query: q || {}}
       riot.mount('div#content', 'create-part', opts)
-
-      if(q.tab === 'sequence') {
-        riot.mount('div#create-part-content', 'create-sequence')
-      } else if(q.tab === 'instances') {
-        riot.mount('div#create-part-content', 'create-instances')
-      } else {
-        riot.mount('div#create-part-content', 'create-virtual-form',opts)
-      }
     })
 
 /*

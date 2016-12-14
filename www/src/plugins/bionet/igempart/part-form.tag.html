@@ -1,11 +1,9 @@
 <part-form>
-    <content-container style="padding-top:165px;">
-        <section-container>
-            <div id="edit-part-content" class="{theme.style.color.background} {theme.style.color.text}">
-                <part-specification/>
-            </div>
-        </section-container>
-    </content-container>
+    <div style="padding-top:165px;">
+        <div id="edit-part-content" class="{theme.style.color.background} {theme.style.color.text}">
+            <part-specification/>
+        </div>
+    </div>
     <script>
         // setup secondary nav
         app.dispatch(app.$.secondaryNav, [{
@@ -147,7 +145,7 @@
 </part-attachment>
 
 <part-sequence>
-    <form-container>
+    <form onsubmit={submitForm}>
         <!-- The initial sequence can be loaded using the flashvars parameter and URL-encoded JSON  -->
         <!-- This will fail if the JSON is not 100% correct. E.g. remember that hashes are formatted -->
         <!-- like: {"key": "value"} and _not_ like: {key: "value"} -->
@@ -163,7 +161,8 @@
 -->
         <form-textarea-input label="Sequence" ref="sequence" name="sequence" value={formData.sequence}/>
         <std-button action={submitForm} label="submit" />
-    </form-container>
+        <input type="submit" style="visibility:hidden" />
+    </form>
     <script>
         /*
             var formData = app.getModel('partData')
@@ -190,8 +189,12 @@
             }
             this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
               //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
-        */
+                                */
+        this.formData = {
+            sequence: ''
+        }
         this.submitForm = function(e) {
+            e.stopPropagation();
 
         }
 
@@ -199,14 +202,15 @@
 </part-sequence>
 
 <part-instance>
-    <form-container>
+    <form onsubmit={submitForm}>
         <form-text-input label="Physical Location Code" ref="locationid" name="locationid" value={formData.location}/>
         <form-text-input label="Datamatrix Code" ref="datamatrix" name="datamatrix" value={formData.qrcode}/>
         <form-text-input label="Cassette Code" ref="cassette" name="cassette" value={}/>
         <std-button action={submitForm} label="add physical" />
+        <input type="submit" style="display:none" />
         <div class="row">
         </div>
-    </form-container>
+    </form>
     <list-container>
         <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}>
             <span>

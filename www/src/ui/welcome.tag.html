@@ -1,14 +1,12 @@
 <welcome>
-    <content-container style="padding-top:100px;">
-        <section-container>
-            <div id="home-page-content" class={themeClasses}>
-                <mpassword-form/>
-            </div>
-            <div style="height:30px" />
-            <div class="center red-text">{errorMsg}</div>
-            <br/>
-        </section-container>
-    </content-container>
+    <div style="padding-top:100px;">
+        <div id="home-page-content" class={themeClasses}>
+            <mpassword-form/>
+        </div>
+        <div style="height:30px" />
+        <div class="center red-text">{errorMsg}</div>
+        <br/>
+    </div>
     <script>
         const theme = app.getTheme()
         this.themeClasses = theme.style.color.background + ' ' + theme.style.color.text
@@ -57,7 +55,7 @@
             }
             return value
         }.bind(this)
-        
+
         // submit search query and route to search results
         this.searchclick = function(e) {
             e.preventDefault()
@@ -71,8 +69,8 @@
                 else partid = partid.substr(0, pos - 2)
             }
             const q = {
-                    q: this.refs.searchbio.value
-                }
+                q: this.refs.searchbio.value
+            }
             app.dispatch('bioClassQuery', q)
             console.log('search query:', JSON.stringify(q))
             app.dispatch('bioClassCache', [])

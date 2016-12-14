@@ -1,29 +1,23 @@
-<create-form-container>
-    <content-container style="padding-top:100px;">
-        <section-container>
-            <create-form/>
-        </section-container>
-    </content-container>
-</create-form-container>
-
 <create-form>
-    <form ref="createForm" onsubmit={submitForm2}>
-        <div>What would you like to add?</div>
-        <div>
-            <div id="selectedTypeContainer" class="selected-type">
-                <span id="selectedTypeLabel">plasmid</span>
+    <div style="padding-top:100px;">
+        <form ref="createForm" onsubmit={submitForm2}>
+            <div>What would you like to add?</div>
+            <div>
+                <div id="selectedTypeContainer" class="selected-type">
+                    <span id="selectedTypeLabel">plasmid</span>
+                </div>
+                <div class="query-container">
+                    <input type="text" id="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+                </div>
             </div>
-            <div class="query-container">
-                <input type="text" id="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
-            </div>
-        </div>
-        <input type="submit" style="display:none" />
-        <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
-        <ul id="matchList">
-            <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-            <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
-        </ul>
-    </form>
+            <input type="submit" style="display:none" />
+            <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
+            <ul id="matchList">
+                <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+                <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
+            </ul>
+        </form>
+    </div>
 
     <script>
         this.submitForm2 = function(e) {
@@ -153,7 +147,7 @@
                         this.update();
                 } else if (e.keyCode === 40) { // down arrow
                     e.preventDefault()
-                    if (this.selected===null) this.selected=0
+                    if (this.selected === null) this.selected = 0
                     else if (this.selected < this.matches.length - 1) this.selected++
                         this.update();
                 } else if (e.keyCode === 27) { // escape
