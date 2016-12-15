@@ -113,7 +113,7 @@
                 if (err) return app.ui.toast("Error: " + err) // TODO handle error
 
                 app.ui.toast("Virtual created with ID: " + id)
-
+                app.state.editPart = app.state.createPart
                 route('/edit/' + id);
             });
 
