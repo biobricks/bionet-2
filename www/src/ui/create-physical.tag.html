@@ -4,6 +4,7 @@
         <h5 id="createPhysicalHeader"></h5>
         <form id="createPhysicalForm" ref="createPhysicalForm" class="col s12" onsubmit={submitForm}>
 
+          <input type="hidden" ref="id" name="id" value={formData.id} />
             <div class="row">
                 <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
             </div>
@@ -31,11 +32,8 @@
             </div>
 
             <div class="row">
-                <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a> or
-            </div>
-
-            <div class="row">
-                <br/>
+                <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a>
+                <p>or</p>
                 <div id="autocomplete-container" />
             </div>
 
@@ -216,6 +214,7 @@
                         app.dispatch('error', err)
                         return
                     }
+                            console.log("GOT:", data);
                     this.formData = data
                     console.log('create-physical mount, formData=', JSON.stringify(data))
                     this.update()

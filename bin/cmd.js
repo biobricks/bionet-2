@@ -432,11 +432,11 @@ websocket.createServer({server: server}, function(stream) {
                         if(err) return cb(err);
 
                        m.labelImagePath = imagePath; 
-
+                       console.log("SAVING:", m);
                         saveMaterialInDB(m, curUser, 'p', function(err, id) {
                             if(err) return cb(err);
                             if(!doPrint) return cb(null, id);
-                            
+
                             var relativePath = path.relative(settings.labelImageFilePath, imagePath);
                             printServer.printLabel(relativePath);
                             console.log("relative path:", relativePath);

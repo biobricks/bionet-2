@@ -146,7 +146,6 @@
 
             var hadQueryBeforeKeydown = false;
             $('#q').keydown(function(e) {
-                console.log('create form q keydown')
 
                 if (e.keyCode === 38) { // up arrow
                     e.preventDefault()
@@ -207,11 +206,10 @@
                             });
                         }
                     }
-
                     if (this.matches && this.matches.length) {
-                        selected = 0;
+                        this.selected = 0;
                     } else {
-                        selected = null
+                        this.selected = null
                     }
                     this.update()
 
