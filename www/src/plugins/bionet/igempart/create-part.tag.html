@@ -53,7 +53,7 @@
 </create-part>
 
 <create-virtual-form>
-    <form name="createPartForm" class="col s12" onsubmit={submitForm}>
+    <form id="createPartForm" ref="createPartForm" class="col s12" onsubmit={submitForm}>
         <form-text-input label="Part Name" ref="name" name="name" value={formData.name}/>
         <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
         <form-text-input label="Created by" ref="creator" name="creator" value={formData.creator}/>
@@ -80,6 +80,10 @@
                 $.extend(app.state.createPart, $.formToObject('createPartForm'))
             }
             console.log('create-virtual-form, formData:%s', JSON.stringify(this.formData))
+            
+            $(this.refs.createPartForm).change(function(e) {
+                $.extend(app.state.createPart, $.formToObject('createPartForm'))
+            }.bind(this));
 
         });
 
@@ -101,10 +105,6 @@
 
         // TODO JUUl this doesn't work if using $(this.createPartForm)
         // probably because it needs to be run from within on('mount')
-
-        $(this.createPartForm).change(function(e) {
-            $.extend(app.state.createPart, $.formToObject('createPartForm'))
-        }.bind(this));
 
         this.submitForm = function(e) {
             e.preventDefault()
