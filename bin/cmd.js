@@ -16,6 +16,7 @@ var accountdown = require('accountdown'); // user/login management
 var uuid = require('uuid').v4;
 var through = require('through2');
 var treeIndex = require('level-tree-index');
+var elasticIndex = require('level-elasticsearch-index');
 var accounts = require('../libs/user_accounts.js');
 var printServer = require('../libs/print_server.js');
 var Mailer = require('../libs/mailer.js');
