@@ -4,7 +4,7 @@
             <mpassword-form/>
         </div>
         <div style="height:30px" />
-        <div class="center red-text">{errorMsg}</div>
+        <div class="center red-text" ref="errormessage">{errorMsg}</div>
         <br/>
     </div>
     <script>
@@ -13,7 +13,8 @@
         const tag = this
 
         app.on('signupError', function(msg) {
-            this.errorMsg = msg
+            console.log('signup error:', msg)
+            tag.errorMsg = msg
             tag.update()
         })
 
@@ -80,7 +81,7 @@
 
         this.on('before-mount', function() {
             observer = app.addObserver(app.$.loginState, function(loginState) {
-                this.loggedin = loginState
+                tag.loggedin = loginState
                 tag.update()
             })
         })
@@ -130,6 +131,10 @@
             app.state.signup.email = this.refs.enteremail.value
             riot.mount('div#home-page-content', 'password-form')
         }.bind(this)
+        
+        this.on('mount', function() {
+            $('#enteremail').focus()
+        })
 
     </script>
 </email-form>
@@ -145,6 +150,10 @@
     </form>
 
     <script>
+        this.on('mount', function() {
+            $('#enterpassword1').focus()
+        })
+        
         this.submitForm = function(e) {
             e.preventDefault()
 
@@ -159,6 +168,7 @@
             }, function(err, user) {
                 if (err) {
                     app.emit('signupError', err)
+                    riot.mount('div#home-page-content', 'mpassword-form')
                     return
                 }
 
@@ -173,7 +183,7 @@
                     // UI components should listen for app.user change
                     app.dispatch(app.$.loginState, true)
 
-                    route('inventory') // TODO probably not where we want to end up
+                    riot.mount('div#home-page-content', 'mpassword-form')
                 })
             }.bind(this))
         }.bind(this)

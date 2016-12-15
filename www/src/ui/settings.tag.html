@@ -43,7 +43,7 @@
     this.on('before-mount', function() {
       //console.log('mpassword-form mount')
       app.addObserver(app.$.loginState, function(loginState) {
-        this.loggedin = loginState
+        tag.loggedin = loginState
         tag.update()
       })
     })

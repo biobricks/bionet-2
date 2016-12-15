@@ -22,6 +22,7 @@ route('/logout', function () {
         if (err) {
             app.ui.toast("Error logout route: " + err) // TODO handle better
         }
+        app.dispatch(app.$.loginState, false)
         route('/');
     });
 })
