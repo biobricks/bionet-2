@@ -65,7 +65,8 @@
         <input type="submit" style="visibility:hidden" />
     </form>
     <script>
-        const tag=this
+        const tag = this
+        tag.formData = {}
         this.on('mount', function() {
             tag.formData = app.state.editPart
             tag.update()
@@ -78,6 +79,7 @@
 
         this.submitForm = function(e) {
             e.preventDefault()
+            $.extend(app.state.editPart, $.formToObject('editPartForm'))
             if (!app.state.editPart.id) {
                 app.ui.toast("Error: Missing part ID") // TODO better error handling
                 return;
@@ -95,9 +97,26 @@
 </part-specification>
 
 <part-notes>
-    <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
+    <form id="editPartForm" name="editPartForm" class="col s12" onsubmit={submitForm}>
+        <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
+        <std-button action={submitForm} label="submit" />
+        <input type="submit" style="visibility:hidden" />
+    </form>
     <script>
-
+        const tag = this
+        tag.formData = {}
+        this.on('mount', function() {
+            tag.formData = app.state.editPart
+            tag.update()
+            console.log("part-notes tag:", JSON.stringify(tag.formData))
+            $(this.editPartForm).change(function(e) {
+                $.extend(app.state.editPart, $.formToObject('editPartForm'))
+            }.bind(this));
+        })
+        this.submitForm = function(e) {
+            e.preventDefault()
+            $.extend(app.state.editPart, $.formToObject('editPartForm'))
+        }
 
     </script>
 </part-notes>
@@ -149,7 +168,7 @@
 </part-attachment>
 
 <part-sequence>
-    <form onsubmit={submitForm}>
+    <form id="editPartForm" onsubmit={submitForm}>
         <!-- The initial sequence can be loaded using the flashvars parameter and URL-encoded JSON  -->
         <!-- This will fail if the JSON is not 100% correct. E.g. remember that hashes are formatted -->
         <!-- like: {"key": "value"} and _not_ like: {key: "value"} -->
@@ -169,40 +188,48 @@
     </form>
     <script>
         /*
-                            var formData = app.getModel('partData')
-                              //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
+                                                            var formData = app.getModel('partData')
+                                                              //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
 
-                            // map igem plasmid annotations to flash plasmid viewer component
-                            var annotations = formData.plasmidAnnotations
-                            var features = []
-                            if (annotations !== undefined) {
-                              for (var i = 0; i < annotations.length; i++) {
-                                var annotation = annotations[i]
-                                features.push({
-                                  name: annotation[3],
-                                  type: annotation[0],
-                                  from: annotation[1],
-                                  to: annotation[2]
-                                })
-                              }
-                            }
-                            var seq_obj = {
-                              name: formData.name,
-                              sequence: formData.sequence,
-                              features: features
-                            }
-                            this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
-                              //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
-                                                */
-        this.formData = {
-            sequence: ''
-        }
+                                                            // map igem plasmid annotations to flash plasmid viewer component
+                                                            var annotations = formData.plasmidAnnotations
+                                                            var features = []
+                                                            if (annotations !== undefined) {
+                                                              for (var i = 0; i < annotations.length; i++) {
+                                                                var annotation = annotations[i]
+                                                                features.push({
+                                                                  name: annotation[3],
+                                                                  type: annotation[0],
+                                                                  from: annotation[1],
+                                                                  to: annotation[2]
+                                                                })
+                                                              }
+                                                            }
+                                                            var seq_obj = {
+                                                              name: formData.name,
+                                                              sequence: formData.sequence,
+                                                              features: features
+                                                            }
+                                                            this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
+                                                              //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
+                                                                                */
+        const tag = this
+        tag.formData = {}
+        this.on('mount', function() {
+            tag.formData = app.state.editPart
+            tag.update()
+            console.log("part-sequence tag:", JSON.stringify(tag.formData))
+            $(tag.editPartForm).change(function(e) {
+                $.extend(app.state.editPart, $.formToObject('editPartForm'))
+            });
+        })
         this.submitForm = function(e) {
-            e.stopPropagation();
-
+            e.preventDefault()
+            $.extend(app.state.editPart, $.formToObject('editPartForm'))
         }
 
     </script>
+
 </part-sequence>
 
 <part-instance>
