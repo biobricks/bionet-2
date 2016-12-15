@@ -16,7 +16,7 @@ var accountdown = require('accountdown'); // user/login management
 var uuid = require('uuid').v4;
 var through = require('through2');
 var treeIndex = require('level-tree-index');
-var elasticIndex = require('level-elasticsearch-index');
+var ElasticIndex = require('level-elasticsearch-index');
 var accounts = require('../libs/user_accounts.js');
 var printServer = require('../libs/print_server.js');
 var Mailer = require('../libs/mailer.js');
@@ -100,10 +100,28 @@ var physicalTree = treeIndex(physicalDB, sublevel(indexDB, 't'), {
   parentProp: 'parent_id'
 });
 
+var elasticIndex = ElasticIndex(bioDB);
+
+elasticIndex.add('name', function(key, val) {
+  val = JSON.parse(val); // TODO this should not be needed
+
+  var o = {
+    id: val.id,
+    name: val.name
+  };
+  console.log("BUILD:", o);
+  return o;
+});
+
 // TODO for debug only
 physicalTree.rebuild(function(err) {
   if(err) return console.error("inventory tree rebuild error:", err);
-  console.log("Finished rebuild");
+  console.log("Finished inventory tree rebuild");
+});
+
+elasticIndex.rebuildAll(function(err) {
+  if(err) return console.error("elastic index rebuild error:", err);
+  console.log("Finished elastic index rebuild");
 });
 
 var miscDB = sublevel(db, 'm');
@@ -451,6 +469,22 @@ websocket.createServer({server: server}, function(stream) {
                 }
                 
                 console.log("saving:", m);
+            },
+
+            elasticSearch: function(curUser, query, cb) {
+              console.log("BEGIN SEARCH:", query);
+              elasticIndex.search('name', {
+                query: {
+                  match: {
+                    name: query
+                  }
+                }}, function(err, result) {
+                  console.log("SEARCH CB:", err, result);
+                  if(err) return cb(err);
+
+                  cb(null, result.hits.hits);
+                });
+                
             },
 
             inventoryTree: function(curUser, cb) {

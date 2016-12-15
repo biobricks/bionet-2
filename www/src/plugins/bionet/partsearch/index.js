@@ -56,7 +56,25 @@ var partsearch = {
         'url': '/q' + termsURL
       }]);
 
-      riot.mount('div#content', 'search-result', q)
+      setTimeout(function() { // TODO remove timeout
+
+        app.remote.elasticSearch(q.terms, function(err, results) {
+          if(err) return console.error(err); // TODO handle error better
+          
+          q.results = [];
+          var i;
+          for(i=0; i < results.length; i++) {
+            if(!results[i]._source || !results[i]._source.name) continue;
+            q.results.push({
+              primary_text: results[i]._source.name,
+              id: results[i]._source.id
+            });
+          }
+
+          riot.mount('div#content', 'search-result', q)
+          
+        });
+      }, 500);
     })
   },
   remove: function() {

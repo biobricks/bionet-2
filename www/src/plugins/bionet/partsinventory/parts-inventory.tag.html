@@ -49,6 +49,7 @@
                     // TODO rewrite this matching algorithm 
                     //      so we can do single-pass matching
                     //      so we can use a stream
+                    //      And move it to the level-tree-index module
 
                     var matches = [];
                     this.nodes = [];
@@ -59,17 +60,6 @@
                         if (cur.match(q)) matches.push(cur);
                     }
 
-                    /*
-                            return {
-                              url: '/edit/' + x.id,
-                              secondary_url: '/q?partid=' + x.id,
-                              secondary_url_label: 'view availabilty',
-                              righticon: 'star',
-                              primary_text: x.id,
-                              secondary_text: x.description,
-                              starred: false,
-                              data: x.data
-                    */
                     var j, m, add, perfect;
                     for (i = 0; i < children.length; i++) {
                         cur = children[i].path;

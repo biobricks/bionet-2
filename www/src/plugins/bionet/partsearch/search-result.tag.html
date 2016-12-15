@@ -2,7 +2,7 @@
   <div style="padding-top:100px;">
       <list-container>
         <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-        <list-item no-reorder each={item in searchresult} item={item}/>
+        <list-item no-reorder each={item in parent.opts.results} item={item}/>
       </list-container>
       <!--
       <pagination items={pagination}/>
@@ -36,6 +36,11 @@
 //      this.secondaryHeader = this.searchresult.length + ' items'
 //      this.searchresult.push(streamItem)
 
+    this.on('mount', function() {
+
+//      this.results = opts.results;
+//      this.update();
+    });
 
     this.on('unmount', function() {
       this.searchresult = undefined
