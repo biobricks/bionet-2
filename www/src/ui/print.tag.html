@@ -1,7 +1,7 @@
 <print>
     <div class="print">
         <canvas id="labelPreview" class="labelPreview tab" width="560" height="174"></canvas>
-        <form id="createLabelForm" name="createLabelForm" class="col s12" onsubmit={submitForm}>
+        <form id="createLabelForm" ref="createLabelForm" name="createLabelForm" class="col s12" onsubmit={submitForm}>
             <form-text-input label="Title" name="title" value={labelFormData.title} />
             <form-textarea-input label="Additional text" name="text" value={labelFormData.text} />
             <form-text-input label="Storage temperature" name="temperature" value={labelFormData.temperature} />
