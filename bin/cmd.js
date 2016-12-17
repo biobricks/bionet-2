@@ -497,6 +497,7 @@ websocket.createServer({server: server}, function(stream) {
             // get all physical instances of a virtual
             // TODO create an index for this
             instancesOfVirtual: function(curUser, virtual_id, cb) {
+              var results=[];
               var s = physicalDB.createReadStream({
                 valueEncoding: 'json'
               });
@@ -504,10 +505,19 @@ websocket.createServer({server: server}, function(stream) {
                 if(!data || !data.value || !data.value.virtual_id) return next()
 
                 if(data.value.virtual_id === virtual_id) {
-                  this.push(data.value);
+                    results.push(data.value);
                 }
                 next();
               }));
+                
+              s.on('close', function() {
+                  cb(null,results);
+              });
+              
+              out.on('error', function(err) {
+                cb(err);
+                console.error("instancesofvirtual error:", err);
+              });
               
               return out;
             },

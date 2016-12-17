@@ -68,8 +68,8 @@ var igempart = {
 
         partDataAccessor.reduceRoute('toPhysicalItem', (m, partData) => {
             return {
-                id: partData.datamatrix,
                 name: partData.name,
+                virtual_id: partData.virtual_id,
                 cassetteid: partData.cassetteid,
                 locationid: partData.locationid
             }
@@ -87,7 +87,7 @@ var igempart = {
                     return;
                 }
                 toast(physicalData.name + ' saved')
-                app.dispatch('bioPhysicalQuery', physicalData.name)
+                app.dispatch('bioPhysicalQuery', physicalData.virtual_id)
             })
         })
 

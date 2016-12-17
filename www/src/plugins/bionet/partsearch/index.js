@@ -26,53 +26,70 @@ var partsearch = {
             }
         })
 
-        app.observe('bioPhysicalQuery', (q) => {
-            app.remote.inventoryTree(function (err, children) {
-                if (err) return console.error(err);
-
-                // TODO rewrite this matching algorithm 
-                //      so we can do single-pass matching
-                //      so we can use a stream
-                //      And move it to the level-tree-index module
-
-                var matches = [];
-                var nodes = [];
-
-                var i, cur, indent, a;
-                for (i = 0; i < children.length; i++) {
-                    cur = children[i].path;
-                    if (cur.match(q)) matches.push(cur);
-                }
-
-                var j, m, add, perfect;
-                for (i = 0; i < children.length; i++) {
-                    cur = children[i].path;
-                    a = cur.split('.');
-                    indent = a.length - 1;
-                    add = false
-                    perfect = false
-                    for (j = 0; j < matches.length; j++) {
-                        m = matches[j];
-                        if (m.indexOf(cur) === 0) {
-                            add = true;
-                            if (m.length === cur.length) perfect = true;
-                            break;
-                        }
-                    }
-                    if (add) {
-                        const bioPhysical = {
-                            indent: indent,
-                            url: 'edit-physical/' + children[i].path + "/?id=" + children[i].key,
-                            primary_text: a[a.length - 1],
-                            id: children[i].key,
-                            highlight: perfect
-                        };
-                        nodes.push(bioPhysical)
-                    }
-                }
-                app.route('searchResult', 'list', null, nodes)
-            });
+        searchResult.reduceRoute('toListItem', (m, partList) => {
+            const partData = partList[0]
+            return {
+                primary_text: partData.name,
+                secondary_text: partData.id +' '+partData.cassetteid+' '+partData.locationid,
+                url: partData.name,
+                data:partData
+            }
         })
+
+        app.observe('bioPhysicalQuery', (q) => {
+            app.remote.instancesOfVirtual(q, function (err,data) {
+                app.route('searchResult', 'updateList', 'toListItem', data)
+            })
+        })
+
+        /*
+
+        app.remote.inventoryTree(function (err, children) {
+            if (err) return console.error(err);
+
+            // TODO rewrite this matching algorithm 
+            //      so we can do single-pass matching
+            //      so we can use a stream
+            //      And move it to the level-tree-index module
+
+            var matches = [];
+            var nodes = [];
+
+            var i, cur, indent, a;
+            for (i = 0; i < children.length; i++) {
+                cur = children[i].path;
+                if (cur.match(q)) matches.push(cur);
+            }
+
+            var j, m, add, perfect;
+            for (i = 0; i < children.length; i++) {
+                cur = children[i].path;
+                a = cur.split('.');
+                indent = a.length - 1;
+                add = false
+                perfect = false
+                for (j = 0; j < matches.length; j++) {
+                    m = matches[j];
+                    if (m.indexOf(cur) === 0) {
+                        add = true;
+                        if (m.length === cur.length) perfect = true;
+                        break;
+                    }
+                }
+                if (add) {
+                    const bioPhysical = {
+                        indent: indent,
+                        url: 'edit-physical/' + children[i].path + "/?id=" + children[i].key,
+                        primary_text: a[a.length - 1],
+                        id: children[i].key,
+                        highlight: perfect
+                    };
+                    nodes.push(bioPhysical)
+                }
+            }
+            app.route('searchResult', 'list', null, nodes)
+        });
+        */
 
         /*
                 return {

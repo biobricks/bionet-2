@@ -281,7 +281,7 @@
         this.clickphysical = function(itemData) {
             console.log('clickphysical', JSON.stringify(itemData))
             tag.refs.locationid.value = itemData.locationid
-            tag.refs.datamatrix.value = itemData.id
+            tag.refs.datamatrix.value = itemData.name
             tag.refs.cassette.value = itemData.cassetteid
             tag.update()
         }
@@ -290,23 +290,21 @@
             e.preventDefault()
             //const partData = $.formToObject('editPartForm'))
             const partData = JSON.parse(JSON.stringify(tag.formData))
-            partData.name = app.state.editPart.id
+            partData.virtual_id = app.state.editPart.id
             partData.locationid = tag.refs.locationid.value
-            partData.datamatrix = tag.refs.datamatrix.value
+            partData.name = tag.refs.datamatrix.value
             partData.cassetteid = tag.refs.cassette.value
             console.log('part-instance tag submit:', JSON.stringify(partData))
             app.route('partDataAccessor', 'storePhysical', 'toPhysicalItem', partData)
         }
 
-        app.addRouteDestination('searchResult', 'list', function(list) {
-            console.log('physical part search result, tag:', JSON.stringify(list))
-            tag.secondaryHeader = list.length + ' Physical instances'
-            tag.searchresult = list
-            for (var i = 0; i < list.length; i++) {
-                list[i].click = tag.clickphysical
-            }
+        app.addRouteDestination('searchResult', 'updateList', function(item) {
+            console.log('physical part search result, tag:', JSON.stringify(item))
+            item.click = tag.clickphysical
+            tag.searchresult.push(item)
+            tag.secondaryHeader = tag.searchresult.length + ' Physical instances'
             tag.update()
-            app.dispatch('searchCache', list)
         })
+
     </script>
 </part-instance>
