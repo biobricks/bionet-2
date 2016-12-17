@@ -487,10 +487,30 @@ websocket.createServer({server: server}, function(stream) {
                 
             },
 
+            // get the entire physical inventory tree
+            // TODO implement a server side filter for the physicals tree
             inventoryTree: function(curUser, cb) {
               physicalTree.children(null, cb);
             },
 
+
+            // get all physical instances of a virtual
+            // TODO create an index for this
+            instancesOfVirtual: function(curUser, virtual_id, cb) {
+              var s = physicalDB.createReadStream({
+                valueEncoding: 'json'
+              });
+              var out = s.pipe(through.obj(function(data, enc, next) {
+                if(!data || !data.value || !data.value.virtual_id) return next()
+
+                if(data.value.virtual_id === virtual_id) {
+                  this.push(data.value);
+                }
+                next();
+              }));
+              
+              return out;
+            },
 
             get: function(curUser, id, cb) {
               console.log("getting:", id);
