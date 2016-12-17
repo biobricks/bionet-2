@@ -1,14 +1,16 @@
 <autocomplete>
     <div class="input-field">
         <label for="autocomplete" class="active">Container</label>
-        <input type="text" ref="q" name="autocomplete" id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
+        <input type="text" ref={opts.ref || opts.name || 'q'} name={opts.name || 'q'} id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
         <ul id="matchList" style="z-index:1000">
-            <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver} onclick={selectCurrent}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.text}</li>
+            <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver} onmousedown={clickSelect}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.text}</li>
             <li if={matches && !matches.length} class="no-match">No matches found</li>
         </ul>
     </div>
     <script>
         var searchCallback;
+
+        opts.ref = opts.ref || 'q';
 
         function query(s, cb) {
             if (!searchCallback) return;
@@ -39,11 +41,14 @@
 
             this.selectCurrent = function() {
                 var sel = this.matches[this.selected]
-                this.refs.q.value = sel.text
+                this.refs[opts.ref].value = sel.text
                 this.update()
                 this.hideMatches()
             }.bind(this)
 
+            this.clickSelect = function(e) {
+                this.selectCurrent();
+            }.bind(this)
 
             this.hideMatches = function(e) {
                 this.matches = null
@@ -70,7 +75,7 @@
 
             this.matches = []
 
-            $(this.refs.q).keydown(function(e) {
+            $(this.refs[opts.ref]).keydown(function(e) {
                 if (e.keyCode === 38) { // up arrow
                     e.preventDefault()
                     if (this.selected !== null && this.selected > 0) this.selected--
@@ -94,12 +99,12 @@
                 $('#matchList').css("display:block")
             }
 
-            $(this.refs.q).on('input', function(e) {
+            $(this.refs[opts.ref]).on('input', function(e) {
 
-                query(this.refs.q.value, function(err, results) {
+                query(this.refs[opts.ref].value, function(err, results) {
                     if (err) return; // TODO handle
 
-                    this.matches = results;
+                    this.matches = results || [];
 
                     if (this.matches && this.matches.length) {
                         selected = 0;
@@ -119,7 +124,7 @@
             } else {
                 $('#matchList').css('border', 'none')
             }
-            var q = this.refs.q.value
+            var q = this.refs[opts.ref].value
             q = q.trim();
             q = q.replace(/\s+/g, ' ').toLowerCase()
 

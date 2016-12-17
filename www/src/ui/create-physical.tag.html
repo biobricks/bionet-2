@@ -90,22 +90,20 @@
             var formData = $.formToObject('createPhysicalForm') || {};
             console.log('create-physical, form=%s', JSON.stringify(formData))
             formData.label = this.labelFormData;
-            var parent_id = formData.parent_id;
-            var parent_name = formData.parent_name;
 
-            if (!parent_id || !parent_id.length) {
-                if (parent_name) {
-                    app.remote.getBy('name', parent_name, function(err, m) {
+            if (!formData.parent_id) {
+                if (formData.parent_name) {
+                    app.remote.getBy('name', formData.parent_name, function(err, m) {
                         if (err) return app.ui.toast("Error:" + err);
 
-                        parent_name = '';
                         if (!m) {
                             app.ui.toast("Warning: Invalid container");
                         } else {
-                            parent_id = m.id;
+                            formData.parent_id = m.id;
+                            this.update();
                         }
                         savePhysical(formData, this.labelImageData);
-                    })
+                    }.bind(this))
                     return;
                 }
             }
@@ -214,7 +212,6 @@
                         app.dispatch('error', err)
                         return
                     }
-                            console.log("GOT:", data);
                     this.formData = data
                     console.log('create-physical mount, formData=', JSON.stringify(data))
                     this.update()

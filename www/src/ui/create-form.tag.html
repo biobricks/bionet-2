@@ -75,7 +75,6 @@
         this.selectedType = null
 
         this.on('mount', function() {
-            console.log('create-form mount')
             $('#q').focus()
 
             this.updateMatchListPosition = function() {
@@ -120,13 +119,11 @@
             }.bind(this)
 
             this.clickSelect = function(e) {
-                console.log("CLICK SELECT");
                 this.selectCurrent();
             }.bind(this)
 
 
             this.elementOver = function(e) {
-                console.log("MOUSE OVER");
                 if ($(e.target).hasClass('no-match')) return;
                 var lis = $('#matchList').find('li');
                 var i;

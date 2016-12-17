@@ -230,6 +230,10 @@ function saveMaterialInDB(m, user, dbType, cb) {
     m.created = m.created || c;
     m.updated = c;
 
+    if(settings.debug) {
+      console.log("Saving to bioDB. Key:", m.id, "Value:", m);
+    }
+
     db.put(m.id, m, {valueEncoding: 'json'}, function(err) {
       if(err) return cb(err);
       addToIndex(m);
@@ -429,8 +433,6 @@ websocket.createServer({server: server}, function(stream) {
             },
 
             saveVirtual: function(curUser, m, cb) {
-              
-              console.log("saving:", m);
 
               saveMaterialInDB(m, curUser, 'v', function(err, id) {
                 if(err) return cb(err);
