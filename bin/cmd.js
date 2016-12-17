@@ -199,14 +199,14 @@ printServer.start(settings, function(err) {
 });
 
 
-function changeInfo(user) {
+function changeInfo(userData) {
   return {
-    user: user.email,
+    user: userData.user.email,
     time: unixEpochTime()
   };
 }
 
-function saveMaterialInDB(m, user, dbType, cb) {
+function saveMaterialInDB(m, userData, dbType, cb) {
   if(!m.name || !m.name.trim()) return cb("Name must be specified");
 
   idGenerator.getCur(function(err, curID) {
@@ -226,7 +226,7 @@ function saveMaterialInDB(m, user, dbType, cb) {
       db = physicalDB;
     }
 
-    var c = changeInfo(user);
+    var c = changeInfo(userData);
     m.created = m.created || c;
     m.updated = c;
 
@@ -401,7 +401,7 @@ websocket.createServer({server: server}, function(stream) {
                 type = type.name.toLowerCase().trim()
               }
               
-              var s = bioDB.createReadStream({valueEncoding: 'json'});
+              var s = virtualDB.createReadStream({valueEncoding: 'json'});
   
               var out = s.pipe(through.obj(function(data, enc, cb) {
 
@@ -570,6 +570,37 @@ websocket.createServer({server: server}, function(stream) {
                     }
                 });
             },
+          
+            // TODO use indexes for this
+            getVirtualBy: function(curUser, field, value, cb) {
+
+                var s = virtualDB.createReadStream({valueEncoding: 'json'});
+                var found = false;
+                var out = s.pipe(through.obj(function(data, enc, next) {
+                    if(!data || !data.value || !data.value[field]) return next()
+                    if(data.value[field] == value) {
+                        found = true;
+                        cb(null, data.value);
+                        s.destroy();
+                    } else {
+                        next();
+                    }
+                }));
+                
+                s.on('end', function() {
+                    if(!found) {
+                        found = true;
+                        cb(null, null);
+                    }
+                });
+
+                s.on('error', function(err) {
+                    if(!found) {
+                        found = true;
+                        cb(err);
+                    }
+                });
+            },
 
             // TODO use indexes for this!
             getBy: function(curUser, field, value, cb) {
@@ -601,6 +632,8 @@ websocket.createServer({server: server}, function(stream) {
                     }
                 });
             },
+
+
 
             // TODO doesn't work
             recentChanges: rpc.syncReadStream(function() {

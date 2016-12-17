@@ -52,15 +52,17 @@
     <form id="editPartForm" name="editPartForm" class="col s12" onsubmit={submitForm}>
         <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
         <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
-        <form-text-input label="Created by" ref="creator" name="creator" value={formData.creator}/>
-        <form-text-input label="Created" ref="created" name="created" value={formData.created}/>
         <form-text-input label="Storage temperature" ref="temperature" name="temperature" value={formData.temperature}/>
         <form-textarea-input label="Biosafety level" ref="bsl" name="bsl" value={formData.bsl}/>
         <form-switch label="Biohazardous?" ref="biohazard" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
         <form-textarea-input label="Sequence" ref="sequence" name="sequence" value={formData.sequence}/>
-        <form-image imagesrc={formData.avatar} label="Avatar" height="60px" />
         <form-text-input label="" ref="avatar" name="avatar" value={formData.avatar}/>
         <form-image imagesrc={formData.qrcode} label="Datamatrix code" height="140px" />
+        <div>
+          <p>
+            Created by: {formData.created.user}
+          </p>
+        </div>
         <std-button action={submitForm} label="submit" />
         <input type="submit" style="visibility:hidden" />
     </form>
@@ -85,7 +87,7 @@
                 return;
             }
 
-            app.remote.save(app.state.editPart, null, false, function(err, id) {
+            app.remote.saveVirtual(app.state.editPart, function(err, id) {
                 if (err) return app.ui.toast("Error: " + err) // TODO handle error
 
                 app.ui.toast("Material saved with ID: " + id)

@@ -34,7 +34,7 @@
             var val = this.refs.q.value.trim()
 
             if (!this.selectedType && val) {
-                app.remote.getBy('name', val, function(err, o) {
+                app.remote.getVirtualBy('name', val, function(err, o) {
                     if (err) return app.ui.toast("Error: " + err); // TODO handle better
 
                     if (!o) {

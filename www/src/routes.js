@@ -3,7 +3,14 @@ const route =require('riot-route')
 
 // is this string formatted like a UUID?
 function isUUID(str) {
-    return !!str.toLowerCase().match(/^[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}$/)
+  str = str.trim().toLowerCase();
+
+  // Strip off initial "v-" or "p-" if needed
+  if(str.match(/^[vp]-/)) {
+    str = str.slice(2);
+  }
+
+  return !!str.match(/^[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}$/)
 }
 
 route('/', function () {
@@ -79,6 +86,7 @@ route('/print', function () {
 })
 
 function editPhysicalRoute(typeOrID, q) {
+    q = q || {};
 
     app.dispatch(app.$.appBarConfig, {
         enableTopNav: true,
@@ -93,14 +101,14 @@ function editPhysicalRoute(typeOrID, q) {
 
     opts.type = typeOrID
 
-    if (isUUID(typeOrID)) {
+    if(isUUID(typeOrID)) {
         opts.virtualID = typeOrID
     } else {
         opts.type2 = typeOrID
     }
     opts.key = q.id
     opts.mode = 'edit'
-    console.log("editPhysicalRoute, mounting component: %s",JSON.stringify(opts))
+
     riot.mount('div#content', 'create-physical', opts);
 }
 
@@ -126,7 +134,7 @@ function createPhysicalRoute(typeOrID, q) {
 
     opts.type = typeOrID
 
-    if (isUUID(typeOrID)) {
+    if(isUUID(typeOrID)) {
         opts.virtualID = typeOrID
     } else {
         opts.type = typeOrID

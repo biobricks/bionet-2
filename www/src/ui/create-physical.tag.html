@@ -1,7 +1,7 @@
 <create-physical>
 
     <div class="container" style="margin-top:100px">
-        <h5 id="createPhysicalHeader"></h5>
+        <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
         <form id="createPhysicalForm" ref="createPhysicalForm" class="col s12" onsubmit={submitForm}>
 
           <input type="hidden" ref="id" name="id" value={formData.id} />
@@ -28,7 +28,7 @@
             </div>
 
             <div class="row">
-                <form-text-input label="Location ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
+              <form-text-input label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
             </div>
 
             <div class="row">
@@ -37,6 +37,7 @@
                 <div id="autocomplete-container" />
             </div>
 
+            <input type="hidden" ref="virtual_id" name="virtual_id" value={formData.virtual_id} />
             <std-button label="submit" action={submitForm} />
             <input type="submit" style="visibility:hidden" />
         </form>
@@ -67,7 +68,8 @@
             }
         }
 
-        var savePhysical = function(p, labelImage, cb) {
+        var savePhysical = function(p, labelImage) {
+                            console.log("SAVING:", p);
             var doPrint = labelImage ? true : false
             app.remote.savePhysical(p, labelImage, doPrint, function(err, id) {
                 if (err) {
@@ -77,7 +79,9 @@
                 }
 
                 app.ui.toast("Saved to database")
-                if (cb) cb();
+                setTimeout(function() {
+                  route('edit-physical/' + encodeURIComponent(id) + '/');
+                }, 500);
             })
         }.bind(this)
 
@@ -88,7 +92,6 @@
         this.submitForm = function(e) {
             e.preventDefault()
             var formData = $.formToObject('createPhysicalForm') || {};
-            console.log('create-physical, form=%s', JSON.stringify(formData))
             formData.label = this.labelFormData;
 
             if (!formData.parent_id) {
@@ -96,7 +99,7 @@
                     app.remote.getBy('name', formData.parent_name, function(err, m) {
                         if (err) return app.ui.toast("Error:" + err);
 
-                        if (!m) {
+                        if(!m) {
                             app.ui.toast("Warning: Invalid container");
                         } else {
                             formData.parent_id = m.id;
@@ -213,11 +216,10 @@
                         return
                     }
                     this.formData = data
-                    console.log('create-physical mount, formData=', JSON.stringify(data))
+
                     this.update()
                 }.bind(this))
             }
-            if (opts.mode === 'edit') return;
 
             riot.mount('#autocomplete-container', 'autocomplete', {
                 searchCallback: function(query, cb) {
@@ -228,23 +230,24 @@
                 name: 'parent_name',
             });
 
-            if (opts.virtualID) {
+            if(opts.virtualID) {
                 // create new physical instance of this material
-                app.remote.getMaterial(opts.virtualID, function(err, virtual) {
+                app.remote.get(opts.virtualID, function(err, virtual) {
                     if (err) {
                         app.ui.toast(err); // TODO handle better
                         return;
                     }
+                    this.formData.virtual_id = virtual.id;
+                    this.formData.name = virtual.name;
                     this.printNameDefault = this.refs.name.value.trim() || virtual.name
-                    $(this.createPhysicalHeader).html("New " + virtual.name)
-
+                    $(this.refs.createPhysicalHeader).html("New " + virtual.name)
+                    this.update();
                     // TODO
 
                 }.bind(this));
                 return;
             }
 
-            console.log("Creating:", opts.type);
             app.remote.getType(opts.type, function(err, type) {
                 if (err) {
                     if (err.notFound) {
@@ -263,7 +266,7 @@
                 }
 
                 this.printNameDefault = this.refs.name.value.trim() || type.name
-                $(this.createPhysicalHeader).html("New " + type.name)
+                $(this.refs.createPhysicalHeader).html("New " + type.name)
 
                 // TODO
 
