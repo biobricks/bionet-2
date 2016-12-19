@@ -6,20 +6,22 @@
         </div>
     </div>
     <script>
-        
+        const tag = this
         this.on('update', function() {
-            this.data = this.opts.riotValue;
+            tag.data = tag.opts.riotValue;
         })
-                
+
         this.on('mount', function() {
-            console.log("form-text-input, opts:", JSON.stringify(this.opts))
-            Object.defineProperty(this, "value", {
+            //console.log("form-text-input, opts:", JSON.stringify(tag.opts))
+            tag.data = tag.opts.riotValue
+            tag.update()
+            Object.defineProperty(tag, "value", {
                 get: function() {
-                    return this.refs.inputTag.value;
+                    return $(tag.refs.inputTag).val()
                 },
                 set: function(value) {
-                    this.data = value;
-                    this.update();
+                    tag.data = value;
+                    $(tag.refs.inputTag).val(value)
                 }
             });
         })

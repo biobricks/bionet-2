@@ -68,7 +68,9 @@
     </form>
     <script>
         const tag = this
-        tag.formData = {}
+        tag.formData = {
+            created:{}
+        }
         this.on('mount', function() {
             tag.formData = app.state.editPart
             tag.update()
@@ -280,11 +282,11 @@
         this.primaryHeader = ''
         this.secondaryHeader = ''
 
-        this.clickphysical = function(itemData) {
-            console.log('clickphysical', JSON.stringify(itemData))
-            tag.refs.locationid.value = itemData.locationid
-            tag.refs.datamatrix.value = itemData.name
-            tag.refs.cassette.value = itemData.cassetteid
+        this.clickphysical = function(item) {
+            console.log('clickphysical', JSON.stringify(item))
+            tag.refs.locationid.value = item.data.locationid
+            tag.refs.datamatrix.value = item.data.name
+            tag.refs.cassette.value = item.data.cassetteid
             tag.update()
         }
 
@@ -300,10 +302,12 @@
             app.route('partDataAccessor', 'storePhysical', 'toPhysicalItem', partData)
         }
 
-        app.addRouteDestination('searchResult', 'updateList', function(item) {
-            console.log('physical part search result, tag:', JSON.stringify(item))
-            item.click = tag.clickphysical
-            tag.searchresult.push(item)
+        app.addRouteDestination('searchResult', 'updateList', function(itemList) {
+            //console.log('physical part search result, tag:', JSON.stringify(itemList))
+            for (var i=0; i<itemList.length; i++) {
+                itemList[i].click = tag.clickphysical
+            }
+            tag.searchresult=itemList
             tag.secondaryHeader = tag.searchresult.length + ' Physical instances'
             tag.update()
         })

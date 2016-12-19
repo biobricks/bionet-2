@@ -27,17 +27,22 @@ var partsearch = {
         })
 
         searchResult.reduceRoute('toListItem', (m, partList) => {
-            const partData = partList[0]
-            return {
-                primary_text: partData.name,
-                secondary_text: partData.id +' '+partData.cassetteid+' '+partData.locationid,
-                url: partData.name,
-                data:partData
+            const convertItem = function (partData) {
+                return {
+                    primary_text: partData.name,
+                    secondary_text: partData.id + ' ' + partData.cassetteid + ' ' + partData.locationid,
+                    data: partData
+                }
             }
+            const listItem=[]
+            for (var i=0; i<partList.length; i++) {
+                listItem.push(convertItem(partList[i]))
+            }
+            return listItem
         })
 
         app.observe('bioPhysicalQuery', (q) => {
-            app.remote.instancesOfVirtual(q, function (err,data) {
+            app.remote.instancesOfVirtual(q, function (err, data) {
                 app.route('searchResult', 'updateList', 'toListItem', data)
             })
         })
