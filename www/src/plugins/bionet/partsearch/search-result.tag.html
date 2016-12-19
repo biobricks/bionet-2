@@ -11,6 +11,7 @@
 
   <script>
     const tag = this
+    tag.results=[]
     // todo: store search query somewhere else
     this.primaryHeader = 'Search results for "' + opts.terms + '"'
 
@@ -37,9 +38,8 @@
 //      this.searchresult.push(streamItem)
 
     this.on('mount', function() {
-
-//      this.results = opts.results;
-//      this.update();
+        //tag.results = tag.parent.opts.results
+        //tag.update()
     });
 
     this.on('unmount', function() {

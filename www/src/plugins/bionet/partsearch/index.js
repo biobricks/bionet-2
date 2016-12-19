@@ -34,8 +34,8 @@ var partsearch = {
                     data: partData
                 }
             }
-            const listItem=[]
-            for (var i=0; i<partList.length; i++) {
+            const listItem = []
+            for (var i = 0; i < partList.length; i++) {
                 listItem.push(convertItem(partList[i]))
             }
             return listItem
@@ -129,10 +129,10 @@ var partsearch = {
             app.dispatch(app.$.breadcrumbs, [{
                 'label': 'search',
                 'url': '/'
-      }, {
+              }, {
                 'label': q.terms,
                 'url': '/q' + termsURL
-      }]);
+              }]);
 
             setTimeout(function () { // TODO remove timeout
 
@@ -145,6 +145,7 @@ var partsearch = {
                         if (!results[i]._source || !results[i]._source.name) continue;
                         q.results.push({
                             primary_text: results[i]._source.name,
+                            url: '/edit/'+results[i]._source.id,
                             id: results[i]._source.id
                         });
                     }
