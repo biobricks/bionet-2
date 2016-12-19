@@ -1,28 +1,43 @@
 <create-physical>
 
     <div class="container" style="margin-top:100px">
-        <h5 id="createPhysicalHeader"></h5>
-        <form name="createPhysicalForm" class="col s12" onsubmit={submitForm}>
-            <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
-            <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
-<!--
+        <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
+        <form id="createPhysicalForm" ref="createPhysicalForm" class="col s12" onsubmit={submitForm}>
+
+          <input type="hidden" ref="id" name="id" value={formData.id} />
+            <div class="row">
+                <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+            </div>
+
+            <div class="row">
+                <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
+            </div>
+
             <div each={field in fields}>
-                <form-text-input label={field.name} ref={field.name} name={field.name} value="" />
-            </div>
--->
-            <div class="row">
-                <div style="display:block;float:left">Barcode:
-                    <input type="text" id="curBarcode" ref="barcode"  name="barcode"/><a id="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+                <div class="row">
+                    <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
                 </div>
             </div>
 
             <div class="row">
-                <div style="display:block;float:left">Location ID:
-                    <input type="text" id="curContainerBarcode" ref="parent_id" name="parent_id"/><a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a> or </div>
-                <div id="autocomplete-container" class="col s12" style="width:300px;padding-left:15px;float:left">
-                </div>
+                <form-text-input label="Barcode" ref="curBarcode" name="barcode" value={formData.barcode}/>
             </div>
 
+            <div class="row">
+                <a id="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+            </div>
+
+            <div class="row">
+              <form-text-input label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
+            </div>
+
+            <div class="row">
+                <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a>
+                <p>or</p>
+                <div id="autocomplete-container" />
+            </div>
+
+            <input type="hidden" ref="virtual_id" name="virtual_id" value={formData.virtual_id} />
             <std-button label="submit" action={submitForm} />
             <input type="submit" style="visibility:hidden" />
         </form>
@@ -31,12 +46,12 @@
         <div id="printModal" class="printModal modal"></div>
     </div>
     <script>
-        console.log("create physical tag, opts:%s",JSON.stringify(opts))
+        console.log("create physical tag, opts:%s", JSON.stringify(opts))
         const appSettings = app.getAppSettings()
         const dataTypes = appSettings.dataTypes
-        this.formData={
-            name:'',
-            notes:''
+        this.formData = {
+            name: '',
+            notes: ''
         }
         this.fields = []
             //console.log('create physical, object=',JSON.stringify())
@@ -53,7 +68,8 @@
             }
         }
 
-        var savePhysical = function(p, labelImage, cb) {
+        var savePhysical = function(p, labelImage) {
+                            console.log("SAVING:", p);
             var doPrint = labelImage ? true : false
             app.remote.savePhysical(p, labelImage, doPrint, function(err, id) {
                 if (err) {
@@ -63,9 +79,11 @@
                 }
 
                 app.ui.toast("Saved to database")
-                if (cb) cb();
+                setTimeout(function() {
+                  route('edit-physical/' + encodeURIComponent(id) + '/');
+                }, 500);
             })
-        }
+        }.bind(this)
 
         /*
            TODO:
@@ -73,30 +91,28 @@
         */
         this.submitForm = function(e) {
             e.preventDefault()
-            var formData = $.formToObject(this.createPhysicalForm) || {};
+            var formData = $.formToObject('createPhysicalForm') || {};
             formData.label = this.labelFormData;
-            var parent_id = formData.refs.parent_id.value;
-            var parent_name = formData.refs.parent_name.value;
 
-            if (!parent_id || !parent_id.length) {
-                if (parent_name) {
-                    app.remote.getBy('name', parent_name, function(err, m) {
+            if (!formData.parent_id) {
+                if (formData.parent_name) {
+                    app.remote.getBy('name', formData.parent_name, function(err, m) {
                         if (err) return app.ui.toast("Error:" + err);
 
-                        parent_name = '';
-                        if (!m) {
+                        if(!m) {
                             app.ui.toast("Warning: Invalid container");
                         } else {
-                            parent_id = m.id;
+                            formData.parent_id = m.id;
+                            this.update();
                         }
                         savePhysical(formData, this.labelImageData);
-                    })
+                    }.bind(this))
                     return;
                 }
             }
 
             savePhysical(formData, this.labelImageData);
-        }
+        }.bind(this)
 
         this.createLabel = function() {
             var tags = []
@@ -123,7 +139,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.scanItem = function() {
             console.log('scanItem')
@@ -148,7 +164,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.scanContainer = function() {
             console.log('scan container function')
@@ -179,7 +195,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.on('mount', function() {
 
@@ -188,18 +204,19 @@
             }
 
             if (opts.query && opts.query.name && opts.query.name.trim()) {
-                this.refs.name.value = decodeURIComponent(opts.query.name);;
+                this.formData.name = decodeURIComponent(opts.query.name);
             }
 
             this.update();
             // todo: was opts.id but apparently riot uses opts.id for something else
-            if (opts.uuid !== undefined) {
-                app.remote.get(opts.uuid, function(err, data) {
+            if (opts.key !== undefined) {
+                app.remote.get(opts.key, function(err, data) {
                     if (err) {
                         app.dispatch('error', err)
                         return
                     }
-                    this.formData=data
+                    this.formData = data
+
                     this.update()
                 }.bind(this))
             }
@@ -213,23 +230,24 @@
                 name: 'parent_name',
             });
 
-            if (opts.virtualID) {
+            if(opts.virtualID) {
                 // create new physical instance of this material
-                app.remote.getMaterial(opts.virtualID, function(err, virtual) {
+                app.remote.get(opts.virtualID, function(err, virtual) {
                     if (err) {
                         app.ui.toast(err); // TODO handle better
                         return;
                     }
-                    this.printNameDefault = $(this.createPhysicalForm.name).val().trim() || virtual.name
-                    $(this.createPhysicalHeader).html("New " + virtual.name)
-
+                    this.formData.virtual_id = virtual.id;
+                    this.formData.name = virtual.name;
+                    this.printNameDefault = this.refs.name.value.trim() || virtual.name
+                    $(this.refs.createPhysicalHeader).html("New " + virtual.name)
+                    this.update();
                     // TODO
 
                 }.bind(this));
                 return;
             }
 
-            console.log("Creating:", opts.type);
             app.remote.getType(opts.type, function(err, type) {
                 if (err) {
                     if (err.notFound) {
@@ -247,8 +265,8 @@
                     return;
                 }
 
-                this.printNameDefault = $(this.createPhysicalForm.name).val().trim() || type.name
-                $(this.createPhysicalHeader).html("New " + type.name)
+                this.printNameDefault = this.refs.name.value.trim() || type.name
+                $(this.refs.createPhysicalHeader).html("New " + type.name)
 
                 // TODO
 

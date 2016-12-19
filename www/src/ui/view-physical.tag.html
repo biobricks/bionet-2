@@ -2,10 +2,11 @@
 
     <div class="container" style="margin-top:100px">
         <h5 id="createPhysicalHeader"></h5>
-        <form name="createPhysicalForm" class="col s12">
+        <form name="createPhysicalForm" class="col s12" onsubmit={submitForm}>
             <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
 
             <img src={this.imgPath} width="600" />
+            <input type="submit" style="display:none" />
         </form>
     </div>
     <script>
@@ -17,7 +18,9 @@
                 title: this.printNameDefault,
                 bsl: 1
             }
-
+            this.submitForm = function(e) {
+                e.preventDefault()
+            }
             var opts = {
                 title: "Create label",
                 subtitle: undefined,
@@ -37,7 +40,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.scanItem = function() {
             var opts = {
@@ -59,7 +62,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.scanContainer = function() {
             var opts = {
@@ -82,7 +85,7 @@
                     tags[0].unmount(true)
                 }
             })
-        }
+        }.bind(this)
 
         this.on('mount', function() {
             this.formData = this.opts

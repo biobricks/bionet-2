@@ -1,18 +1,17 @@
 <search-result>
-  <content-container style="padding-top:100px;">
-    <section-container>
+  <div style="padding-top:100px;">
       <list-container>
         <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-        <list-item no-reorder each={item in searchresult} item={item}/>
+        <list-item no-reorder each={item in parent.opts.results} item={item}/>
       </list-container>
       <!--
       <pagination items={pagination}/>
       -->
-    </section-container>
-  </content-container>
+  </div>
 
   <script>
     const tag = this
+    tag.results=[]
     // todo: store search query somewhere else
     this.primaryHeader = 'Search results for "' + opts.terms + '"'
 
@@ -38,6 +37,10 @@
 //      this.secondaryHeader = this.searchresult.length + ' items'
 //      this.searchresult.push(streamItem)
 
+    this.on('mount', function() {
+        //tag.results = tag.parent.opts.results
+        //tag.update()
+    });
 
     this.on('unmount', function() {
       this.searchresult = undefined

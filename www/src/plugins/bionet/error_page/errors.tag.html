@@ -1,15 +1,14 @@
 <error-page>
-  <content-container style="padding-top:100px;">
-    <section-container>
-      <h5>{errorMessage}</h5>
-    </section-container>
-  </content-container>
-  <script>
-    this.errorMessage=app.getModel('error')
-    app.observe('error', function(err) {
-      console.log('error page: err=%s',err)
-      this.errorMessage = err
-      tag.update()
-    })
-  </script>
+    <div style="padding-top:100px;">
+        <h5>{errorMessage}</h5>
+    </div>
+    <script>
+        this.errorMessage = app.getModel('error')
+        app.observe('error', function(err) {
+            console.log('error page: err=%s', err)
+            this.errorMessage = err
+            tag.update()
+        })
+
+    </script>
 </error-page>

@@ -1,15 +1,21 @@
 <nav-item>
-  <li class="{opts.class}"><a class="{theme.style.color.navText}" href={opts.action}><i if={opts.icon} class="material-icons">{opts.icon}</i>{opts.label}</a></li>
+    <li class="{class}"><a class="{theme.style.color.navText}" onclick={clickNav}><i if={opts.icon} class="material-icons">{opts.icon}</i>{opts.label}</a></li>
+    <script>
+        const tag=this
+        this.clickNav = function() {
+            route(opts.action)
+        }
+    </script>
 </nav-item>
 
 <nav-text>
-  <li class="{opts.class}"><a class="{theme.style.color.navText}" style={style} href={opts.action}>{opts.label}</a></li>
+    <li class="{class}"><a class="{theme.style.color.navText}" style={style} href={opts.action}>{opts.label}</a></li>
 </nav-text>
 
 <nav-icon>
-    <li class="{opts.class}"><a class="{theme.style.color.navText}" href={opts.action}><i class="material-icons left {style}">{opts.icon}</i></a></li>
+    <li class="{class}"><a class="{theme.style.color.navText}" href={opts.action}><i class="material-icons left {style}">{opts.icon}</i></a></li>
 </nav-icon>
 
 <nav-text-icon>
-    <li class="{opts.class}"><a class="{theme.style.color.navText}" href={opts.action}><i class="material-icons left">{opts.icon}</i>{opts.label}</a></li>
+    <li class="{class}"><a class="{theme.style.color.navText}" href={opts.action}><i class="material-icons left">{opts.icon}</i>{opts.label}</a></li>
 </nav-text-icon>

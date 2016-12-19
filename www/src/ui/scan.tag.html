@@ -8,8 +8,8 @@
       <p>Without camera access you will only be able to scan using an attached USB barcode scanner</p>
     </div>
 
-    <canvas id="scanCanvas" class="scanCanvas" width="560" height="560"></canvas>
-    <video id="scanVideo" class="scanVideo" width="440" height="330"></video>
+    <canvas ref="scanCanvas" class="scanCanvas" width="560" height="560"></canvas>
+    <video ref="scanVideo" class="scanVideo" width="440" height="330"></video>
     <div id="debug"></div>
     <div class="canvas-layers"></div>
     <div class="canvas-box"></div>
@@ -40,14 +40,14 @@
       return parseInt(m[1]);
     }
 
-    function decodeQrCode(cb) {
-      var data = this.scanCtx.getImageData(0, 0, this.scanCanvas.width, this.scanCanvas.height);
-      this.qr.callback = cb;
-      this.qr.decode(data);
+    function decodeQrCode(self, cb) {
+      var data = self.scanCtx.getImageData(0, 0, self.refs.scanCanvas.width, self.refs.scanCanvas.height);
+      self.qr.callback = cb;
+      self.qr.decode(data);
     }
 
     function decodeDMCode(cb) {
-      datamatrix(null, this.scanCanvas, {
+      datamatrix(null, this.refs.scanCanvas, {
         debug: true
       }, function(err, data) {
         $('.canvas-layers').html(' '); // TODO tmp debug removal
@@ -70,33 +70,30 @@
       if(!keepScanning) return;
       delay = delay || 500; // delay between frames in ms
 
-      this.scanCtx.drawImage(this.scanVideo, 0, 0);
+      this.scanCtx.drawImage(this.refs.scanVideo, 0, 0);
       console.log("scanning...")
-      decodeQrCode(function(data) {
+      decodeQrCode(this, function(data) {
         if(!data) {
-                           console.log("did not get data");
           if(!enableDM) {
-            setTimeout(scan, delay);
+            setTimeout(scan.bind(this), delay);
           } else {
             decodeDMCode(function(data) {
-              if(!data) return setTimeout(scan, delay);
-              console.log("GOT CODE");
+              if(!data) return setTimeout(scan.bind(this), delay);
               // TODO decode then call scanSuccess
             });
           }
           return
         }
-                           console.log("GOT DATA:", data);
         var id = getIDFromURL(data);
-        if(!id) return setTimeout(scan, delay);
+        if(!id) return setTimeout(scan.bind(this), delay);
         // TODO visual indication of scan success
         scanSuccess(id);
-      });
+      }.bind(this));
     }
 
     function scanError(str) {
       $('.scan .error').html(str);
-      $('#scanVideo').css('display', 'none');
+      $('.scanVideo').css('display', 'none');
     }
 
     this.on('unmount', function() {
@@ -105,7 +102,7 @@
 
     this.keyboardScan = function(e) {
       e.preventDefault();
-      var code = this.keyboardInputForm.code.refs.value;
+      var code = this.refs.code.value;
       code = code.replace(/[^\d]+/g, '');
       if(code.length <= 0) {
         $('#keyboardInput').val('');
@@ -120,7 +117,7 @@
 
       setTimeout(function() {
         $('#keyboardInput').focus()
-        $(this.keyboardInputForm.code).blur(function(e) {
+        $('#keyboardInput').blur(function(e) {
           $('#keyboardInput').focus()
         });
       }, 1)
@@ -151,7 +148,7 @@
     this.on('mount', function() {
       modalCallback = this.opts.cb
       this.qr = new QrCode();
-      this.scanCtx = this.scanCanvas.getContext("2d");
+      this.scanCtx = this.refs.scanCanvas.getContext("2d");
 
       initKeyboardCapture()
 
@@ -163,18 +160,18 @@
           } else if(err.name === 'InternalError') {
             scanError("Could not access your camera. Is another application using it?");
           } else {
-            scanError("Unknown camera access error: " + err.msg)
+            scanError("Unknown camera access error: " + err.msg || err)
           }
           return;
         }
         cameraStream = stream
 
-        $(this.scanVideo).css('visibility', 'visible');
-        this.scanVideo.src = window.URL.createObjectURL(stream);
-        this.scanVideo.play();
+        $(this.refs.scanVideo).css('visibility', 'visible');
+        this.refs.scanVideo.src = window.URL.createObjectURL(stream);
+        this.refs.scanVideo.play();
 
-        setTimeout(scan, 500);
-      });
+        setTimeout(scan.bind(this), 500);
+      }.bind(this));
     });
   </script>
 </scan>

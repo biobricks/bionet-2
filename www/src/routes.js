@@ -3,7 +3,14 @@ const route =require('riot-route')
 
 // is this string formatted like a UUID?
 function isUUID(str) {
-    return !!str.toLowerCase().match(/^[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}$/)
+  str = str.trim().toLowerCase();
+
+  // Strip off initial "v-" or "p-" if needed
+  if(str.match(/^[vp]-/)) {
+    str = str.slice(2);
+  }
+
+  return !!str.match(/^[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}$/)
 }
 
 route('/', function () {
@@ -22,6 +29,7 @@ route('/logout', function () {
         if (err) {
             app.ui.toast("Error logout route: " + err) // TODO handle better
         }
+        app.dispatch(app.$.loginState, false)
         route('/');
     });
 })
@@ -41,7 +49,7 @@ route('/create', function () {
         enableBreadCrumbs: false,
         enableSubbar: false
     })
-    riot.mount('div#content', 'create-form-container')
+    riot.mount('div#content', 'create-form')
 })
 
 route('/scan', function () {
@@ -50,7 +58,7 @@ route('/scan', function () {
         enableBreadCrumbs: false,
         enableSubbar: false
     })
-    riot.mount('div#content', 'scan')
+    riot.mount('div#content', 'scan-page')
 })
 
 
@@ -78,6 +86,7 @@ route('/print', function () {
 })
 
 function editPhysicalRoute(typeOrID, q) {
+    q = q || {};
 
     app.dispatch(app.$.appBarConfig, {
         enableTopNav: true,
@@ -92,13 +101,14 @@ function editPhysicalRoute(typeOrID, q) {
 
     opts.type = typeOrID
 
-    if (isUUID(typeOrID)) {
+    if(isUUID(typeOrID)) {
         opts.virtualID = typeOrID
     } else {
         opts.type2 = typeOrID
     }
     opts.key = q.id
-    console.log("editPhysicalRoute, mounting component: %s",JSON.stringify(opts))
+    opts.mode = 'edit'
+
     riot.mount('div#content', 'create-physical', opts);
 }
 
@@ -124,7 +134,7 @@ function createPhysicalRoute(typeOrID, q) {
 
     opts.type = typeOrID
 
-    if (isUUID(typeOrID)) {
+    if(isUUID(typeOrID)) {
         opts.virtualID = typeOrID
     } else {
         opts.type = typeOrID

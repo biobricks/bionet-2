@@ -146,7 +146,7 @@ var appmain = {
     // TODO JUUL move non-namespaced routes to main file
 
 
-
+    /*
     app.addRoute('/logout', function () {
       console.log("logging out");
       app.logout(function() {
@@ -155,6 +155,7 @@ var appmain = {
         route('/')
       });
     })
+    */
   },
   remove: function() {
     

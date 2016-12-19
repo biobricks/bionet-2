@@ -1,23 +1,22 @@
 <create-unknown>
-  <content-container style="padding-top:0px;">
-    <section-container>
-      <div class="create-unknown">
-        <h5>What would you like to create?</h5>
-        <ul>
-          <li each={item in dataTypes}><a href="{item.url}">{item.name}</a></li>
-        </ul>
-      </div>
-    </section-container>
-  </content-container>
+    <div style="padding-top:0px;">
+        <div class="create-unknown">
+            <h5>What would you like to create?</h5>
+            <ul>
+                <li each={item in dataTypes}><a href="{item.url}">{item.name}</a></li>
+            </ul>
+        </div>
+    </div>
 
-  <script>
-    const appSettings = app.getAppSettings()
-    this.dataTypes = appSettings.dataTypes
-    for (var i = 0; i < this.dataTypes.length; i++) {
-      const type = this.dataTypes[i]
-      if (type.virtual === true) type.url = '/create-virtual/' + encodeURI(type.name)
-      else type.url = '/create-physical/' + encodeURI(type.name)
-    }
-    console.log("create unknown, types:%s",JSON.stringify(this.dataTypes))
-  </script>
+    <script>
+        const appSettings = app.getAppSettings()
+        this.dataTypes = appSettings.dataTypes
+        for (var i = 0; i < this.dataTypes.length; i++) {
+            const type = this.dataTypes[i]
+            if (type.virtual === true) type.url = '/create-virtual/' + encodeURI(type.name)
+            else type.url = '/create-physical/' + encodeURI(type.name)
+        }
+        console.log("create unknown, types:%s", JSON.stringify(this.dataTypes))
+
+    </script>
 </create-unknown>

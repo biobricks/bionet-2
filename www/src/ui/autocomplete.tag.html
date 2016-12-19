@@ -1,125 +1,136 @@
 <autocomplete>
-  <div>
-    <div>
-      <input type="text" ref="q" id={opts.name} placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
+    <div class="input-field">
+        <label for="autocomplete" class="active">Container</label>
+        <input type="text" ref={opts.ref || opts.name || 'q'} name={opts.name || 'q'} id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
+        <ul id="matchList" style="z-index:1000">
+            <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver} onmousedown={clickSelect}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.text}</li>
+            <li if={matches && !matches.length} class="no-match">No matches found</li>
+        </ul>
     </div>
-    <ul id="matchList">
-      <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.text}</li>
-      <li if={matches && !matches.length} class="no-match">No matches found</li>
-    </ul>
-  </div>
-  <script>
+    <script>
+        var searchCallback;
 
-    var searchCallback;
-    
-    function query(s, cb) {
-      if(!searchCallback) return;
-      s = s.trim();
-      if(!s) return null;
-      s = s.replace(/\s+/g, ' ')
+        opts.ref = opts.ref || 'q';
 
-      searchCallback(s, cb)
-    }
+        function query(s, cb) {
+            if (!searchCallback) return;
+            s = s.trim();
+            if (!s) return null;
+            s = s.replace(/\s+/g, ' ')
 
-    this.selected = null
+            searchCallback(s, cb)
+        }
 
-    this.on('mount', function() {
-
-      searchCallback = this.opts.searchCallback;
-
-      this.updateMatchListPosition = function() {
-        var pos = $(this.q).position();
-        if (pos===undefined) return
-        pos.top += $(this.q).innerHeight() + 2;
-        pos.left -= 7 // TODO why?
-        pos.width = $(this.q).innerWidth();
-        $(this.matchList).css(pos)
-      }.bind(this)
-      
-      $(window).resize(function() {
-        this.updateMatchListPosition();
-      }.bind(this))
-
-      this.selectCurrent = function() {
-        var sel = this.matches[this.selected]
-        this.q.value = sel.text
-        this.hideMatches()
-      }.bind(this)
-
-
-      this.hideMatches = function(e) {
-        this.matches = null
         this.selected = null
-        this.update()
-      }.bind(this)
 
-      this.elementOver = function(e) {
-        if($(e.target).hasClass('no-match')) return;
-          var lis = $(this.matchList).find('li');
-        var i;
-        for(i=0; i < lis.length; i++) {
-          if(lis[i] == e.target) {
-            this.selected = i
-            break
-          }
-        }
-        this.update()
-     }.bind(this)
+        this.on('mount', function() {
 
-      this.updateMatchListPosition();
+            searchCallback = this.opts.searchCallback;
 
-      this.matches = []
+            this.updateMatchListPosition = function() {
+                var pos = $('#autocomplete_q').position();
+                if (pos === undefined) return
+                pos.top += $('#autocomplete_q').innerHeight() + 2;
+                pos.width = $('#autocomplete_q').innerWidth();
+                $('#matchList').css(pos)
+            }.bind(this)
 
-      $(this.q).keydown(function(e) {
-        if(e.keyCode === 38) { // up arrow
-          e.preventDefault()
-          if(this.selected !== null && this.selected > 0) this.selected--
-          this.update();
-        } else if(e.keyCode === 40) { // down arrow
-          e.preventDefault()
-          if(this.selected !== null && this.selected < this.matches.length-1) this.selected++
-          this.update();
-        } else if(e.keyCode === 27) { // escape
-          this.hideMatches()
-        } else if(e.keyCode === 9 || e.keyCode === 13) { // tab or enter
-          if(this.selected === null) return // normal operation if nothing selected
-          e.preventDefault();
-          this.selectCurrent()
-        }
+            $(window).resize(function() {
+                this.updateMatchListPosition();
+            }.bind(this))
 
-      }.bind(this));
+            this.selectCurrent = function() {
+                var sel = this.matches[this.selected]
+                this.refs[opts.ref].value = sel.text
+                this.update()
+                this.hideMatches()
+            }.bind(this)
 
-      $(this.q).on('input', function(e) {
-        
-        query(this.q.refs.value, function(err, results) {
-          if(err) return; // TODO handle
+            this.clickSelect = function(e) {
+                this.selectCurrent();
+            }.bind(this)
 
-          this.matches = results;
+            this.hideMatches = function(e) {
+                this.matches = null
+                this.selected = null
+                $('#matchList').css("display:none")
+                this.update()
+            }.bind(this)
 
-          if(this.matches && this.matches.length) {
-            selected = 0;
-          } else {
-            selected = null
-          }
-          this.update()
+            this.elementOver = function(e) {
+                if ($(e.target).hasClass('no-match')) return;
+                var lis = $('#matchList').find('li');
+                var i;
+                for (i = 0; i < lis.length; i++) {
+                    if (lis[i] == e.target) {
+                        this.selected = i
+                        break
+                    }
+                }
+                this.update()
+            }.bind(this)
 
-        }.bind(this));       
-      }.bind(this))
-    })
+            this.updateMatchListPosition();
+            this.hideMatches()
 
-    this.on('updated', function() {
-      if(this.matches && this.matches.length) {
-        $(this.matchList).css('border', '')
-      } else {
-        $(this.matchList).css('border', 'none')
-      }
-      var q = this.q.refs.value
-      q = q.trim();
-      q = q.replace(/\s+/g, ' ').toLowerCase()
+            this.matches = []
 
-      $(this.q).css('color', '');
+            $(this.refs[opts.ref]).keydown(function(e) {
+                if (e.keyCode === 38) { // up arrow
+                    e.preventDefault()
+                    if (this.selected !== null && this.selected > 0) this.selected--
+                        this.update();
+                } else if (e.keyCode === 40) { // down arrow
+                    e.preventDefault()
+                    if (this.selected === null) this.selected = 0
+                    else if (this.selected < this.matches.length - 1) this.selected++
+                        this.update();
+                } else if (e.keyCode === 27) { // escape
+                    this.hideMatches()
+                } else if (e.keyCode === 9 || e.keyCode === 13) { // tab or enter
+                    if (this.selected === null) return // normal operation if nothing selected
+                    e.preventDefault();
+                    this.selectCurrent()
+                }
 
-    })
+            }.bind(this));
 
-  </script>
+            this.showMatches = function() {
+                $('#matchList').css("display:block")
+            }
+
+            $(this.refs[opts.ref]).on('input', function(e) {
+
+                query(this.refs[opts.ref].value, function(err, results) {
+                    if (err) return; // TODO handle
+
+                    this.matches = results || [];
+
+                    if (this.matches && this.matches.length) {
+                        selected = 0;
+                    } else {
+                        selected = null
+                    }
+                    this.showMatches()
+                    this.update()
+
+                }.bind(this));
+            }.bind(this))
+        })
+
+        this.on('updated', function() {
+            if (this.matches && this.matches.length) {
+                $('#matchList').css('border', '')
+            } else {
+                $('#matchList').css('border', 'none')
+            }
+            var q = this.refs[opts.ref].value
+            q = q.trim();
+            q = q.replace(/\s+/g, ' ').toLowerCase()
+
+            $('#autocomplete_q').css('color', '');
+
+        })
+
+    </script>
 </autocomplete>

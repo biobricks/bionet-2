@@ -1,21 +1,20 @@
 <welcome>
-    <content-container style="padding-top:100px;">
-        <section-container>
-            <div id="home-page-content" class={themeClasses}>
-                <mpassword-form/>
-            </div>
-            <div style="height:30px" />
-            <div class="center red-text">{errorMsg}</div>
-            <br/>
-        </section-container>
-    </content-container>
+    <div style="padding-top:100px;">
+        <div id="home-page-content" class={themeClasses}>
+            <mpassword-form/>
+        </div>
+        <div style="height:30px" />
+        <div class="center red-text" ref="errormessage">{errorMsg}</div>
+        <br/>
+    </div>
     <script>
         const theme = app.getTheme()
         this.themeClasses = theme.style.color.background + ' ' + theme.style.color.text
         const tag = this
 
         app.on('signupError', function(msg) {
-            this.errorMsg = msg
+            console.log('signup error:', msg)
+            tag.errorMsg = msg
             tag.update()
         })
 
@@ -26,16 +25,15 @@
     <form class="col center" onsubmit={searchclick}>
         <img class="center" src="static/images/home-bionet.png" height="220px" />
         <div style="height:40px" />
-
+        <input type="submit" style="display:none" />
         <search-input label="search biomaterials" ref="searchbio" name="searchbio" value={searchbioInit}/>
     </form>
     <form if={!app.user} onsubmit={signupAction} class="col center">
         <div class="center">OR</div>
+        <input type="submit" style="display:none" />
         <form-text-input-empty label="enter invitation code, hint:code" ref="mpassword" name="mpassword" value={mpasswordInit}/>
         <std-button label="sign up" action={signupAction}/>
     </form>
-
-
     <script>
         const tag = this
         this.searchbioInit = ''
@@ -57,10 +55,11 @@
                 value = undefined
             }
             return value
-        }
-        
+        }.bind(this)
+
         // submit search query and route to search results
-        this.searchclick = function() {
+        this.searchclick = function(e) {
+            e.preventDefault()
             var partid = this.refs.searchbio.value
             var distance = getParam(partid, 'd:')
             var locationid = getParam(partid, 'l:')
@@ -71,18 +70,18 @@
                 else partid = partid.substr(0, pos - 2)
             }
             const q = {
-                    q: this.refs.searchbio.value
-                }
+                q: this.refs.searchbio.value
+            }
             app.dispatch('bioClassQuery', q)
             console.log('search query:', JSON.stringify(q))
             app.dispatch('bioClassCache', [])
             route('q?terms=' + encodeURIComponent(this.refs.searchbio.value))
-        }
+        }.bind(this)
 
 
         this.on('before-mount', function() {
             observer = app.addObserver(app.$.loginState, function(loginState) {
-                this.loggedin = loginState
+                tag.loggedin = loginState
                 tag.update()
             })
         })
@@ -93,6 +92,7 @@
         // TODO on app.user change we need to update
 
         this.signupAction = function(e) {
+            e.preventDefault()
             var masterPassword = this.refs.mpassword.value
             console.log('signupAction: master password=%s', this.refs.mpassword.value)
             app.remote.checkMasterPassword(masterPassword, function(err) {
@@ -109,7 +109,7 @@
                 // proceed to email entry
                 riot.mount('div#home-page-content', 'email-form')
             });
-        };
+        }.bind(this);
 
     </script>
 </mpassword-form>
@@ -127,9 +127,14 @@
         this.enteremailInit = ''
 
         this.submitForm = function(e) {
+            e.preventDefault()
             app.state.signup.email = this.refs.enteremail.value
             riot.mount('div#home-page-content', 'password-form')
-        }
+        }.bind(this)
+        
+        this.on('mount', function() {
+            $('#enteremail').focus()
+        })
 
     </script>
 </email-form>
@@ -145,7 +150,12 @@
     </form>
 
     <script>
+        this.on('mount', function() {
+            $('#enterpassword1').focus()
+        })
+        
         this.submitForm = function(e) {
+            e.preventDefault()
 
             if (this.refs.enterpassword1.value !== this.refs.enterpassword2.value) {
                 app.emit('signupError', 'Passwords do not match.')
@@ -158,6 +168,7 @@
             }, function(err, user) {
                 if (err) {
                     app.emit('signupError', err)
+                    riot.mount('div#home-page-content', 'mpassword-form')
                     return
                 }
 
@@ -172,10 +183,10 @@
                     // UI components should listen for app.user change
                     app.dispatch(app.$.loginState, true)
 
-                    route('inventory') // TODO probably not where we want to end up
+                    riot.mount('div#home-page-content', 'mpassword-form')
                 })
-            })
-        }
+            }.bind(this))
+        }.bind(this)
 
     </script>
 </password-form>

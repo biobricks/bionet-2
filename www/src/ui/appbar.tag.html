@@ -47,11 +47,12 @@
                 </div>
             </nav>
         </div>
+    </div>
 
-        <login/>
-        <settings/>
+    <login/>
+    <settings/>
 
-        <!-- search form
+    <!-- search form
 <form>
         <div class="input-field">
           <input id="search" type="search" required>
@@ -61,91 +62,91 @@
       </form>
 -->
 
-        <script>
-            const tag = this
-            this.theme = app.getTheme()
-            this.enableTopNav = true
-            this.enableBreadCrumbs = false
-            this.enableSubbar = false
+    <script>
+        const tag = this
+        this.theme = app.getTheme()
+        this.enableTopNav = true
+        this.enableBreadCrumbs = false
+        this.enableSubbar = false
 
-            // observe changes to appbar configuration update appbar
-            app.observe(app.$.appBarConfig, function(config) {
-                console.log('init app bar menus, config=%s', JSON.stringify(config))
-                this.enableTopNav = config.enableTopNav
-                this.enableBreadCrumbs = config.enableBreadCrumbs
-                this.enableSubbar = config.enableSubbar
-                tag.update();
-            }.bind(this));
+        // observe changes to appbar configuration update appbar
+        app.observe(app.$.appBarConfig, function(config) {
+            console.log('init app bar menus, config=%s', JSON.stringify(config))
+            this.enableTopNav = config.enableTopNav
+            this.enableBreadCrumbs = config.enableBreadCrumbs
+            this.enableSubbar = config.enableSubbar
+            tag.update();
+        }.bind(this));
 
-            // initialize primary nav
-            const primaryNavItems = app.getModel(app.$.primaryNav)
-                //style: 'margin-left:80px;',
-            this.fullMenu = {
-                id: 'full-menu',
-                classname: 'hide-on-med-and-down left',
-                items: primaryNavItems
-            }
-            this.mobileMenu = {
-                id: 'mobile-menu',
-                classname: 'side-nav ' + this.theme.style.color.navText + ' ' + this.theme.style.color.navBackground,
-                items: primaryNavItems
-            }
+        // initialize primary nav
+        const primaryNavItems = app.getModel(app.$.primaryNav)
+            //style: 'margin-left:80px;',
+        this.fullMenu = {
+            id: 'full-menu',
+            classname: 'hide-on-med-and-down left',
+            items: primaryNavItems
+        }
+        this.mobileMenu = {
+            id: 'mobile-menu',
+            classname: 'side-nav ' + this.theme.style.color.navText + ' ' + this.theme.style.color.navBackground,
+            items: primaryNavItems
+        }
 
-            // observe changes to primary nav and update appbar
-            app.observe(app.$.primaryNav, function(navItems) {
-                this.fullMenu.items = navItems
-                this.mobileMenu.items = navItems
-                tag.update();
-            }.bind(this));
+        // observe changes to primary nav and update appbar
+        app.observe(app.$.primaryNav, function(navItems) {
+            this.fullMenu.items = navItems
+            this.mobileMenu.items = navItems
+            tag.update();
+        }.bind(this));
 
-            // initialize secondary nav
-            const secondaryNavItems = app.getModel(app.$.secondaryNav)
-            this.secondaryfullMenu = {
-                id: 'secondary-full-menu',
-                classname: 'hide-on-med-and-down left',
-                items: secondaryNavItems
-            }
-            this.secondaryMobileMenu = {
-                id: 'mobile-menu2',
-                classname: 'side-nav ' + this.theme.style.color.navText + ' ' + this.theme.style.color.navBackground,
-                items: secondaryNavItems
-            }
+        // initialize secondary nav
+        const secondaryNavItems = app.getModel(app.$.secondaryNav)
+        this.secondaryfullMenu = {
+            id: 'secondary-full-menu',
+            classname: 'hide-on-med-and-down left',
+            items: secondaryNavItems
+        }
+        this.secondaryMobileMenu = {
+            id: 'mobile-menu2',
+            classname: 'side-nav ' + this.theme.style.color.navText + ' ' + this.theme.style.color.navBackground,
+            items: secondaryNavItems
+        }
 
-            // observe changes to secondary nav and update appbar
-            app.observe(app.$.secondaryNav, function(navItems) {
-                this.secondaryfullMenu.items = navItems
-                this.secondaryMobileMenu.items = navItems
-                tag.update();
-            }.bind(this));
+        // observe changes to secondary nav and update appbar
+        app.observe(app.$.secondaryNav, function(navItems) {
+            this.secondaryfullMenu.items = navItems
+            this.secondaryMobileMenu.items = navItems
+            tag.update();
+        }.bind(this));
 
-            // attach materialize actions to tags after completion of mounting tags
-            this.on('mount', function() {
+        // attach materialize actions to tags after completion of mounting tags
+        this.on('mount', function() {
 
-                $('#login-slideout').sideNav({
-                    closeOnClick: true,
+            $('#login-slideout-button').sideNav({
+                closeOnClick: true,
+                edge: 'right'
+            });
+            $('#login-slideout-button').collapsible();
+
+            $("#settings-slideout").sideNav({
+                    closeOnClick: false,
                     edge: 'right'
-                });
-                $('#login-slideout').collapsible();
+                })
+                //$("#settings-slideout").dropdown();
+            $('#mobile-nav').sideNav({
+                closeOnClick: true
+            });
+            $('#mobile-nav-secondary').sideNav({
+                closeOnClick: true
+            });
+            $('.parallax').parallax();
+            $(".dropdown-button").dropdown({
+                hover: true,
+                beloworigin: true
+            });
+            $('.materialboxed').materialbox();
+        })
 
-                $("#settings-slideout").sideNav({
-                        closeOnClick: false,
-                        edge: 'right'
-                    })
-                    //$("#settings-slideout").dropdown();
-                $('#mobile-nav').sideNav({
-                    closeOnClick: true
-                });
-                $('#mobile-nav-secondary').sideNav({
-                    closeOnClick: true
-                });
-                $('.parallax').parallax();
-                $(".dropdown-button").dropdown({
-                    hover: true,
-                    beloworigin: true
-                });
-                $('.materialboxed').materialbox();
-            })
-
-        </script>
+    </script>
 
 </appbar>

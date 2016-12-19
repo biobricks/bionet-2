@@ -1,70 +1,117 @@
 <form-text-input>
     <div class="row">
         <div class="input-field col s12">
-            <input id={opts.name} ref={opts.name} type="text" value={opts.value}>
+            <input id={opts.name} name={opts.name} ref="inputTag" type="text" value={data}>
             <label for={opts.name} class="active">{opts.label}</label>
         </div>
     </div>
     <script>
-        Object.defineProperty(this, "value", {
-            get: function() {
-                return this.refs[opts.name].value;
-            }
-        });
+        const tag = this
+        this.on('update', function() {
+            tag.data = tag.opts.riotValue;
+        })
+
+        this.on('mount', function() {
+            //console.log("form-text-input, opts:", JSON.stringify(tag.opts))
+            tag.data = tag.opts.riotValue
+            tag.update()
+            Object.defineProperty(tag, "value", {
+                get: function() {
+                    return $(tag.refs.inputTag).val()
+                },
+                set: function(value) {
+                    tag.data = value;
+                    $(tag.refs.inputTag).val(value)
+                }
+            });
+        })
+
     </script>
 </form-text-input>
+
 
 <form-select-input>
     <div class="row">
         <div class="input-field col s12">
-            <select id={opts.name} ref={opts.name} type="select">
+            <select id={opts.name} name={opts.name} ref="selectTag" type="select">
                 <option>Select {opts.label || 'option'}</option>
                 <option each={option, index in opts.options} value={option.value} {selected: (option.value===o pts.value)}>{option.label}</option>
             </select>
         </div>
     </div>
     <script>
-        Object.defineProperty(this, "value", {
-            get: function() {
-                return this.refs[opts.name].value;
-            }
-        });
+        this.on('update', function() {
+            this.data = this.opts.riotValue;
+        })
+        this.on('mount', function() {
+            Object.defineProperty(this, "value", {
+                get: function() {
+                    return this.refs.selectTag.value;
+                },
+                set: function(value) {
+                    this.data = value;
+                    this.update();
+                }
+            });
+        })
+
     </script>
 </form-select-input>
-
 <search-input>
     <div class="row">
         <div class="col s3 m3 l3" />
         <div class="input-field col s6 m6 l6">
-            <i class="material-icons postfix" onclick={opts.action}>search</i>
-            <input id={opts.name} ref={opts.name} type="text" />
+            <i class="material-icons postfix" style="cursor: pointer; cursor: hand; " onclick={opts.action}>search</i>
+            <input id={opts.name} name={opts.name} ref="inputTag" type="text" value={data} />
             <label for={opts.name}>{opts.label}</label>
         </div>
     </div>
     <script>
-        Object.defineProperty(this, "value", {
-            get: function() {
-                return this.refs[opts.name].value;
+        this.data = opts.value;
+        this.on('update', function() {
+            this.data = this.opts.riotValue;
+        })
+        this.on('mount', function() {
+            if (this.value === undefined) {
+                Object.defineProperty(this, "value", {
+                    get: function() {
+                        return this.refs.inputTag.value;
+                    },
+                    set: function(value) {
+                        this.data = value;
+                        this.update();
+                    }
+                });
             }
-        });
+        })
+
     </script>
 </search-input>
-
 <form-text-input-empty>
     <div class="row">
         <div class="col s3 m3 l3" />
         <div class="input-field col s6 m6 l6">
             <yield/>
-            <input id={opts.name} ref={opts.name} type="text">
+            <input id={opts.name} name={opts.name} ref="inputTag" type="text" value={data}>
             <label for={opts.name}>{opts.label}</label>
         </div>
     </div>
     <script>
-        Object.defineProperty(this, "value", {
-            get: function() {
-                return this.refs[opts.name].value;
-            }
-        });
+        this.on('update', function() {
+            this.data = this.opts.riotValue;
+        })
+        this.on('mount', function() {
+            Object.defineProperty(this, "value", {
+                get: function() {
+                    return this.refs.inputTag.value;
+                },
+                set: function(value) {
+                    this.data = value;
+                    this.update();
+                }
+            });
+        })
+
     </script>
 </form-text-input-empty>
 
@@ -72,32 +119,52 @@
     <div class="row">
         <div class="col s3 m3 l3" />
         <div class="input-field col s6 m6 l6">
-            <input id={opts.name} ref={opts.name} type="password">
+            <input id={opts.name} name={opts.name} ref="inputTag" type="password" value={data}>
             <label for={opts.name}>{opts.label}</label>
         </div>
     </div>
     <script>
-        Object.defineProperty(this, "value", {
-            get: function() {
-                return this.refs[opts.name].value;
-            }
-        });
+        this.on('update', function() {
+            this.data = this.opts.riotValue;
+        })
+        this.on('mount', function() {
+            Object.defineProperty(this, "value", {
+                get: function() {
+                    return this.refs.inputTag.value;
+                },
+                set: function(value) {
+                    this.data = value;
+                    this.update();
+                }
+            });
+        })
+
     </script>
 </password-text-input-empty>
 
 <form-textarea-input>
     <div class="row">
         <div class="input-field col s12">
-            <textarea id={opts.name} ref={opts.name} type="text" value={opts.value} class="materialize-textarea"></textarea>
+            <textarea id={opts.name} name={opts.name} ref="inputTag" type="text" value={data} class="materialize-textarea"></textarea>
             <label for={opts.name} class="active">{opts.label}</label>
         </div>
     </div>
     <script>
-        Object.defineProperty(this, "value", {
-            get: function() {
-                return this.refs[opts.name].value;
-            }
-        });
+        this.on('update', function() {
+            this.data = this.opts.riotValue;
+        })
+        this.on('mount', function() {
+            Object.defineProperty(this, "value", {
+                get: function() {
+                    return this.refs.inputTag.value;
+                },
+                set: function(value) {
+                    this.data = value;
+                    this.update();
+                }
+            });
+        })
+
     </script>
 </form-textarea-input>
 
@@ -107,8 +174,8 @@
             <div class="switch">
                 <label class="active">
                     {opts.label}&nbsp; {opts.options[0]}
-                    <input if={opts.value} ref={opts.name} type="checkbox" id={opts.name} checked />
-                    <input if={!opts.value} ref={opts.name} type="checkbox" id={opts.name} />
+                    <input if={opts.value} name={opts.name} ref={opts.name} type="checkbox" id={opts.name} checked />
+                    <input if={!opts.value} name={opts.name} ref={opts.name} type="checkbox" id={opts.name} />
                     <span class="lever"></span> {opts.options[1]}
                 </label>
             </div>

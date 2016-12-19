@@ -1,6 +1,11 @@
 <app>
     <appbar/>
-    <div id="content" class="{theme.style.color.background+' '+theme.style.color.text}" />
+    <div id="content-container" class="container {theme.style.color.background} {theme.style.color.text}">
+        <div class="section">
+            <div id="content" class="{theme.style.color.background+' '+theme.style.color.text}" />
+        </div>
+    </div>
+    <div style="height:48px"></div>
     <!--  <footer-tag background={theme.style.color.highlightBackground} /> -->
 
     <script>
@@ -10,13 +15,29 @@
 
         app.observe(app.$.theme, function(theme) {
             // TODO theming should be done by loading and unloading css files (or sets of styles)
-            $('body').removeClass(this.theme.style.color.background)
-            $('body').addClass(theme.style.color.background)
-            this.theme = theme
+            $('body').removeClass(tag.theme.style.color.background)
+            $('body').addClass(tag.theme.style.color.background)
             tag.update();
         });
 
         console.log('app tag initialization')
+        var observer = {}
+        this.on('before-mount', function() {
+            observer = app.addObserver(app.$.theme, function(theme) {
+                this.theme = theme
+                tag.update()
+            })
+        })
+        this.on('mount', function() {
+            $('#content-container').css('display', 'none')
+            $('#content-container').fadeIn(300)
+        })
+        this.on('before-unmount', function() {
+            $('#content-container').fadeOut(300)
+        })
+        this.on('unmount', function() {
+            app.removeObserver(app.$.theme, observer)
+        })
 
     </script>
 </app>

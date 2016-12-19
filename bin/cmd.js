@@ -16,6 +16,7 @@ var accountdown = require('accountdown'); // user/login management
 var uuid = require('uuid').v4;
 var through = require('through2');
 var treeIndex = require('level-tree-index');
+var ElasticIndex = require('level-elasticsearch-index');
 var accounts = require('../libs/user_accounts.js');
 var printServer = require('../libs/print_server.js');
 var Mailer = require('../libs/mailer.js');
@@ -99,10 +100,28 @@ var physicalTree = treeIndex(physicalDB, sublevel(indexDB, 't'), {
   parentProp: 'parent_id'
 });
 
+var elasticIndex = ElasticIndex(bioDB);
+
+elasticIndex.add('name', function(key, val) {
+  val = JSON.parse(val); // TODO this should not be needed
+
+  var o = {
+    id: val.id,
+    name: val.name
+  };
+  console.log("BUILD:", o);
+  return o;
+});
+
 // TODO for debug only
 physicalTree.rebuild(function(err) {
   if(err) return console.error("inventory tree rebuild error:", err);
-  console.log("Finished rebuild");
+  console.log("Finished inventory tree rebuild");
+});
+
+elasticIndex.rebuildAll(function(err) {
+  if(err) return console.error("elastic index rebuild error:", err);
+  console.log("Finished elastic index rebuild");
 });
 
 var miscDB = sublevel(db, 'm');
@@ -180,14 +199,14 @@ printServer.start(settings, function(err) {
 });
 
 
-function changeInfo(user) {
+function changeInfo(userData) {
   return {
-    user: user.email,
+    user: userData.user.email,
     time: unixEpochTime()
   };
 }
 
-function saveMaterialInDB(m, user, dbType, cb) {
+function saveMaterialInDB(m, userData, dbType, cb) {
   if(!m.name || !m.name.trim()) return cb("Name must be specified");
 
   idGenerator.getCur(function(err, curID) {
@@ -207,9 +226,13 @@ function saveMaterialInDB(m, user, dbType, cb) {
       db = physicalDB;
     }
 
-    var c = changeInfo(user);
+    var c = changeInfo(userData);
     m.created = m.created || c;
     m.updated = c;
+
+    if(settings.debug) {
+      console.log("Saving to bioDB. Key:", m.id, "Value:", m);
+    }
 
     db.put(m.id, m, {valueEncoding: 'json'}, function(err) {
       if(err) return cb(err);
@@ -378,7 +401,7 @@ websocket.createServer({server: server}, function(stream) {
                 type = type.name.toLowerCase().trim()
               }
               
-              var s = bioDB.createReadStream({valueEncoding: 'json'});
+              var s = virtualDB.createReadStream({valueEncoding: 'json'});
   
               var out = s.pipe(through.obj(function(data, enc, cb) {
 
@@ -410,8 +433,6 @@ websocket.createServer({server: server}, function(stream) {
             },
 
             saveVirtual: function(curUser, m, cb) {
-              
-              console.log("saving:", m);
 
               saveMaterialInDB(m, curUser, 'v', function(err, id) {
                 if(err) return cb(err);
@@ -436,7 +457,7 @@ websocket.createServer({server: server}, function(stream) {
                         saveMaterialInDB(m, curUser, 'p', function(err, id) {
                             if(err) return cb(err);
                             if(!doPrint) return cb(null, id);
-                            
+
                             var relativePath = path.relative(settings.labelImageFilePath, imagePath);
                             printServer.printLabel(relativePath);
                             console.log("relative path:", relativePath);
@@ -451,11 +472,63 @@ websocket.createServer({server: server}, function(stream) {
                 
                 console.log("saving:", m);
             },
+/*
+                  match: {
+                    name: query
+                  }
+*/
+            elasticSearch: function(curUser, query, cb) {
+              console.log("BEGIN SEARCH:", query);
+              elasticIndex.search('name', {
+                query: {
+                  "match_phrase_prefix": {
+                    "name": {
+                      "query": query
+                    }
+                  }
+                }}, function(err, result) {
+                  console.log("SEARCH CB:", err, result);
+                  if(err) return cb(err);
 
+                  cb(null, result.hits.hits);
+                });
+                
+            },
+
+            // get the entire physical inventory tree
+            // TODO implement a server side filter for the physicals tree
             inventoryTree: function(curUser, cb) {
               physicalTree.children(null, cb);
             },
 
+
+            // get all physical instances of a virtual
+            // TODO create an index for this
+            instancesOfVirtual: function(curUser, virtual_id, cb) {
+              var results=[];
+              var s = physicalDB.createReadStream({
+                valueEncoding: 'json'
+              });
+              var out = s.pipe(through.obj(function(data, enc, next) {
+                if(!data || !data.value || !data.value.virtual_id) return next()
+
+                if(data.value.virtual_id === virtual_id) {
+                    results.push(data.value);
+                }
+                next();
+              }));
+                
+              s.on('close', function() {
+                  cb(null,results);
+              });
+              
+              out.on('error', function(err) {
+                cb(err);
+                console.error("instancesofvirtual error:", err);
+              });
+              
+              return out;
+            },
 
             get: function(curUser, id, cb) {
               console.log("getting:", id);
@@ -484,6 +557,37 @@ websocket.createServer({server: server}, function(stream) {
                     if(data.value.label.humanID == humanID) {
                         found = true;
                         cb(null, data.value);
+                    } else {
+                        next();
+                    }
+                }));
+                
+                s.on('end', function() {
+                    if(!found) {
+                        found = true;
+                        cb(null, null);
+                    }
+                });
+
+                s.on('error', function(err) {
+                    if(!found) {
+                        found = true;
+                        cb(err);
+                    }
+                });
+            },
+          
+            // TODO use indexes for this
+            getVirtualBy: function(curUser, field, value, cb) {
+
+                var s = virtualDB.createReadStream({valueEncoding: 'json'});
+                var found = false;
+                var out = s.pipe(through.obj(function(data, enc, next) {
+                    if(!data || !data.value || !data.value[field]) return next()
+                    if(data.value[field] == value) {
+                        found = true;
+                        cb(null, data.value);
+                        s.destroy();
                     } else {
                         next();
                     }
@@ -534,6 +638,8 @@ websocket.createServer({server: server}, function(stream) {
                     }
                 });
             },
+
+
 
             // TODO doesn't work
             recentChanges: rpc.syncReadStream(function() {

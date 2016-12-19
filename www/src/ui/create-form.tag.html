@@ -1,39 +1,40 @@
-<create-form-container>
-    <content-container style="padding-top:100px;">
-        <section-container>
-            <create-form/>
-        </section-container>
-    </content-container>
-</create-form-container>
-
 <create-form>
-    <form ref="createForm" onsubmit={submitForm2}>
-        <div>What would you like to add?</div>
-        <div>
-            <div id="selectedTypeContainer" class="selected-type">
-                <span id="selectedTypeLabel">plasmid</span>
+    <div style="padding-top:100px;">
+        <form ref="createForm" onsubmit={submitForm2}>
+            <div class="row">
+                <div class="col s3 m3 l3" />
+                <div class="col s6 m6 l6">
+                    <div>What would you like to add?</div>
+                    <div id="selectedTypeContainer" class="selected-type">
+                        <span id="selectedTypeLabel">plasmid</span>
+                    </div>
+                    <div class="query-container">
+                        <input type="text" id="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+                        <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
+                    </div>
+                    <ul id="matchList" class="col s6 m6 l6">
+                        <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+                        <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
+                    </ul>
+                </div>
             </div>
-            <div class="query-container">
-                <input type="text" id="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
-            </div>
-        </div>
-        <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
-        <ul id="matchList">
-            <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-            <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
-        </ul>
-    </form>
+            <!--
+                    <div class="query-container">
+                    </div>
+                    -->
+            <input type="submit" style="display:none" />
+        </form>
+    </div>
 
     <script>
         this.submitForm2 = function(e) {
-            console.log('create-form submitForm')
             e.preventDefault();
 
             //     this.selectCurrent();
             var val = this.refs.q.value.trim()
 
             if (!this.selectedType && val) {
-                app.remote.getBy('name', val, function(err, o) {
+                app.remote.getVirtualBy('name', val, function(err, o) {
                     if (err) return app.ui.toast("Error: " + err); // TODO handle better
 
                     if (!o) {
@@ -60,7 +61,7 @@
             } else {
                 // do nothing
             }
-        };
+        }.bind(this);
 
         function query(type, q, cb) {
 
@@ -74,7 +75,6 @@
         this.selectedType = null
 
         this.on('mount', function() {
-            console.log('create-form mount')
             $('#q').focus()
 
             this.updateMatchListPosition = function() {
@@ -119,13 +119,11 @@
             }.bind(this)
 
             this.clickSelect = function(e) {
-                console.log("CLICK SELECT");
                 this.selectCurrent();
             }.bind(this)
 
 
             this.elementOver = function(e) {
-                console.log("MOUSE OVER");
                 if ($(e.target).hasClass('no-match')) return;
                 var lis = $('#matchList').find('li');
                 var i;
@@ -145,7 +143,6 @@
 
             var hadQueryBeforeKeydown = false;
             $('#q').keydown(function(e) {
-                console.log('create form q keydown')
 
                 if (e.keyCode === 38) { // up arrow
                     e.preventDefault()
@@ -153,11 +150,12 @@
                         this.update();
                 } else if (e.keyCode === 40) { // down arrow
                     e.preventDefault()
-                    if (this.selected !== null && this.selected < this.matches.length - 1) this.selected++
+                    if (this.selected === null) this.selected = 0
+                    else if (this.selected < this.matches.length - 1) this.selected++
                         this.update();
                 } else if (e.keyCode === 27) { // escape
                     this.hideMatches()
-                } else if (e.keyCode === 9) { // tab
+                } else if (e.keyCode === 9 || e.keyCode === 13) { // tab or enter
                     if (this.selected === null) return // normal operation if nothing selected
                     e.preventDefault();
                     this.selectCurrent()
@@ -205,11 +203,10 @@
                             });
                         }
                     }
-
                     if (this.matches && this.matches.length) {
-                        selected = 0;
+                        this.selected = 0;
                     } else {
-                        selected = null
+                        this.selected = null
                     }
                     this.update()
 

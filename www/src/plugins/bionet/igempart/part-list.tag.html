@@ -1,14 +1,12 @@
 <part-list>
 
-  <content-container style="padding-top:100px;">
-    <section-container>
+  <div style="padding-top:100px;">
       <list-container>
         <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
         <list-item no-reorder each={item in inventorylist} item={item}/>
       </list-container>
       <pagination items={pagination}/>
-    </section-container>
-  </content-container>
+    </div>
 
   <script>
     const q = app.getModel('searchQuery')

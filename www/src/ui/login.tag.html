@@ -1,5 +1,5 @@
 <login>
-    <div id="login-slideout2" class="side-nav" style="width:300px;z-index:9999">
+    <div id="login-slideout" class="side-nav" style="width:300px;z-index:9999">
         <close-button action={closeLogin} color='white' />
         <img src="static/images/bionet_login.png" width="300px" />
         <form class="col" style="margin-top:30px;margin-left:15%" onsubmit={submitLogin}>
@@ -24,7 +24,8 @@
         this.closeLogin = function() {
             $('#login-slideout').sideNav('hide');
         }
-        this.submitLogin = function() {
+        this.submitLogin = function(e) {
+            e.preventDefault()
             console.log('submitlogin, name=', this.refs.username)
 
             app.login(this.refs.username.value, this.refs.loginpassword.value, function(err, user) {
@@ -37,7 +38,7 @@
                 this.refs.loginpassword.value = ''
                 this.closeLogin()
                 app.dispatch(app.$.loginState, true)
-            });
+            }.bind(this));
         }.bind(this)
 
         this.forgotPassword = function() {
@@ -49,27 +50,44 @@
 
 <login-button>
     <li>
-        <a id="login-slideout" data-activates="login-slideout2" class="right {theme.style.color.navButton}" style="margin:0;display:{loggedIn ? 'none' : 'inline'}">login</a>
-        <a if={loggedIn} href="/logout" class="right {theme.style.color.navButton}">logout</a>
+        <a id="login-slideout-button" onclick={login} data-activates="login-slideout" class="right {theme.style.color.navButton} button-collapse" style="margin:0;display:inline">login</a>
+        <a id="logout-button" onclick={logout} class="right {theme.style.color.navButton}" style="display:none">logout</a>
     </li>
     <script>
         const tag = this;
-        const theme = app.getTheme()
-        this.theme = theme
-        this.loggedIn = app.getLoginState()
+        this.theme = app.getTheme()
         var observer = {}
+
+        const showLogin = function(login) {
+            if (login) {
+                $('#logout-button').css('display', 'block')
+                $('#login-slideout-button').css('display', 'none')
+            } else {
+                $('#logout-button').css('display', 'none')
+                $('#login-slideout-button').css('display', 'block')
+            }
+        }
+        
+        this.login = function() {
+            console.log('login-button: login function:', app.getLoginState())
+        }
+        
+        this.logout = function() {
+            route('/logout')
+        }
+
         this.on('before-mount', function() {
-            //console.log('login-button mount')
             observer = app.addObserver(app.$.loginState, function(loggedIn) {
-                console.log("!!!!! loginstate change");
-                //console.log('loginState, login.js')
-                this.loggedIn = loggedIn
-                tag.update()
-            })
+                console.log("login-button:", loggedIn);
+                tag.loggedIn = loggedIn
+                showLogin(loggedIn)
+                //tag.update()
+            }.bind(this))
         })
 
         this.on('mount', function() {
-
+            tag.loggedIn = app.getLoginState()
+            showLogin(tag.loggedIn)
         });
 
         this.on('unmount', function() {

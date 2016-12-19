@@ -129,6 +129,7 @@ stdThemePlugin.start = function () {
   require('./create-form.tag.html')
   require('./create-physical.tag.html')
   require('./scan.tag.html')
+  require('./scan-page.tag.html')
   require('./print.tag.html')
   require('./autocomplete.tag.html')
   require('./create-unknown.tag.html')
