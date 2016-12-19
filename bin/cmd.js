@@ -472,13 +472,19 @@ websocket.createServer({server: server}, function(stream) {
                 
                 console.log("saving:", m);
             },
-
+/*
+                  match: {
+                    name: query
+                  }
+*/
             elasticSearch: function(curUser, query, cb) {
               console.log("BEGIN SEARCH:", query);
               elasticIndex.search('name', {
                 query: {
-                  match: {
-                    name: query
+                  "match_phrase_prefix": {
+                    "name": {
+                      "query": query
+                    }
                   }
                 }}, function(err, result) {
                   console.log("SEARCH CB:", err, result);
