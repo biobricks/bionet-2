@@ -142,11 +142,15 @@ var partsearch = {
                     q.results = [];
                     var i;
                     for (i = 0; i < results.length; i++) {
-                        if (!results[i]._source || !results[i]._source.name) continue;
+                        const result = results[i]._source
+                        if (!result || !result.name) continue;
+                        console.log('result:',JSON.stringify(results[i] ))
+                        const isVirtual = result.id.charAt(0)==='v'
                         q.results.push({
-                            primary_text: results[i]._source.name,
-                            url: '/edit/'+results[i]._source.id,
-                            id: results[i]._source.id
+                            primary_text: result.name,
+                            secondary_text: ((isVirtual) ? 'virtual' : 'physical') +' id '+result.id,
+                            url: '/edit/'+result.id,
+                            id: result.id
                         });
                     }
 
