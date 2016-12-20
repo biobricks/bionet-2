@@ -59,9 +59,9 @@
         <form-text-input label="" ref="avatar" name="avatar" value={formData.avatar}/>
         <form-image imagesrc={formData.qrcode} label="Datamatrix code" height="140px" />
         <div>
-          <p>
-            Created by: {formData.created.user}
-          </p>
+            <p>
+                Created by: {formData.created.user}
+            </p>
         </div>
         <std-button action={submitForm} label="submit" />
         <input type="submit" style="visibility:hidden" />
@@ -69,7 +69,7 @@
     <script>
         const tag = this
         tag.formData = {
-            created:{}
+            created: {}
         }
         this.on('mount', function() {
             tag.formData = app.state.editPart
@@ -192,31 +192,31 @@
     </form>
     <script>
         /*
-                                                                    var formData = app.getModel('partData')
-                                                                      //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
+                                                                                                    var formData = app.getModel('partData')
+                                                                                                      //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
 
-                                                                    // map igem plasmid annotations to flash plasmid viewer component
-                                                                    var annotations = formData.plasmidAnnotations
-                                                                    var features = []
-                                                                    if (annotations !== undefined) {
-                                                                      for (var i = 0; i < annotations.length; i++) {
-                                                                        var annotation = annotations[i]
-                                                                        features.push({
-                                                                          name: annotation[3],
-                                                                          type: annotation[0],
-                                                                          from: annotation[1],
-                                                                          to: annotation[2]
-                                                                        })
-                                                                      }
-                                                                    }
-                                                                    var seq_obj = {
-                                                                      name: formData.name,
-                                                                      sequence: formData.sequence,
-                                                                      features: features
-                                                                    }
-                                                                    this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
-                                                                      //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
-                                                                                        */
+                                                                                                    // map igem plasmid annotations to flash plasmid viewer component
+                                                                                                    var annotations = formData.plasmidAnnotations
+                                                                                                    var features = []
+                                                                                                    if (annotations !== undefined) {
+                                                                                                      for (var i = 0; i < annotations.length; i++) {
+                                                                                                        var annotation = annotations[i]
+                                                                                                        features.push({
+                                                                                                          name: annotation[3],
+                                                                                                          type: annotation[0],
+                                                                                                          from: annotation[1],
+                                                                                                          to: annotation[2]
+                                                                                                        })
+                                                                                                      }
+                                                                                                    }
+                                                                                                    var seq_obj = {
+                                                                                                      name: formData.name,
+                                                                                                      sequence: formData.sequence,
+                                                                                                      features: features
+                                                                                                    }
+                                                                                                    this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
+                                                                                                      //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
+                                                                                                                        */
         const tag = this
         tag.formData = {}
         this.on('mount', function() {
@@ -246,12 +246,7 @@
         <div class="row">
         </div>
     </form>
-    
-    <list-container>
-    </list-container>
-    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}>
-    </list-header>
-    
+    <!--
     <span>
         <select style="display:inline-block; width:30%">
             <option value="" selected disabled>Select action</option>
@@ -260,27 +255,33 @@
             <option value="3">Update</option>
         </select>
     </span>
-    
+
     <span>
         <a class="waves-effect waves-light btn  darken-1">update</a>
     </span>
-    
-    <form>
+    -->
+
+    <div if ={searchresult.length>0} class="collection with-header z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
+        <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
         <list-item no-reorder each={item in searchresult} item={item}>
             <div>
                 <input type="checkbox" id="{item.data.id}" />
                 <label for="{item.data.id}"></label>
             </div>
         </list-item>
-    </form>
+    </div>
 
     <script>
         const tag = this
         this.formData = app.getModel('createPart')
-        app.dispatch('bioPhysicalQuery', this.formData.name)
         this.searchresult = []
         this.primaryHeader = ''
         this.secondaryHeader = ''
+
+        this.on('mount', function() {
+            tag.formData = app.state.editPart
+            app.dispatch('bioPhysicalQuery', tag.formData.id)
+        })
 
         this.clickphysical = function(item) {
             console.log('clickphysical', JSON.stringify(item))
@@ -292,7 +293,7 @@
 
         this.submitForm = function(e) {
             e.preventDefault()
-            //const partData = $.formToObject('editPartForm'))
+                //const partData = $.formToObject('editPartForm'))
             const partData = JSON.parse(JSON.stringify(tag.formData))
             partData.virtual_id = app.state.editPart.id
             partData.locationid = tag.refs.locationid.value
@@ -304,11 +305,12 @@
 
         app.addRouteDestination('searchResult', 'updateList', function(itemList) {
             //console.log('physical part search result, tag:', JSON.stringify(itemList))
-            for (var i=0; i<itemList.length; i++) {
+            for (var i = 0; i < itemList.length; i++) {
                 itemList[i].click = tag.clickphysical
             }
-            tag.searchresult=itemList
-            tag.secondaryHeader = tag.searchresult.length + ' Physical instances'
+            tag.searchresult = itemList
+            tag.primaryHeader = 'Physical instances'
+            tag.secondaryHeader = tag.searchresult.length + ' instances'
             tag.update()
         })
 
