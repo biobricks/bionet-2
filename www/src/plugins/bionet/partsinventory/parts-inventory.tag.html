@@ -1,6 +1,6 @@
 <parts-inventory>
     <div style="padding-top:100px;">
-            <parts-inventory-form q={testvalue}/>
+        <parts-inventory-form q={testvalue}/>
     </div>
     <script>
         this.on('mount', function() {
@@ -17,13 +17,13 @@
     <form onsubmit={submitForm}>
         <search-input label="search inventory" ref="searchinventory" name="searchinventory" action={submitForm}/>
         <input type="submit" style="display:none" />
-        <div id="part-inventory-content" class="{theme.style.color.background+' '+ theme.style.color.text}">
+        <div if={nodes.length>0} class="collection with-header z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
+            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
             <inventory-treeview nodes={nodes} />
-            <list-container>
-            </list-container>
         </div>
     </form>
     <script>
+        const tag = this
         this.theme = app.getTheme();
         this.nodes = [];
         var q = (this.opts.q) ? decodeURIComponent(this.opts.q) : '';
@@ -76,17 +76,21 @@
                             }
                         }
                         if (add) {
+                            const data = children[i].value
+                            console.log('inventory re value:', JSON.stringify(data))
                             this.nodes.push({
                                 indent: indent,
                                 url: 'edit-physical/' + children[i].path + "/?id=" + children[i].key,
                                 primary_text: a[a.length - 1],
+                                secondary_text: (data.locationid !== undefined) ? 'location id: ' + data.locationid : undefined,
                                 id: children[i].key,
                                 highlight: perfect
                             });
                         }
                     }
-
-                    this.update();
+                    tag.primaryHeader = 'Search inventory for ' + '\'' + q + '\''
+                    tag.secondaryHeader = this.nodes.length + ' results'
+                    tag.update();
 
                 }.bind(this));
             }.bind(this), 500);
@@ -99,10 +103,10 @@
         this.submitForm = function(e) {
             e.preventDefault()
             q = encodeURIComponent(this.refs.searchinventory.value)
-            //q = this.refs.searchinventory.value
+                //q = this.refs.searchinventory.value
             const iurl = '/inventory/' + q
             updateInventoryTree()
-            //route(iurl)
+                //route(iurl)
                 //route('/inventory/?q=' + encodeURIComponent(this.refs.searchinventory.value))
         }.bind(this)
 
@@ -111,16 +115,11 @@
 
 <inventory-treeview>
 
-    <ul style="margin:0 0 0 1em;position:relative">
-        <li style="padding:0 1.5em;">
-            <list-item each={node in opts.nodes} item={node} />
-        </li>
-    </ul>
-
+    <list-item each={node in opts.nodes} item={node} />
     <script>
         /*
-                                                            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-                                                            */
+                                                                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                                                                                    */
         const tag = this;
 
 
