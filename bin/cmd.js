@@ -478,7 +478,7 @@ websocket.createServer({server: server}, function(stream) {
                   }
 */
             elasticSearch: function(curUser, query, cb) {
-              console.log("BEGIN SEARCH:", query);
+
               elasticIndex.search('name', {
                 query: {
                   "match_phrase_prefix": {
@@ -487,7 +487,7 @@ websocket.createServer({server: server}, function(stream) {
                     }
                   }
                 }}, function(err, result) {
-                  console.log("SEARCH CB:", err, result);
+
                   if(err) return cb(err);
 
                   cb(null, result.hits.hits);
@@ -666,24 +666,29 @@ websocket.createServer({server: server}, function(stream) {
                 return out;
             }),
 
-            search: rpc.syncStream(function(curUser, q) {
+            search: function(curUser, q, cb) {
+              console.log("CALLED SEARCH:", q);
                 var s = bioDB.createReadStream({valueEncoding: 'json'});
 
+                var ret = [];
 
-                var out = s.pipe(through.obj(function(data, enc, cb) {
+                var out = s.pipe(through.obj(function(data, enc, next) {
                     if((data.value.name && data.value.name.toLowerCase().match(q.toLowerCase())) || (data.value.description && data.value.description.toLowerCase().match(q.toLowerCase()))) {
-                        this.push(data.value);
+                       // this.push(data.value);
+                       ret.push(data.value);
                     }
                    
-                    cb();
+                    next();
                 }));
                 
-                out.on('error', function(err) {
-                    // TODO handle
-                    console.error("search stream error:", err);
+                s.on('error', function(err) {
+                  cb(err);
                 });
-                return out;
-            })
+                s.on('end', function() {
+                  console.log("SENDING:", ret);
+                  cb(null, ret);
+                });
+            }
 
         },
 

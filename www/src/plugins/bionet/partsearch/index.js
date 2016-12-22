@@ -133,21 +133,23 @@ var partsearch = {
                 'label': q.terms,
                 'url': '/q' + termsURL
               }]);
-
-                app.remote.elasticSearch(q.terms, function (err, results) {
+          console.log("SEARCHING FOR:", q.terms);
+                app.remote.search(q.terms, function (err, results) {
+                    console.log("CALLED BACK");
                     if (err) return console.error(err); // TODO handle error better
 
                     q.results = [];
-                    var i;
+                    var i, result;
                     for (i = 0; i < results.length; i++) {
-                        const result = results[i]._source
+//                        const result = results[i]._source
+                        result = results[i];
                         if (!result || !result.name) continue;
                         console.log('result:',JSON.stringify(results[i] ))
                         const isVirtual = result.id.charAt(0)==='v'
                         q.results.push({
                             primary_text: result.name,
                             secondary_text: ((isVirtual) ? 'virtual' : 'physical') +' id '+result.id,
-                            url: '/edit/'+result.id,
+                            url: (isVirtual) ? '/edit/'+result.id : '/edit-physical/'+result.id,
                             id: result.id
                         });
                     }
