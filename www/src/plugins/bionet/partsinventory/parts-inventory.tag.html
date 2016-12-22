@@ -40,9 +40,6 @@
 
             }
 
-            // TODO remove settimeout
-            setTimeout(function() {
-
                 app.remote.inventoryTree(function(err, children) {
                     if (err) return console.error(err);
 
@@ -93,7 +90,6 @@
                     tag.update();
 
                 }.bind(this));
-            }.bind(this), 500);
         }.bind(this)
 
         this.on('mount', function() {

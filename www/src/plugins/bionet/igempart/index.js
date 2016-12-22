@@ -212,8 +212,6 @@ var igempart = {
                 });
             } else {
 
-                // TODO this is very bad
-                setTimeout(function () {
                     app.remote.get(id, function (err, data) {
 
                         if (err) {
@@ -222,7 +220,7 @@ var igempart = {
                         }
                         cb(data);
                     })
-                }, 500)
+
             }
         }
 
