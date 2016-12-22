@@ -146,7 +146,7 @@ class App extends EventEmitter {
       settings.init(settingsObj)
       thisModule.dispatch(thisModule.$.plugin, 'start')
 
-      thisModule.startRouter()
+//      thisModule.startRouter()
     })
   }
 

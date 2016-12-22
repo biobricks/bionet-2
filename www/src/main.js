@@ -102,6 +102,7 @@ function connector(cb) {
         auth.authenticate(remote, {
             setCookie: true
         }, function (err, userData) {
+            app.startRouter();
             if (err) {
                 console.log("Not logged in");
                 app.dispatch('loginState', false);

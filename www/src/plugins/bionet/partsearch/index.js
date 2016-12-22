@@ -134,8 +134,6 @@ var partsearch = {
                 'url': '/q' + termsURL
               }]);
 
-            setTimeout(function () { // TODO remove timeout
-
                 app.remote.elasticSearch(q.terms, function (err, results) {
                     if (err) return console.error(err); // TODO handle error better
 
@@ -157,7 +155,6 @@ var partsearch = {
                     riot.mount('div#content', 'search-result', q)
 
                 });
-            }, 500);
         })
     },
     remove: function () {
