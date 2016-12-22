@@ -14,7 +14,7 @@ stdThemePlugin.start = function () {
     //----------------------------------------------------------------------------
     // primary nav - logged in
     const loggedInNav = [{
-        icon: 'search',
+        label: 'search',
         action: '/'
   }, {
         label: 'inventory',
