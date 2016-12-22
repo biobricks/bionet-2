@@ -51,7 +51,7 @@ stdThemePlugin.start = function () {
             navText: 'grey-text text-darken-2',
             navBackground: 'white',
             navButton: 'grey-text text-darken-2',
-            smallLogo: 'static/images/BioNet_Logo_Vertical_web_sm.png'
+            smallLogo: '/static/images/BioNet_Logo_Vertical_web_sm.png'
         },
         dark: {
             text: 'grey-text text-lighten-2',
@@ -60,7 +60,7 @@ stdThemePlugin.start = function () {
             navText: 'grey-text text-lighten-2',
             navBackground: 'grey darken-3',
             navButton: 'grey-text text-lighten-2',
-            smallLogo: 'static/images/BioNet_Logo_Vertical_web_sm_white.png'
+            smallLogo: '/static/images/BioNet_Logo_Vertical_web_sm_white.png'
         }
     }
 
