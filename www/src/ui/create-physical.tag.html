@@ -1,10 +1,12 @@
 <create-physical>
 
     <div class="container" style="margin-top:100px">
-        <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
         <form id="createPhysicalForm" ref="createPhysicalForm" class="col s12" onsubmit={submitForm}>
+            <div class="row">
+                <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
+            </div>
 
-          <input type="hidden" ref="id" name="id" value={formData.id} />
+            <input type="hidden" ref="id" name="id" value={formData.id} />
             <div class="row">
                 <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
             </div>
@@ -28,7 +30,7 @@
             </div>
 
             <div class="row">
-              <form-text-input label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
+                <form-text-input label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
             </div>
 
             <div class="row">
@@ -69,7 +71,7 @@
         }
 
         var savePhysical = function(p, labelImage) {
-                            console.log("SAVING:", p);
+            console.log("SAVING:", p);
             var doPrint = labelImage ? true : false
             app.remote.savePhysical(p, labelImage, doPrint, function(err, id) {
                 if (err) {
@@ -80,7 +82,7 @@
 
                 app.ui.toast("Saved to database")
                 setTimeout(function() {
-                  route('edit-physical/' + encodeURIComponent(id) + '/');
+                    route('edit-physical/' + encodeURIComponent(id) + '/');
                 }, 500);
             })
         }.bind(this)
@@ -99,7 +101,7 @@
                     app.remote.getBy('name', formData.parent_name, function(err, m) {
                         if (err) return app.ui.toast("Error:" + err);
 
-                        if(!m) {
+                        if (!m) {
                             app.ui.toast("Warning: Invalid container");
                         } else {
                             formData.parent_id = m.id;
@@ -230,7 +232,7 @@
                 name: 'parent_name',
             });
 
-            if(opts.virtualID) {
+            if (opts.virtualID) {
                 // create new physical instance of this material
                 app.remote.get(opts.virtualID, function(err, virtual) {
                     if (err) {
