@@ -85,8 +85,7 @@ route('/print', function () {
     riot.mount('div#content', 'print')
 })
 
-function editPhysicalRoute(typeOrID, q) {
-    q = q || {};
+function editPhysicalRoute(typeOrID) {
 
     app.dispatch(app.$.appBarConfig, {
         enableTopNav: true,
@@ -94,19 +93,20 @@ function editPhysicalRoute(typeOrID, q) {
         enableSubbar: false
     })
 
-    var opts = {
-        query: q || {}
-    }
+    var opts = {};
+
     typeOrID = decodeURIComponent(typeOrID).trim()
 
-    opts.type = typeOrID
 
     if(isUUID(typeOrID)) {
-        opts.virtualID = typeOrID
+        if(typeOrID.match(/^p-/)) {
+          opts.physicalID = typeOrID
+        } else {
+          opts.virtualID = typeOrID
+        }
     } else {
-        opts.type2 = typeOrID
+      opts.type = typeOrID
     }
-    opts.key = q.id
     opts.mode = 'edit'
 
     riot.mount('div#content', 'create-physical', opts);
@@ -114,10 +114,6 @@ function editPhysicalRoute(typeOrID, q) {
 
 route('edit-physical/*', editPhysicalRoute);
 
-route('edit-physical/*/..', function (typeOrID) {
-    var q = route.query()
-    editPhysicalRoute(typeOrID, q);
-});
 
 function createPhysicalRoute(typeOrID, q) {
 

@@ -211,18 +211,6 @@
 
             this.update();
             // todo: was opts.id but apparently riot uses opts.id for something else
-            if (opts.key !== undefined) {
-                app.remote.get(opts.key, function(err, data) {
-                    if (err) {
-                        app.dispatch('error', err)
-                        return
-                    }
-                    this.formData = data
-
-                    this.update()
-                }.bind(this))
-            }
-
             riot.mount('#autocomplete-container', 'autocomplete', {
                 searchCallback: function(query, cb) {
                     app.remote.physicalAutocomplete(query, function(err, result) {
@@ -231,6 +219,23 @@
                 },
                 name: 'parent_name',
             });
+
+            // if we are editing
+            if (opts.physicalID) {
+                app.remote.get(opts.physicalID, function(err, data) {
+                    if (err) {
+                        app.dispatch('error', err)
+                        return
+                    }
+                    this.formData = data
+
+                    this.printNameDefault = data.name;
+                    $(this.refs.createPhysicalHeader).html("Edit")
+                    this.update()
+                }.bind(this))
+                return;
+            }
+
 
             if (opts.virtualID) {
                 // create new physical instance of this material
@@ -269,8 +274,6 @@
 
                 this.printNameDefault = this.refs.name.value.trim() || type.name
                 $(this.refs.createPhysicalHeader).html("New " + type.name)
-
-                // TODO
 
             }.bind(this));
         }.bind(this));
