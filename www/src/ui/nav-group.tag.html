@@ -1,6 +1,6 @@
 <nav-group>
     <ul id={opts.tagid} class="{ opts.classname }" style="{stylename}">
-        <li each={item in opts.navitems }><a class="{theme.style.color.navText}" onclick={navClick}><i if={item.icon} class="material-icons left">{item.icon}</i>{item.label}</a></li>
+        <li each={item in opts.navitems }><a class="{theme.style.color.navText}" onclick={navClick}><i if={item.icon} class="material-icons left">{item.icon}</i><span if={item.label}>{item.label}</span></a></li>
     </ul>
     <script>
         this.theme=app.getTheme()
