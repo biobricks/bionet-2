@@ -26,7 +26,7 @@
             </div>
 
             <div class="row">
-                <a id="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+                <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
             </div>
 
             <div class="row">
@@ -44,8 +44,8 @@
             <input type="submit" style="visibility:hidden" />
         </form>
 
-        <div id="scanModal" class="scanModal modal"></div>
-        <div id="printModal" class="printModal modal"></div>
+        <div id="scanModal" ref="scanModal" class="scanModal modal"></div>
+        <div id="printModal" ref="printModal" class="printModal modal"></div>
     </div>
     <script>
         console.log("create physical tag, opts:%s", JSON.stringify(opts))
@@ -56,7 +56,7 @@
             notes: ''
         }
         this.fields = []
-            //console.log('create physical, object=',JSON.stringify())
+
         for (var i = 0; i < dataTypes.length; i++) {
             const dataType = dataTypes[i]
             if (opts.type === dataType.name && dataType.fields !== undefined) {
@@ -71,7 +71,6 @@
         }
 
         var savePhysical = function(p, labelImage) {
-            console.log("SAVING:", p);
             var doPrint = labelImage ? true : false
             app.remote.savePhysical(p, labelImage, doPrint, function(err, id) {
                 if (err) {
@@ -130,13 +129,13 @@
                 cb: function(err, formData, imageData) {
                     this.labelFormData = formData;
                     this.labelImageData = imageData;
-                    $(this.printModal).closeModal();
-                    $(this.createLabelButton).html('edit label');
+                    $(this.refs.printModal).closeModal();
+                    $(this.refs.createLabelButton).html('edit label');
                 }
             }
             tags = riot.mount('#printModal', 'modal-content', labelOpts)
 
-            $(this.printModal).openModal({
+            $(this.refs.printModal).openModal({
                 complete: function() {
                     tags[0].unmount(true)
                 }
@@ -152,16 +151,16 @@
                 subTag: "scan", // the tag to mount
                 cb: function(err, id) {
                     if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
-                    $(this.curBarcode).val(id);
-                    $(this.scanButton).html('rescan');
-                    $(this.scanModal).closeModal();
+                    $(this.refs.curBarcode).val(id);
+                    $(this.refs.scanButton).html('rescan');
+                    $(this.refs.scanModal).closeModal();
                     console.log('scan item cb, tags:', tags)
                     tags[0].unmount(true)
                 }
             }
             tags = riot.mount('#scanModal', 'modal-content', scanOpts)
 
-            $(this.scanModal).openModal({
+            $(this.refs.scanModal).openModal({
                 complete: function() {
                     tags[0].unmount(true)
                 }

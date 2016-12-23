@@ -39,31 +39,31 @@
                     return cb(err);
                 }
                 this.humanID = humanID
-                updateLabel(function() {
+                updateLabel(this, function() {
                     cb(null, humanID);
                 });
-            })
+            }.bind(this))
         }
 
-        function updateLabel(cb) {
+        function updateLabel(self, cb) {
             cb = cb || function() {}
 
             var pre = ""
-            pre += "ID: " + (this.humanID || '?') + "\n";
-            pre += $(this.createLabelForm.title).val() + "\n";
+            pre += "ID: " + (self.humanID || '?') + "\n";
+            pre += $(self.refs.createLabelForm.title).val() + "\n";
 
-            var txt = $(this.createLabelForm.text).val()
-            var temperature = $(this.createLabelForm.temperature).val()
+            var txt = $(self.refs.createLabelForm.text).val()
+            var temperature = $(self.refs.createLabelForm.temperature).val()
 
             var o = {
                 temperature: temperature,
-                bsl: this.labelFormData.bsl || 0
+                bsl: self.labelFormData.bsl || 0
             };
 
             if (o.bsl > 1) {
                 o.biohazard = true;
             }
-            labelMaker.drawLabel('labelPreview', settings.base_url + "/p/" + this.humanID, pre + txt, o, cb);
+            labelMaker.drawLabel('labelPreview', settings.base_url + "/p/" + self.humanID, pre + txt, o, cb);
         }
 
         this.submitForm = function(e) {
@@ -93,25 +93,25 @@
 
             // if this isn't in a settimeout it doesn't work :/
             setTimeout(function() {
-                $(this.createLabelForm.text).focus()
-            }, 1)
+                $(this.refs.createLabelForm.text).focus()
+            }.bind(this), 1)
 
-            $(this.createLabelForm.title).on('input', function(e) {
-                updateLabel()
+            $(this.refs.createLabelForm.title).on('input', function(e) {
+                updateLabel(this)
             }.bind(this))
 
-            $(this.createLabelForm.text).on('input', function(e) {
-                updateLabel()
+            $(this.refs.createLabelForm.text).on('input', function(e) {
+                updateLabel(this)
             }.bind(this))
 
-            $(this.createLabelForm.temperature).on('input', function(e) {
-                updateLabel()
+            $(this.refs.createLabelForm.temperature).on('input', function(e) {
+                updateLabel(this)
             }.bind(this))
 
             waitForFontLoad(['FiraSans-Regular', 'FiraSans-Bold', 'FiraSans-Bold'], function() {
-                updateLabel()
+                updateLabel(this)
             }.bind(this));
-        });
+        }.bind(this));
 
     </script>
 </print>
