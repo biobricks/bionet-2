@@ -5,15 +5,15 @@ var $ = window.$
 import app from './app'
 window.app = app // our one global variable
 app.initialize()
+require('./ui/uitags.js')
 
 // install plugins
 // todo: build plugins as separate modules and scan plugins folder for plugins to install
 require('./plugins/bionet')
 require('./plugins/bionet-scanner')
-
 var ui = require('./ui')
-var routes = require('./routes.js');
 
+var routes = require('./routes.js');
 
 window.$.formToObject = require('form_to_object');
 window.$.xtend = require('xtend'); // extend that does not modify arguments
@@ -71,7 +71,7 @@ function connector(cb) {
     var failed = false;
 
     function failOnce(err) {
-        console.log('main.js failOnce error:', (typeof err === 'object') ? err.message+' '+err.stack : err);
+        console.log('main.js failOnce error:', (typeof err === 'object') ? err.message + ' ' + err.stack : err);
         if (!failed) {
             cb(err);
             failed = true;
@@ -79,7 +79,7 @@ function connector(cb) {
     }
 
     var wsProtocol = 'ws://';
-    if (settings.base_url.match(/^https/)) {
+    if (/^https/i.test(settings.base_url)) {
         wsProtocol = 'wss://';
     }
     var stream = websocket(wsProtocol + window.document.location.host);
@@ -127,11 +127,12 @@ function connect() {
         }
         if (reconnectAttempts) {
             console.log("Reconnected!");
+        } else {
+            app.startPlugins();
         }
-        reconnectAttempts = 0;
         app.remote = remote;
         app.user = user;
-        app.startRouter();
+        reconnectAttempts = 0;
     })
 }
 
@@ -165,13 +166,9 @@ app.logout = function (cb) {
 
 };
 
-
 $(document).ready(function () {
 
     console.log("document ready")
-
-    // start plugins
-    app.startPlugins();
-
     connect();
+
 });
