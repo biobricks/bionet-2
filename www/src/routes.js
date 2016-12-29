@@ -107,12 +107,11 @@ function editPhysicalRoute(typeOrID) {
     } else {
       opts.type = typeOrID
     }
-    opts.mode = 'edit'
-
+    console.log('edit physical id: %s route: %s',typeOrID, JSON.stringify(opts))
     riot.mount('div#content', 'create-physical', opts);
 }
 
-route('edit-physical/*', editPhysicalRoute);
+route('/edit-physical/*', editPhysicalRoute);
 
 
 function createPhysicalRoute(typeOrID, q) {
