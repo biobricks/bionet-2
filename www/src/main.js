@@ -82,7 +82,13 @@ function connector(cb) {
     if (/^https/i.test(settings.base_url)) {
         wsProtocol = 'wss://';
     }
-    var stream = websocket(wsProtocol + window.document.location.host);
+    console.log('connecting to websocket, protocol=', wsProtocol, settings.base_url)
+    var stream = websocket(wsProtocol + window.document.location.host, {
+        headers: {
+            'proxy_read_timeout': '1000s',
+            'ping': 10
+        }
+    });
     stream.on('error', failOnce);
 
     // You can turn on debugging like this:
@@ -94,7 +100,6 @@ function connector(cb) {
     rpcClient.pipe(stream).pipe(rpcClient);
 
     rpcClient.on('error', failOnce);
-
 
     rpcClient.on('methods', function (remote) {
 
@@ -127,11 +132,10 @@ function connect() {
         }
         if (reconnectAttempts) {
             console.log("Reconnected!");
-        } else {
-            app.startPlugins();
         }
         app.remote = remote;
         app.user = user;
+        app.startPlugins();
         reconnectAttempts = 0;
     })
 }
