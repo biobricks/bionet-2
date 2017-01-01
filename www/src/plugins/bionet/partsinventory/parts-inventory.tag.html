@@ -77,7 +77,7 @@
                             console.log('inventory re value:', JSON.stringify(data))
                             this.nodes.push({
                                 indent: indent,
-                                url: '/edit-physical/' + children[i].key,
+                                url: '/edit-physical/' + data.id,
                                 primary_text: a[a.length - 1],
                                 secondary_text: (data.locationid !== undefined) ? 'location id: ' + data.locationid : undefined,
                                 id: children[i].key,
