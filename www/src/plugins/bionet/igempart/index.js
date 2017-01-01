@@ -252,14 +252,16 @@ var igempart = {
             getMaterial(partID, function (data) {
                 app.state.editPart = data
                 var opts = {
-                    partID
+                    partID: partID,
+                    virtualID: partID
                 }
 
                 riot.mount('div#content', 'part-form', opts)
                 if (section == 'sequence') {
                     riot.mount('div#edit-part-content', 'part-sequence', opts)
                 } else if (section == 'instances') {
-                    riot.mount('div#edit-part-content', 'part-instance', opts)
+                    opts.topMargin=0
+                    riot.mount('div#edit-part-content', 'create-physical', opts)
                 } else if (section == 'notes') {
                     riot.mount('div#edit-part-content', 'part-notes', opts)
                 } else if (section == 'attachment') {

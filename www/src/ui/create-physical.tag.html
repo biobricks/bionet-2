@@ -1,52 +1,39 @@
 <create-physical>
 
-    <div class="container" style="margin-top:100px">
-        <form id="createPhysicalForm" ref="createPhysicalForm" class="col s12" onsubmit={submitForm}>
-            <div class="row">
-                <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
-            </div>
+    <div if={opts.topMargin!==undefined} id="createPhysical" style="margin-top:{opts.topMargin}px" />
+    <div if={opts.topMargin===undefined} id="createPhysical" style="margin-top:100px" />
 
-            <input type="hidden" ref="id" name="id" value={formData.id} />
-            <div class="row">
-                <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
-            </div>
+    <form id="createPhysicalForm" ref="createPhysicalForm" class="col s12" onsubmit={submitForm}>
 
-            <div class="row">
-                <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
-            </div>
+        <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
 
-            <div each={field in fields}>
-                <div class="row">
-                    <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
-                </div>
-            </div>
+        <input type="hidden" ref="id" name="id" value={formData.id} />
+        <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
 
-            <div class="row">
-                <form-text-input label="Barcode" ref="curBarcode" name="barcode" value={formData.barcode}/>
-            </div>
+        <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
 
-            <div class="row">
-                <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
-            </div>
+        <div each={field in fields}>
+            <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
+        </div>
 
-            <div class="row">
-                <form-text-input label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
-            </div>
+        <form-text-input label="Barcode" ref="curBarcode" name="barcode" value={formData.barcode}/>
 
-            <div class="row">
-                <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a>
-                <p>or</p>
-                <div id="autocomplete-container" />
-            </div>
+        <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
 
-            <input type="hidden" ref="virtual_id" name="virtual_id" value={formData.virtual_id} />
-            <std-button label="submit" action={submitForm} />
-            <input type="submit" style="visibility:hidden" />
-        </form>
+        <div style="margin-top:30px" />
+        <form-text-input label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
 
-        <div id="scanModal" ref="scanModal" class="scanModal modal"></div>
-        <div id="printModal" ref="printModal" class="printModal modal"></div>
-    </div>
+        <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a>
+        <p>or</p>
+        <div id="autocomplete-container" />
+
+        <input type="hidden" ref="virtual_id" name="virtual_id" value={formData.virtual_id} />
+        <std-button2 label="submit" action={submitForm} />
+        <input type="submit" style="visibility:hidden" />
+    </form>
+
+    <div id="scanModal" ref="scanModal" class="scanModal modal"></div>
+    <div id="printModal" ref="printModal" class="printModal modal"></div>
     <script>
         console.log("create physical tag, opts:%s", JSON.stringify(opts))
         const appSettings = app.getAppSettings()
@@ -209,6 +196,7 @@
             }
 
             this.update();
+
             // todo: was opts.id but apparently riot uses opts.id for something else
             riot.mount('#autocomplete-container', 'autocomplete', {
                 searchCallback: function(query, cb) {
@@ -229,9 +217,10 @@
                     this.formData = data
 
                     this.printNameDefault = data.name;
-                    $(this.refs.createPhysicalHeader).html("Edit")
+                    $(this.refs.createPhysicalHeader).html("Edit " + data.name)
                     this.update()
                 }.bind(this))
+                $('#createPhysicalForm').scrollTop(0)
                 return;
             }
 
@@ -251,6 +240,7 @@
                     // TODO
 
                 }.bind(this));
+                $('#createPhysicalForm').scrollTop(0)
                 return;
             }
 

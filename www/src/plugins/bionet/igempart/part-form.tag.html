@@ -243,6 +243,8 @@
 </part-sequence>
 
 <part-instance>
+    <create-physical/>
+        <!--
     <form onsubmit={submitForm}>
         <form-text-input label="Physical Location Code" ref="locationid" name="locationid" value={formData.location}/>
         <form-text-input label="Datamatrix Code" ref="datamatrix" name="datamatrix" value={formData.qrcode}/>
@@ -252,6 +254,7 @@
         <div class="row">
         </div>
     </form>
+        -->
     <!--
     <span>
         <select style="display:inline-block; width:30%">
@@ -265,7 +268,6 @@
     <span>
         <a class="waves-effect waves-light btn  darken-1">update</a>
     </span>
-    -->
 
     <div if ={searchresult.length>0} class="collection with-header z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
         <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
@@ -276,6 +278,7 @@
             </div>
         </list-item>
     </div>
+    -->
 
     <script>
         const tag = this
