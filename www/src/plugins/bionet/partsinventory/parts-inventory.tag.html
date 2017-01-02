@@ -26,12 +26,13 @@
         const tag = this
         this.theme = app.getTheme();
         this.nodes = [];
-        var q = (this.opts.q) ? decodeURIComponent(this.opts.q) : '';
-        console.log('parts-inventory-form: q=', q)
+        var q = (this.opts.q) ? decodeURIComponent(this.opts.q) : undefined;
 
         const updateInventoryTree = function() {
-            if (q.length === 0) return;
-            this.refs.searchinventory.value = q;
+            console.log('parts-inventory-form: updateInventoryTree q=', q)
+            if (q === undefined) return;
+            const matchAll = (q.length > 0) ? false : true;
+            tag.refs.searchinventory.value = q;
 
             //q = new RegExp(q.replace(/\s+/, '.*'), 'i');
 
@@ -40,56 +41,56 @@
 
             }
 
-                app.remote.inventoryTree(function(err, children) {
-                    if (err) return console.error(err);
+            app.remote.inventoryTree(function(err, children) {
+                if (err) return console.error(err);
 
-                    // TODO rewrite this matching algorithm 
-                    //      so we can do single-pass matching
-                    //      so we can use a stream
-                    //      And move it to the level-tree-index module
+                // TODO rewrite this matching algorithm 
+                //      so we can do single-pass matching
+                //      so we can use a stream
+                //      And move it to the level-tree-index module
 
-                    var matches = [];
-                    this.nodes = [];
+                var matches = [];
+                this.nodes = [];
 
-                    var i, cur, indent, a;
-                    for (i = 0; i < children.length; i++) {
-                        cur = children[i].path;
-                        if (cur.match(q)) matches.push(cur);
-                    }
+                var i, cur, indent, a;
+                for (i = 0; i < children.length; i++) {
+                    cur = children[i].path;
+                    if (cur.match(q) || matchAll) matches.push(cur);
+                }
 
-                    var j, m, add, perfect;
-                    for (i = 0; i < children.length; i++) {
-                        cur = children[i].path;
-                        a = cur.split('.');
-                        indent = a.length - 1;
-                        add = false
-                        perfect = false
-                        for (j = 0; j < matches.length; j++) {
-                            m = matches[j];
-                            if (m.indexOf(cur) === 0) {
-                                add = true;
-                                if (m.length === cur.length) perfect = true;
-                                break;
-                            }
-                        }
-                        if (add) {
-                            const data = children[i].value
-                            console.log('inventory re value:', JSON.stringify(data))
-                            this.nodes.push({
-                                indent: indent,
-                                url: '/edit-physical/' + data.id,
-                                primary_text: a[a.length - 1],
-                                secondary_text: (data.locationid !== undefined) ? 'location id: ' + data.locationid : undefined,
-                                id: children[i].key,
-                                highlight: perfect
-                            });
+                var j, m, add, perfect;
+                for (i = 0; i < children.length; i++) {
+                    cur = children[i].path;
+                    a = cur.split('.');
+                    indent = a.length - 1;
+                    add = false
+                    perfect = false
+                    for (j = 0; j < matches.length; j++) {
+                        m = matches[j];
+                        if (m.indexOf(cur) === 0) {
+                            add = true;
+                            if (m.length === cur.length) perfect = true;
+                            break;
                         }
                     }
-                    tag.primaryHeader = 'Search inventory for ' + '\"' + q + '\"'
-                    tag.secondaryHeader = this.nodes.length + ' results'
-                    tag.update();
+                    if (add) {
+                        const data = children[i].value
+                        console.log('inventory re value:', JSON.stringify(data))
+                        this.nodes.push({
+                            indent: indent,
+                            url: '/edit-physical/' + data.id,
+                            primary_text: a[a.length - 1],
+                            secondary_text: (data.locationid !== undefined) ? 'location id: ' + data.locationid : undefined,
+                            id: children[i].key,
+                            highlight: perfect
+                        });
+                    }
+                }
+                tag.primaryHeader = 'Search inventory for ' + '\"' + q + '\"'
+                tag.secondaryHeader = this.nodes.length + ' results'
+                tag.update();
 
-                }.bind(this));
+            }.bind(this));
         }.bind(this)
 
         this.on('mount', function() {
@@ -114,8 +115,8 @@
     <list-item each={node in opts.nodes} item={node} />
     <script>
         /*
-                                                                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-                                                                                                    */
+                                                                                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                                                                                                    */
         const tag = this;
 
 
