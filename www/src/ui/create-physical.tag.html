@@ -12,6 +12,8 @@
 
         <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
 
+        <form-text-input label="Storage temperature" ref="temperature" name="temperature" value={formData.temperature}/>
+
         <div each={field in fields}>
             <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
         </div>
