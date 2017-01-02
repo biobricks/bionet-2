@@ -41,10 +41,10 @@ stdThemePlugin.start = function () {
     //----------------------------------------------------------------------------
     // primary nav - logged in
     const loggedInNav = [{
-        label: 'search',
+        label: 'global search',
         action: '/'
   }, {
-        label: 'inventory',
+        label: 'local inventory',
         action: '/inventory'
   }, {
         label: 'create',
@@ -52,21 +52,15 @@ stdThemePlugin.start = function () {
   }, {
         label: 'scan',
         action: '/scan'
-  }, {
-        label: 'help',
-        action: '/help'
   }];
 
     // primary nav - logged out
     const loggedOutNav = [{
-        icon: 'search',
+        label: 'global search',
         action: '/'
   }, {
-        label: 'inventory',
+        label: 'local inventory',
         action: '/inventory'
-  }, {
-        label: 'help',
-        action: '/help'
   }]
 
     // initialize theme settings
