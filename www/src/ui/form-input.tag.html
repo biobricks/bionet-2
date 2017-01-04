@@ -1,12 +1,14 @@
 <form-text-input>
     <div class="row">
-        <div class="input-field col s12">
+        <div class="input-field col {inputWidth}">
             <input id={opts.name} name={opts.name} ref="inputTag" type="text" value={data}>
             <label for={opts.name} class="active">{opts.label}</label>
         </div>
     </div>
     <script>
         const tag = this
+        this.inputWidth = (opts.width) ? opts.width : 's12'
+        
         this.on('update', function() {
             tag.data = tag.opts.riotValue;
         })
@@ -118,23 +120,25 @@
 <password-text-input-empty>
     <div class="row">
         <div class="col s3 m3 l3" />
-        <div class="input-field col s6 m6 l6">
+        <div class="input-field col {inputWidth}">
             <input id={opts.name} name={opts.name} ref="inputTag" type="password" value={data}>
             <label for={opts.name}>{opts.label}</label>
         </div>
     </div>
     <script>
+        const tag=this
+        this.inputWidth = (opts.width) ? opts.width : 's6 m6 l6'
         this.on('update', function() {
-            this.data = this.opts.riotValue;
+            tag.data = tag.opts.riotValue;
         })
         this.on('mount', function() {
             Object.defineProperty(this, "value", {
                 get: function() {
-                    return this.refs.inputTag.value;
+                    return tag.refs.inputTag.value;
                 },
                 set: function(value) {
-                    this.data = value;
-                    this.update();
+                    tag.data = value;
+                    tag.update();
                 }
             });
         })
