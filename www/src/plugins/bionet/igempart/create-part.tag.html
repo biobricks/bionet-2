@@ -9,17 +9,17 @@
 
         // setup secondary nav
         app.dispatch(app.$.secondaryNav, [{
-            label: 'specifications',
+            label: 'virtual properties',
             icon: undefined,
             action: '/create-virtual/' + this.opts.type
         }, {
-            label: 'sequence',
-            icon: undefined,
-            action: '/create-virtual/' + this.opts.type + '/?tab=sequence'
-        }, {
-            label: 'physical instance',
+            label: 'physical properties',
             icon: undefined,
             action: '/create-virtual/' + this.opts.type + '/?tab=instances'
+        }, {
+            label: 'attachments',
+            icon: undefined,
+            action: '/create-virtual/' + this.opts.type + '/?tab=attachments'
         }])
 
         // initialize breadcrumbs
@@ -40,8 +40,8 @@
 
         this.on('mount', function() {
             const tab = opts.query.tab
-            if (tab === 'sequence') {
-                riot.mount('div#create-part-content', 'create-sequence')
+            if (tab === 'attachments') {
+                riot.mount('div#create-part-content', 'part-attachment')
             } else if (tab === 'instances') {
                 riot.mount('div#create-part-content', 'create-instances')
             } else {
@@ -76,11 +76,14 @@
             if (this.opts.query && this.opts.query.name && this.opts.query.name.trim()) {
                 //this.refs.name.value = decodeURIComponent(this.opts.query.name);
                 this.formData.name = decodeURIComponent(this.opts.query.name);
+                this.formData.creator = app.user.email
+                const d = new Date()
+                this.formData.created = d.toDateString()
                 this.update();
                 $.extend(app.state.createPart, $.formToObject('createPartForm'))
             }
             console.log('create-virtual-form, formData:%s', JSON.stringify(this.formData))
-            
+
             $(this.refs.createPartForm).change(function(e) {
                 $.extend(app.state.createPart, $.formToObject('createPartForm'))
             }.bind(this));

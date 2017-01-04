@@ -5,19 +5,9 @@
         </div>
     </div>
     <script>
-        /*
-                                            label: 'sequence',
-                                            icon: undefined,
-                                            action: '/edit/' + opts.partID + '/sequence'
-                                        }, {
-                                            label: 'notes',
-                                            icon: undefined,
-                                            action: '/edit/' + opts.partID + '/notes'
-                                        }, {
-                                        */
 
         this.theme = app.getTheme()
-            // setup secondary nav
+        // setup secondary nav
         app.dispatch(app.$.secondaryNav, [{
             label: 'virtual properties',
             icon: undefined,
@@ -223,31 +213,31 @@
     </form>
     <script>
         /*
-                                                                                                                                            var formData = app.getModel('partData')
-                                                                                                                                              //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
+    var formData = app.getModel('partData')
+      //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
 
-                                                                                                                                            // map igem plasmid annotations to flash plasmid viewer component
-                                                                                                                                            var annotations = formData.plasmidAnnotations
-                                                                                                                                            var features = []
-                                                                                                                                            if (annotations !== undefined) {
-                                                                                                                                              for (var i = 0; i < annotations.length; i++) {
-                                                                                                                                                var annotation = annotations[i]
-                                                                                                                                                features.push({
-                                                                                                                                                  name: annotation[3],
-                                                                                                                                                  type: annotation[0],
-                                                                                                                                                  from: annotation[1],
-                                                                                                                                                  to: annotation[2]
-                                                                                                                                                })
-                                                                                                                                              }
-                                                                                                                                            }
-                                                                                                                                            var seq_obj = {
-                                                                                                                                              name: formData.name,
-                                                                                                                                              sequence: formData.sequence,
-                                                                                                                                              features: features
-                                                                                                                                            }
-                                                                                                                                            this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
-                                                                                                                                              //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
-                                                                                                                                                                */
+    // map igem plasmid annotations to flash plasmid viewer component
+    var annotations = formData.plasmidAnnotations
+    var features = []
+    if (annotations !== undefined) {
+      for (var i = 0; i < annotations.length; i++) {
+        var annotation = annotations[i]
+        features.push({
+          name: annotation[3],
+          type: annotation[0],
+          from: annotation[1],
+          to: annotation[2]
+        })
+      }
+    }
+    var seq_obj = {
+      name: formData.name,
+      sequence: formData.sequence,
+      features: features
+    }
+    this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
+      //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
+                        */
         const tag = this
         tag.formData = {}
         this.on('mount', function() {
