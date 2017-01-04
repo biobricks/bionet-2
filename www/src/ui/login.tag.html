@@ -49,6 +49,7 @@
 </login>
 
 <login-button>
+    <li><a id="username" style="display:none">{username}</a></li>
     <li>
         <a id="login-slideout-button" onclick={login} data-activates="login-slideout" class="right {theme.style.color.navButton} button-collapse" style="margin:0;display:inline">login</a>
         <a id="logout-button" onclick={logout} class="right {theme.style.color.navButton}" style="display:none">logout</a>
@@ -57,21 +58,25 @@
         const tag = this;
         this.theme = app.getTheme()
         var observer = {}
+        this.username = ''
 
         const showLogin = function(login) {
             if (login) {
+                $('#username').css('display', 'block')
                 $('#logout-button').css('display', 'block')
                 $('#login-slideout-button').css('display', 'none')
+                tag.username = app.user.email
             } else {
                 $('#logout-button').css('display', 'none')
                 $('#login-slideout-button').css('display', 'block')
+                tag.username = ''
             }
         }
-        
+
         this.login = function() {
             console.log('login-button: login function:', app.getLoginState())
         }
-        
+
         this.logout = function() {
             route('/logout')
         }
@@ -81,7 +86,7 @@
                 console.log("login-button:", loggedIn);
                 tag.loggedIn = loggedIn
                 showLogin(loggedIn)
-                //tag.update()
+                    //tag.update()
             }.bind(this))
         })
 
