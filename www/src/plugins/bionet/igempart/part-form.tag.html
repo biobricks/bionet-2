@@ -42,17 +42,21 @@
 </part-form>
 
 <part-specification>
-    <h5 id="createVirtualHeader" ref="createVirtualHeader">Edit Plasmid</h5>
+    <h5 id="createVirtualHeader" ref="createVirtualHeader">Edit {formData.type}</h5>
     <form id="editPartForm" name="editPartForm" class="col s12">
         <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
         <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
         <form-textarea-input label="Biosafety level" ref="bsl" name="bsl" value={formData.bsl}/>
         <form-switch label="Biohazardous?" ref="biohazard" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
-        <form-textarea-input label="Sequence" ref="sequence" name="sequence" value={formData.sequence}/>
         <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
-        <div>
+        <div each={field in fields}>
+            <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value={formData[field.name]} />
+        </div>
+        <div style="margin-bottom:30px">
             <p>
-                Created by: {formData.created.user}
+                Created by: {formData.created.user}<br/>
+                Created: {createdDate}<br/>
+                Updated: {updatedDate}
             </p>
         </div>
         <input type="submit" class="waves-effect waves-light btn darken-1" label="submit"/>
@@ -64,9 +68,19 @@
             created: {}
         }
         this.notify=true
+        this.createdDate=''
+        this.updatedDate=''
 
         this.on('mount', function() {
+            
             tag.formData = app.state.editPart
+            this.fields = app.getAttributesForType(tag.formData.type)
+            var d = new Date()
+            d.setTime(tag.formData.created.time*1000)
+            tag.createdDate = d.toDateString()
+            d = new Date()
+            d.setTime(tag.formData.updated.time*1000)
+            tag.updatedDate = d.toDateString()
             tag.update()
             console.log("part-specification mount:", JSON.stringify(tag.formData))
 

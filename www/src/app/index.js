@@ -280,6 +280,25 @@ class App extends EventEmitter {
     getAppSettings() {
         return appSettings;
     }
+    getAttributesForType(type) {
+        const dataTypes = appSettings.dataTypes
+        const attributes = []
+        for (var i = 0; i < dataTypes.length; i++) {
+            const dataType = dataTypes[i]
+            if (type === dataType.name) {
+                const fields = dataType.fields
+                if (fields === undefined) return attributes
+                Object.keys(fields).forEach(function(key, index) {
+                    attributes.push({
+                        name: key,
+                        value: fields[index]
+                    })
+                })
+                break
+            }
+        }
+        return attributes
+    }
 
 };
 export default new App();

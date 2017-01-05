@@ -1,22 +1,49 @@
 <create-unknown>
-    <div style="padding-top:0px;">
+    <div style="padding-top:0px; margin-top:0px">
         <div class="create-unknown">
+            <create-quilt/>
+        </div>
+    </div>
+</create-unknown>
+<create-quilt>
+    <div class="row">
+        <div class="col s3 m3 l3"></div>
+        <div class="col s6 m6 l6 left-align">
             <h5>What would you like to create?</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s3 m3 l3"></div>
+        <div class="col s3 m3 l3 left-align">
+            <h6>Virtuals</h6>
             <ul>
-                <li each={item in dataTypes}><a href="{item.url}">{item.name}</a></li>
+                <li each={item in virtuals}><a href="{item.url}">{item.name}</a></li>
+            </ul>
+        </div>
+        <div class="col s3 m3 l3 left-align">
+            <h6>Locations</h6>
+            <ul>
+                <li each={item in locations}><a href="{item.url}">{item.name}</a></li>
             </ul>
         </div>
     </div>
 
     <script>
         const appSettings = app.getAppSettings()
+        this.virtuals = []
+        this.locations = []
         this.dataTypes = appSettings.dataTypes
         for (var i = 0; i < this.dataTypes.length; i++) {
             const type = this.dataTypes[i]
-            if (type.virtual === true) type.url = '/create-virtual/' + encodeURI(type.name)
-            else type.url = '/create-physical/' + encodeURI(type.name)
+            if (type.virtual === true) {
+                type.url = '/create-virtual/' + encodeURI(type.name)
+                this.virtuals.push(type)
+            } else {
+                type.url = '/create-physical/' + encodeURI(type.name)
+                this.locations.push(type)
+            }
         }
         console.log("create unknown, types:%s", JSON.stringify(this.dataTypes))
 
     </script>
-</create-unknown>
+</create-quilt>

@@ -38,12 +38,16 @@
     <div id="printModal" ref="printModal" class="printModal modal"></div>
     <script>
         console.log("create physical tag, opts:%s", JSON.stringify(opts))
-        const appSettings = app.getAppSettings()
-        const dataTypes = appSettings.dataTypes
+        this.fields = app.getAttributesForType(opts.type)
+
         this.formData = {
             name: '',
             notes: ''
         }
+        
+        /*
+        const appSettings = app.getAppSettings()
+        const dataTypes = appSettings.dataTypes
         this.fields = []
 
         for (var i = 0; i < dataTypes.length; i++) {
@@ -58,6 +62,7 @@
                 }.bind(this));
             }
         }
+        */
 
         var savePhysical = function(p, labelImage) {
             var doPrint = labelImage ? true : false

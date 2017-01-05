@@ -53,58 +53,67 @@
 </create-part>
 
 <create-virtual-form>
+    <h5 id="createVirtualHeader" ref="createVirtualHeader">Create {type}</h5>
     <form id="createPartForm" ref="createPartForm" class="col s12" onsubmit={submitForm}>
-        <form-text-input label="Part Name" ref="name" name="name" value={formData.name}/>
+        <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
         <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
-        <form-text-input label="Created by" ref="creator" name="creator" value={formData.creator}/>
-        <form-text-input label="Created" ref="created" name="created" value={formData.created}/>
-        <form-text-input label="Storage temperature" ref="temperature" name="temperature" value={formData.temperature}/>
+        <form-text-input label="Created by" ref="creator" name="creator.user" value={formData.creator.user}/>
+        <form-text-input label="Created" ref="created" name="creator.time" value={formData.creator.time}/>
         <form-textarea-input label="Biosafety level" ref="bsl" name="bsl" value={formData.bsl}/>
         <form-switch label="Biohazardous?" ref="biohazard" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
-        <form-image imagesrc={formData.avatar} label="Avatar" height="60px" />
-        <form-text-input label="" ref="avatar" name="avatar" value={formData.avatar}/>
+        <div each={field in fields}>
+            <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
+        </div>
+        <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
         <std-button label="submit" action={submitForm} />
         <input type="submit" style="visibility:hidden" />
     </form>
     <script>
+        const tag = this
+        this.type=decodeURIComponent(opts.type)
         console.log('create-virtual-form, opts:%s', JSON.stringify(this.opts))
+            /*
+        <form-textarea-input label="Sequence" ref="sequence" name="sequence" value={formData.sequence}/>
+                creator: app.user.email,
+                created: new Date().toDateString(),
+            */
+
+        this.fields = app.getAttributesForType(this.type)
+
+        app.state.createPart = app.state.createPart || {}
+        this.formData = {
+            type: this.type,
+            name: '',
+            description: '',
+            creator: {
+                user: app.user.email,
+                time: new Date().toDateString()
+            },
+            notes: '',
+            bsl: '',
+            biohazard: ''
+        }
+        for (var i=0; i<this.fields.length; i++) {
+            this.formData[this.fields[i].name]=''
+        }
+        $.extend(app.state.createPart, this.formData)
+
+        console.log('create-virtual-form, createPart:%s', JSON.stringify(app.state.createPart))
+
         this.on('mount', function() {
 
-            if (!this.formData) {
-                this.formData = {};
-            }
-            if (this.opts.query && this.opts.query.name && this.opts.query.name.trim()) {
-                //this.refs.name.value = decodeURIComponent(this.opts.query.name);
-                this.formData.name = decodeURIComponent(this.opts.query.name);
-                this.formData.creator = app.user.email
-                const d = new Date()
-                this.formData.created = d.toDateString()
-                this.update();
+            if (tag.opts.query && tag.opts.query.name && tag.opts.query.name.trim()) {
+                tag.formData.name = decodeURIComponent(tag.opts.query.name);
+                tag.update();
                 $.extend(app.state.createPart, $.formToObject('createPartForm'))
             }
-            console.log('create-virtual-form, formData:%s', JSON.stringify(this.formData))
+            console.log('create-virtual-form, formData:%s', JSON.stringify(tag.formData))
 
-            $(this.refs.createPartForm).change(function(e) {
+            $(tag.refs.createPartForm).change(function(e) {
                 $.extend(app.state.createPart, $.formToObject('createPartForm'))
-            }.bind(this));
+            });
 
         });
-
-        this.formData = app.state.createPart
-        if (!this.formData || this.formData.name === undefined) {
-            this.formData = {
-                name: '',
-                description: '',
-                creator: '',
-                created: '',
-                temperature: '',
-                bsl: '',
-                biohazard: '',
-                avatar: ''
-            }
-
-        }
-        app.state.createPart = app.state.createPart || {}
 
         // TODO JUUl this doesn't work if using $(this.createPartForm)
         // probably because it needs to be run from within on('mount')
