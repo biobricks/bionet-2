@@ -321,9 +321,17 @@ websocket.createServer({server: server}, function(stream) {
             },
 
             delMaterial: function(curUser, id, cb) {
+                console.log('delMaterial:',id);
                 if(!id) return cb("Missing id");
                 
-                bioDB.del(id, cb);
+                //bioDB.del(id, cb);
+                physicalDB.del(id, cb);
+            },
+            
+            delPhysical: function(curUser, id, cb) {
+                console.log('delPhysical:',id);
+                if(!id) return cb("Missing id");
+                physicalDB.del(id, cb);
             },
 
             physicalAutocomplete: function(curUser, query, cb) {

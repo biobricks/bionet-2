@@ -8,6 +8,7 @@
         <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
 
         <input type="hidden" ref="id" name="id" value={formData.id} />
+        <input type="hidden" ref="type" name="type" value={type} />
         <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
 
         <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
@@ -37,35 +38,19 @@
     <div id="scanModal" ref="scanModal" class="scanModal modal"></div>
     <div id="printModal" ref="printModal" class="printModal modal"></div>
     <script>
+        const tag= this
         console.log("create physical tag, opts:%s", JSON.stringify(opts))
         this.fields = app.getAttributesForType(opts.type)
+        this.type = opts.type
 
         this.formData = {
             name: '',
             notes: ''
         }
         
-        /*
-        const appSettings = app.getAppSettings()
-        const dataTypes = appSettings.dataTypes
-        this.fields = []
-
-        for (var i = 0; i < dataTypes.length; i++) {
-            const dataType = dataTypes[i]
-            if (opts.type === dataType.name && dataType.fields !== undefined) {
-                const fields = dataType.fields
-                Object.keys(fields).forEach(function(key, index) {
-                    this.fields.push({
-                        name: key,
-                        value: fields[index]
-                    })
-                }.bind(this));
-            }
-        }
-        */
-
         var savePhysical = function(p, labelImage) {
             var doPrint = labelImage ? true : false
+            console.log('savePhysical, p=',JSON.stringify(p))
             app.remote.savePhysical(p, labelImage, doPrint, function(err, id) {
                 if (err) {
                     app.ui.toast("Error: " + err); // TODO improve
@@ -200,6 +185,7 @@
 
             if (opts.query && opts.query.name && opts.query.name.trim()) {
                 this.formData.name = decodeURIComponent(opts.query.name);
+                this.type = this.formData.name
             }
 
             this.update();
@@ -222,6 +208,7 @@
                         return
                     }
                     this.formData = data
+                    this.type = data.type
 
                     this.printNameDefault = data.name;
                     $(this.refs.createPhysicalHeader).html("Edit " + data.name)
@@ -240,6 +227,7 @@
                         return;
                     }
                     this.formData.virtual_id = virtual.id;
+                    this.type = virtual.type
                     this.formData.name = virtual.name;
                     this.printNameDefault = this.refs.name.value.trim() || virtual.name
                     $(this.refs.createPhysicalHeader).html("New " + virtual.name)
@@ -267,7 +255,6 @@
                     route('/create/' + encodeURIComponent(opts.type));
                     return;
                 }
-
                 this.printNameDefault = this.refs.name.value.trim() || type.name
                 $(this.refs.createPhysicalHeader).html("New " + type.name)
 

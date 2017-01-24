@@ -15,10 +15,14 @@
 <parts-inventory-form>
     <div style="padding-top:100px;" />
     <form onsubmit={submitForm}>
+        <!--
         <search-input label="search inventory" ref="searchinventory" name="searchinventory" action={submitForm}/>
         <input type="submit" style="display:none" />
+        -->
         <div if={nodes.length>0} class="collection with-header z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
+            <!--
             <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+            -->
             <inventory-treeview nodes={nodes} />
         </div>
     </form>
@@ -26,13 +30,13 @@
         const tag = this
         this.theme = app.getTheme();
         this.nodes = [];
-        var q = (this.opts.q) ? decodeURIComponent(this.opts.q) : undefined;
-
+        //var q = (this.opts.q) ? decodeURIComponent(this.opts.q) : undefined;
+        var q=''
         const updateInventoryTree = function() {
             console.log('parts-inventory-form: updateInventoryTree q=', q)
             if (q === undefined) return;
             const matchAll = (q.length > 0) ? false : true;
-            tag.refs.searchinventory.value = q;
+            //tag.refs.searchinventory.value = q;
 
             //q = new RegExp(q.replace(/\s+/, '.*'), 'i');
 
@@ -75,7 +79,7 @@
                     }
                     if (add) {
                         const data = children[i].value
-                        console.log('inventory re value:', JSON.stringify(data))
+                        //console.log('inventory re value:', JSON.stringify(data))
                         this.nodes.push({
                             indent: indent,
                             url: '/edit-physical/' + data.id,
@@ -110,7 +114,7 @@
     </script>
 </parts-inventory-form>
 
-<inventory-treeview>
+<inventory-treeview2>
 
     <list-item each={node in opts.nodes} item={node} />
     <script>
@@ -158,4 +162,4 @@
 
     </script>
 
-</inventory-treeview>
+</inventory-treeview2>
