@@ -1,0 +1,129 @@
+<bionet-setup-schemas>
+    <div style="padding-top:165px;">
+        <h5>Schemas</h5>
+        <div class="fixed-action-btn horizontal" style="top:185px; right:25px">
+            <a onclick={addNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+            <ul>
+                <li><a onclick={deleteNode} class="btn-floating red"><i class="material-icons">delete</i></a></li>
+                <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li>
+                <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+                <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
+            </ul>
+        </div>
+        <table id="ftree">
+            <colgroup>
+                <col width="*"></col>
+                <col width="150px"></col>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <style>
+        table.fancytree-ext-table tbody tr td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            display: table-cell;
+        }
+
+    </style>
+    <script>
+        const tag = this
+
+        // setup secondary nav
+        app.dispatch(app.$.secondaryNav, [{
+            label: 'storage',
+            action: '/bionetsetup/storage'
+        }, {
+            label: 'schemas',
+            action: '/bionetsetup/schemas'
+        }, {
+            label: 'strains',
+            action: '/bionetsetup/strains'
+        }])
+
+        // configure app bar
+        app.dispatch(app.$.appBarConfig, {
+            enableTopNav: true,
+            enableBreadCrumbs: true,
+            enableSubbar: true
+        })
+
+        this.addNode = function() {
+            // Get a FancytreeNode instance
+            var node = $("#ftree").fancytree("getActiveNode");
+            if (!node) node = $("#ftree").fancytree("getRootNode");
+            node.addChildren({
+                title: 'New item',
+                type: 'text',
+                children: []
+            })
+        }
+
+        this.deleteNode = function() {
+            // Get a FancytreeNode instance
+            var node = $("#ftree").fancytree("getActiveNode");
+            if (!node) return
+            node.remove()
+        }
+
+        this.on('mount', function() {
+
+            // initialize breadcrumbs
+            app.dispatch(app.$.breadcrumbs, [{
+                'label': 'configure',
+                'url': '/'
+            }, {
+                'label': 'schemas',
+                'url': '/bionetsetup/schemas'
+            }]);
+
+            const ftSettings = {
+                extensions: ["table", "gridnav"],
+                source: [],
+                renderColumns: function(event, data) {
+                    console.log('tdlist:')
+                    var node = data.node
+                    var $tdList = $(node.tr).find(">td");
+                    $tdList.eq(1).html('<span>' + node.data.type + '</span>');
+                }
+            }
+            $("#ftree").fancytree(ftSettings);
+            const ftree = $("#ftree").fancytree("getTree");
+
+            $("#ftree").on('click keypress dblclick', function(e) {
+                const active = $(e.target)
+                console.log('click:', active.prop("tagName"), active.text())
+                if (!active.text()) return
+                app.editTextElement(e, active)
+            })
+
+            const bionetSetup = app.getStream('bionetSetup')
+            bionetSetup.addRoute('schemas', function(schemaData) {
+                console.log('initializing schemas:', JSON.stringify(schemaData))
+                const ftree = $("#ftree").fancytree("getTree");
+                ftree.reload(schemaData)
+                    //$("#ftree").editableTableWidget();
+            })
+
+            bionetSetup.route('requestSchemas')
+        })
+
+
+        this.runSetup = function() {
+            console.log('Run setup')
+            app.dispatch('bionetSetup', setup)
+        }
+
+    </script>
+</bionet-setup-schemas>

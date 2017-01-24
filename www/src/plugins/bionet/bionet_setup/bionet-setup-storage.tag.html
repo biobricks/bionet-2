@@ -1,0 +1,356 @@
+<!--
+<inventory-treeview>
+    <bionet-setup-storage/>
+</inventory-treeview>
+<bionet-setup-storage>
+-->
+<inventory-treeview>
+    <div style="padding-top:0px;">
+        <div class="fixed-action-btn" style="bottom:100px; left:25px; width:150px; text-align:left">
+            <a class="btn-floating btn-large waves-effect waves-light green"><i class="material-icons">add</i></a>
+            <ul style="text-align:left;">
+                <li if={createType==='storage'} each={item in locations}><span class="add-type" onclick={addNode}>{item.name}</span></li>
+                <li if={createType==='material'} each={item in materials}><span class="add-type" onclick={addNode}>{item.name}</span></li>
+            </ul>
+        </div>
+        <div class="fixed-action-btn" style="bottom:25px; left:25px; width:150px; text-align:left">
+            <a onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></a>
+        </div>
+
+        <table id="ftree">
+            <colgroup>
+                <col width="*"></col>
+                <col width="250px"></col>
+                <col width="150px"></col>
+                <col width="100px"></col>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th style="padding-left:10px">Name</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Barcode</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <style>
+        table.fancytree-ext-table tbody tr td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            display: table-cell;
+        }
+        
+        span.fancytree-edit {
+            cursor: 'pointer';
+        }
+        
+        span.add-type:hover {
+            background-color: #E5F3FB;
+            outline: 1px solid #70C0E7;
+        }
+
+    </style>
+    <script>
+        const tag = this
+        const appSettings = app.getAppSettings()
+        const dataTypes = appSettings.dataTypes
+        const bionetSetup = app.getStream('bionetSetup')
+
+        // setup secondary nav
+        app.dispatch(app.$.secondaryNav, [{
+            label: 'storage',
+            action: '/bionetsetup/storage'
+        }, {
+            label: 'schemas',
+            action: '/bionetsetup/schemas'
+        }, {
+            label: 'strains',
+            action: '/bionetsetup/strains'
+        }])
+
+        // configure app bar
+        app.dispatch(app.$.appBarConfig, {
+            enableTopNav: true,
+            enableBreadCrumbs: true,
+            enableSubbar: false
+        })
+
+        this.addNode = function(e) {
+
+            // get active node
+            var node = $("#ftree").fancytree("getActiveNode");
+
+            // initialize parent id
+            var parentId
+            if (!node) {
+                node = $("#ftree").fancytree("getRootNode");
+            } else {
+                parentId = node.data.dbData.id
+            }
+
+            // initialize storage type
+            const active = $(e.target)
+            const type = active.text()
+            
+            // generate unique name
+            const nodeIndex = (node.children) ? node.children.length+1 : 1
+            const name = type+'_'+node.getIndexHier()+'.'+nodeIndex
+
+            // initialize standard attributes
+            const dbData = {
+                name: name,
+                type: type,
+                parent_id: parentId
+            }
+
+            // initialize attributes
+            const attributes = app.getAttributesForType(type)
+            for (var i = 0; i < attributes.length; i++) {
+                dbData[attributes[i].name] = type + ' ' + attributes[i].name
+            }
+
+            bionetSetup.route('createStorageItem', undefined, dbData)
+        }
+
+        bionetSetup.addRoute('createStorageItemResult', function(storageItem) {
+            console.log('createStorageItemResult', JSON.stringify(storageItem))
+            
+            const newNodeData = {
+                title: storageItem.name,
+                children: [],
+                dbData: storageItem
+            }
+            // get active node
+            var parentNode = $("#ftree").fancytree("getActiveNode");
+            if (!parentNode) {
+                parentNode = $("#ftree").fancytree("getRootNode");
+            }
+            const newNode = parentNode.addChildren(newNodeData)
+            parentNode.setExpanded()
+            //dbData.name = type + '_' + newNode.getIndexHier()
+            //console.log('add node :', JSON.stringify(dbData))
+            /*
+            const ftree = $("#ftree").fancytree("getTree")
+            ftree.visit(function(node) {
+                if (node.data.dbData.name === storageItem.name) {
+                    node.setTitle(storageItem.name)
+                    node.data.dbData.id = storageItem.id
+                    console.log('createStorageItemResult %s updated with id %s', storageItem.name, storageItem.id)
+                }
+            })
+            */
+        })
+
+        this.deleteNode = function() {
+            const ftree = $("#ftree").fancytree("getTree")
+            const deleteNodes = []
+            const delChildren = function(node) {
+                if (!node.children) return
+                for (var i = 0; i < node.children.length; i++) {
+                    const childNode = node.children[i]
+                    delChildren(childNode)
+                    deleteNodes.push(childNode)
+                }
+            }
+            ftree.visit(function(node) {
+                if (node.isSelected()) {
+                    delChildren(node)
+                    deleteNodes.push(node)
+                }
+            })
+            for (var i = 0; i < deleteNodes.length; i++) {
+                const node = deleteNodes[i]
+                const id = node.data.dbData.id
+                console.log('removing %s %s', node.title, id)
+                bionetSetup.route('delPhysical', undefined, id)
+                node.remove()
+            }
+        }
+
+        this.on('mount', function() {
+            // initialize breadcrumbs
+            /*
+            app.dispatch(app.$.breadcrumbs, [{
+                'label': 'configure',
+                'url': '/'
+            }, {
+                'label': 'storage',
+                'url': '/bionetsetup/storage'
+            }]);
+            */
+
+            tag.materials = []
+            tag.locations = []
+            for (var i = 0; i < dataTypes.length; i++) {
+                const type = dataTypes[i]
+                if (type.virtual === true) {
+                    type.url = '/create-virtual/' + encodeURI(type.name)
+                    tag.materials.push(type)
+                } else {
+                    type.url = '/create-physical/' + encodeURI(type.name)
+                    tag.locations.push(type)
+                }
+            }
+            tag.createType='storage'
+            tag.update()
+
+
+            const ftSettings = {
+                extensions: ["table", "gridnav", "dnd5"],
+                source: [],
+                checkbox: true,
+                icon: false,
+                renderColumns: function(event, data) {
+                    console.log('tdlist:')
+                    const node = data.node
+                    const $tdList = $(node.tr).find(">td");
+                    const dbData = node.data.dbData
+                    const type = (dbData.type) ? dbData.type : ''
+                    const barcode = (dbData.barcode) ? dbData.barcode : ' '
+                    $tdList.eq(1).html('<span class="fancytree-edit">' + dbData.Description + '</span>');
+                    $tdList.eq(2).html('<span class="fancytree-edit">' + type + '</span>');
+                    $tdList.eq(3).html('<span class="fancytree-edit">' + barcode + '</span>');
+                    //$tdList.eq(3).html('<span>' + node.getIndexHier() + '</span>');
+                },
+                beforeSelect: function(event,data) {
+                },
+                modifyChild: function(event, data) {
+                    if (data.operation === 'remove') {
+                        const deleteNode = data.childNode
+                    }
+                },
+                keydown: function(event, data) {
+                    const node = data.node;
+                    if (event.which === 13) {
+                        event.preventDefault();
+                        console.log('setup-storage - save item: ', node)
+                        const $tdList = $(node.tr).find(">td");
+                        const dbData = node.data.dbData
+                            //dbData.name = $tdList.eq(0).text()
+                        dbData.Description = $tdList.eq(1).text()
+                        dbData.type = ($tdList.eq(2).text()) ? $tdList.eq(2).text() : ' '
+                        dbData.barcode = $tdList.eq(3).text()
+                            //console.log('title: %s node.data:%s',node.title,JSON.stringify(dbData))
+                        bionetSetup.route('updateStorageItem', undefined, dbData)
+                    }
+                },
+                dnd5: {
+                    // autoExpandMS: 400,
+                    // preventForeignNodes: true, 
+                    // preventNonNodes: true, 
+                    // preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+                    // preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+                    // scroll: true,
+                    // scrollSpeed: 7,
+                    // scrollSensitivity: 10,
+
+                    // --- Drag-support:
+
+                    dragStart: function(node, data) {
+                        /* This function MUST be defined to enable dragging for the tree.
+                         *
+                         * Return false to cancel dragging of node.
+                         * data.dataTransfer.setData() and .setDragImage() is available
+                         * here.
+                         */
+                        //          data.dataTransfer.setDragImage($("<div>hurz</div>").appendTo("body")[0], -10, -10);
+                        return true;
+                    },
+                    dragDrag: function(node, data) {
+                        data.dataTransfer.dropEffect = "move";
+                    },
+                    dragEnd: function(node, data) {},
+
+                    // --- Drop-support:
+
+                    dragEnter: function(node, data) {
+                        // node.debug("dragEnter", data);
+                        data.dataTransfer.dropEffect = "move";
+                        // data.dataTransfer.effectAllowed = "copy";
+                        return true;
+                    },
+                    dragOver: function(node, data) {
+                        data.dataTransfer.dropEffect = "move";
+                        // data.dataTransfer.effectAllowed = "copy";
+                    },
+                    dragLeave: function(node, data) {},
+                    dragDrop: function(node, data) {
+                        /* This function MUST be defined to enable dropping of items on
+                         * the tree.
+                         */
+                        var transfer = data.dataTransfer;
+
+                        node.debug("drop", data);
+
+                        // alert("Drop on " + node + ":\n"
+                        //   + "source:" + JSON.stringify(data.otherNodeData) + "\n"
+                        //   + "hitMode:" + data.hitMode
+                        //   + ", dropEffect:" + transfer.dropEffect 
+                        //   + ", effectAllowed:" + transfer.effectAllowed);
+
+                        if (data.otherNode) {
+                            // Drop another Fancytree node from same frame
+                            // (maybe from another tree however)
+                            var sameTree = (data.otherNode.tree === data.tree);
+
+                            data.otherNode.moveTo(node, data.hitMode);
+                        } else if (data.otherNodeData) {
+                            // Drop Fancytree node from different frame or window, so we only have
+                            // JSON representation available
+                            node.addChild(data.otherNodeData, data.hitMode);
+                        } else {
+                            // Drop a non-node
+                            node.addNode({
+                                title: transfer.getData("text")
+                            }, data.hitMode);
+                        }
+                        node.setExpanded();
+                    }
+                }
+            }
+
+            $("#ftree").fancytree(ftSettings);
+            $("#ftree").on('click dblclick', function(e) {
+                const active = $(e.target)
+                    //console.log('tree click:',e.which)
+                const elementType = active.prop('nodeName');
+                console.log('elementType:', elementType)
+                    //if (elementType!=='SPAN') return
+                if (!active.hasClass('fancytree-edit')) {
+                    var node = $("#ftree").fancytree("getActiveNode");
+                    const type= node.data.dbData.type
+                    tag.createType = (type.indexOf('box')>=0 || type.indexOf('shelf')>=0 || type.indexOf('cabinet')>=0|| type.indexOf('drawer')>=0) ? 'material' : 'storage'
+                    console.log('beforeSelect:%s %s %s',node.title, type, tag.createType)
+                    tag.update()
+                    return
+                }
+                    //if (!active.text()) return
+                app.editTextElement(e, active)
+            })
+
+            bionetSetup.addRoute('storage', function(storageData) {
+                //console.log('initializing storage:', JSON.stringify(storageData))
+                const ftree = $("#ftree").fancytree("getTree");
+                ftree.reload(storageData)
+            })
+
+            bionetSetup.route('requestStorage')
+
+        })
+
+        this.runSetup = function() {
+            console.log('Run setup')
+            app.dispatch('bionetSetup', setup)
+        }
+
+    </script>
+</inventory-treeview>
