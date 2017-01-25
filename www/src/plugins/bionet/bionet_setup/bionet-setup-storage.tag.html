@@ -5,47 +5,56 @@
 <bionet-setup-storage>
 -->
 <inventory-treeview>
-    <div style="padding-top:0px;">
+    <div class="contentHeight">
         <div class="fixed-action-btn" style="bottom:100px; left:25px; width:150px; text-align:left">
             <a class="btn-floating btn-large waves-effect waves-light green"><i class="material-icons">add</i></a>
             <ul style="text-align:left;">
-                <li if={createType==='storage'} each={item in locations}><span class="add-type" onclick={addNode}>{item.name}</span></li>
-                <li if={createType==='material'} each={item in materials}><span class="add-type" onclick={addNode}>{item.name}</span></li>
+                <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.name}</span></li>
+                <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.name}</span></li>
             </ul>
         </div>
         <div class="fixed-action-btn" style="bottom:25px; left:25px; width:150px; text-align:left">
             <a onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></a>
         </div>
 
-        <table id="ftree">
-            <colgroup>
+        <div style="float:left; top:0px; height:100%;">
+            <table id="ftree" style="margin-top:15px; width:400px;border:none !important;">
+                <colgroup>
+                    <col width="390px"></col>
+                    <!--
                 <col width="*"></col>
                 <col width="250px"></col>
                 <col width="150px"></col>
                 <col width="100px"></col>
-            </colgroup>
-            <thead>
-                <tr>
-                    <th style="padding-left:10px">Name</th>
-                    <th>Description</th>
-                    <th>Type</th>
-                    <th>Barcode</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
+            -->
+                </colgroup>
+                <!--
+                <thead>
+                    <tr>
+                        <th style="padding-left:10px">Name</th>
+                    </tr>
+                </thead>
+                -->
+                <tbody style="border: none !important;">
+                    <tr>
+                        <td></td>
+                        <!--
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
+                    -->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="editPhysical" style="float:left; top:0px; height:100%; margin-left:25px;">
+            <create-physical show="false" top-margin="0px" />
+        </div>
     </div>
     <style>
-        table.fancytree-ext-table tbody tr td {
+        table.fancytree-ext-table tr td {
+            border: none !important;
             padding: 8px;
-            border: 1px solid #ddd;
             display: table-cell;
         }
         
@@ -53,9 +62,17 @@
             cursor: 'pointer';
         }
         
-        span.add-type:hover {
+        li.add-type:hover {
             background-color: #E5F3FB;
             outline: 1px solid #70C0E7;
+        }
+        
+        div.editPhysical {
+            width: calc(100% - 450px)
+        }
+        
+        div.contentHeight {
+            height: calc(100% - 100px)
         }
 
     </style>
@@ -100,10 +117,10 @@
             // initialize storage type
             const active = $(e.target)
             const type = active.text()
-            
+
             // generate unique name
-            const nodeIndex = (node.children) ? node.children.length+1 : 1
-            const name = type+'_'+node.getIndexHier()+'.'+nodeIndex
+            const nodeIndex = (node.children) ? node.children.length + 1 : 1
+            const name = type + '_' + node.getIndexHier() + '.' + nodeIndex
 
             // initialize standard attributes
             const dbData = {
@@ -123,31 +140,31 @@
 
         bionetSetup.addRoute('createStorageItemResult', function(storageItem) {
             console.log('createStorageItemResult', JSON.stringify(storageItem))
-            
+
             const newNodeData = {
-                title: storageItem.name,
-                children: [],
-                dbData: storageItem
-            }
-            // get active node
+                    title: storageItem.name,
+                    children: [],
+                    dbData: storageItem
+                }
+                // get active node
             var parentNode = $("#ftree").fancytree("getActiveNode");
             if (!parentNode) {
                 parentNode = $("#ftree").fancytree("getRootNode");
             }
             const newNode = parentNode.addChildren(newNodeData)
             parentNode.setExpanded()
-            //dbData.name = type + '_' + newNode.getIndexHier()
-            //console.log('add node :', JSON.stringify(dbData))
-            /*
-            const ftree = $("#ftree").fancytree("getTree")
-            ftree.visit(function(node) {
-                if (node.data.dbData.name === storageItem.name) {
-                    node.setTitle(storageItem.name)
-                    node.data.dbData.id = storageItem.id
-                    console.log('createStorageItemResult %s updated with id %s', storageItem.name, storageItem.id)
-                }
-            })
-            */
+                //dbData.name = type + '_' + newNode.getIndexHier()
+                //console.log('add node :', JSON.stringify(dbData))
+                /*
+                const ftree = $("#ftree").fancytree("getTree")
+                ftree.visit(function(node) {
+                    if (node.data.dbData.name === storageItem.name) {
+                        node.setTitle(storageItem.name)
+                        node.data.dbData.id = storageItem.id
+                        console.log('createStorageItemResult %s updated with id %s', storageItem.name, storageItem.id)
+                    }
+                })
+                */
         })
 
         this.deleteNode = function() {
@@ -200,7 +217,7 @@
                     tag.locations.push(type)
                 }
             }
-            tag.createType='storage'
+            tag.createType = 'storage'
             tag.update()
 
 
@@ -210,6 +227,7 @@
                 checkbox: true,
                 icon: false,
                 renderColumns: function(event, data) {
+                    /*
                     console.log('tdlist:')
                     const node = data.node
                     const $tdList = $(node.tr).find(">td");
@@ -220,15 +238,16 @@
                     $tdList.eq(2).html('<span class="fancytree-edit">' + type + '</span>');
                     $tdList.eq(3).html('<span class="fancytree-edit">' + barcode + '</span>');
                     //$tdList.eq(3).html('<span>' + node.getIndexHier() + '</span>');
+                    */
                 },
-                beforeSelect: function(event,data) {
-                },
+                beforeSelect: function(event, data) {},
                 modifyChild: function(event, data) {
                     if (data.operation === 'remove') {
                         const deleteNode = data.childNode
                     }
                 },
                 keydown: function(event, data) {
+                    /*
                     const node = data.node;
                     if (event.which === 13) {
                         event.preventDefault();
@@ -236,12 +255,10 @@
                         const $tdList = $(node.tr).find(">td");
                         const dbData = node.data.dbData
                             //dbData.name = $tdList.eq(0).text()
-                        dbData.Description = $tdList.eq(1).text()
-                        dbData.type = ($tdList.eq(2).text()) ? $tdList.eq(2).text() : ' '
-                        dbData.barcode = $tdList.eq(3).text()
                             //console.log('title: %s node.data:%s',node.title,JSON.stringify(dbData))
                         bionetSetup.route('updateStorageItem', undefined, dbData)
                     }
+                    */
                 },
                 dnd5: {
                     // autoExpandMS: 400,
@@ -319,28 +336,40 @@
             }
 
             $("#ftree").fancytree(ftSettings);
-            $("#ftree").on('click dblclick', function(e) {
+            $("#ftree").on('click dblclick keydown', function(e) {
+                if (e.type === 'keydown') {
+                    if (e.which !== undefined && e.which !== 13) return
+                }
                 const active = $(e.target)
-                    //console.log('tree click:',e.which)
                 const elementType = active.prop('nodeName');
                 console.log('elementType:', elementType)
-                    //if (elementType!=='SPAN') return
-                if (!active.hasClass('fancytree-edit')) {
+                //if (!active.hasClass('fancytree-edit')) {
                     var node = $("#ftree").fancytree("getActiveNode");
-                    const type= node.data.dbData.type
-                    tag.createType = (type.indexOf('box')>=0 || type.indexOf('shelf')>=0 || type.indexOf('cabinet')>=0|| type.indexOf('drawer')>=0) ? 'material' : 'storage'
-                    console.log('beforeSelect:%s %s %s',node.title, type, tag.createType)
-                    tag.update()
-                    return
-                }
-                    //if (!active.text()) return
-                app.editTextElement(e, active)
+                    if (node) {
+                        const dbData = node.data.dbData
+                        const type = dbData.type
+                        tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('cabinet') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
+                        console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
+                        tag.update()
+                        bionetSetup.route('getPhysical', undefined, dbData.id)
+                        if (e.type==='keydown') node.setExpanded()
+                    }
+                //}
+                //if (!active.text()) return
+                //app.editTextElement(e, active)
             })
 
             bionetSetup.addRoute('storage', function(storageData) {
                 //console.log('initializing storage:', JSON.stringify(storageData))
                 const ftree = $("#ftree").fancytree("getTree");
-                ftree.reload(storageData)
+                ftree.reload(storageData).then(function() {
+                    const children = ftree.getRootNode().children
+                    const activeNode = children[0]
+                    if (activeNode) {
+                        activeNode.setExpanded();
+                        activeNode.setFocus();
+                    }
+                })
             })
 
             bionetSetup.route('requestStorage')

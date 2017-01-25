@@ -1,13 +1,17 @@
 <app>
     <appbar/>
-    <div id="content-container" class="container {theme.style.color.background} {theme.style.color.text}">
-        <div class="section">
+    <div id="content-container" class="{theme.style.color.background} {theme.style.color.text}" style="margin-left:125px;">
+        <div class="contentHeight">
             <div id="content" class="{theme.style.color.background+' '+theme.style.color.text}" />
         </div>
     </div>
     <div style="height:48px"></div>
     <!--  <footer-tag background={theme.style.color.highlightBackground} /> -->
-
+    <style>
+        div.contentHeight {
+            height:calc(100% - 100px)
+        }
+    </style>
     <script>
         const tag = this
         this.theme = app.getTheme()

@@ -2,7 +2,7 @@
     <div class="input-field">
         <label for="autocomplete" class="active">Container</label>
         <input type="text" ref={opts.ref || opts.name || 'q'} name={opts.name || 'q'} id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
-        <ul id="matchList" style="z-index:1000">
+        <ul id="matchList" style="z-index:1000; border: 1px solid #404040;">
             <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver} onmousedown={clickSelect}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.text}</li>
             <li if={matches && !matches.length} class="no-match">No matches found</li>
         </ul>

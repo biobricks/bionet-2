@@ -131,6 +131,17 @@ var bionetSetup = {
             })
         })
 
+
+        bionetSetup.addRoute('getPhysical', function (id) {
+            app.remote.get(id, function (err, data) {
+                if (err) {
+                    app.dispatch('error', err)
+                    return
+                }
+                bionetSetup.route('getPhysicalResult', undefined, data)
+            })
+        })
+
         bionetSetup.addRoute('updateStorageItem', function (storageItem) {
             console.log('updateStorageItem:', JSON.stringify(storageItem))
             app.remote.savePhysical(storageItem, null, false, function (err, id) {

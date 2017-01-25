@@ -1,56 +1,99 @@
 <create-physical>
-
     <div if={opts.topMargin!==undefined} id="createPhysical" style="margin-top:{opts.topMargin}px" />
     <div if={opts.topMargin===undefined} id="createPhysical" style="margin-top:100px" />
-
+    <!--
     <form id="createPhysicalForm" ref="createPhysicalForm" class="col s12" onsubmit={submitForm}>
+    -->
+    <form id="createPhysicalForm" ref="createPhysicalForm" onsubmit={submitForm}>
 
         <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
 
-        <input type="hidden" ref="id" name="id" value={formData.id} />
-        <input type="hidden" ref="type" name="type" value={type} />
-        <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
-
-        <form-textarea-input label="Notes" ref="notes" name="notes" value={formData.notes}/>
-
-        <form-text-input label="Storage temperature" ref="temperature" name="temperature" value={formData.temperature}/>
-
-        <div each={field in fields}>
-            <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
+        <div if={showPhysical}>
+            <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
         </div>
 
-        <form-text-input label="Barcode" ref="curBarcode" name="barcode" value={formData.barcode}/>
+        <div id="selectVirtual" class="row">
+            <!--
+            <div id="selectedTypeContainer" class="selected-type">
+                <span id="selectedTypeLabel">plasmid</span>
+            </div>
+            -->
+            <div class="input-field col s12">
+                <div class="query-container">
+                    <input type="text" id="q" name="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+                    <label for="q" class="active">Instance of {type}</label>
+                </div>
+                <ul id="matchList" class="matchlist">
+                    <li each={match, index in matches} class="matchlist {highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+                    <li if={matches && !matches.length} class="matchlist no-match">No matches found</li>
+                </ul>
+            </div>
+        </div>
 
-        <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+        <div if={showPhysical} each={field in fields}>
+            <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
+        </div>
 
-        <div style="margin-top:30px" />
-        <form-text-input label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
+        <div if={showPhysical} class="row">
+            <div class="col">
+                <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+            </div>
+        </div>
+        <div if={showPhysical}>
+            <div style="margin-top:30px" />
+            <form-text-input label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
+        </div>
+        <div if={showPhysical} class="row">
+            <div class="col">
+                <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a>
+                <div id="autocomplete-container" />
+            </div>
+        </div>
 
-        <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a>
-        <p>or</p>
-        <div id="autocomplete-container" />
+        <div if={showPhysical} class="row">
+            <div class="col">
+                <div style="margin-top:30px" />
+                <std-button label="submit" action={submitForm} />
+            </div>
+        </div>
 
+        <input type="hidden" ref="id" name="id" value={formData.id} />
+        <input type="hidden" ref="type" name="type" value={type} />
         <input type="hidden" ref="virtual_id" name="virtual_id" value={formData.virtual_id} />
-        <std-button2 label="submit" action={submitForm} />
         <input type="submit" style="visibility:hidden" />
     </form>
 
     <div id="scanModal" ref="scanModal" class="scanModal modal"></div>
     <div id="printModal" ref="printModal" class="printModal modal"></div>
+
+    <style>
+        .matchlist {
+            background-color: rgba(255, 255, 255, 1);
+            z-index: 1000;
+        }
+
+    </style>
     <script>
-        const tag= this
+        const tag = this
         console.log("create physical tag, opts:%s", JSON.stringify(opts))
         this.fields = app.getAttributesForType(opts.type)
         this.type = opts.type
+        this.isMaterial = false
+        this.showPhysical = true
+
+        if (opts.show === undefined || opts.show === true) this.showPhysical = true
+        else this.showPhysical = false
+
+        const bionetSetup = app.getStream('bionetSetup')
 
         this.formData = {
             name: '',
             notes: ''
         }
-        
+
         var savePhysical = function(p, labelImage) {
             var doPrint = labelImage ? true : false
-            console.log('savePhysical, p=',JSON.stringify(p))
+            console.log('savePhysical, p=', JSON.stringify(p))
             app.remote.savePhysical(p, labelImage, doPrint, function(err, id) {
                 if (err) {
                     app.ui.toast("Error: " + err); // TODO improve
@@ -59,9 +102,11 @@
                 }
 
                 app.ui.toast("Saved to database")
-                setTimeout(function() {
-                    route('edit-physical/' + encodeURIComponent(id) + '/');
-                }, 500);
+                    /*
+                    setTimeout(function() {
+                        route('edit-physical/' + encodeURIComponent(id) + '/');
+                    }, 500);
+                    */
             })
         }.bind(this)
 
@@ -177,6 +222,26 @@
             })
         }.bind(this)
 
+        function query(type, q, cb) {
+
+            app.remote.createAutocomplete(type, q, function(err, results) {
+                if (err) return cb(err)
+                cb(null, results)
+            });
+        }
+        this.hideMatches = function(e) {
+            this.matches = null
+            this.selected = null
+            this.update()
+        }.bind(this)
+
+        this.clickSelect = function(e) {
+            this.selectCurrent();
+        }.bind(this)
+
+        this.selected = null
+        this.selectedType = null
+
         this.on('mount', function() {
 
             if (!this.formData) {
@@ -218,6 +283,31 @@
                 return;
             }
 
+            $('#selectVirtual').hide()
+
+            bionetSetup.addRoute('getPhysicalResult', function(data) {
+                tag.formData = data
+                tag.type = data.type
+                const dataType = app.getType(data.type)
+                if (dataType.virtual) tag.isMaterial = true
+                else tag.isMaterial = false
+                if (tag.isMaterial) {
+                    tag.refs.q.value = ''
+                    $('#selectVirtual').show()
+                    tag.updateMatchListPosition()
+                } else {
+                    $('#selectVirtual').hide()
+                }
+                tag.printNameDefault = data.name;
+                //$(tag.refs.createPhysicalHeader).html("Edit " + data.name)
+                tag.fields = app.getAttributesForType(data.type)
+                tag.showPhysical = true
+                tag.update()
+            })
+
+            if (opts.isVirtual) {
+                tag.isMaterial = true
+            }
 
             if (opts.virtualID) {
                 // create new physical instance of this material
@@ -238,27 +328,131 @@
                 $('#createPhysicalForm').scrollTop(0)
                 return;
             }
-
-            app.remote.getType(opts.type, function(err, type) {
-                if (err) {
-                    if (err.notFound) {
-                        // we are creating a material of unknown type
-                        route('/create-unknown/' + encodeURIComponent(opts.type))
-                        return
+            
+            if (opts.type) {
+                app.remote.getType(opts.type, function(err, type) {
+                    if (err) {
+                        if (err.notFound) {
+                            // we are creating a material of unknown type
+                            route('/create-unknown/' + encodeURIComponent(opts.type))
+                            return
+                        }
+                        return app.ui.toast(err); // TODO handle better
                     }
-                    return app.ui.toast(err); // TODO handle better
-                }
-                // We are creating a new material of type: opts.type
+                    // We are creating a new material of type: opts.type
 
-                if (type.virtual) {
-                    // this type needs to be a virtual that then has physicals associated
-                    route('/create/' + encodeURIComponent(opts.type));
-                    return;
+                    if (type.virtual) {
+                        // this type needs to be a virtual that then has physicals associated
+                        route('/create/' + encodeURIComponent(opts.type));
+                        return;
+                    }
+                    this.printNameDefault = this.refs.name.value.trim() || type.name
+                    $(this.refs.createPhysicalHeader).html("New " + type.name)
+
+                }.bind(this));
+            }
+
+            this.updateMatchListPosition = function() {
+                $('#matchList').css($('#q').css(['top', 'left', 'offset']))
+                    /*
+                    var pos = $('#q').offset();
+                    if (pos === undefined) return
+                    pos.top += $('#q').innerHeight() + 2;
+                    pos.width = $('#q').innerWidth();
+                    $('#matchList').css(pos)
+                    */
+            }.bind(this)
+
+            $(window).resize(function() {
+                this.updateMatchListPosition();
+            }.bind(this))
+
+            this.setSelectedType = function(type) {
+                if (!type) {
+                    this.selectedType = null
+                    $('#selectedTypeContainer').css('display', 'none')
+                } else {
+                    this.selectedType = type
+                    $('#selectedTypeLabel').text(type.name)
+                    $('#selectedTypeContainer').css('display', 'block')
                 }
-                this.printNameDefault = this.refs.name.value.trim() || type.name
-                $(this.refs.createPhysicalHeader).html("New " + type.name)
+                this.updateMatchListPosition()
+            }.bind(this)
+
+            this.selectCurrent = function() {
+                var sel = this.matches[this.selected]
+                this.refs.q.value = sel.name
+                    /*
+                if (sel.pre === 'type') {
+                    //this.setSelectedType(sel)
+                    this.refs.q.value = ''
+                } else {
+                    this.refs.q.value = sel.name
+                }
+                */
+                this.hideMatches()
+            }.bind(this)
+
+            $('#q').keydown(function(e) {
+
+                if (e.keyCode === 38) { // up arrow
+                    e.preventDefault()
+                    if (this.selected !== null && this.selected > 0) this.selected--
+                        this.update();
+                } else if (e.keyCode === 40) { // down arrow
+                    e.preventDefault()
+                    if (this.selected === null) this.selected = 0
+                    else if (this.selected < this.matches.length - 1) this.selected++
+                        this.update();
+                } else if (e.keyCode === 27) { // escape
+                    this.hideMatches()
+                } else if (e.keyCode === 9 || e.keyCode === 13) { // tab or enter
+                    if (this.selected === null) return // normal operation if nothing selected
+                    e.preventDefault();
+                    this.selectCurrent()
+                } else {
+                    hadQueryBeforeKeydown = !!this.refs.q.value.replace(/\s+/g, '')
+                }
 
             }.bind(this));
+
+            $('#q').on('input', function(e) {
+
+                this.matches = [];
+
+                var q = this.refs.q.value.trim();
+
+                query(this.selectedType, q, function(err, results) {
+                    if (err) return app.ui.toast(err); // TODO better error handling
+
+                    if (!q) {
+                        this.matches = null;
+                    } else {
+                        var i;
+                        for (i = 0; i < results.types.length; i++) {
+                            this.matches.push({
+                                pre: "type",
+                                name: results.types[i].name,
+                                extraClass: 'type',
+                                virtual: results.types[i].virtual
+                            });
+                        }
+                        for (i = 0; i < results.virtuals.length; i++) {
+                            this.matches.push({
+                                pre: "virtual",
+                                name: results.virtuals[i].name
+                            });
+                        }
+                    }
+                    if (this.matches && this.matches.length) {
+                        this.selected = 0;
+                    } else {
+                        this.selected = null
+                    }
+                    this.update()
+
+                }.bind(this))
+            }.bind(this))
         }.bind(this));
 
     </script>
