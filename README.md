@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 This is a work in progress. Don't expect anything to work.
 
@@ -261,3 +262,6 @@ You can restore from a backup by first deleting the old database (obviously be c
 Username restrictions:
 
 * No @ symbols
+=======
+# bionet-private
+>>>>>>> e1b2796755d4c0ef184c33c643dc192fdb31eeb0
