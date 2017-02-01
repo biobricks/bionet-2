@@ -110,7 +110,7 @@ var partsearch = {
 
         //---------------------------------------------------------------------
         // search route
-        app.addRoute('/q..', function () {
+        const globalSearch = function (terms) {
             app.dispatch(app.$.appBarConfig, {
                 enableTopNav: true,
                 enableBreadCrumbs: true,
@@ -122,41 +122,48 @@ var partsearch = {
             if (q.page !== undefined) {
                 console.log('search result page: ' + q.page)
             }
-            const termsURL = (q.terms !== undefined) ? '?terms=' + q.terms : ''
+            //const termsURL = (q.terms !== undefined) ? '?terms=' + q.terms : ''
+            q.terms = (terms !== undefined) ? decodeURIComponent(terms) : ''
+            if (q.terms.length<=0) {
+                q.results=[]
+                riot.mount('div#content', 'search-result', q)
+                return
+            }
 
-            q.terms = decodeURIComponent(q.terms)
+            console.log("SEARCHING FOR:", q.terms);
 
-            app.dispatch(app.$.breadcrumbs, [{
-                'label': 'search',
-                'url': '/'
-              }, {
-                'label': q.terms,
-                'url': '/q' + termsURL
-              }]);
-          console.log("SEARCHING FOR:", q.terms);
-                app.remote.search(q.terms, function (err, results) {
-                    console.log("CALLED BACK");
-                    if (err) return console.error(err); // TODO handle error better
+            app.remote.search(q.terms, function (err, results) {
 
-                    q.results = [];
-                    var i, result;
-                    for (i = 0; i < results.length; i++) {
-//                        const result = results[i]._source
-                        result = results[i];
-                        if (!result || !result.name) continue;
-                        console.log('result:',JSON.stringify(results[i] ))
-                        const isVirtual = result.id.charAt(0)==='v'
-                        q.results.push({
-                            primary_text: result.name,
-                            secondary_text: ((isVirtual) ? 'virtual' : 'physical') +' id '+result.id,
-                            url: (isVirtual) ? '/edit/'+result.id : '/edit-physical/'+result.id,
-                            id: result.id
-                        });
-                    }
+                console.log("CALLED BACK");
+                if (err) return console.error(err); // TODO handle error better
 
-                    riot.mount('div#content', 'search-result', q)
+                q.results = [];
+                var i, result;
+                for (i = 0; i < results.length; i++) {
+                    //                        const result = results[i]._source
+                    result = results[i];
+                    if (!result || !result.name) continue;
+                    console.log('result:', JSON.stringify(results[i]))
+                    const isVirtual = result.id.charAt(0) === 'v'
+                        //                        url: (isVirtual) ? '/edit/' + result.id : '/edit-physical/' + result.id,
+                        //secondary_text: ((isVirtual) ? 'virtual' : 'physical') + ' id ' + result.id,
 
-                });
+                    q.results.push({
+                        primary_text: result.name,
+                        secondary_text: '',
+                        id: result.id
+                    });
+                }
+
+                riot.mount('div#content', 'search-result', q)
+
+            });
+        }
+        app.addRoute('/search', function () {
+            globalSearch()
+        })
+        app.addRoute('/search/*', function (terms) {
+            globalSearch(terms)
         })
     },
     remove: function () {

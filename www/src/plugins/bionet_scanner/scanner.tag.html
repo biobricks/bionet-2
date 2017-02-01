@@ -1,5 +1,5 @@
 <scanner>
-  <div id="scanner-widget" style="padding-top:110px;"></div>
+  <div id="scanner-widget" class="scanner-widget"></div>
   <style>
     @font-face {
       font-family: 'Roboto';
@@ -8,11 +8,17 @@
       font-weight: normal;
       font-style: normal;
     }
+      .scanner-widget {
+          width:100%;
+          height:100%
+          z-index:2;
+      }
     
   </style>
   
   <script>
     this.on('mount', function() {
+        console.log('scanner tag mount')
       app.dispatch('startScan', {
         status: 'start'
       })

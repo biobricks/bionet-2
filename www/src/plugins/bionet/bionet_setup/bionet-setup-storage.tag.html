@@ -5,19 +5,16 @@
 <bionet-setup-storage>
 -->
 <inventory-treeview>
-    <div class="contentHeight">
-        <div class="fixed-action-btn" style="bottom:100px; left:25px; width:150px; text-align:left">
-            <a class="btn-floating btn-large waves-effect waves-light green"><i class="material-icons">add</i></a>
-            <ul style="text-align:left;">
-                <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.name}</span></li>
-                <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.name}</span></li>
-            </ul>
-        </div>
-        <div class="fixed-action-btn" style="bottom:25px; left:25px; width:150px; text-align:left">
-            <a onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></a>
-        </div>
 
-        <div style="float:left; top:0px; height:100%;">
+    <div class="content-height">
+        <!--
+        <div class="fixed-action-btn" style="bottom:100px; left:25px; width:50px; text-align:left">
+            <a class="btn-floating btn-large waves-effect waves-light green dropdown-button"><i class="material-icons" data-activates="addmenu">add</i></a>
+        </div>
+        -->
+
+
+        <div class="inventory-tree">
             <table id="ftree" style="margin-top:15px; width:400px;border:none !important;">
                 <colgroup>
                     <col width="390px"></col>
@@ -47,15 +44,34 @@
                 </tbody>
             </table>
         </div>
-        <div class="editPhysical" style="float:left; top:0px; height:100%; margin-left:25px;">
+        <div id="physical-storage" class="edit-physical">
             <create-physical show="false" top-margin="0px" />
         </div>
+        <div id="scanner" style="position:absolute;top:100px; left:0px"></div>
+    
+        <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:130px; right:25px; text-align:left" data-activates="addmenu"><i class="material-icons">add</i></a>
+        <ul id="addmenu" class="dropdown-content" style="position:absolute; top:130px; right:25px; width:200px !important; text-align:left;z-index:1000">
+            <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.name}</span></li>
+            <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.name}</span></li>
+        </ul>
+    
+        <div class="fixed-action-btn" style="position:absolute; top:200px; right:25px; text-align:left">
+            <a onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></a>
+        </div>
+    
     </div>
     <style>
         table.fancytree-ext-table tr td {
             border: none !important;
             padding: 8px;
             display: table-cell;
+        }
+        
+        .inventory-tree {
+            overflow: auto;
+            float: left;
+            margin-left: 25px;
+            width: 400px;
         }
         
         span.fancytree-edit {
@@ -67,11 +83,15 @@
             outline: 1px solid #70C0E7;
         }
         
-        div.editPhysical {
-            width: calc(100% - 450px)
+        .edit-physical {
+            overflow: auto;
+            width: calc(100% - 600px);
+            float: left;
+            //margin-left: 25px;
         }
         
-        div.contentHeight {
+        div.content-height {
+            margin-top: 115px;
             height: calc(100% - 100px)
         }
 
@@ -220,6 +240,16 @@
             tag.createType = 'storage'
             tag.update()
 
+            $('.dropdown-button').dropdown({
+                inDuration: 300,
+                outDuration: 225,
+                constrainWidth: false,
+                hover: true,
+                gutter: 0,
+                belowOrigin: true,
+                alignment: 'left',
+                stopPropagation: false
+            });
 
             const ftSettings = {
                 extensions: ["table", "gridnav", "dnd5"],
@@ -343,17 +373,35 @@
                 const active = $(e.target)
                 const elementType = active.prop('nodeName');
                 console.log('elementType:', elementType)
-                //if (!active.hasClass('fancytree-edit')) {
-                    var node = $("#ftree").fancytree("getActiveNode");
-                    if (node) {
-                        const dbData = node.data.dbData
-                        const type = dbData.type
-                        tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('cabinet') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
-                        console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
-                        tag.update()
-                        bionetSetup.route('getPhysical', undefined, dbData.id)
-                        if (e.type==='keydown') node.setExpanded()
+                    //if (!active.hasClass('fancytree-edit')) {
+                var node = $("#ftree").fancytree("getActiveNode");
+                if (node) {
+                    const dbData = node.data.dbData
+                    const type = dbData.type
+                    tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('cabinet') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
+                    
+                    if (tag.createType==='material') {
+                        console.log('activating scanner')
+                        app.dispatch('startScan',{status:'init'})
                     }
+                    
+                    console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
+                    tag.update()
+                    bionetSetup.route('getPhysical', undefined, dbData.id)
+                    if (e.type === 'keydown') node.setExpanded()
+                    $('.edit-physical').css({
+                        height: $(window).innerHeight() - 120
+                    });
+
+                    app.dispatch(app.$.breadcrumbs, [{
+                        'label': 'workbench',
+                        'url': '/inventory'
+                    }, {
+                        'label': node.title,
+                        'url': '/inventory'
+                    }]);
+
+                }
                 //}
                 //if (!active.text()) return
                 //app.editTextElement(e, active)
@@ -363,6 +411,9 @@
                 //console.log('initializing storage:', JSON.stringify(storageData))
                 const ftree = $("#ftree").fancytree("getTree");
                 ftree.reload(storageData).then(function() {
+                    $('.inventory-tree').css({
+                        height: $(window).innerHeight() - 120
+                    });
                     const children = ftree.getRootNode().children
                     const activeNode = children[0]
                     if (activeNode) {

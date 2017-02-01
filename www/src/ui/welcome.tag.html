@@ -75,7 +75,7 @@
             app.dispatch('bioClassQuery', q)
             console.log('search query:', JSON.stringify(q))
             app.dispatch('bioClassCache', [])
-            route('q?terms=' + encodeURIComponent(this.refs.searchbio.value))
+            route('search/' + encodeURIComponent(this.refs.searchbio.value))
         }.bind(this)
 
 

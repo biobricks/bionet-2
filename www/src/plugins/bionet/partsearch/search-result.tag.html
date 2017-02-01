@@ -1,43 +1,122 @@
 <search-result>
-    <div style="padding-top:100px;">
-        <div class="collection with-header z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
-            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-            <list-item no-reorder each={item in results} item={item}/>
+    <div class="searchheight">
+        <div class="searchresult">
+            <form id="search-form">
+                <div class="input-field col">
+                    <i class="material-icons postfix" style="cursor: pointer; cursor: hand; " onclick={searchClick}>search</i>
+                    <input id="search" ref="search" type="text" value={opts.terms} autofocus style="width:390px" />
+                    <label id="search-label" class="active" for="search">Search biomaterials</label>
+                </div>
+                <input type="submit" style="display:none" />
+            </form>
+            <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
+                <list-item class="searchItem" no-reorder each={item in results} item={item}/>
+            </div>
         </div>
-        <!--
-      <pagination items={pagination}/>
-      -->
+        <div class="edititem">
+            <create-physical show="false" top-margin="0px" />
+        </div>
     </div>
+
+    <style>
+        .searchheight {
+            margin-top: 115px;
+            height: calc(100% - 100px)
+        }
+        
+        .searchresult {
+            overflow: auto;
+            float: left;
+            margin-left: 25px;
+            width: 400px;
+        }
+        
+        .edititem {
+            overflow: auto;
+            width: calc(100% - 600px);
+            float: left;
+            margin-left: 25px;
+        }
+
+    </style>
 
     <script>
         const tag = this
-        tag.theme=app.getTheme()
+        tag.theme = app.getTheme()
         tag.results = []
-            // todo: store search query somewhere else
+        tag.pagination = []
+        const bionetSetup = app.getStream('bionetSetup')
 
-        this.pagination = [{
-            url: '1',
-            label: '1',
-            active: 'active blue darken-2'
-        }, {
-            url: '2',
-            label: '2'
-        }, {
-            url: '3',
-            label: '3'
-        }, {
-            url: '4',
-            label: '4'
-        }, {
-            url: '5',
-            label: '5'
+        this.searchClick = function(e) {
+            e.preventDefault()
+            const terms = tag.refs.search.value
+            console.log('search-result tag, query:', terms)
+            route('search/' + encodeURIComponent(terms))
+            return false
+        }
+
+        const breadcrumbs = [{
+            'label': 'global search',
+            'url': '/search'
         }]
 
         this.on('mount', function() {
             tag.results = tag.opts.results
+
+            const itemClick = function(item) {
+                console.log('itemClick:', JSON.stringify(item))
+                bionetSetup.route('getPhysical', undefined, item.id)
+                app.dispatch(app.$.breadcrumbs, [{
+                    'label': 'global search',
+                    'url': '/search'
+                }, {
+                    'label': opts.terms,
+                    'url': '/search/' + opts.terms,
+                }, {
+                    'label': item.primary_text,
+                    'url': '/search/' + opts.terms
+                }])
+            }
+            
+            const results = tag.results
+            for (var i = 0; i < results.length; i++) {
+                results[i].click = itemClick
+            }
+
+            if (opts.terms && opts.terms.length > 0) {
+                breadcrumbs.push({
+                    'label': opts.terms,
+                    'url': '/search/' + opts.terms
+                });
+                $('#search-label').addClass('active')
+            }
+
+            app.dispatch(app.$.breadcrumbs, breadcrumbs);
+            $('#search-form').submit(function(e) {
+                console.log('search-form submit')
+                tag.searchClick(e)
+                return false;
+            });
+
             tag.primaryHeader = 'Search results for "' + opts.terms + '"'
             tag.secondaryHeader = tag.results.length + ' items'
             tag.update()
+
+            $('.searchresult').css({
+                height: $(window).innerHeight() - 120
+            });
+            $('.edititem').css({
+                height: $(window).innerHeight() - 120
+            });
+
+            $("searchItem").on('click dblclick keydown', function(e) {
+                if (e.type === 'keydown') {
+                    if (e.which !== undefined && e.which !== 13) return
+                }
+                const active = $(e.target)
+                const elementType = active.prop('nodeName');
+                console.log('elementType:', elementType)
+            })
         });
 
         this.on('unmount', function() {

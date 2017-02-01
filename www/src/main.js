@@ -10,7 +10,7 @@ require('./ui/uitags.js')
 // install plugins
 // todo: build plugins as separate modules and scan plugins folder for plugins to install
 require('./plugins/bionet')
-require('./plugins/bionet-scanner')
+require('./plugins/bionet_scanner')
 var ui = require('./ui')
 
 var routes = require('./routes.js');

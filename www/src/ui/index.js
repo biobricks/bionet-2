@@ -42,22 +42,22 @@ stdThemePlugin.start = function () {
     // primary nav - logged in
     const loggedInNav = [{
         label: 'global search',
-        action: '/'
+        action: '/search'
   }, {
         label: 'local inventory',
         action: '/inventory'
   }, {
-        label: 'create',
+        label: 'workbench',
         action: '/create'
   }, {
-        label: 'scan',
-        action: '/scan'
+        label: 'configure',
+        action: '/bionetsetup/config'
   }];
 
     // primary nav - logged out
     const loggedOutNav = [{
         label: 'global search',
-        action: '/'
+        action: '/search'
   }, {
         label: 'local inventory',
         action: '/inventory'

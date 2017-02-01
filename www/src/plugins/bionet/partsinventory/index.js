@@ -18,10 +18,10 @@ var partsInventory = {
 
             // todo: set inventory item
             app.dispatch(app.$.breadcrumbs, [{
-                'label': 'local inventory',
+                'label': 'workbench',
                 'url': '/inventory'
             }]);
-            riot.mount('div#content', 'parts-inventory-form', {q:q})
+            riot.mount('div#content', 'inventory-treeview', {q:q})
         }
         route('/inventory', function () {
             inventoryRouter();
