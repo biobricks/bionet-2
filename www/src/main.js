@@ -71,7 +71,7 @@ function connector(cb) {
     }
 
     var wsProtocol = 'ws://';
-    if(window.location.protocol.match(/^https/i) {
+    if(window.location.protocol.match(/^https/i)) {
         wsProtocol = 'wss://';
     }
 
