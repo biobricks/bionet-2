@@ -30,7 +30,7 @@ module.exports = {
   // if falsy, only admins can create users
   //  must be set in www/settings.js
   // or the UI will not reflect the change
-  userSignupPassword: null,
+  userSignupPassword: 'code',
 
   mailer: {
     type: "smtp", // can also be "direct" or "console"

@@ -10,7 +10,7 @@ require('./ui/uitags.js')
 // install plugins
 // todo: build plugins as separate modules and scan plugins folder for plugins to install
 require('./plugins/bionet')
-require('./plugins/bionet_scanner')
+require('./plugins/bionet-scanner')
 var ui = require('./ui')
 
 var routes = require('./routes.js');
@@ -22,12 +22,6 @@ var emailValidator = require('email-validator');
 var passwordValidator = require('./password_validator.js');
 var settings = require('../../settings.js');
 
-/*
-var settings = {
-  base_url: 'http://localhost:8000',
-};
-*/
-
 var LabelMaker = require('./labelmaker.js');
 var QrCode = require('qrcode-reader');
 var getUserMedia = require('getusermedia');
@@ -38,8 +32,6 @@ var websocket = require('websocket-stream');
 var rpc = require('rpc-multistream'); // RPC and multiple streams over one stream
 var auth = require('rpc-multiauth'); // authentication
 var through = require('through2'); // stream helper
-
-//var labelMaker = new LabelMaker({symbolPath: settings.symbolPath});
 
 var reconnectDelay = 2;
 var reconnectAttempts = 0;
@@ -79,16 +71,18 @@ function connector(cb) {
     }
 
     var wsProtocol = 'ws://';
-    if (/^https/i.test(settings.base_url)) {
+    if(window.location.protocol.match(/^https/i) {
         wsProtocol = 'wss://';
     }
-    console.log('connecting to websocket, protocol=', wsProtocol, settings.base_url)
-    var stream = websocket(wsProtocol + window.document.location.host, {
-        headers: {
-            'proxy_read_timeout': '1000s',
-            'ping': 10
-        }
-    });
+
+    var port = '';
+    if(window.location.port) {
+      port = ':' + window.location.port;
+    }
+    var websocketUrl = wsProtocol + window.document.location.host + port;
+    console.log('connecting to websocket', websocketUrl)
+
+    var stream = websocket(websocketUrl);
     stream.on('error', failOnce);
 
     // You can turn on debugging like this:
