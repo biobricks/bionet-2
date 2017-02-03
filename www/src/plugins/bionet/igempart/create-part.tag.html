@@ -1,8 +1,106 @@
 <create-part>
+    <!--
     <div style="padding-top:165px;">
         <div id="create-part-content" class={themeClass}>
         </div>
     </div>
+    -->
+    
+    <div class="content-height">
+        create part<br/>
+        <!--
+        <div class="fixed-action-btn" style="bottom:100px; left:25px; width:50px; text-align:left">
+            <a class="btn-floating btn-large waves-effect waves-light green dropdown-button"><i class="material-icons" data-activates="addmenu">add</i></a>
+        </div>
+        -->
+
+
+        <div class="inventory-tree">
+            <table id="ftree" style="margin-top:15px; width:400px;border:none !important;">
+                <colgroup>
+                    <col width="390px"></col>
+                    <!--
+                <col width="*"></col>
+                <col width="250px"></col>
+                <col width="150px"></col>
+                <col width="100px"></col>
+            -->
+                </colgroup>
+                <!--
+                <thead>
+                    <tr>
+                        <th style="padding-left:10px">Name</th>
+                    </tr>
+                </thead>
+                -->
+                <tbody style="border: none !important;">
+                    <tr>
+                        <td></td>
+                        <!--
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    -->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="physical-storage" class="edit-physical">
+        <div id="create-part-content" class={themeClass}>
+        </div>
+            <!--
+            <create-physical show="false" top-margin="0px" />
+            -->
+        </div>
+        <div id="scanner" style="position:absolute;top:100px; left:0px"></div>
+    
+        <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:130px; right:25px; text-align:left" data-activates="addmenu"><i class="material-icons">add</i></a>
+        <ul id="addmenu" class="dropdown-content" style="position:absolute; top:130px; right:25px; width:200px !important; text-align:left;z-index:1000">
+            <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.name}</span></li>
+            <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.name}</span></li>
+        </ul>
+    
+        <div class="fixed-action-btn" style="position:absolute; top:200px; right:25px; text-align:left">
+            <a onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></a>
+        </div>
+    
+    </div>
+    <style>
+        table.fancytree-ext-table tr td {
+            border: none !important;
+            padding: 8px;
+            display: table-cell;
+        }
+        
+        .inventory-tree {
+            overflow: auto;
+            float: left;
+            margin-left: 25px;
+            width: 400px;
+        }
+        
+        span.fancytree-edit {
+            cursor: 'pointer';
+        }
+        
+        li.add-type:hover {
+            background-color: #E5F3FB;
+            outline: 1px solid #70C0E7;
+        }
+        
+        .edit-physical {
+            overflow: auto;
+            width: calc(100% - 600px);
+            float: left;
+            //margin-left: 25px;
+        }
+        
+        div.content-height {
+            margin-top: 115px;
+            height: calc(100% - 100px)
+        }
+
+    </style>
     <script>
         const theme = app.getTheme()
         this.themeClass = theme.style.color.background + ' ' + theme.style.color.text

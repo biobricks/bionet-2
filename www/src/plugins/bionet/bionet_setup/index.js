@@ -60,7 +60,6 @@ var bionetSetup = {
                 for (i = 0; i < children.length; i++) {
                     cur = children[i].path;
                     a = cur.split('.');
-                    /*
                     indent = a.length - 1;
                     add = false
                     perfect = false
@@ -72,8 +71,7 @@ var bionetSetup = {
                             break;
                         }
                     }
-                    */
-                    if (add || 1) {
+                    if (add) {
                         const data = children[i].value
                             //console.log('inventory re value:', JSON.stringify(data))
                         var key = children[i].key

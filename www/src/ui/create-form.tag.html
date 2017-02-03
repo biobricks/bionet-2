@@ -1,33 +1,110 @@
 <create-form>
-    <div style="padding-top:75px;">
-        <create-quilt/>
-        <form ref="createForm" onsubmit={submitForm2}>
-            <div class="row">
-                <div class="col s3 m3 l3" />
-                <div class="col s6 m6 l6">
-                    <div>Search for item to create from pre-existing stock</div>
-                    <div id="selectedTypeContainer" class="selected-type">
-                        <span id="selectedTypeLabel">plasmid</span>
-                    </div>
-                    <div class="query-container">
-                        <input type="text" id="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
-                        <div class="sub-hint">Examples: plasmid, strain, ethanol</div>
-                    </div>
-                    <ul id="matchList" class="col s6 m6 l6">
-                        <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-                        <li if={matches && !matches.length} class="no-match">No matches found - Hit enter to create{selectedType ? ' new ' + selectedType.name : ''}</li>
-                    </ul>
-                </div>
-            </div>
-            <!--
-                    <div class="query-container">
-                    </div>
+    <div class="content-height">
+        <!--
+        <div class="fixed-action-btn" style="bottom:100px; left:25px; width:50px; text-align:left">
+            <a class="btn-floating btn-large waves-effect waves-light green dropdown-button"><i class="material-icons" data-activates="addmenu">add</i></a>
+        </div>
+        -->
+
+
+        <div class="inventory-tree">
+            <table id="ftree" style="margin-top:15px; width:400px;border:none !important;">
+                <colgroup>
+                    <col width="390px"></col>
+                    <!--
+                <col width="*"></col>
+                <col width="250px"></col>
+                <col width="150px"></col>
+                <col width="100px"></col>
+            -->
+                </colgroup>
+                <!--
+                <thead>
+                    <tr>
+                        <th style="padding-left:10px">Name</th>
+                    </tr>
+                </thead>
+                -->
+                <tbody style="border: none !important;">
+                    <tr>
+                        <td></td>
+                        <!--
+                    <td></td>
+                    <td></td>
+                    <td></td>
                     -->
-            <input type="submit" style="display:none" />
-        </form>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="edit-physical" class="edit-physical">
+            <create-physical show="false" top-margin="0px" />
+        </div>
+        <!--
+        -->
+        <div id="create-physical" class="edit-physical">
+            <create-quilt/>
+            <!--
+            <form ref="createForm" onsubmit={submitForm2}>
+                <div id="selectVirtual2" class="row">
+                    <div class="input-field col s6">
+                        <div class="query-container">
+                            <input type="text" id="q2" name="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+                            <label for="q2" class="active">Instance of {type}</label>
+                        </div>
+                        <ul id="matchList2" class="matchlist2">
+                            <li each={match, index in matches} class="matchlist {highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+                            <li if={matches && !matches.length} class="matchlist no-match">No matches found</li>
+                        </ul>
+                    </div>
+                </div>
+                <input type="submit" style="display:none" />
+            </form>
+        -->
+        </div>
     </div>
 
+    <style>
+        table.fancytree-ext-table tr td {
+            border: none !important;
+            padding: 8px;
+            display: table-cell;
+        }
+        
+        .inventory-tree {
+            overflow: auto;
+            float: left;
+            margin-left: 25px;
+            width: 400px;
+        }
+        
+        span.fancytree-edit {
+            cursor: 'pointer';
+        }
+        
+        li.add-type:hover {
+            background-color: #E5F3FB;
+            outline: 1px solid #70C0E7;
+        }
+        
+        .edit-physical {
+            overflow: auto;
+            width: calc(100% - 600px);
+            float: left;
+            margin-left: 25px;
+        }
+        
+        div.content-height {
+            margin-top: 115px;
+            height: calc(100% - 100px)
+        }
+
+    </style>
     <script>
+        const tag = this
+        const bionetSetup = app.getStream('bionetSetup')
+
         this.submitForm2 = function(e) {
             e.preventDefault();
 
@@ -72,175 +149,402 @@
             });
         }
 
+
+        bionetSetup.addRoute('createStorageItemResult', function(storageItem) {
+            console.log('createStorageItemResult', JSON.stringify(storageItem))
+
+            const newNodeData = {
+                    title: storageItem.name,
+                    children: [],
+                    dbData: storageItem
+                }
+                // get active node
+            var parentNode = $("#ftree").fancytree("getActiveNode");
+            if (!parentNode) {
+                parentNode = $("#ftree").fancytree("getRootNode");
+            }
+            const newNode = parentNode.addChildren(newNodeData)
+            parentNode.setExpanded()
+                //dbData.name = type + '_' + newNode.getIndexHier()
+                //console.log('add node :', JSON.stringify(dbData))
+                /*
+                const ftree = $("#ftree").fancytree("getTree")
+                ftree.visit(function(node) {
+                    if (node.data.dbData.name === storageItem.name) {
+                        node.setTitle(storageItem.name)
+                        node.data.dbData.id = storageItem.id
+                        console.log('createStorageItemResult %s updated with id %s', storageItem.name, storageItem.id)
+                    }
+                })
+                */
+        })
+
         this.selected = null
         this.selectedType = null
 
         this.on('mount', function() {
-            $('#q').focus()
+                $('#name').focus()
 
-            this.updateMatchListPosition = function() {
-                var pos = $('#q').offset();
-                if (pos === undefined) return
-                pos.top += $('#q').innerHeight() + 2;
-                pos.width = $('#q').innerWidth();
-                $('#matchList').css(pos)
-            }.bind(this)
+                this.updateMatchListPosition = function() {
+                    var pos = $('#q').offset();
+                    if (pos === undefined) return
+                    pos.top += $('#q').innerHeight() + 2;
+                    pos.width = $('#q').innerWidth();
+                    $('#matchList').css(pos)
+                }.bind(this)
 
-            $(window).resize(function() {
-                this.updateMatchListPosition();
-            }.bind(this))
+                $(window).resize(function() {
+                    this.updateMatchListPosition();
+                }.bind(this))
 
-            this.selectCurrent = function() {
-                var sel = this.matches[this.selected]
-                if (sel.pre === 'type') {
-                    this.setSelectedType(sel)
-                    this.refs.q.value = ''
-                } else {
-                    this.refs.q.value = sel.name
-                }
-                this.hideMatches()
-            }.bind(this)
-
-            this.setSelectedType = function(type) {
-                if (!type) {
-                    this.selectedType = null
-                    $('#selectedTypeContainer').css('display', 'none')
-                } else {
-                    this.selectedType = type
-                    $('#selectedTypeLabel').text(type.name)
-                    $('#selectedTypeContainer').css('display', 'block')
-                }
-                this.updateMatchListPosition()
-            }.bind(this)
-
-            this.hideMatches = function(e) {
-                this.matches = null
-                this.selected = null
-                this.update()
-            }.bind(this)
-
-            this.clickSelect = function(e) {
-                this.selectCurrent();
-            }.bind(this)
-
-
-            this.elementOver = function(e) {
-                if ($(e.target).hasClass('no-match')) return;
-                var lis = $('#matchList').find('li');
-                var i;
-                for (i = 0; i < lis.length; i++) {
-                    if (lis[i] == e.target) {
-                        this.selected = i
-                        break
+                this.selectCurrent = function() {
+                    var sel = this.matches[this.selected]
+                    if (sel.pre === 'type') {
+                        this.setSelectedType(sel)
+                        this.refs.q.value = ''
+                    } else {
+                        this.refs.q.value = sel.name
                     }
-                }
-                this.update()
-
-            }.bind(this)
-
-            this.updateMatchListPosition();
-
-            this.matches = []
-
-            var hadQueryBeforeKeydown = false;
-            $('#q').keydown(function(e) {
-
-                if (e.keyCode === 38) { // up arrow
-                    e.preventDefault()
-                    if (this.selected !== null && this.selected > 0) this.selected--
-                        this.update();
-                } else if (e.keyCode === 40) { // down arrow
-                    e.preventDefault()
-                    if (this.selected === null) this.selected = 0
-                    else if (this.selected < this.matches.length - 1) this.selected++
-                        this.update();
-                } else if (e.keyCode === 27) { // escape
                     this.hideMatches()
-                } else if (e.keyCode === 9 || e.keyCode === 13) { // tab or enter
-                    if (this.selected === null) return // normal operation if nothing selected
-                    e.preventDefault();
-                    this.selectCurrent()
-                } else {
-                    hadQueryBeforeKeydown = !!this.refs.q.value.replace(/\s+/g, '')
-                }
+                }.bind(this)
 
-            }.bind(this));
-
-            $('#q').keyup(function(e) {
-                if (e.keyCode === 8 || e.keyCode === 46) { // backspace or delete
-                    var hasQueryNow = !!this.refs.q.value.replace(/\s+/g, '')
-
-                    if (!hadQueryBeforeKeydown && !hasQueryNow) {
-                        this.setSelectedType()
-                    }
-                }
-            }.bind(this));
-
-            $('#q').on('input', function(e) {
-
-                this.matches = [];
-
-                var q = this.refs.q.value.trim();
-
-                query(this.selectedType, q, function(err, results) {
-                    if (err) return app.ui.toast(err); // TODO better error handling
-
-                    if (!q) {
-                        this.matches = null;
+                this.setSelectedType = function(type) {
+                    if (!type) {
+                        this.selectedType = null
+                        $('#selectedTypeContainer').css('display', 'none')
                     } else {
-                        var i;
-                        for (i = 0; i < results.types.length; i++) {
-                            this.matches.push({
-                                pre: "type",
-                                name: results.types[i].name,
-                                extraClass: 'type',
-                                virtual: results.types[i].virtual
-                            });
-                        }
-                        for (i = 0; i < results.virtuals.length; i++) {
-                            this.matches.push({
-                                pre: "virtual",
-                                name: results.virtuals[i].name
-                            });
-                        }
+                        this.selectedType = type
+                        $('#selectedTypeLabel').text(type.name)
+                        $('#selectedTypeContainer').css('display', 'block')
                     }
-                    if (this.matches && this.matches.length) {
-                        this.selected = 0;
-                    } else {
-                        this.selected = null
+                    this.updateMatchListPosition()
+                }.bind(this)
+
+                this.hideMatches = function(e) {
+                    this.matches = null
+                    this.selected = null
+                    this.update()
+                }.bind(this)
+
+                this.clickSelect = function(e) {
+                    this.selectCurrent();
+                }.bind(this)
+
+
+                this.elementOver = function(e) {
+                    if ($(e.target).hasClass('no-match')) return;
+                    var lis = $('#matchList').find('li');
+                    var i;
+                    for (i = 0; i < lis.length; i++) {
+                        if (lis[i] == e.target) {
+                            this.selected = i
+                            break
+                        }
                     }
                     this.update()
 
+                }.bind(this)
+
+                this.updateMatchListPosition();
+
+                this.matches = []
+
+                var hadQueryBeforeKeydown = false;
+                /*
+                $('#q').keydown(function(e) {
+
+                    if (e.keyCode === 38) { // up arrow
+                        e.preventDefault()
+                        if (this.selected !== null && this.selected > 0) this.selected--
+                            this.update();
+                    } else if (e.keyCode === 40) { // down arrow
+                        e.preventDefault()
+                        if (this.selected === null) this.selected = 0
+                        else if (this.selected < this.matches.length - 1) this.selected++
+                            this.update();
+                    } else if (e.keyCode === 27) { // escape
+                        this.hideMatches()
+                    } else if (e.keyCode === 9 || e.keyCode === 13) { // tab or enter
+                        if (this.selected === null) return // normal operation if nothing selected
+                        e.preventDefault();
+                        this.selectCurrent()
+                    } else {
+                        hadQueryBeforeKeydown = !!this.refs.q.value.replace(/\s+/g, '')
+                    }
+
+                }.bind(this));
+
+                $('#q').keyup(function(e) {
+                    if (e.keyCode === 8 || e.keyCode === 46) { // backspace or delete
+                        var hasQueryNow = !!this.refs.q.value.replace(/\s+/g, '')
+
+                        if (!hadQueryBeforeKeydown && !hasQueryNow) {
+                            this.setSelectedType()
+                        }
+                    }
+                }.bind(this));
+
+                $('#q').on('input', function(e) {
+                    return
+                    this.matches = [];
+
+                    var q = this.refs.q.value.trim();
+
+                    query(this.selectedType, q, function(err, results) {
+                        if (err) return app.ui.toast(err); // TODO better error handling
+
+                        if (!q) {
+                            this.matches = null;
+                        } else {
+                            var i;
+                            for (i = 0; i < results.types.length; i++) {
+                                this.matches.push({
+                                    pre: "type",
+                                    name: results.types[i].name,
+                                    extraClass: 'type',
+                                    virtual: results.types[i].virtual
+                                });
+                            }
+                            for (i = 0; i < results.virtuals.length; i++) {
+                                this.matches.push({
+                                    pre: "virtual",
+                                    name: results.virtuals[i].name
+                                });
+                            }
+                        }
+                        if (this.matches && this.matches.length) {
+                            this.selected = 0;
+                        } else {
+                            this.selected = null
+                        }
+                        this.update()
+
+                    }.bind(this))
                 }.bind(this))
-            }.bind(this))
-        })
+                */
+                const ftSettings = {
+                    extensions: ["table", "gridnav", "dnd5"],
+                    source: [],
+                    checkbox: true,
+                    icon: false,
+                    renderColumns: function(event, data) {
+                        /*
+                        console.log('tdlist:')
+                        const node = data.node
+                        const $tdList = $(node.tr).find(">td");
+                        const dbData = node.data.dbData
+                        const type = (dbData.type) ? dbData.type : ''
+                        const barcode = (dbData.barcode) ? dbData.barcode : ' '
+                        $tdList.eq(1).html('<span class="fancytree-edit">' + dbData.Description + '</span>');
+                        $tdList.eq(2).html('<span class="fancytree-edit">' + type + '</span>');
+                        $tdList.eq(3).html('<span class="fancytree-edit">' + barcode + '</span>');
+                        //$tdList.eq(3).html('<span>' + node.getIndexHier() + '</span>');
+                        */
+                    },
+                    beforeSelect: function(event, data) {},
+                    modifyChild: function(event, data) {
+                        if (data.operation === 'remove') {
+                            const deleteNode = data.childNode
+                        }
+                    },
+                    keydown: function(event, data) {
+                        /*
+                        const node = data.node;
+                        if (event.which === 13) {
+                            event.preventDefault();
+                            console.log('setup-storage - save item: ', node)
+                            const $tdList = $(node.tr).find(">td");
+                            const dbData = node.data.dbData
+                                //dbData.name = $tdList.eq(0).text()
+                                //console.log('title: %s node.data:%s',node.title,JSON.stringify(dbData))
+                            bionetSetup.route('updateStorageItem', undefined, dbData)
+                        }
+                        */
+                    },
+                    dnd5: {
+                        // autoExpandMS: 400,
+                        // preventForeignNodes: true, 
+                        // preventNonNodes: true, 
+                        // preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+                        // preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+                        // scroll: true,
+                        // scrollSpeed: 7,
+                        // scrollSensitivity: 10,
 
-        this.on('updated', function() {
-            if (this.matches && this.matches.length) {
-                $('#matchList').css('border', '')
-            } else {
-                $('#matchList').css('border', 'none')
-            }
-            var q = this.refs.q.value
-            q = q.trim();
-            q = q.replace(/\s+/g, ' ').toLowerCase()
+                        // --- Drag-support:
 
-            $('#q').css('color', '');
+                        dragStart: function(node, data) {
+                            /* This function MUST be defined to enable dragging for the tree.
+                             *
+                             * Return false to cancel dragging of node.
+                             * data.dataTransfer.setData() and .setDragImage() is available
+                             * here.
+                             */
+                            //          data.dataTransfer.setDragImage($("<div>hurz</div>").appendTo("body")[0], -10, -10);
+                            return true;
+                        },
+                        dragDrag: function(node, data) {
+                            data.dataTransfer.dropEffect = "move";
+                        },
+                        dragEnd: function(node, data) {},
 
-            if (this.matches) {
+                        // --- Drop-support:
 
-                $('#matchList').find('li').mouseover(function(e) {
+                        dragEnter: function(node, data) {
+                            // node.debug("dragEnter", data);
+                            data.dataTransfer.dropEffect = "move";
+                            // data.dataTransfer.effectAllowed = "copy";
+                            return true;
+                        },
+                        dragOver: function(node, data) {
+                            data.dataTransfer.dropEffect = "move";
+                            // data.dataTransfer.effectAllowed = "copy";
+                        },
+                        dragLeave: function(node, data) {},
+                        dragDrop: function(node, data) {
+                            /* This function MUST be defined to enable dropping of items on
+                             * the tree.
+                             */
+                            var transfer = data.dataTransfer;
 
-                }.bind(this))
+                            node.debug("drop", data);
 
-                // check for single exact match
-                if (this.matches.length === 1) {
-                    if (this.matches[0].name.replace(/[^\w\d]+/g, '').toLowerCase() === q.replace(/[^\w\d]+/g, '')) {
-                        $('#q').css('color', 'green')
+                            // alert("Drop on " + node + ":\n"
+                            //   + "source:" + JSON.stringify(data.otherNodeData) + "\n"
+                            //   + "hitMode:" + data.hitMode
+                            //   + ", dropEffect:" + transfer.dropEffect 
+                            //   + ", effectAllowed:" + transfer.effectAllowed);
+
+                            if (data.otherNode) {
+                                // Drop another Fancytree node from same frame
+                                // (maybe from another tree however)
+                                var sameTree = (data.otherNode.tree === data.tree);
+
+                                data.otherNode.moveTo(node, data.hitMode);
+                            } else if (data.otherNodeData) {
+                                // Drop Fancytree node from different frame or window, so we only have
+                                // JSON representation available
+                                node.addChild(data.otherNodeData, data.hitMode);
+                            } else {
+                                // Drop a non-node
+                                node.addNode({
+                                    title: transfer.getData("text")
+                                }, data.hitMode);
+                            }
+                            node.setExpanded();
+                        }
                     }
                 }
-            }
-        })
+
+                $("#ftree").fancytree(ftSettings);
+                $("#ftree").on('click dblclick keydown', function(e) {
+                    if (e.type === 'keydown') {
+                        if (e.which !== undefined && e.which !== 13) return
+                    }
+                    const active = $(e.target)
+                    const elementType = active.prop('nodeName');
+                    console.log('elementType:', elementType)
+                        //if (!active.hasClass('fancytree-edit')) {
+                    var node = $("#ftree").fancytree("getActiveNode");
+                    if (node) {
+
+                        if (node.title === 'new materials') {
+                            $('#create-physical').css({
+                                display: 'block'
+                            });
+                            $('#edit-physical').css({
+                                display: 'none'
+                            });
+                            return
+                        }
+
+                        const dbData = node.data.dbData
+                        const type = dbData.type
+                        tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('cabinet') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
+
+                        if (type.indexOf('box') >= 0) {
+                            //console.log('activating scanner')
+                            //app.dispatch('startScan',{status:'init'})
+                        }
+
+                        console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
+                        tag.update()
+                        bionetSetup.route('getPhysical', undefined, dbData.id)
+                        if (e.type === 'keydown') node.setExpanded()
+                        $('#edit-physical').css({
+                            height: $(window).innerHeight() - 120,
+                            display: 'block'
+                        });
+
+                        app.dispatch(app.$.breadcrumbs, [{
+                            'label': 'workbench',
+                            'url': '/inventory'
+                        }, {
+                            'label': node.title,
+                            'url': '/inventory'
+                        }]);
+
+                    }
+                    //}
+                    //if (!active.text()) return
+                    //app.editTextElement(e, active)
+                })
+
+
+                bionetSetup.addRoute('storage', function(storageData) {
+                    //console.log('initializing storage:', JSON.stringify(storageData))
+                    const ftree = $("#ftree").fancytree("getTree");
+                    ftree.reload(storageData).then(function() {
+                        $('.inventory-tree').css({
+                            height: $(window).innerHeight() - 120
+                        });
+                        const activeNode = ftree.findFirst('new materials')
+                            //const children = ftree.getRootNode().children
+                            //const activeNode = children[0]
+                        if (activeNode) {
+                            activeNode.setExpanded();
+                            activeNode.setFocus();
+                        }
+                    })
+                })
+                
+                $('#create-physical').css({
+                    display: 'block'
+                });
+                $('#edit-physical').css({
+                    display: 'none'
+                });
+
+                bionetSetup.route('requestStorage', undefined, "Tim")
+            })
+            /*
+            this.on('updated', function() {
+                if (this.matches && this.matches.length) {
+                    $('#matchList').css('border', '')
+                } else {
+                    $('#matchList').css('border', 'none')
+                }
+                var q = this.refs.q.value
+                q = q.trim();
+                q = q.replace(/\s+/g, ' ').toLowerCase()
+
+                $('#q').css('color', '');
+
+                if (this.matches) {
+
+                    $('#matchList').find('li').mouseover(function(e) {
+
+                    }.bind(this))
+
+                    // check for single exact match
+                    if (this.matches.length === 1) {
+                        if (this.matches[0].name.replace(/[^\w\d]+/g, '').toLowerCase() === q.replace(/[^\w\d]+/g, '')) {
+                            $('#q').css('color', 'green')
+                        }
+                    }
+                }
+            })
+            */
 
     </script>
 </create-form>

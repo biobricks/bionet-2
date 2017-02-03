@@ -101,6 +101,7 @@
         const appSettings = app.getAppSettings()
         const dataTypes = appSettings.dataTypes
         const bionetSetup = app.getStream('bionetSetup')
+        tag.formData={}
 
         // setup secondary nav
         app.dispatch(app.$.secondaryNav, [{
@@ -378,11 +379,11 @@
                 if (node) {
                     const dbData = node.data.dbData
                     const type = dbData.type
-                    tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('cabinet') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
+                    tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
                     
-                    if (tag.createType==='material') {
-                        console.log('activating scanner')
-                        app.dispatch('startScan',{status:'init'})
+                    if (type.indexOf('box') >= 0) {
+                        //console.log('activating scanner')
+                        //app.dispatch('startScan',{status:'init'})
                     }
                     
                     console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
