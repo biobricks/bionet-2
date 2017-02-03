@@ -81,7 +81,12 @@ var multiLevelServer = net.createServer(function(con) {
     con.destroy();
     console.error("multilevel client error:", err);
   });
-}).listen(settings.dbPort || 13377);
+}).listen({
+  host: settings.dbHostname || 'localhost',
+  port: settings.dbPort || 13377
+}, function(err) {
+  console.log("multilevel listening");
+});
 
 multiLevelServer.on('error', function(err) {
     console.error("multilevel server error:", err);
