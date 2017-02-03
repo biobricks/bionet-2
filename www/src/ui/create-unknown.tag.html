@@ -7,43 +7,149 @@
 </create-unknown>
 <create-quilt>
     <div class="row">
+        <div class="col s6 m6 l6 left-align">
+            <form>
+                <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+                <form-text-input label="Instances" ref="instances" name="instances" value={formData.instances}/>
+                <div each={item in virtuals}>
+                    <input name="selectvirtual" type="radio" id={item.name} value={item.name} onclick={setFields}/>
+                    <label for={item.name}>{item.name}</label>
+                </div>
+            </form>
+            <div id="scanner" style="position:absolute;top:100px; left:0px"></div>
+            <div class="row" style="margin-top:25px">
+                <div each={field in fields}>
+                    <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
+                </div>
+            </div>
+
+            <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:130px; right:25px; text-align:left" onclick={addNode}><i class="material-icons">add</i></a>
+
+            <div class="fixed-action-btn" style="position:absolute; top:200px; right:25px; text-align:left">
+                <a onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></a>
+            </div>
+            <!--
+    <div class="row">
         <div class="col s3 m3 l3"></div>
         <div class="col s6 m6 l6 left-align">
             <h5>What would you like to create?</h5>
         </div>
     </div>
-    <div class="row">
-        <div class="col s3 m3 l3"></div>
-        <div class="col s3 m3 l3 left-align">
             <h6>Virtuals</h6>
             <ul>
                 <li each={item in virtuals}><a href="{item.url}">{item.name}</a></li>
             </ul>
-        </div>
-        <div class="col s3 m3 l3 left-align">
+
+   <input name="group1" type="radio" id="test1" />
+      <label for="test1">Red</label>
+<div class="col s3 m3 l3 left-align">
             <h6>Locations</h6>
             <ul>
                 <li each={item in locations}><a href="{item.url}">{item.name}</a></li>
             </ul>
         </div>
-    </div>
+        -->
+        </div>
 
-    <script>
-        const appSettings = app.getAppSettings()
-        this.virtuals = []
-        this.locations = []
-        this.dataTypes = appSettings.dataTypes
-        for (var i = 0; i < this.dataTypes.length; i++) {
-            const type = this.dataTypes[i]
-            if (type.virtual === true) {
-                type.url = '/create-virtual/' + encodeURI(type.name)
-                this.virtuals.push(type)
-            } else {
-                type.url = '/create-physical/' + encodeURI(type.name)
-                this.locations.push(type)
+        <script>
+            const tag = this
+            tag.formData = {
+                name: '',
+                instances: '1'
             }
-        }
-        console.log("create unknown, types:%s", JSON.stringify(this.dataTypes))
+            tag.fields = []
+            const bionetSetup = app.getStream('bionetSetup')
 
-    </script>
+            const appSettings = app.getAppSettings()
+
+            this.virtuals = []
+            this.locations = []
+            this.dataTypes = appSettings.dataTypes
+            for (var i = 0; i < this.dataTypes.length; i++) {
+                const type = this.dataTypes[i]
+                if (type.virtual === true) {
+                    type.url = '/create-virtual/' + encodeURI(type.name)
+                    this.virtuals.push(type)
+                } else {
+                    type.url = '/create-physical/' + encodeURI(type.name)
+                    this.locations.push(type)
+                }
+            }
+            console.log("create unknown, types:%s", JSON.stringify(this.dataTypes))
+
+            tag.setFields = function() {
+                const type = $('input[name=selectvirtual]:checked').val()
+                tag.fields = app.getAttributesForType(type)
+                tag.update()
+            }
+
+            tag.deleteNode = function() {
+                const ftree = $("#ftree").fancytree("getTree")
+                const deleteNodes = []
+                const delChildren = function(node) {
+                    if (!node.children) return
+                    for (var i = 0; i < node.children.length; i++) {
+                        const childNode = node.children[i]
+                        delChildren(childNode)
+                        deleteNodes.push(childNode)
+                    }
+                }
+                ftree.visit(function(node) {
+                    if (node.isSelected()) {
+                        delChildren(node)
+                        deleteNodes.push(node)
+                    }
+                })
+                for (var i = 0; i < deleteNodes.length; i++) {
+                    const node = deleteNodes[i]
+                    const id = node.data.dbData.id
+                    console.log('removing %s %s', node.title, id)
+                    bionetSetup.route('delPhysical', undefined, id)
+                    node.remove()
+                }
+            }
+
+            tag.addNode = function(e) {
+
+                // get active node
+                var node = $("#ftree").fancytree("getActiveNode");
+
+                // initialize parent id
+                var parentId
+                if (!node) {
+                    node = $("#ftree").fancytree("getRootNode");
+                } else {
+                    parentId = node.data.dbData.id
+                }
+
+                // initialize storage type
+                //const active = $(e.target)
+                //const type = active.text()
+                const type = $('input[name=selectvirtual]:checked').val()
+
+                // generate unique name
+                const seriesName = tag.refs.name.value
+                const instances = tag.refs.instances.value
+                const attributes = app.getAttributesForType(type)
+                for (var instance = 0; instance < instances; instance++) {
+                    const name = seriesName + '_' + instance
+
+                    // initialize standard attributes
+                    const dbData = {
+                        name: name,
+                        type: type,
+                        parent_id: parentId
+                    }
+
+                    // initialize attributes
+                    for (var i = 0; i < attributes.length; i++) {
+                        dbData[attributes[i].name] = type + ' ' + attributes[i].name
+                    }
+                    console.log('addNode: %s', instances, JSON.stringify(dbData))
+
+                    bionetSetup.route('createStorageItem', undefined, dbData)
+                }
+            }
+
+        </script>
 </create-quilt>

@@ -12,13 +12,7 @@
             <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
         </div>
 
-        <div id="selectVirtual" class="row">
-            <!--
-            <div id="selectedTypeContainer" class="selected-type">
-                <span id="selectedTypeLabel">plasmid</span>
-            </div>
-            -->
-            <div class="input-field col s12">
+        <div class="input-field col s12">
                 <div class="query-container">
                     <input type="text" id="q" name="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
                     <label for="q" class="active">Instance of {type}</label>

@@ -10,6 +10,7 @@ import partsInventory from './partsinventory'
 import errorPage from './error_page'
 import passwordReset from './password_reset'
 import bionetSetup from './bionet_setup'
+import workbench from './workbench'
 
 const bionetPlugin = app.addPlugin('bionet')
 
@@ -46,6 +47,10 @@ bionetPlugin.start = function () {
     //-------------------------------------------------------------------------
     // initialize bionet setup
     bionetSetup.init();
+    
+    //-------------------------------------------------------------------------
+    // initialize bionet setup
+    workbench.init();
 
 }
 
