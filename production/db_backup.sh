@@ -3,7 +3,7 @@
 # This is a bionet live database backup script
 # It uses the `bin/db.js dump` command to dump the bionet database to a json file.
 
-# This script will create a time-stamped complete JSON-formatted file 
+# This script will create a time-stamped gzipped JSON-formatted file 
 # containing the entire database of the running bionet app.
 # Every time this script is run it will check if all previous backups
 # take up more than MAX_BACKUP_SIZE megabytes of disk space, and if they do
@@ -33,7 +33,7 @@ DB_BACKUP_FILE="${DB_BACKUP_PATH}/bionet_$(date +%d-%m-%Y_%H-%M-%S).json.gz"
 
 # Run backup
 echo "Backing up database to $DB_BACKUP_FILE"
-node ${BIONET_PATH}/bin/db.js dump | gzip -c -9 > $DB_BACKUP_FILE
+node ${BIONET_PATH}/bin/db.js dump --online | gzip -c -9 > $DB_BACKUP_FILE
 
 if [ $? -ne "0" ]; then
   echo "Database backup failed" >&2

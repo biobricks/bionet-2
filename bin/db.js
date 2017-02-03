@@ -18,7 +18,8 @@ var argv = minimist(process.argv.slice(2), {
     },
     boolean: [
         'help',
-        'force'
+        'force', // 
+        'online' // if set, this script will fail if the bionet app isn't running
     ],
     default: {
         settings: '../settings.js',
@@ -48,6 +49,8 @@ function usage(err) {
   f("    list: Print list of all users");
   f("  help: Display this usage message");
   f('');
+  f("  The --online flag will cause this script to fail if the bionet app");
+  f("  isn't currently running.");
   if(err) {
     process.exit(1);
   } else {
@@ -59,6 +62,20 @@ function fail(str, exitCode) {
   console.error(str);
   process.exit(exitCode || 1);
 }
+
+function isDBEmpty(cb) {
+  var dbs = db.createKeyStream();
+  var empty = true;
+  dbs.on('data', function() {
+    empty = false;
+    dbs.destroy();
+  });
+
+  dbs.on('end', function() {
+    cb(null, empty);
+  });
+}
+
 
 if(argv._.length < 1) {
   usage("No command specified");
@@ -77,99 +94,104 @@ if(cmd === 'help') {
 
 var db = multilevel.client();
 var con = net.connect(settings.dbPort);
-con.pipe(db.connect()).pipe(con);
-
-function isDBEmpty(cb) {
-  var dbs = db.createKeyStream();
-  var empty = true;
-  dbs.on('data', function() {
-    empty = false;
-    dbs.destroy();
-  });
-
-  dbs.on('end', function() {
-    cb(null, empty);
-  });
-}
-
-
-if(cmd.match(/^d/)) { // dump
-
-  var dbs = db.createReadStream()
-  var jstream = JSONStream.stringifyObject();
-  dbs.pipe(through.obj(function(obj, enc, cb) {
-    // reformat key/value as array since stringifyObject expects that
-    this.push([obj.key, obj.value])
-    cb();
-  })).pipe(jstream).pipe(process.stdout);
-
-  dbs.on('close', function() {
-    con.end();
-  })
-
-
-} else if(cmd.match(/^i/)) { // import
-
-  if(args.length !== 1) {
-    usage("Missing name of file to import")
+con.on('error', function(err) {
+  if(argv.online) {
+    console.error("Error: bionet app appears to be offline");
+    console.error("       and --online flag was specified");
+    process.exit(1);
   }
-  isDBEmpty(function(err, isEmpty) {
-    if(err) fail(err);
+  console.error("Warning: bionet app appears to be offline")
+  console.error("Warning: opening bionet database directly");
+  db = level(settings.dbPath || './db');
+  main();
+});
 
-    if(!isEmpty) {
-      if(!argv.force) {
-        fail("Trying to import into non-empty database.\nRe-run command with --force to import anyway.");
+con.on('connect', function() {
+  con.pipe(db.connect()).pipe(con);
+  main();
+});
+
+
+function main() {
+
+  if(cmd.match(/^d/)) { // dump
+
+    var dbs = db.createReadStream()
+    var jstream = JSONStream.stringifyObject();
+    dbs.pipe(through.obj(function(obj, enc, cb) {
+      // reformat key/value as array since stringifyObject expects that
+      this.push([obj.key, obj.value])
+      cb();
+    })).pipe(jstream).pipe(process.stdout);
+
+    dbs.on('close', function() {
+      con.end();
+    })
+
+
+  } else if(cmd.match(/^i/)) { // import
+
+    if(args.length !== 1) {
+      usage("Missing name of file to import")
+    }
+    isDBEmpty(function(err, isEmpty) {
+      if(err) fail(err);
+
+      if(!isEmpty) {
+        if(!argv.force) {
+          fail("Trying to import into non-empty database.\nRe-run command with --force to import anyway.");
+        }
       }
-    }
-  });
-  var count = 0;
-  var ins = fs.createReadStream(args[0], {encoding: 'utf8'});
-  var jstream = JSONStream.parse([{emitKey: true}]);
-
-  jstream.pipe(through.obj(function(obj, enc, cb) {    
-    db.put(obj.key, obj.value, cb);
-    count++;
-  }, function(cb) {
-    console.log("Imported", count, "rows.");    
-    con.end()
-  }));
-
-  ins.pipe(jstream)
-
-} else if(cmd.match(/^u/)) { // user
-
-  var subCmd;
-
-  if(args.length > 0) {
-    subCmd = args[0];
-  } else {
-    subCmd = 'list';
-  }
-
-  db.on('open', function() {
-    var userDB = sublevel(db, 'accountdown', { valueEncoding: 'json' });
-
-    var users = accountdown(userDB, {
-      login: { basic: require('accountdown-basic') }
     });
-    
-    count = 0;
-    if(subCmd.match(/^l/)) {
-      var s = users.list();
-      s.pipe(through.obj(function(data, enc, cb) {
-        console.log(data.value);
-        cb();
-        count++;
-      }, function() {
-        console.log("Listed", count, "users");
-      }));
+    var count = 0;
+    var ins = fs.createReadStream(args[0], {encoding: 'utf8'});
+    var jstream = JSONStream.parse([{emitKey: true}]);
 
+    jstream.pipe(through.obj(function(obj, enc, cb) {    
+      db.put(obj.key, obj.value, cb);
+      count++;
+    }, function(cb) {
+      console.log("Imported", count, "rows.");    
+      con.end()
+    }));
+
+    ins.pipe(jstream)
+
+  } else if(cmd.match(/^u/)) { // user
+
+    var subCmd;
+
+    if(args.length > 0) {
+      subCmd = args[0];
     } else {
-      usage("Invalid user command");
+      subCmd = 'list';
     }
 
-  });
+    db.on('open', function() {
+      var userDB = sublevel(db, 'accountdown', { valueEncoding: 'json' });
 
-} else {
-  usage("Invalid command");
+      var users = accountdown(userDB, {
+        login: { basic: require('accountdown-basic') }
+      });
+      
+      count = 0;
+      if(subCmd.match(/^l/)) {
+        var s = users.list();
+        s.pipe(through.obj(function(data, enc, cb) {
+          console.log(data.value);
+          cb();
+          count++;
+        }, function() {
+          console.log("Listed", count, "users");
+        }));
+
+      } else {
+        usage("Invalid user command");
+      }
+
+    });
+
+  } else {
+    usage("Invalid command");
+  }
 }
