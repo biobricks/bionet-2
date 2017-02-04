@@ -46,7 +46,6 @@
         <div id="create-physical" class="edit-physical">
             <create-quilt/>
 
-            <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete}/>
             <!--
             <form ref="createForm2" onsubmit={submitForm2}>
                 <div id="selectVirtual2" class="row">
@@ -147,15 +146,6 @@
                 // do nothing
             }
         }.bind(this);
-
-        this.updateAutocomplete = function(q, cb) {
-            console.log('updateAutocomplete: ', q)
-            app.remote.createAutocomplete(this.selectedType, q, function(err, results) {
-                if (err) return cb(err)
-                //console.log('updateAutocomplete results: ', JSON.stringify(results))
-                cb(null, results)
-            });
-        }
 
         function query(type, q, cb) {
             app.remote.createAutocomplete(type, q, function(err, results) {
@@ -471,6 +461,8 @@
                     }
 
                     const dbData = node.data.dbData
+                    console.log('select physical:',JSON.stringify(dbData))
+                    /*
                     const type = dbData.type
                     tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('cabinet') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
 
@@ -478,8 +470,8 @@
                         //console.log('activating scanner')
                         //app.dispatch('startScan',{status:'init'})
                     }
+                    */
 
-                    console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
                     tag.update()
                     bionetSetup.route('getPhysical', undefined, dbData.id)
                     if (e.type === 'keydown') node.setExpanded()
@@ -529,33 +521,6 @@
 
             bionetSetup.route('requestStorage', undefined, "Tim")
         })
-
-        this.on('updated', function() {
-            if (tag.matches && tag.matches.length) {
-                $('#matchList2').css('border', '')
-            } else {
-                $('#matchList2').css('border', 'none')
-            }
-            var q = this.refs.q2.value
-            q = q.trim();
-            q = q.replace(/\s+/g, ' ').toLowerCase()
-
-            $('#q2').css('color', '');
-
-            if (tag.matches) {
-
-                $('#matchList2').find('li').mouseover(function(e) {
-
-                })
-
-                // check for single exact match
-                if (tag.matches.length === 1) {
-                    if (tag.matches[0].name.replace(/[^\w\d]+/g, '').toLowerCase() === q.replace(/[^\w\d]+/g, '')) {
-                        $('#q2').css('color', 'green')
-                    }
-                }
-            }
-        })
-
+        
     </script>
 </create-form>

@@ -11,21 +11,18 @@
             <input type="text" id="autocomplete_q"  ref={opts.ref || opts.name || 'q'} name={opts.name || 'qq'}  placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
     -->
 
-    <div class="input-field col s6">
+    <div class="input-field col s12">
         <div class="query-container">
             <input type="text" ref={opts.ref || opts.name || 'q'} name={opts.name || 'q'} id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
-            <label for={opts.name || 'q'} class="active">Instance of {type}</label>
+            <label for={opts.name || 'q'} class="active">Name</label>
         </div>
         <ul id="matchList_q" class="matchlist">
             <li each={match, index in matches} class="matchlist {highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
             <li if={matches && !matches.length} class="matchlist no-match">No matches found</li>
         </ul>
-        <ul>
-            <li each={match in matches} class="matchlist" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-        </ul>
+        
         
     </div>
-
 
     <style>
         .matchlist {
@@ -69,7 +66,7 @@
 
             this.selectCurrent = function() {
                 var sel = this.matches[this.selected]
-                this.refs[opts.ref].value = sel.text
+                this.refs[opts.ref].value = sel.name
                 this.update()
                 this.hideMatches()
             }.bind(this)
@@ -133,9 +130,9 @@
                     //console.log('autocomplete query:', JSON.stringify(results))
                     if (err) return; // TODO handle
 
-                    tag.matches = results || [];
+                    tag.matches = results.virtuals || [];
 
-                    //console.log('results: ', JSON.stringify(tag.matches))
+                    console.log('results: ', JSON.stringify(tag.matches))
 
                     if (tag.matches && tag.matches.length) {
                         selected = 0;

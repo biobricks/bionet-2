@@ -280,7 +280,9 @@
             $('#selectVirtual').hide()
 
             bionetSetup.addRoute('getPhysicalResult', function(data) {
+                console.log('getPhysicalResult',JSON.stringify(data))
                 tag.formData = data
+                /*
                 tag.type = data.type
                 const dataType = app.getType(data.type)
                 if (dataType.virtual) tag.isMaterial = true
@@ -295,6 +297,7 @@
                 tag.printNameDefault = data.name;
                 //$(tag.refs.createPhysicalHeader).html("Edit " + data.name)
                 tag.fields = app.getAttributesForType(data.type)
+                */
                 tag.showPhysical = true
                 tag.update()
             })

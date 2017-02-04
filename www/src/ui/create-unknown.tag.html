@@ -9,12 +9,17 @@
     <div class="row">
         <div class="col s6 m6 l6 left-align">
             <form>
+                <!--
                 <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+                -->
+                <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete}/>
                 <form-text-input label="Instances" ref="instances" name="instances" value={formData.instances}/>
+                <!--
                 <div each={item in virtuals}>
                     <input name="selectvirtual" type="radio" id={item.name} value={item.name} onclick={setFields}/>
                     <label for={item.name}>{item.name}</label>
                 </div>
+                -->
             </form>
             <div id="scanner" style="position:absolute;top:100px; left:0px"></div>
             <div class="row" style="margin-top:25px">
@@ -77,6 +82,14 @@
             }
             console.log("create unknown, types:%s", JSON.stringify(this.dataTypes))
 
+            this.updateAutocomplete = function(q, cb) {
+                console.log('updateAutocomplete: ', q)
+                app.remote.createAutocomplete(null, q, function(err, results) {
+                    if (err) return cb(err)
+                        //console.log('updateAutocomplete results: ', JSON.stringify(results))
+                    cb(null, results)
+                });
+            }
             tag.setFields = function() {
                 const type = $('input[name=selectvirtual]:checked').val()
                 tag.fields = app.getAttributesForType(type)
@@ -128,7 +141,8 @@
                 const type = $('input[name=selectvirtual]:checked').val()
 
                 // generate unique name
-                const seriesName = tag.refs.name.value
+                const seriesName = $('#autocomplete_q').val()
+                //const seriesName = tag.refs.selectVirtual.value
                 const instances = tag.refs.instances.value
                 const attributes = app.getAttributesForType(type)
                 for (var instance = 0; instance < instances; instance++) {
