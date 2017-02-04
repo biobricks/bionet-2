@@ -45,6 +45,7 @@ var accounts = {
             value: {
                 email: user.email, 
                 name: user.name,
+                workbenchID: user.workbenchID,
                 verified: false,
                 verificationCode: uuid(),
                 created: (new Date()).value
@@ -55,7 +56,7 @@ var accounts = {
             if(err) {
                 var msg;
                 if(err.type == 'EXISTS') {
-                    return cb("User already exists");
+                    return cb(new Error("User already exists"));
                 } else {
                     return cb(err);
                 }
@@ -63,6 +64,15 @@ var accounts = {
           console.log("USER CREATED, sending verification", user, opts.value.verificationCode);
             mailer.sendVerification(user, opts.value.verificationCode, cb);
         });
+    },
+
+    // update user value
+    update: function(users, userValue, cb) {
+      users.get(userValue.email, function(err, value) {
+        if(err) return cb(err);
+
+        users.put(userValue.email, userValue, cb);
+      });
     },
 
     verify: function(users, code, cb) {

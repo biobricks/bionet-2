@@ -103,7 +103,9 @@ con.on('error', function(err) {
   console.error("Warning: bionet app appears to be offline")
   console.error("Warning: opening bionet database directly");
   db = level(settings.dbPath || './db');
-  main();
+  db.on('ready', function() {
+    main();
+  });
 });
 
 con.on('connect', function() {
@@ -119,12 +121,13 @@ function main() {
     var dbs = db.createReadStream()
     var jstream = JSONStream.stringifyObject();
     dbs.pipe(through.obj(function(obj, enc, cb) {
+      console.log('--------------');
       // reformat key/value as array since stringifyObject expects that
       this.push([obj.key, obj.value])
       cb();
     })).pipe(jstream).pipe(process.stdout);
 
-    dbs.on('close', function() {
+    dbs.on('end', function() {
       con.end();
     })
 
