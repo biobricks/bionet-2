@@ -66,17 +66,18 @@ Class abbreviation is: p
   key: p-<uuid>
   value: {
     id: p-<uuid>,
+    hidden: true|false, // hidden from searches, etc. 
     type: <type>,
     virtual_id: <uuid>, // the id of the parent virtual (if any)
     name: <text>,
     description: <text>,
     barcode: <barcode>, // barcode as string (If any. Only for DataMatrix)
     parent_id: <physical_id>,
-    files: [
+    files: [{
       fileName: <generated_unique_name_on_disk>,
       fileType: <detected_file_type>,
       name: <name_of_uploaded_file>
-    ],
+    }, ... ],
     // ... + any type-specific fields, e.g:
     locationInParent: { 
       // e.g. "shelf 2, rack 3, row 3, column 4" if needed for this type

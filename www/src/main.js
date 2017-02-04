@@ -75,11 +75,7 @@ function connector(cb) {
         wsProtocol = 'wss://';
     }
 
-    var port = '';
-    if(window.location.port) {
-      port = ':' + window.location.port;
-    }
-    var websocketUrl = wsProtocol + window.document.location.host + port;
+    var websocketUrl = wsProtocol + window.document.location.host;
     console.log('connecting to websocket', websocketUrl)
 
     var stream = websocket(websocketUrl);

@@ -45,6 +45,7 @@ var accounts = {
             value: {
                 email: user.email, 
                 name: user.name,
+                workbench_id: user.workbench_id,
                 verified: false,
                 verificationCode: uuid(),
                 created: (new Date()).value
