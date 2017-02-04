@@ -331,17 +331,18 @@ websocket.createServer({server: server}, function(stream) {
       }
       var user = {email: email};
 
-      saveMaterialInDB({
-        type: 'workbench',
-        name: '_workbench-'+uuid(),
-        hidden: true
-      }, curUser, 'p', function(err, id) {
-        if(err) return cb(err);
-
-        // associate workbench with user
-        user.workbenchID = id;
-
-        accounts.create(users, user, password, mailer, cb);
+      accounts.create(users, user, password, mailer, function(err) {
+        saveMaterialInDB({
+          type: 'workbench',
+          name: '_workbench-'+uuid(),
+          hidden: true
+        }, {user: user}, 'p', function(err, id) {
+          if(err) return cb(err);
+          
+          // associate workbench with user
+          user.workbenchID = id;
+          accounts.update(users, user, cb);
+        });
       });
     }, 
 
@@ -370,21 +371,21 @@ websocket.createServer({server: server}, function(stream) {
 
       // get user's workbench physical
       getWorkbench: function(curUser, cb) {
-        if(!curUser.workbenchID) return cb(new Error("User workbench missing"));
+        if(!curUser.user.workbenchID) return cb(new Error("User workbench missing"));
 
-        bioDB.get(curUser.workbenchID, cb);
+        physicalDB.get(curUser.user.workbenchID, cb);
       },
 
       workbenchTree: function(curUser, cb) {
-        if(!curUser.workbenchID) return cb(new Error("User workbench missing"));
+        if(!curUser.user.workbenchID) return cb(new Error("User workbench missing"));
 
-        physicalTree.childrenFromKey(curUser.workbenchID, cb);
+        physicalTree.childrenFromKey(curUser.user.workbenchID, cb);
       },
 
       saveInWorkbench: function(curUser, m, imageData, doPrint, cb) {
-        if(!curUser.workbenchID) return cb(new Error("User workbench missing"));
+        if(!curUser.user.workbenchID) return cb(new Error("User workbench missing"));
         
-        m.parent_id = curUser.workbenchID;
+        m.parent_id = curUser.user.workbenchID;
         savePhysical(curUser, m, imageData, doPrint, cb);
       },
 
