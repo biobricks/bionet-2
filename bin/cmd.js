@@ -73,6 +73,7 @@ var db = level(settings.dbPath || './db');
 var bioDB = sublevel(db, 'b');
 var virtualDB = sublevel(bioDB, 'v-', {valueEncoding: 'json'});
 var physicalDB = sublevel(bioDB, 'p-', {valueEncoding: 'json'});
+var cartDB = sublevel(bioDB, 'c-', {valueEncoding: 'json'});
 
 // Start multilevel server for low level db access (e.g. backups)
 var multiLevelServer = net.createServer(function(con) {
@@ -245,6 +246,10 @@ function saveMaterialInDB(m, userData, dbType, cb) {
       cb(null, m.id);
     });
   })
+}
+
+function userCartDB(userID) {
+  return sublevel(cartDB, userID, {valueEncoding: 'json'});
 }
 
 function savePhysical(curUser, m, imageData, doPrint, cb) {
@@ -432,6 +437,39 @@ websocket.createServer({server: server}, function(stream) {
           return cb(null, a);
         });
 
+      },
+
+      // add a physical to user's cart
+      addToCart: function(curUser, physical_id, name, cb) {
+        
+        var o = {
+          user: curUser.user.email,
+          physical_id: id,
+          created: unixEpochTime()
+        }
+        
+        var ucDB = userCartDB(o.user);
+        
+        // TODO is it too dangerous to use the physical's name as a key here?
+        // they should be unique, but are we really ensuring that?
+        ucDB.put(name, o, cb);
+      },
+
+      // stream a user's cart
+      cartStream: rpc.syncStream(function(curUser) {
+        var ucDB = userCartDB(curUser.user.email);
+        
+        return ucDB.createReadStream();
+      }),
+
+      delFromCart: function(curUser, cb) {
+        // TODO
+        cb(new Error("Not yet implemented"));
+      },
+
+      emptyCart: function(curUser, cb) {
+        // TODO
+        cb(new Error("Not yet implemented"));
       },
 
       getType: function(curUser, name, cb) {
