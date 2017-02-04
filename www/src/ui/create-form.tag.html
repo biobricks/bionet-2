@@ -45,15 +45,17 @@
         -->
         <div id="create-physical" class="edit-physical">
             <create-quilt/>
+
+            <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete}/>
             <!--
-            <form ref="createForm" onsubmit={submitForm2}>
+            <form ref="createForm2" onsubmit={submitForm2}>
                 <div id="selectVirtual2" class="row">
                     <div class="input-field col s6">
                         <div class="query-container">
-                            <input type="text" id="q2" name="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+                            <input type="text" id="q2" name="q2" ref="q2" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
                             <label for="q2" class="active">Instance of {type}</label>
                         </div>
-                        <ul id="matchList2" class="matchlist2">
+                        <ul id="matchList2" class="matchlist">
                             <li each={match, index in matches} class="matchlist {highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
                             <li if={matches && !matches.length} class="matchlist no-match">No matches found</li>
                         </ul>
@@ -61,11 +63,16 @@
                 </div>
                 <input type="submit" style="display:none" />
             </form>
-        -->
+            -->
         </div>
     </div>
 
     <style>
+        .matchlist {
+            background-color: rgba(255, 255, 255, 1);
+            z-index: 1000;
+        }
+        
         table.fancytree-ext-table tr td {
             border: none !important;
             padding: 8px;
@@ -109,7 +116,7 @@
             e.preventDefault();
 
             //     this.selectCurrent();
-            var val = this.refs.q.value.trim()
+            var val = this.refs.q2.value.trim()
 
             if (!this.selectedType && val) {
                 app.remote.getVirtualBy('name', val, function(err, o) {
@@ -141,8 +148,16 @@
             }
         }.bind(this);
 
-        function query(type, q, cb) {
+        this.updateAutocomplete = function(q, cb) {
+            console.log('updateAutocomplete: ', q)
+            app.remote.createAutocomplete(this.selectedType, q, function(err, results) {
+                if (err) return cb(err)
+                //console.log('updateAutocomplete results: ', JSON.stringify(results))
+                cb(null, results)
+            });
+        }
 
+        function query(type, q, cb) {
             app.remote.createAutocomplete(type, q, function(err, results) {
                 if (err) return cb(err)
                 cb(null, results)
@@ -181,370 +196,366 @@
 
         this.selected = null
         this.selectedType = null
+        this.matches = []
 
         this.on('mount', function() {
-                $('#name').focus()
+            $('#name').focus()
 
-                this.updateMatchListPosition = function() {
-                    var pos = $('#q').offset();
-                    if (pos === undefined) return
-                    pos.top += $('#q').innerHeight() + 2;
-                    pos.width = $('#q').innerWidth();
-                    $('#matchList').css(pos)
-                }.bind(this)
+            this.updateMatchListPosition = function() {
+                var pos = $('#q2').offset();
+                if (pos === undefined) return
+                pos.top += $('#q2').innerHeight() + 2;
+                pos.width = $('#q2').innerWidth();
+                $('#matchList2').css(pos)
+            }.bind(this)
 
-                $(window).resize(function() {
-                    this.updateMatchListPosition();
-                }.bind(this))
-
-                this.selectCurrent = function() {
-                    var sel = this.matches[this.selected]
-                    if (sel.pre === 'type') {
-                        this.setSelectedType(sel)
-                        this.refs.q.value = ''
-                    } else {
-                        this.refs.q.value = sel.name
-                    }
-                    this.hideMatches()
-                }.bind(this)
-
-                this.setSelectedType = function(type) {
-                    if (!type) {
-                        this.selectedType = null
-                        $('#selectedTypeContainer').css('display', 'none')
-                    } else {
-                        this.selectedType = type
-                        $('#selectedTypeLabel').text(type.name)
-                        $('#selectedTypeContainer').css('display', 'block')
-                    }
-                    this.updateMatchListPosition()
-                }.bind(this)
-
-                this.hideMatches = function(e) {
-                    this.matches = null
-                    this.selected = null
-                    this.update()
-                }.bind(this)
-
-                this.clickSelect = function(e) {
-                    this.selectCurrent();
-                }.bind(this)
-
-
-                this.elementOver = function(e) {
-                    if ($(e.target).hasClass('no-match')) return;
-                    var lis = $('#matchList').find('li');
-                    var i;
-                    for (i = 0; i < lis.length; i++) {
-                        if (lis[i] == e.target) {
-                            this.selected = i
-                            break
-                        }
-                    }
-                    this.update()
-
-                }.bind(this)
-
+            $(window).resize(function() {
                 this.updateMatchListPosition();
+            }.bind(this))
 
-                this.matches = []
+            this.selectCurrent = function() {
+                var sel = this.matches[this.selected]
+                if (sel.pre === 'type') {
+                    this.setSelectedType(sel)
+                    this.refs.q2.value = ''
+                } else {
+                    this.refs.q2.value = sel.name
+                }
+                this.hideMatches()
+            }.bind(this)
 
-                var hadQueryBeforeKeydown = false;
-                /*
-                $('#q').keydown(function(e) {
+            this.setSelectedType = function(type) {
+                if (!type) {
+                    this.selectedType = null
+                    $('#selectedTypeContainer').css('display', 'none')
+                } else {
+                    this.selectedType = type
+                    $('#selectedTypeLabel').text(type.name)
+                    $('#selectedTypeContainer').css('display', 'block')
+                }
+                this.updateMatchListPosition()
+            }.bind(this)
 
-                    if (e.keyCode === 38) { // up arrow
-                        e.preventDefault()
-                        if (this.selected !== null && this.selected > 0) this.selected--
-                            this.update();
-                    } else if (e.keyCode === 40) { // down arrow
-                        e.preventDefault()
-                        if (this.selected === null) this.selected = 0
-                        else if (this.selected < this.matches.length - 1) this.selected++
-                            this.update();
-                    } else if (e.keyCode === 27) { // escape
-                        this.hideMatches()
-                    } else if (e.keyCode === 9 || e.keyCode === 13) { // tab or enter
-                        if (this.selected === null) return // normal operation if nothing selected
-                        e.preventDefault();
-                        this.selectCurrent()
+            this.hideMatches = function(e) {
+                this.matches = null
+                this.selected = null
+                this.update()
+            }.bind(this)
+
+            this.clickSelect = function(e) {
+                this.selectCurrent();
+            }.bind(this)
+
+
+            this.elementOver = function(e) {
+                if ($(e.target).hasClass('no-match')) return;
+                var lis = $('#matchList2').find('li');
+                var i;
+                for (i = 0; i < lis.length; i++) {
+                    if (lis[i] == e.target) {
+                        this.selected = i
+                        break
+                    }
+                }
+                this.update()
+
+            }.bind(this)
+
+            this.updateMatchListPosition();
+
+            var hadQueryBeforeKeydown = false;
+
+            $('#q2').keydown(function(e) {
+                if (e.keyCode === 38) { // up arrow
+                    e.preventDefault()
+                    if (tag.selected !== null && tag.selected > 0) tag.selected--;
+                    tag.update()
+                } else if (e.keyCode === 40) { // down arrow
+                    e.preventDefault()
+                    if (tag.selected === null) tag.selected = 0;
+                    else if (tag.selected < tag.matches.length - 1) tag.selected++;
+                    tag.update()
+                } else if (e.keyCode === 27) { // escape
+                    tag.hideMatches()
+                } else if (e.keyCode === 9 || e.keyCode === 13) { // tab or enter
+                    if (tag.selected === null) return // normal operation if nothing selected
+                    e.preventDefault();
+                    tag.selectCurrent()
+                } else {
+                    hadQueryBeforeKeydown = !tag.refs.q2.value.replace(/\s+/g, '')
+                }
+
+            }.bind(this));
+
+            $('#q2').keyup(function(e) {
+                if (e.keyCode === 8 || e.keyCode === 46) { // backspace or delete
+                    var hasQueryNow = !!this.refs.q2.value.replace(/\s+/g, '')
+
+                    if (!hadQueryBeforeKeydown && !hasQueryNow) {
+                        this.setSelectedType()
+                    }
+                }
+            }.bind(this));
+
+            $('#q2').on('input', function(e) {
+                this.matches = [];
+
+                var q = this.refs.q2.value.trim();
+
+                query(this.selectedType, q, function(err, results) {
+                    if (err) return app.ui.toast(err); // TODO better error handling
+
+                    if (!q) {
+                        this.matches = null;
                     } else {
-                        hadQueryBeforeKeydown = !!this.refs.q.value.replace(/\s+/g, '')
-                    }
-
-                }.bind(this));
-
-                $('#q').keyup(function(e) {
-                    if (e.keyCode === 8 || e.keyCode === 46) { // backspace or delete
-                        var hasQueryNow = !!this.refs.q.value.replace(/\s+/g, '')
-
-                        if (!hadQueryBeforeKeydown && !hasQueryNow) {
-                            this.setSelectedType()
+                        var i;
+                        for (i = 0; i < results.types.length; i++) {
+                            this.matches.push({
+                                pre: "type",
+                                name: results.types[i].name,
+                                extraClass: 'type',
+                                virtual: results.types[i].virtual
+                            });
+                        }
+                        for (i = 0; i < results.virtuals.length; i++) {
+                            this.matches.push({
+                                pre: "virtual",
+                                name: results.virtuals[i].name
+                            });
                         }
                     }
-                }.bind(this));
+                    if (this.matches && this.matches.length) {
+                        this.selected = 0;
+                    } else {
+                        this.selected = null
+                    }
+                    this.update()
 
-                $('#q').on('input', function(e) {
-                    return
-                    this.matches = [];
-
-                    var q = this.refs.q.value.trim();
-
-                    query(this.selectedType, q, function(err, results) {
-                        if (err) return app.ui.toast(err); // TODO better error handling
-
-                        if (!q) {
-                            this.matches = null;
-                        } else {
-                            var i;
-                            for (i = 0; i < results.types.length; i++) {
-                                this.matches.push({
-                                    pre: "type",
-                                    name: results.types[i].name,
-                                    extraClass: 'type',
-                                    virtual: results.types[i].virtual
-                                });
-                            }
-                            for (i = 0; i < results.virtuals.length; i++) {
-                                this.matches.push({
-                                    pre: "virtual",
-                                    name: results.virtuals[i].name
-                                });
-                            }
-                        }
-                        if (this.matches && this.matches.length) {
-                            this.selected = 0;
-                        } else {
-                            this.selected = null
-                        }
-                        this.update()
-
-                    }.bind(this))
                 }.bind(this))
-                */
-                const ftSettings = {
-                    extensions: ["table", "gridnav", "dnd5"],
-                    source: [],
-                    checkbox: true,
-                    icon: false,
-                    renderColumns: function(event, data) {
-                        /*
-                        console.log('tdlist:')
-                        const node = data.node
+            }.bind(this))
+
+            const ftSettings = {
+                extensions: ["table", "gridnav", "dnd5"],
+                source: [],
+                checkbox: true,
+                icon: false,
+                renderColumns: function(event, data) {
+                    /*
+                    console.log('tdlist:')
+                    const node = data.node
+                    const $tdList = $(node.tr).find(">td");
+                    const dbData = node.data.dbData
+                    const type = (dbData.type) ? dbData.type : ''
+                    const barcode = (dbData.barcode) ? dbData.barcode : ' '
+                    $tdList.eq(1).html('<span class="fancytree-edit">' + dbData.Description + '</span>');
+                    $tdList.eq(2).html('<span class="fancytree-edit">' + type + '</span>');
+                    $tdList.eq(3).html('<span class="fancytree-edit">' + barcode + '</span>');
+                    //$tdList.eq(3).html('<span>' + node.getIndexHier() + '</span>');
+                    */
+                },
+                beforeSelect: function(event, data) {},
+                modifyChild: function(event, data) {
+                    if (data.operation === 'remove') {
+                        const deleteNode = data.childNode
+                    }
+                },
+                keydown: function(event, data) {
+                    /*
+                    const node = data.node;
+                    if (event.which === 13) {
+                        event.preventDefault();
+                        console.log('setup-storage - save item: ', node)
                         const $tdList = $(node.tr).find(">td");
                         const dbData = node.data.dbData
-                        const type = (dbData.type) ? dbData.type : ''
-                        const barcode = (dbData.barcode) ? dbData.barcode : ' '
-                        $tdList.eq(1).html('<span class="fancytree-edit">' + dbData.Description + '</span>');
-                        $tdList.eq(2).html('<span class="fancytree-edit">' + type + '</span>');
-                        $tdList.eq(3).html('<span class="fancytree-edit">' + barcode + '</span>');
-                        //$tdList.eq(3).html('<span>' + node.getIndexHier() + '</span>');
-                        */
+                            //dbData.name = $tdList.eq(0).text()
+                            //console.log('title: %s node.data:%s',node.title,JSON.stringify(dbData))
+                        bionetSetup.route('updateStorageItem', undefined, dbData)
+                    }
+                    */
+                },
+                dnd5: {
+                    // autoExpandMS: 400,
+                    // preventForeignNodes: true, 
+                    // preventNonNodes: true, 
+                    // preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+                    // preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+                    // scroll: true,
+                    // scrollSpeed: 7,
+                    // scrollSensitivity: 10,
+
+                    // --- Drag-support:
+
+                    dragStart: function(node, data) {
+                        /* This function MUST be defined to enable dragging for the tree.
+                         *
+                         * Return false to cancel dragging of node.
+                         * data.dataTransfer.setData() and .setDragImage() is available
+                         * here.
+                         */
+                        //          data.dataTransfer.setDragImage($("<div>hurz</div>").appendTo("body")[0], -10, -10);
+                        return true;
                     },
-                    beforeSelect: function(event, data) {},
-                    modifyChild: function(event, data) {
-                        if (data.operation === 'remove') {
-                            const deleteNode = data.childNode
-                        }
+                    dragDrag: function(node, data) {
+                        data.dataTransfer.dropEffect = "move";
                     },
-                    keydown: function(event, data) {
-                        /*
-                        const node = data.node;
-                        if (event.which === 13) {
-                            event.preventDefault();
-                            console.log('setup-storage - save item: ', node)
-                            const $tdList = $(node.tr).find(">td");
-                            const dbData = node.data.dbData
-                                //dbData.name = $tdList.eq(0).text()
-                                //console.log('title: %s node.data:%s',node.title,JSON.stringify(dbData))
-                            bionetSetup.route('updateStorageItem', undefined, dbData)
-                        }
-                        */
+                    dragEnd: function(node, data) {},
+
+                    // --- Drop-support:
+
+                    dragEnter: function(node, data) {
+                        // node.debug("dragEnter", data);
+                        data.dataTransfer.dropEffect = "move";
+                        // data.dataTransfer.effectAllowed = "copy";
+                        return true;
                     },
-                    dnd5: {
-                        // autoExpandMS: 400,
-                        // preventForeignNodes: true, 
-                        // preventNonNodes: true, 
-                        // preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
-                        // preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
-                        // scroll: true,
-                        // scrollSpeed: 7,
-                        // scrollSensitivity: 10,
+                    dragOver: function(node, data) {
+                        data.dataTransfer.dropEffect = "move";
+                        // data.dataTransfer.effectAllowed = "copy";
+                    },
+                    dragLeave: function(node, data) {},
+                    dragDrop: function(node, data) {
+                        /* This function MUST be defined to enable dropping of items on
+                         * the tree.
+                         */
+                        var transfer = data.dataTransfer;
 
-                        // --- Drag-support:
+                        node.debug("drop", data);
 
-                        dragStart: function(node, data) {
-                            /* This function MUST be defined to enable dragging for the tree.
-                             *
-                             * Return false to cancel dragging of node.
-                             * data.dataTransfer.setData() and .setDragImage() is available
-                             * here.
-                             */
-                            //          data.dataTransfer.setDragImage($("<div>hurz</div>").appendTo("body")[0], -10, -10);
-                            return true;
-                        },
-                        dragDrag: function(node, data) {
-                            data.dataTransfer.dropEffect = "move";
-                        },
-                        dragEnd: function(node, data) {},
+                        // alert("Drop on " + node + ":\n"
+                        //   + "source:" + JSON.stringify(data.otherNodeData) + "\n"
+                        //   + "hitMode:" + data.hitMode
+                        //   + ", dropEffect:" + transfer.dropEffect 
+                        //   + ", effectAllowed:" + transfer.effectAllowed);
 
-                        // --- Drop-support:
+                        if (data.otherNode) {
+                            // Drop another Fancytree node from same frame
+                            // (maybe from another tree however)
+                            var sameTree = (data.otherNode.tree === data.tree);
 
-                        dragEnter: function(node, data) {
-                            // node.debug("dragEnter", data);
-                            data.dataTransfer.dropEffect = "move";
-                            // data.dataTransfer.effectAllowed = "copy";
-                            return true;
-                        },
-                        dragOver: function(node, data) {
-                            data.dataTransfer.dropEffect = "move";
-                            // data.dataTransfer.effectAllowed = "copy";
-                        },
-                        dragLeave: function(node, data) {},
-                        dragDrop: function(node, data) {
-                            /* This function MUST be defined to enable dropping of items on
-                             * the tree.
-                             */
-                            var transfer = data.dataTransfer;
-
-                            node.debug("drop", data);
-
-                            // alert("Drop on " + node + ":\n"
-                            //   + "source:" + JSON.stringify(data.otherNodeData) + "\n"
-                            //   + "hitMode:" + data.hitMode
-                            //   + ", dropEffect:" + transfer.dropEffect 
-                            //   + ", effectAllowed:" + transfer.effectAllowed);
-
-                            if (data.otherNode) {
-                                // Drop another Fancytree node from same frame
-                                // (maybe from another tree however)
-                                var sameTree = (data.otherNode.tree === data.tree);
-
-                                data.otherNode.moveTo(node, data.hitMode);
-                            } else if (data.otherNodeData) {
-                                // Drop Fancytree node from different frame or window, so we only have
-                                // JSON representation available
-                                node.addChild(data.otherNodeData, data.hitMode);
-                            } else {
-                                // Drop a non-node
-                                node.addNode({
-                                    title: transfer.getData("text")
-                                }, data.hitMode);
-                            }
-                            node.setExpanded();
+                            data.otherNode.moveTo(node, data.hitMode);
+                        } else if (data.otherNodeData) {
+                            // Drop Fancytree node from different frame or window, so we only have
+                            // JSON representation available
+                            node.addChild(data.otherNodeData, data.hitMode);
+                        } else {
+                            // Drop a non-node
+                            node.addNode({
+                                title: transfer.getData("text")
+                            }, data.hitMode);
                         }
+                        node.setExpanded();
                     }
                 }
+            }
 
-                $("#ftree").fancytree(ftSettings);
-                $("#ftree").on('click dblclick keydown', function(e) {
-                    if (e.type === 'keydown') {
-                        if (e.which !== undefined && e.which !== 13) return
-                    }
-                    const active = $(e.target)
-                    const elementType = active.prop('nodeName');
-                    console.log('elementType:', elementType)
-                        //if (!active.hasClass('fancytree-edit')) {
-                    var node = $("#ftree").fancytree("getActiveNode");
-                    if (node) {
+            $("#ftree").fancytree(ftSettings);
+            $("#ftree").on('click dblclick keydown', function(e) {
+                if (e.type === 'keydown') {
+                    if (e.which !== undefined && e.which !== 13) return
+                }
+                const active = $(e.target)
+                const elementType = active.prop('nodeName');
+                console.log('elementType:', elementType)
+                    //if (!active.hasClass('fancytree-edit')) {
+                var node = $("#ftree").fancytree("getActiveNode");
+                if (node) {
 
-                        if (node.title === 'new materials') {
-                            $('#create-physical').css({
-                                display: 'block'
-                            });
-                            $('#edit-physical').css({
-                                display: 'none'
-                            });
-                            return
-                        }
-
-                        const dbData = node.data.dbData
-                        const type = dbData.type
-                        tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('cabinet') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
-
-                        if (type.indexOf('box') >= 0) {
-                            //console.log('activating scanner')
-                            //app.dispatch('startScan',{status:'init'})
-                        }
-
-                        console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
-                        tag.update()
-                        bionetSetup.route('getPhysical', undefined, dbData.id)
-                        if (e.type === 'keydown') node.setExpanded()
-                        $('#edit-physical').css({
-                            height: $(window).innerHeight() - 120,
+                    if (node.title === 'new materials') {
+                        $('#create-physical').css({
                             display: 'block'
                         });
-
-                        app.dispatch(app.$.breadcrumbs, [{
-                            'label': 'workbench',
-                            'url': '/inventory'
-                        }, {
-                            'label': node.title,
-                            'url': '/inventory'
-                        }]);
-
-                    }
-                    //}
-                    //if (!active.text()) return
-                    //app.editTextElement(e, active)
-                })
-
-
-                bionetSetup.addRoute('storage', function(storageData) {
-                    //console.log('initializing storage:', JSON.stringify(storageData))
-                    const ftree = $("#ftree").fancytree("getTree");
-                    ftree.reload(storageData).then(function() {
-                        $('.inventory-tree').css({
-                            height: $(window).innerHeight() - 120
+                        $('#edit-physical').css({
+                            display: 'none'
                         });
-                        const activeNode = ftree.findFirst('new materials')
-                            //const children = ftree.getRootNode().children
-                            //const activeNode = children[0]
-                        if (activeNode) {
-                            activeNode.setExpanded();
-                            activeNode.setFocus();
-                        }
-                    })
-                })
-                
-                $('#create-physical').css({
-                    display: 'block'
-                });
-                $('#edit-physical').css({
-                    display: 'none'
-                });
+                        return
+                    }
 
-                bionetSetup.route('requestStorage', undefined, "Tim")
-            })
-            /*
-            this.on('updated', function() {
-                if (this.matches && this.matches.length) {
-                    $('#matchList').css('border', '')
-                } else {
-                    $('#matchList').css('border', 'none')
+                    const dbData = node.data.dbData
+                    const type = dbData.type
+                    tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('cabinet') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
+
+                    if (type.indexOf('box') >= 0) {
+                        //console.log('activating scanner')
+                        //app.dispatch('startScan',{status:'init'})
+                    }
+
+                    console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
+                    tag.update()
+                    bionetSetup.route('getPhysical', undefined, dbData.id)
+                    if (e.type === 'keydown') node.setExpanded()
+                    $('#edit-physical').css({
+                        height: $(window).innerHeight() - 120,
+                        display: 'block'
+                    });
+
+                    app.dispatch(app.$.breadcrumbs, [{
+                        'label': 'workbench',
+                        'url': '/inventory'
+                    }, {
+                        'label': node.title,
+                        'url': '/inventory'
+                    }]);
+
                 }
-                var q = this.refs.q.value
-                q = q.trim();
-                q = q.replace(/\s+/g, ' ').toLowerCase()
+                //}
+                //if (!active.text()) return
+                //app.editTextElement(e, active)
+            })
 
-                $('#q').css('color', '');
 
-                if (this.matches) {
+            bionetSetup.addRoute('storage', function(storageData) {
+                //console.log('initializing storage:', JSON.stringify(storageData))
+                const ftree = $("#ftree").fancytree("getTree");
+                ftree.reload(storageData).then(function() {
+                    $('.inventory-tree').css({
+                        height: $(window).innerHeight() - 120
+                    });
+                    const activeNode = ftree.findFirst('new materials')
+                        //const children = ftree.getRootNode().children
+                        //const activeNode = children[0]
+                    if (activeNode) {
+                        activeNode.setExpanded();
+                        activeNode.setFocus();
+                    }
+                })
+            })
 
-                    $('#matchList').find('li').mouseover(function(e) {
+            $('#create-physical').css({
+                display: 'block'
+            });
+            $('#edit-physical').css({
+                display: 'none'
+            });
 
-                    }.bind(this))
+            bionetSetup.route('requestStorage', undefined, "Tim")
+        })
 
-                    // check for single exact match
-                    if (this.matches.length === 1) {
-                        if (this.matches[0].name.replace(/[^\w\d]+/g, '').toLowerCase() === q.replace(/[^\w\d]+/g, '')) {
-                            $('#q').css('color', 'green')
-                        }
+        this.on('updated', function() {
+            if (tag.matches && tag.matches.length) {
+                $('#matchList2').css('border', '')
+            } else {
+                $('#matchList2').css('border', 'none')
+            }
+            var q = this.refs.q2.value
+            q = q.trim();
+            q = q.replace(/\s+/g, ' ').toLowerCase()
+
+            $('#q2').css('color', '');
+
+            if (tag.matches) {
+
+                $('#matchList2').find('li').mouseover(function(e) {
+
+                })
+
+                // check for single exact match
+                if (tag.matches.length === 1) {
+                    if (tag.matches[0].name.replace(/[^\w\d]+/g, '').toLowerCase() === q.replace(/[^\w\d]+/g, '')) {
+                        $('#q2').css('color', 'green')
                     }
                 }
-            })
-            */
+            }
+        })
 
     </script>
 </create-form>

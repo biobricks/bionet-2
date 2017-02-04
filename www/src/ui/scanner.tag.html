@@ -1,0 +1,35 @@
+<scanner>
+  <div id="scanner-widget" style="padding-top:110px;"></div>
+  <style>
+    @font-face {
+      font-family: 'Roboto';
+      src: url('static/fonts/roboto/Roboto-Medium.eot');
+      src: url(static/'fonts/roboto/Roboto-Medium.eot?#iefix') format('embedded-opentype'), url('static/fonts/roboto/Roboto-Medium.woff') format('woff'), url('static/fonts/roboto/Roboto-Medium.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+  </style>
+  
+  <script>
+    this.on('mount', function() {
+        console.log('scanner tag mount')
+      app.dispatch('startScan', {
+        status: 'start'
+      })
+    })
+    this.on('unmount', function() {
+      app.dispatch('startScan', {
+        status: 'stop'
+      })
+    })
+
+    // todo: add events handling to initiate and shutdown pixi via streams
+    this.scanButton = function() {
+      app.dispatch('startScan', {
+        status: 'start'
+      })
+    }
+
+  </script>
+</scanner>
