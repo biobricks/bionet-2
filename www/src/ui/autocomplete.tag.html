@@ -1,38 +1,66 @@
 <autocomplete>
+    <!--
     <div class="input-field">
         <label for="autocomplete" class="active">Container</label>
         <input type="text" ref={opts.ref || opts.name || 'q'} name={opts.name || 'q'} id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
-        <ul id="matchList" style="z-index:1000; border: 1px solid #404040;">
-            <li each={match, index in matches} class="{highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver} onmousedown={clickSelect}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.text}</li>
+        <ul id="matchlist_q" class="matchlist" style="border: 1px solid #404040;">
+            <li each={match, index in matches} class="matchlist {highlight: selected === index} {match.extraClass || ''}" onmouseover={elementOver} onmousedown={clickSelect}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.text}</li>
             <li if={matches && !matches.length} class="no-match">No matches found</li>
         </ul>
     </div>
+            <input type="text" id="autocomplete_q"  ref={opts.ref || opts.name || 'q'} name={opts.name || 'qq'}  placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
+    -->
+
+    <div class="input-field col s6">
+        <div class="query-container">
+            <input type="text" ref={opts.ref || opts.name || 'q'} name={opts.name || 'q'} id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
+            <label for={opts.name || 'q'} class="active">Instance of {type}</label>
+        </div>
+        <ul id="matchList_q" class="matchlist">
+            <li each={match, index in matches} class="matchlist {highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+            <li if={matches && !matches.length} class="matchlist no-match">No matches found</li>
+        </ul>
+        <ul>
+            <li each={match in matches} class="matchlist" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+        </ul>
+        
+    </div>
+
+
+    <style>
+        .matchlist {
+            background-color: rgba(255, 255, 255, 1);
+            z-index: 1000;
+        }
+
+    </style>
     <script>
+        const tag = this
         var searchCallback;
 
         opts.ref = opts.ref || 'q';
 
         function query(s, cb) {
-            if (!searchCallback) return;
+            if (!opts.searchcallback) return;
             s = s.trim();
             if (!s) return null;
             s = s.replace(/\s+/g, ' ')
 
-            searchCallback(s, cb)
+            opts.searchcallback(s, cb)
         }
 
         this.selected = null
 
         this.on('mount', function() {
 
-            searchCallback = this.opts.searchCallback;
+            searchCallback = opts.searchCallback;
 
             this.updateMatchListPosition = function() {
                 var pos = $('#autocomplete_q').position();
                 if (pos === undefined) return
                 pos.top += $('#autocomplete_q').innerHeight() + 2;
                 pos.width = $('#autocomplete_q').innerWidth();
-                $('#matchList').css(pos)
+                $('#matchlist_q').css(pos)
             }.bind(this)
 
             $(window).resize(function() {
@@ -53,13 +81,13 @@
             this.hideMatches = function(e) {
                 this.matches = null
                 this.selected = null
-                $('#matchList').css("display:none")
+                $('#matchlist_q').css("display:none")
                 this.update()
             }.bind(this)
 
             this.elementOver = function(e) {
                 if ($(e.target).hasClass('no-match')) return;
-                var lis = $('#matchList').find('li');
+                var lis = $('#matchlist_q').find('li');
                 var i;
                 for (i = 0; i < lis.length; i++) {
                     if (lis[i] == e.target) {
@@ -96,23 +124,26 @@
             }.bind(this));
 
             this.showMatches = function() {
-                $('#matchList').css("display:block")
+                $('#matchlist_q').css("display:block")
             }
 
             $(this.refs[opts.ref]).on('input', function(e) {
 
                 query(this.refs[opts.ref].value, function(err, results) {
+                    //console.log('autocomplete query:', JSON.stringify(results))
                     if (err) return; // TODO handle
 
-                    this.matches = results || [];
+                    tag.matches = results || [];
 
-                    if (this.matches && this.matches.length) {
+                    //console.log('results: ', JSON.stringify(tag.matches))
+
+                    if (tag.matches && tag.matches.length) {
                         selected = 0;
                     } else {
                         selected = null
                     }
-                    this.showMatches()
-                    this.update()
+                    tag.showMatches()
+                    tag.update()
 
                 }.bind(this));
             }.bind(this))
@@ -120,9 +151,9 @@
 
         this.on('updated', function() {
             if (this.matches && this.matches.length) {
-                $('#matchList').css('border', '')
+                $('#matchlist_q').css('border', '')
             } else {
-                $('#matchList').css('border', 'none')
+                $('#matchlist_q').css('border', 'none')
             }
             var q = this.refs[opts.ref].value
             q = q.trim();

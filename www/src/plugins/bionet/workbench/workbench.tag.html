@@ -1,0 +1,165 @@
+<workbench>
+    <div style="padding-top:100px;">
+        <parts-inventory-form q={testvalue}/>
+    </div>
+    <script>
+        this.on('mount', function() {
+            this.testvalue = "somevalue"
+            this.update();
+            console.log('parts-inventory: opts:', JSON.stringify(this.opts))
+        })
+
+    </script>
+</workbench>
+
+<parts-inventory-form>
+    <div style="padding-top:100px;" />
+    <form onsubmit={submitForm}>
+        <!--
+        <search-input label="search inventory" ref="searchinventory" name="searchinventory" action={submitForm}/>
+        <input type="submit" style="display:none" />
+        -->
+        <div if={nodes.length>0} class="{theme.style.color.background +' '+ theme.style.color.text}">
+            <!--
+            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+            -->
+            <inventory-treeview nodes={nodes} />
+        </div>
+    </form>
+    <script>
+        const tag = this
+        this.theme = app.getTheme();
+        this.nodes = [];
+        //var q = (this.opts.q) ? decodeURIComponent(this.opts.q) : undefined;
+        var q=''
+        const updateInventoryTree = function() {
+            console.log('parts-inventory-form: updateInventoryTree q=', q)
+            if (q === undefined) return;
+            const matchAll = (q.length > 0) ? false : true;
+            //tag.refs.searchinventory.value = q;
+
+            //q = new RegExp(q.replace(/\s+/, '.*'), 'i');
+
+
+            function itemFromNode(node) {
+
+            }
+
+            app.remote.inventoryTree(function(err, children) {
+                if (err) return console.error(err);
+
+                // TODO rewrite this matching algorithm 
+                //      so we can do single-pass matching
+                //      so we can use a stream
+                //      And move it to the level-tree-index module
+
+                var matches = [];
+                this.nodes = [];
+
+                var i, cur, indent, a;
+                for (i = 0; i < children.length; i++) {
+                    cur = children[i].path;
+                    if (cur.match(q) || matchAll) matches.push(cur);
+                }
+
+                var j, m, add, perfect;
+                for (i = 0; i < children.length; i++) {
+                    cur = children[i].path;
+                    a = cur.split('.');
+                    indent = a.length - 1;
+                    add = false
+                    perfect = false
+                    for (j = 0; j < matches.length; j++) {
+                        m = matches[j];
+                        if (m.indexOf(cur) === 0) {
+                            add = true;
+                            if (m.length === cur.length) perfect = true;
+                            break;
+                        }
+                    }
+                    if (add) {
+                        const data = children[i].value
+                        //console.log('inventory re value:', JSON.stringify(data))
+                        this.nodes.push({
+                            indent: indent,
+                            url: '/edit-physical/' + data.id,
+                            primary_text: a[a.length - 1],
+                            secondary_text: (data.locationid !== undefined) ? 'location id: ' + data.locationid : undefined,
+                            id: children[i].key,
+                            highlight: perfect
+                        });
+                    }
+                }
+                tag.primaryHeader = 'Search inventory for ' + '\"' + q + '\"'
+                tag.secondaryHeader = this.nodes.length + ' results'
+                tag.update();
+
+            }.bind(this));
+        }.bind(this)
+
+        this.on('mount', function() {
+            updateInventoryTree()
+        });
+
+        this.submitForm = function(e) {
+            e.preventDefault()
+            q = encodeURIComponent(this.refs.searchinventory.value)
+                //q = this.refs.searchinventory.value
+            const iurl = '/inventory/' + q
+            updateInventoryTree()
+                //route(iurl)
+                //route('/inventory/?q=' + encodeURIComponent(this.refs.searchinventory.value))
+        }.bind(this)
+
+    </script>
+</parts-inventory-form>
+
+<inventory-treeview2>
+
+    <list-item each={node in opts.nodes} item={node} />
+    <script>
+        /*
+                                                                                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                                                                                                    */
+        const tag = this;
+
+
+        this.on('mount', function() {
+
+        });
+
+        this.on('updated', function() {
+            console.log('inventory-treeview, opts:', JSON.stringify(opts))
+
+        });
+
+        /*
+            this.primaryHeader = 'Lab inventory'
+            const tag = this
+            this.subitems = []
+
+            app.observe('inventory', function(list) {
+              this.secondaryHeader = ''
+              this.searchresult = list
+
+              var item = list
+              var subitems = []
+              for (var key in item) {
+                if (item.hasOwnProperty(key)) {
+                  var ditem = {
+                    primary_text: key,
+                    subitem: item[key]
+                  }
+                  subitems.push(ditem)
+                }
+              }
+              this.subitems = subitems
+              console.log('inventory-treeview :',JSON.stringify(subitems))
+              tag.update()
+            })
+
+        */
+
+    </script>
+
+</inventory-treeview2>
