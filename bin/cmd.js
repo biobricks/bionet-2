@@ -69,7 +69,7 @@ var userStatic = require('ecstatic')({
 });
 settings.labelImageFilePath = path.resolve(path.join(settings.userFilePath, settings.labelImageFilePath));
 
-var db = level('./db');
+var db = level(settings.dbPath || './db');
 var bioDB = sublevel(db, 'b');
 var virtualDB = sublevel(bioDB, 'v-', {valueEncoding: 'json'});
 var physicalDB = sublevel(bioDB, 'p-', {valueEncoding: 'json'});
