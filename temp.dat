@@ -1,29 +1,643 @@
-Error: Cannot find module '../../../../biomatrix-scratch' from '/home/tim/dev/biobricks/bionet/www/src/ui'
-    at /home/tim/dev/biobricks/bionet/node_modules/resolve/lib/async.js:55:21
-    at load (/home/tim/dev/biobricks/bionet/node_modules/resolve/lib/async.js:69:43)
-    at onex (/home/tim/dev/biobricks/bionet/node_modules/resolve/lib/async.js:92:31)
-    at /home/tim/dev/biobricks/bionet/node_modules/resolve/lib/async.js:22:47
-    at FSReqWrap.oncomplete (fs.js:82:15)
-
-npm ERR! Linux 4.4.0-47-generic
-npm ERR! argv "/home/tim/.nvm/versions/node/v4.4.2/bin/node" "/home/tim/.nvm/versions/node/v4.4.2/bin/npm" "run" "build"
-npm ERR! node v4.4.2
-npm ERR! npm  v2.15.0
-npm ERR! code ELIFECYCLE
-npm ERR! bionet@0.0.1 build: `cross-env NODE_ENV=production browserify -e www/src/main.js -m -o www/js/bionet.js`
-npm ERR! Exit status 1
-npm ERR! 
-npm ERR! Failed at the bionet@0.0.1 build script 'cross-env NODE_ENV=production browserify -e www/src/main.js -m -o www/js/bionet.js'.
-npm ERR! This is most likely a problem with the bionet package,
-npm ERR! not with npm itself.
-npm ERR! Tell the author that this fails on your system:
-npm ERR!     cross-env NODE_ENV=production browserify -e www/src/main.js -m -o www/js/bionet.js
-npm ERR! You can get information on how to open an issue for this project with:
-npm ERR!     npm bugs bionet
-npm ERR! Or if that isn't available, you can get their info via:
-npm ERR! 
-npm ERR!     npm owner ls bionet
-npm ERR! There is likely additional logging output above.
-
-npm ERR! Please include the following file with any support request:
-npm ERR!     /home/tim/dev/biobricks/bionet/npm-debug.log
+Starting http server on localhost port 8000
+multilevel listening
+[printserver] listening on localhost:4200
+Printserver started
+BUILD: { id: 'p-003fa061-1f7f-49f9-92a0-d7c8caeda545',
+  name: 'freezer rack_1.2.3' }
+BUILD: { id: 'p-00aa9a18-bec8-4b4e-bd37-8590c7d644ba',
+  name: 'New 8 x 12 freezer box' }
+BUILD: { id: 'p-041ba27d-c946-466a-b59d-26d3987a9827',
+  name: 'shelf_1.5.1' }
+BUILD: { id: 'p-06dadbce-54cb-41b0-ad90-b8878a439fce',
+  name: 'New 8 x 12 freezer box' }
+BUILD: { id: 'p-073877da-4a64-4db5-b73e-f3b98fdbbab2',
+  name: 'New -80 freezer' }
+BUILD: { id: 'p-08675b67-c27a-46c8-b959-ac79e9c48de7',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-099c6562-00d6-4b9a-8b49-f41f1778fb24',
+  name: 'New 8 x 12 freezer box' }
+BUILD: { id: 'p-0a114f10-f899-441d-8ce3-af1dcd7d6b23',
+  name: '9 x 9 freezer box_1.1.2.1' }
+BUILD: { id: 'p-0b6cab5e-31e1-4839-b1cd-9f81f1b20d80',
+  name: '9 x 9 freezer box_38.4.1.3' }
+BUILD: { id: 'p-0b9203a1-8eb4-4884-b1f4-e80af5140233',
+  name: 'vector_1.1.1.2.1' }
+BUILD: { id: 'p-0d1c09fb-16f5-49a4-8efb-7b530bf20c25',
+  name: '8 x 12 freezer box_1.1.1.2' }
+BUILD: { id: 'p-0e735d3c-3689-4cb2-a12a-8e93b3cc25b4',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-0e7b07e6-d2f5-4ea5-9325-171ae6f4e347',
+  name: 'myNewChemical_0' }
+BUILD: { id: 'p-0fd439f8-a93c-4cac-b9f1-26a7d0f68ccd',
+  name: 'freezer rack_38.4.1' }
+BUILD: { id: 'p-11b11607-985c-4db0-a5cc-173adfa99e34',
+  name: '-80 freezer 6' }
+BUILD: { id: 'p-1301dca1-3eba-4b28-b329-bcd42e16ffad',
+  name: '8 x 12 freezer box_1.1.1.4' }
+BUILD: { id: 'p-1330fa1b-8e9d-4c88-8651-efa5b3ae46cf',
+  name: 'freezer rack_1.1.3' }
+BUILD: { id: 'p-144d4314-0cd6-4cb3-9dd5-1a3749c84e22',
+  name: 'vector_1.2.1.1.2' }
+BUILD: { id: 'p-181c6e59-172e-4483-8c94-eb49702db703',
+  name: '8 x 12 freezer box_6.5.2.7' }
+BUILD: { id: 'p-19e012d9-f86e-4df9-94c4-022b9da640f0',
+  name: 'freezer box_1.2.1.2' }
+BUILD: { id: 'p-1a374999-7c7f-48fe-910b-548af96fa357',
+  name: 'vector_1.1.1.2.3' }
+BUILD: { id: 'p-1a386791-e7f1-469f-be4a-a86c9dfd55f2',
+  name: 'double-stranded_1.1.2.1.4' }
+BUILD: { id: 'p-1bd47ee2-049a-473e-b774-b5d669c6c640',
+  name: '8 x 12 freezer box_1.1.3.2' }
+BUILD: { id: 'p-1e55515d-6bbe-4905-b3a7-fb6fd3577fd2',
+  name: 'New 8 x 12 freezer box' }
+BUILD: { id: 'p-1ea58b76-c41b-433e-b4fc-694aed5cbacc',
+  name: 'New -80 freezer' }
+BUILD: { id: 'p-23252289-da51-4b27-a856-66af87a80ded',
+  name: 'myNewChemical_1' }
+BUILD: { id: 'p-23920e3a-6e52-48a7-adaa-2d6741b16446',
+  name: 'shelf_1.4.6' }
+BUILD: { id: 'p-2473e5b0-eef7-4c20-a81b-a6c175275664',
+  name: '8 x 12 freezer box_1.1.1.3' }
+BUILD: { id: 'p-24a61cc5-8af6-4b90-bb6c-f6ed54ebe6fe',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-252b9049-3230-4efa-83bf-e5edee699a80',
+  name: 'drawer_1.6.3' }
+BUILD: { id: 'p-257e2e59-73bf-4be3-a2c0-59af093d71af',
+  name: 'freezer rack_1.2.1' }
+BUILD: { id: 'p-26922f8c-dae2-40aa-a56f-abe07b79715e',
+  name: '-80 freezer_1.1' }
+BUILD: { id: 'p-286c7d69-b788-4400-bdd5-f4610e838a90',
+  name: 'freezer rack_1.1.3' }
+BUILD: { id: 'p-2899cfef-c301-4776-89bd-aae84404f957',
+  name: 'freezer rack_1.2.1' }
+BUILD: { id: 'p-29318925-0e5c-4e09-a94f-ec24584071ce',
+  name: 'organism_1.1.1.5.1' }
+BUILD: { id: 'p-29a296da-737e-4953-84fa-608cbc7e13af',
+  name: 'single-stranded_1.7.2.1.4' }
+BUILD: { id: 'p-2c36dc40-4b78-42a7-aa84-87a7a36d8f0c',
+  name: 'organism_1.1.1.5.3' }
+BUILD: { id: 'p-2c7526bb-6e03-409f-aab6-6c20d23494e9',
+  name: 'freezer rack_1.3.9' }
+BUILD: { id: 'p-2d7b15f4-164c-42c4-8495-a8ee11e22eb6',
+  name: 'drawer_1.7.3' }
+BUILD: { id: 'p-2e167b31-ab20-4beb-88ce-e4df7ef4afb1',
+  name: 'vector_1.2.1.1.3' }
+BUILD: { id: 'p-2f708c42-c325-4edb-8f4b-7bd1dd52900f',
+  name: '8 x 12 freezer box_1.2.1.2' }
+BUILD: { id: 'p-2fe88e60-d9d5-4d1c-b602-d7c6725da6a2',
+  name: 'freezer rack_1.3.4' }
+BUILD: { id: 'p-30b7ff7b-4963-4e0e-949a-b2e8a7f4d780',
+  name: '8 x 12 freezer box_1.1.3.5' }
+BUILD: { id: 'p-32d27b34-fb90-472d-b282-eb4216e62203',
+  name: '9 x 9 freezer box_1.1.4.5' }
+BUILD: { id: 'p-33d83732-c031-4bb0-9a45-5d9c20b84c9e',
+  name: 'stored materials' }
+BUILD: { id: 'p-35a12a48-474b-402b-8dc4-b2340d822106',
+  name: 'myTestPlasmid_04_1' }
+BUILD: { id: 'p-362965d7-cb5d-4435-ace2-0461cb2893d8',
+  name: 'New -80 freezer' }
+BUILD: { id: 'p-365223ce-c709-430c-b7cc-d30421523163',
+  name: 'drawer_1.7.4' }
+BUILD: { id: 'p-36a0e44f-3cbf-4a3f-8058-9ad815714691',
+  name: 'shelf_1.5.2' }
+BUILD: { id: 'p-3721569a-a57c-44cc-a3c4-d76bd00dab89',
+  name: 'organism_1.1.1.5.4' }
+BUILD: { id: 'p-37a189ed-dcc8-4716-83b3-39f8caa19223',
+  name: '9 x 9 freezer box_1.1.4.2' }
+BUILD: { id: 'p-38f7ab17-5246-463d-a5b5-88adc394aee0',
+  name: 'freezer box_1.2.1.1' }
+BUILD: { id: 'p-3c75ee47-7e03-41aa-b183-31993fb048bc',
+  name: '8 x 12 freezer box_1.2.1.1' }
+BUILD: { id: 'p-3c8fd16d-c438-4191-b540-929e58bec69d',
+  name: 'organism_1.1.1.5.5' }
+BUILD: { id: 'p-3d3d585b-9b32-4bf3-abf7-7583b3cabdde',
+  name: 'organism_1.1.1.5.2' }
+BUILD: { id: 'p-3d53e9fa-037f-43f6-9c2e-7e0a08cb9fa0',
+  name: 'freezer rack_1.1.4' }
+BUILD: { id: 'p-3d71c1f3-681c-4808-8633-853cc8838ec9',
+  name: 'freezer rack_1.4.5' }
+BUILD: { id: 'p-3dc2208a-6b87-4e45-83b1-e47642a6475d',
+  name: 'freezer box' }
+BUILD: { id: 'p-3ef1b0e0-eed5-4bbe-bf59-ff0ada3e90bb',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-3f74ee19-d087-4353-967a-d1452d100739',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-3fd71d73-db47-4198-86bd-3469189b0621',
+  name: 'freezer rack_1.2.4' }
+BUILD: { id: 'p-42868c9a-fd08-4832-900d-619f5430aec8',
+  name: 'undefined_2' }
+BUILD: { id: 'p-44ac145a-70b4-4b26-83fe-7875450f5d91',
+  name: 'freezer rack_1.3.8' }
+BUILD: { id: 'p-45d2936d-98be-4b7c-b20b-370d50fd6c0a',
+  name: 'shelving unit_1.4' }
+BUILD: { id: 'p-46473cfa-86ee-4226-91fc-4dede2f2141b',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-46791a7a-41b4-4c40-90d0-5f8004ca34b5',
+  name: '8 x 12 freezer box_6.5.1.4' }
+BUILD: { id: 'p-473d9c5c-6bbd-4ff3-afab-45742d53deba',
+  name: 'freezer rack_1.1.2' }
+BUILD: { id: 'p-489eb6f8-d3f0-4a2d-935c-6d5cf59d736b',
+  name: 'freezer rack_1.1.2' }
+BUILD: { id: 'p-4a541f7b-10c7-4b3a-bc56-c5ae27c2915e',
+  name: 'freezer rack_1.2.2' }
+BUILD: { id: 'p-4bd53b18-60b8-4511-950c-2de36dcce67b',
+  name: 'New -80 freezer' }
+BUILD: { id: 'p-50a0043d-97ed-4d5d-8692-782ef9a6994c',
+  name: '8 x 12 freezer box_6.5.1.1' }
+BUILD: { id: 'p-51cf9585-b81a-4292-a2cd-194f92566b8c',
+  name: '8 x 12 freezer box_1.1.1.1' }
+BUILD: { id: 'p-52722681-a95a-48a9-9506-e150e6cb4088',
+  name: 'chemical stock_1.7.1.1' }
+BUILD: { id: 'p-53453f92-e4ce-436b-b334-9192b7a4c314',
+  name: 'freezer rack_1.3.5' }
+BUILD: { id: 'p-5380bda4-c7fb-4ef7-afd5-e8badcbf7a2a',
+  name: 'freezer rack_1.3.2' }
+BUILD: { id: 'p-539b0593-7882-46e8-a310-37a60de8be76',
+  name: 'shelf_1.4.1' }
+BUILD: { id: 'p-54721fc9-770e-4fc4-b218-c4c85e0df829',
+  name: '8 x 12 freezer box_1.1.1.1' }
+BUILD: { id: 'p-5485dc3d-df59-4cd9-9e31-082f5a33b6e6',
+  name: 'single-stranded_1.1.2.1.3' }
+BUILD: { id: 'p-54c128e1-b67a-40f4-9217-9257eba67c5d',
+  name: 'freezer rack_6.5.1' }
+BUILD: { id: 'p-55dc8ce6-6f44-4110-a487-f672d65e4357',
+  name: '9 x 9 freezer box_1.1.2.3' }
+BUILD: { id: 'p-5698068e-cca7-4902-ba73-775d5cc38ddc',
+  name: '8 x 12 freezer box_6.5.2.5' }
+BUILD: { id: 'p-572032bd-7f25-4f7d-bbdc-af39e09959ce',
+  name: 'Tim\'s bench' }
+BUILD: { id: 'p-597d072a-7574-4f92-a40a-3a4473643c0a',
+  name: '8 x 12 freezer box_6.5.2.6' }
+BUILD: { id: 'p-5a984659-62e9-4f24-ac89-c3f233fa4e9f',
+  name: 'freezer rack_1.3.7' }
+BUILD: { id: 'p-5b18f0a3-477e-4435-aeba-a06c7f406ac3',
+  name: 'cabinet_1.7' }
+BUILD: { id: 'p-5c317281-3023-4bc3-a902-4992db591788',
+  name: 'freezer rack_1.1.4' }
+BUILD: { id: 'p-5dd38857-fd0e-4219-a425-9c1b4142594b',
+  name: '8 x 12 freezer box_1.1.3.1' }
+BUILD: { id: 'p-5ebca3c0-90a6-439a-9f57-e2a9f7404096',
+  name: '-80 freezer_1.2' }
+BUILD: { id: 'p-60937184-8367-442c-8efa-07bb9f03b4fe',
+  name: 'single-stranded_1.7.2.1.5' }
+BUILD: { id: 'p-60e2507a-4669-41aa-91f4-bb6109b52f6d',
+  name: 'vector_1.7.2.1.3' }
+BUILD: { id: 'p-61553184-23c5-408d-9f7f-2d9262615666',
+  name: 'single-stranded_1.1.2.1.2' }
+BUILD: { id: 'p-62400203-7d30-4a3a-9921-7bcd2fd91b95',
+  name: '9 x 9 freezer box_1.1.4.4' }
+BUILD: { id: 'p-66c74929-de13-4612-9fff-b1f8e08deb7c',
+  name: 'drawer_1.6.2' }
+BUILD: { id: 'p-672d40a1-4f48-4a65-9df9-6d1e24da15d8',
+  name: 'vector_1.2.1.1.4' }
+BUILD: { id: 'p-68563a06-de78-49fd-a943-76ea10e27813',
+  name: '8 x 12 freezer box_38.4.1.1' }
+BUILD: { id: 'p-6a449d87-0ccd-427d-a7ff-4a11f7773fea',
+  name: 'myNewChemical_3' }
+BUILD: { id: 'p-6a8a84ae-be1c-4b01-bb49-dd0c376ba8db',
+  name: 'organism_1.1.1.5.6' }
+BUILD: { id: 'p-6bc2f595-e13a-4a86-b25f-a785edff0cdc',
+  name: 'freezer rack_6.5.4' }
+BUILD: { id: 'p-6bd0026c-d9fa-46e7-8238-ae88dd8098e9',
+  name: 'vector_1.1.2.1.2' }
+BUILD: { id: 'p-6d1a602d-9b21-4a0c-85e4-ccc7060e1b56',
+  name: '8 x 12 freezer box_1.2.1.5' }
+BUILD: { id: 'p-6ecf0655-1b28-49b3-b67a-c75d1d014d3e',
+  name: 'freezer rack_1.2.3' }
+BUILD: { id: 'p-6f8306a2-623d-4848-99be-869fecda461c',
+  name: 'myTestPlasmid_04_2' }
+BUILD: { id: 'p-72fb4335-966b-4cc8-a26e-4093a7a96b02',
+  name: '9 x 9 freezer box_1.1.2.4' }
+BUILD: { id: 'p-74ae8a47-dd0f-44d8-98ac-f85acf8a7ef6',
+  name: 'undefined_1' }
+BUILD: { id: 'p-755d38b1-473a-42de-a4df-5a5fa08ae25c',
+  name: 'freezer rack_1.3.3' }
+BUILD: { id: 'p-7752a46a-4af4-41c8-aba7-2d601f61154c',
+  name: 'vector_1.2.1.1.6' }
+BUILD: { id: 'p-7940c7f1-ae3f-45c7-9cc7-4cb15652af74',
+  name: '9 x 9 freezer box_1.1.4.1' }
+BUILD: { id: 'p-7a1114ca-a3d8-46a3-afaa-23b5cb9d53cc',
+  name: 'shelving unit_1.5' }
+BUILD: { id: 'p-7a5b35ea-80b2-4327-bfe5-d3fc12a1440e',
+  name: 'shelf_1.5.3' }
+BUILD: { id: 'p-7b55f2c5-96da-4f23-9804-045d2f5154d5',
+  name: 'New -80 freezer' }
+BUILD: { id: 'p-7beb121d-dc46-4553-8e5b-4079cf5ccbd4',
+  name: 'freezer rack_1.1.1' }
+BUILD: { id: 'p-7c2682c0-1c62-4839-bea8-f1c175cb5385',
+  name: '8 x 12 freezer box_1.7.2.1' }
+BUILD: { id: 'p-7d86fd44-7328-4a35-aae7-f29756aa53e1',
+  name: 'shelf_1.5.4' }
+BUILD: { id: 'p-819e517b-0778-4186-90f6-950558ae64a7',
+  name: 'myNewChemical_1' }
+BUILD: { id: 'p-8252093a-d926-4e95-b5f7-35496df410f1',
+  name: 'chemical stock_1.6.1.3' }
+BUILD: { id: 'p-831cd076-cb70-45ab-9196-8a0c533d5a1c',
+  name: '-20 freezer_1.2' }
+BUILD: { id: 'p-83bee820-7850-413e-aa5e-18fee067ca10',
+  name: 'myNewChemical_0' }
+BUILD: { id: 'p-841e0bf3-5bd4-4da3-b622-1f919889ae8f',
+  name: 'drawer_1.7.2' }
+BUILD: { id: 'p-85f19408-af43-456c-93a5-efd76f9ebf86',
+  name: 'vector_1.1.1.2.5' }
+BUILD: { id: 'p-88d871bc-8bd7-42d4-be86-b1a9a2664d78',
+  name: 'freezer rack_1.3.6' }
+BUILD: { id: 'p-8ba952e6-c45a-4642-98a2-daf91b29120b',
+  name: '-80 freezer_1.3' }
+BUILD: { id: 'p-8bd3f5cf-6e26-48d4-b6f1-4bca2525a45f',
+  name: 'freezer box' }
+BUILD: { id: 'p-8d41a878-f0f6-40b9-98fb-3107750a80eb',
+  name: 'chemical stock_1.6.1.2' }
+BUILD: { id: 'p-8d6ba5e8-4e83-4bf2-a7c8-1836d5335d30',
+  name: 'vector_1.2.1.1.5' }
+BUILD: { id: 'p-8e05a2e7-e50b-4537-a51b-4c601b8e24e8',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-8e88aaf9-4e93-4305-9e6c-2d38c25e0b37',
+  name: 'New -80 freezer' }
+BUILD: { id: 'p-8eb65626-91ba-43c0-aa6b-2319bc1b12f3',
+  name: 'freezer rack_1.2.2' }
+BUILD: { id: 'p-90b95d3a-fc8d-4834-b67c-7fd32346708b',
+  name: 'myNewChemical_2' }
+BUILD: { id: 'p-90c00272-5291-4f1d-a36c-ce46eb4e78ec',
+  name: '8 x 12 freezer box_1.2.1.3' }
+BUILD: { id: 'p-91f0128f-a1ca-43cd-a55b-edd5d48a94f7',
+  name: '8 x 12 freezer box_6.5.2.2' }
+BUILD: { id: 'p-92646386-404c-427a-8c39-2200f600f24d',
+  name: 'shelf_1.4.2' }
+BUILD: { id: 'p-95ed4958-d63c-45db-9b8a-7ad8a18319c5',
+  name: 'myTestPlasmid_04_0' }
+BUILD: { id: 'p-9902d575-5dc9-45e4-bd6b-489fa68c2c52',
+  name: 'freezer rack_1.2.4' }
+BUILD: { id: 'p-9b43de30-7543-4906-9d38-1767520c4826',
+  name: 'lab_1.1.1.6' }
+BUILD: { id: 'p-9dfb75c4-7a02-40ed-801b-5e9f7e36b217',
+  name: '8 x 12 freezer box_38.4.1.2' }
+BUILD: { id: 'p-9f300745-4508-4bf0-bb08-0f677e6284ec',
+  name: 'double-stranded_1.2.1.1.7' }
+BUILD: { id: 'p-a08c4a7d-1abc-4617-93f1-db0fb5fe041a',
+  name: 'freezer rack_38.4.2' }
+BUILD: { id: 'p-a10732bc-745e-485a-af33-72c05a8080d0',
+  name: 'myNewChemical_2' }
+BUILD: { id: 'p-a3c306c1-0f92-445c-a6d6-a5dcb1e0bc32',
+  name: '9 x 9 freezer box_1.1.1.4' }
+BUILD: { id: 'p-a4f46fcb-a9d0-44e7-b0a9-edfffdfa05fd',
+  name: 'vector_1.1.2.1.1' }
+BUILD: { id: 'p-a5cfb8b6-64b7-4af3-b7ba-d6005a2851db', name: 'create' }
+BUILD: { id: 'p-a84d990e-312b-4ba8-a484-c8030c50a081',
+  name: '8 x 12 freezer box_1.1.1.5' }
+BUILD: { id: 'p-a85a5202-f89c-4aca-bf72-e7c4a886467e',
+  name: '8 x 12 freezer box_1.2.1.6' }
+BUILD: { id: 'p-a9a8e724-eae2-4c4d-b738-1c8f6178b075',
+  name: 'shelving unit_1.4' }
+BUILD: { id: 'p-aae7dcdc-5a9f-48f7-8300-55c9d7638c49',
+  name: 'shelf_1.4.5' }
+BUILD: { id: 'p-ab7d4916-680d-4fc7-a56a-46a6b38b21c4',
+  name: '8 x 12 freezer box_38.4.1.3' }
+BUILD: { id: 'p-acb16756-7489-4d26-ae1c-44e0f3e1d671',
+  name: '8 x 12 freezer box_1.1.1.3' }
+BUILD: { id: 'p-acc947a8-5046-4e09-843b-3e0053504826',
+  name: 'freezer rack_1.1.1' }
+BUILD: { id: 'p-ad8856c8-49c7-43cc-963f-99f92714e37f',
+  name: 'myTestPlasmid_05_2' }
+BUILD: { id: 'p-ae7aae77-5dca-44c1-96ec-e5f4a9e87c47',
+  name: '8 x 12 freezer box_1.2.1.4' }
+BUILD: { id: 'p-af8b5c24-edce-4036-ad6f-1862d2058ffb',
+  name: 'myTestPlasmid_05_1' }
+BUILD: { id: 'p-b0b3577f-5651-4eb0-85a9-482e4e63e444',
+  name: '8 x 12 freezer box_6.5.1.3' }
+BUILD: { id: 'p-b0e1eec0-9051-4f04-bbc4-f84939b40e50',
+  name: '9 x 9 freezer box_1.1.4.3' }
+BUILD: { id: 'p-b143f205-3c48-4519-a049-f8e82b69562f',
+  name: 'myTestPlasmid_05_0' }
+BUILD: { id: 'p-b17e9462-b6d0-4d6f-99a7-537d9d1b500e',
+  name: '8 x 12 freezer box_1.1.3.4' }
+BUILD: { id: 'p-b37599c3-6b80-4e34-a980-d685d5e0333c',
+  name: '8 x 12 freezer box_1.1.1.2' }
+BUILD: { id: 'p-b63b5142-f909-402f-a514-46f1d059da2e',
+  name: '9 x 9 freezer box_1.1.2.2' }
+BUILD: { id: 'p-b761af7b-fca2-488a-9981-78b10afa0219',
+  name: '8 x 12 freezer box_6.5.2.3' }
+BUILD: { id: 'p-b8334d1a-7f94-4b22-95bf-1adb1a581cbe',
+  name: 'drawer_1.6.1' }
+BUILD: { id: 'p-b9156ad6-5bbe-4249-9912-c45e924cab7e',
+  name: 'Endylab' }
+BUILD: { id: 'p-b9341d76-893d-45c3-8194-a8eddc2cd167',
+  name: 'New -80 freezer' }
+BUILD: { id: 'p-bc427227-bf7a-4996-aa06-f5f8d99f6580',
+  name: 'freezer rack_1.3.1' }
+BUILD: { id: 'p-bcb2e938-2465-44a6-998b-8686c7be471b',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-bcc2a71f-0628-4144-9773-cef8554879ed',
+  name: 'shelf_1.4.3' }
+BUILD: { id: 'p-bff859a5-40ce-4779-8684-2c350f20a99a',
+  name: 'vector_1.7.2.1.2' }
+BUILD: { id: 'p-c06e66fe-7afb-409b-a4b1-26bf723f227f',
+  name: 'vector_1.2.1.1.1' }
+BUILD: { id: 'p-c0818a33-63f0-4c63-ac4b-81a449450ca3',
+  name: '8 x 12 freezer box_6.5.1.2' }
+BUILD: { id: 'p-c171ac76-fef7-4fa0-927b-cdd2125de840',
+  name: '8 x 12 freezer box_6.5.2.1' }
+BUILD: { id: 'p-c1817fcb-c856-437d-8d0c-99314782b820',
+  name: 'undefined_0' }
+BUILD: { id: 'p-c38bc22c-a5de-4c23-851a-84e6aa01cab2',
+  name: '8 x 12 freezer box_1.1.3.3' }
+BUILD: { id: 'p-c54a32c1-036a-4d8c-88b8-eba3f2153cd4',
+  name: 'drawer_1.6.4' }
+BUILD: { id: 'p-c5fa182b-4284-4a29-a296-d1b63e333e04',
+  name: 'freezer rack_1.2.5' }
+BUILD: { id: 'p-c8bf560e-cb47-4c91-82ec-1ec5c1bbd884',
+  name: 'shelf_1.4.1' }
+BUILD: { id: 'p-c9b0504c-f90d-4d45-99bc-9be09cfd6081',
+  name: 'shelf_1.4.4' }
+BUILD: { id: 'p-cbce54c0-1089-4ead-9fcb-ddd85eca8d3a',
+  name: 'vector_1.1.1.2.4' }
+BUILD: { id: 'p-ce5031df-9ef6-40ef-84c0-8cdfae3bf981',
+  name: 'freezer rack_6.5.3' }
+BUILD: { id: 'p-ce535f05-28b5-4e35-ad7e-62861d8bd56e',
+  name: 'freezer rack_1.3.10' }
+BUILD: { id: 'p-ced0065b-6a3d-4094-a003-8b29cf8acd3e',
+  name: 'freezer box_1.2.1.5' }
+BUILD: { id: 'p-cf982baf-beed-426c-8a9f-6ef47e874329',
+  name: 'vector_1.7.2.1.1' }
+BUILD: { id: 'p-cfd1b528-33bc-4ead-aec9-824d9b679a22',
+  name: '9 x 9 freezer box_1.1.2.2' }
+BUILD: { id: 'p-cfe0198a-a67d-4687-ac04-8185bfdae168',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-d0c6c857-7056-4aea-b646-4d7c502e5f03',
+  name: 'cabinet_1.6' }
+BUILD: { id: 'p-d25bdd62-5b86-4a8f-9d41-b512ef3182f6',
+  name: '9 x 9 freezer box_1.1.2.5' }
+BUILD: { id: 'p-d5a1cfee-b970-44dc-985f-d95745c67acc',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-d6fa29cd-b384-4518-8f17-a0ec55546511',
+  name: 'freezer box_1.2.1.4' }
+BUILD: { id: 'p-d751e700-b940-4212-b960-e4ac7b3c5220',
+  name: 'single-stranded_1.1.1.2.6' }
+BUILD: { id: 'p-d97de372-8af1-47b5-9f98-5c077cdefe39',
+  name: 'lab_1.1.1.2.3.1' }
+BUILD: { id: 'p-dabc7c0e-0670-4755-ad62-dbd5abaff160',
+  name: 'single-stranded_1.1.1.1.3' }
+BUILD: { id: 'p-db5f43d2-b0f0-466c-90b0-813e7e10af6a',
+  name: 'new materials' }
+BUILD: { id: 'p-ddac8f5b-5f02-4dab-ab13-de37c1368041',
+  name: 'vector_1.1.1.1.1' }
+BUILD: { id: 'p-ddbe6ae0-6032-4e23-887a-8b0aa9ae7e5f',
+  name: 'shelf_1.4.3' }
+BUILD: { id: 'p-e0284489-e12c-48e1-869e-6c3bf8292feb',
+  name: 'chemical stock_1.7.1.2' }
+BUILD: { id: 'p-e2461f0c-8a78-457b-a0b6-0c00a2de12db',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-e2b60081-8896-47fb-8ca2-84b6c2cdb629',
+  name: 'freezer box_1.2.1.3' }
+BUILD: { id: 'p-e43e678b-69d9-4715-95b9-a37938bacebc',
+  name: '-80 freezer_34.1' }
+BUILD: { id: 'p-e4de2c68-2221-402c-942a-a0b9c2d99803',
+  name: '9 x 9 freezer box_1.1.2.1' }
+BUILD: { id: 'p-e676250d-499c-421e-b5a1-f7d1e537f311',
+  name: 'vector_1.1.1.2.2' }
+BUILD: { id: 'p-e8c9d275-4a2d-444f-a765-2840e1474117',
+  name: 'New -80 freezer' }
+BUILD: { id: 'p-e8ebfce9-ab2a-4315-95be-200c749c144f',
+  name: 'freezer rack_6.5.2' }
+BUILD: { id: 'p-f3366f9c-8027-498b-85ab-eddb53692e9e',
+  name: '8 x 12 freezer box_6.5.2.4' }
+BUILD: { id: 'p-f60cfa82-24c3-4b4f-b876-9853415564ad',
+  name: 'New freezer rack' }
+BUILD: { id: 'p-f91f071c-b618-43ac-9a48-a605a65fc390',
+  name: 'shelf_1.4.2' }
+BUILD: { id: 'p-fb4804a6-3583-48fd-9270-3bec35ee6a27',
+  name: 'freezer box_1.1.1.5' }
+BUILD: { id: 'p-fc8d3056-227d-4ee0-b47c-cbe3653e7601',
+  name: 'freezer rack_1.2.6' }
+BUILD: { id: 'p-fd150779-d70c-4eb8-847f-f238cae057c2',
+  name: 'freezer rack_38.4.3' }
+BUILD: { id: 'p-fd15087c-5091-409f-b7e5-c2bc76baa3f2',
+  name: '-20 freezer_1.3' }
+BUILD: { id: 'p-fd575a91-afad-4c12-b952-1688b1beaf67',
+  name: 'single-stranded_1.1.1.1.2' }
+BUILD: { id: 'p-fdae5a33-cfd1-43f6-a1bf-544ec1462c51',
+  name: 'chemical stock_1.6.1.1' }
+BUILD: { id: 'p-ff3e2766-408b-4baa-8b00-72ae043b8b37',
+  name: '8 x 12 freezer box_1.1.2.3' }
+BUILD: { id: 'v-043c7fc7-5b21-4f4f-8d7d-2c92cd92b34c',
+  name: 'myVector_01' }
+BUILD: { id: 'v-5ac6a893-c4b2-451c-a719-a3798a9106cf',
+  name: 'myTestPlasmid_04' }
+BUILD: { id: 'v-63ef064d-2af5-4e44-abaa-1837baad9926',
+  name: 'bbbtest5z' }
+BUILD: { id: 'v-69602e92-e51f-4403-ad91-820fecc7acf7',
+  name: 'myNewChemical' }
+BUILD: { id: 'v-6eec52c1-673f-45af-8db5-b0658ebe221e',
+  name: 'myTestPlasmid_05' }
+BUILD: { id: 'v-a2124518-3720-44b7-a3a8-690187d919a7',
+  name: 'mySingle-Stranded 01' }
+BUILD: { id: 'v-a9448c3b-6c8d-4fcf-8711-3e9e2dfb5d44',
+  name: 'myTestPlasmid_02' }
+BUILD: { id: 'v-aec31a14-8964-4381-a6e2-c2b6713b733b',
+  name: 'bbbtest01' }
+BUILD: { id: 'v-b0603e93-497a-49e1-95ef-0403e5a481e9',
+  name: 'bbbtest5y' }
+BUILD: { id: 'v-b5c08c45-34b9-44d9-8dab-ac165412fa5a',
+  name: 'myTestPlasmid_03' }
+BUILD: { id: 'v-d887f28d-c4dc-4c6d-82dc-ea754d955ad6',
+  name: 'bbbtest02' }
+BUILD: { id: 'v-ee84af73-5665-4681-a5fd-2c71ba799cd7',
+  name: 'myTestPlasmid_04' }
+getting: p-831cd076-cb70-45ab-9196-8a0c533d5a1c
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called
+foo called

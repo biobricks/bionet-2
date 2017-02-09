@@ -12,6 +12,7 @@
                 <!--
                 <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
                 -->
+                <h5>Create biomaterials</h5>
                 <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete}/>
                 <form-text-input label="Instances" ref="instances" name="instances" value={formData.instances}/>
                 <!--
@@ -64,6 +65,7 @@
             }
             tag.fields = []
             const bionetSetup = app.getStream('bionetSetup')
+            const workbench = app.getStream('workbench')
 
             const appSettings = app.getAppSettings()
 
@@ -126,14 +128,14 @@
 
                 // get active node
                 var node = $("#ftree").fancytree("getActiveNode");
+                const ftree = $("#ftree").fancytree("getTree");
 
                 // initialize parent id
                 var parentId
                 if (!node) {
-                    node = $("#ftree").fancytree("getRootNode");
-                } else {
-                    parentId = node.data.dbData.id
+                    node = ftree.getRootNode().children[0]
                 }
+                parentId = node.data.dbData.id
 
                 // initialize storage type
                 //const active = $(e.target)
@@ -142,7 +144,7 @@
 
                 // generate unique name
                 const seriesName = $('#autocomplete_q').val()
-                //const seriesName = tag.refs.selectVirtual.value
+                    //const seriesName = tag.refs.selectVirtual.value
                 const instances = tag.refs.instances.value
                 const attributes = app.getAttributesForType(type)
                 for (var instance = 0; instance < instances; instance++) {
@@ -161,7 +163,8 @@
                     }
                     console.log('addNode: %s', instances, JSON.stringify(dbData))
 
-                    bionetSetup.route('createStorageItem', undefined, dbData)
+                    workbench.route('saveInWorkbench', undefined, dbData)
+                        //bionetSetup.route('createStorageItem', undefined, dbData)
                 }
             }
 

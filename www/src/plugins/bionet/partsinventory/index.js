@@ -18,7 +18,7 @@ var partsInventory = {
 
             // todo: set inventory item
             app.dispatch(app.$.breadcrumbs, [{
-                'label': 'workbench',
+                'label': 'local inventory',
                 'url': '/inventory'
             }]);
             riot.mount('div#content', 'inventory-treeview', {q:q})

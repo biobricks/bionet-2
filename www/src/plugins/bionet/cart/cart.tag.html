@@ -1,0 +1,106 @@
+<cart>
+    <div class="searchheight">
+        <div class="searchresult">
+            <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
+                <list-item class="searchItem" no-reorder each={item in results} item={item}/>
+            </div>
+        </div>
+        <div class="edititem">
+            <create-physical show="false" top-margin="0px" />
+        </div>
+    </div>
+
+    <style>
+        .searchheight {
+            margin-top: 115px;
+            height: calc(100% - 100px)
+        }
+        
+        .searchresult {
+            overflow: auto;
+            float: left;
+            margin-left: 25px;
+            width: 400px;
+        }
+        
+        .edititem {
+            overflow: auto;
+            width: calc(100% - 600px);
+            float: left;
+            margin-left: 25px;
+        }
+
+    </style>
+
+    <script>
+        const tag = this
+        tag.theme = app.getTheme()
+        tag.results = tag.opts.results || []
+        tag.pagination = []
+        const bionetSetup = app.getStream('bionetSetup')
+        const cart = app.getStream('cart')
+
+        const breadcrumbs = [{
+            'label': 'cart',
+            'url': '/cart'
+        }]
+
+        this.on('mount', function() {
+
+            console.log('cart tag')
+            cart.addRoute('cartResult', function(results) {
+                console.log('cart tag, result:', JSON.stringify(results))
+                for (var i = 0; i < results.length; i++) {
+                    results[i].click = itemClick
+                }
+                tag.results = results
+                tag.update()
+            })
+            cart.route('requestCart')
+
+            const itemClick = function(item) {
+                console.log('itemClick:', JSON.stringify(item))
+                bionetSetup.route('getPhysical', undefined, item.id)
+                app.dispatch(app.$.breadcrumbs, [{
+                    'label': 'cart',
+                    'url': '/cart'
+                }, {
+                    'label': item.primary_text,
+                    'url': '/cart/' + opts.terms
+                }])
+            }
+
+            const results = tag.results
+            for (var i = 0; i < results.length; i++) {
+                results[i].click = itemClick
+            }
+
+            app.dispatch(app.$.breadcrumbs, breadcrumbs);
+
+            tag.primaryHeader = 'Search results for "' + opts.terms + '"'
+            tag.secondaryHeader = tag.results.length + ' items'
+            tag.update()
+
+            $('.searchresult').css({
+                height: $(window).innerHeight() - 120
+            });
+            $('.edititem').css({
+                height: $(window).innerHeight() - 120
+            });
+
+            $("searchItem").on('click dblclick keydown', function(e) {
+                if (e.type === 'keydown') {
+                    if (e.which !== undefined && e.which !== 13) return
+                }
+                const active = $(e.target)
+                const elementType = active.prop('nodeName');
+                console.log('elementType:', elementType)
+            })
+        });
+
+        this.on('unmount', function() {
+            this.searchresult = undefined
+        })
+
+    </script>
+</cart>

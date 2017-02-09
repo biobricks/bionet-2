@@ -110,6 +110,12 @@
     <script>
         const tag = this
         const bionetSetup = app.getStream('bionetSetup')
+        const workbench = app.getStream('workbench')
+
+        app.dispatch(app.$.breadcrumbs, [{
+            'label': 'workbench',
+            'url': '/create'
+        }])
 
         this.submitForm2 = function(e) {
             e.preventDefault();
@@ -166,7 +172,7 @@
                 // get active node
             var parentNode = $("#ftree").fancytree("getActiveNode");
             if (!parentNode) {
-                parentNode = $("#ftree").fancytree("getRootNode");
+                parentNode = $("#ftree").fancytree("getRootNode").children[0];
             }
             const newNode = parentNode.addChildren(newNodeData)
             parentNode.setExpanded()
@@ -449,8 +455,7 @@
                     //if (!active.hasClass('fancytree-edit')) {
                 var node = $("#ftree").fancytree("getActiveNode");
                 if (node) {
-
-                    if (node.title === 'new materials') {
+                    if (node.data.dbData.type === 'workbench') {
                         $('#create-physical').css({
                             display: 'block'
                         });
@@ -461,16 +466,16 @@
                     }
 
                     const dbData = node.data.dbData
-                    console.log('select physical:',JSON.stringify(dbData))
-                    /*
-                    const type = dbData.type
-                    tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('cabinet') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
+                    console.log('select physical:', JSON.stringify(dbData))
+                        /*
+                        const type = dbData.type
+                        tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('cabinet') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
 
-                    if (type.indexOf('box') >= 0) {
-                        //console.log('activating scanner')
-                        //app.dispatch('startScan',{status:'init'})
-                    }
-                    */
+                        if (type.indexOf('box') >= 0) {
+                            //console.log('activating scanner')
+                            //app.dispatch('startScan',{status:'init'})
+                        }
+                        */
 
                     tag.update()
                     bionetSetup.route('getPhysical', undefined, dbData.id)
@@ -496,18 +501,20 @@
 
 
             bionetSetup.addRoute('storage', function(storageData) {
-                //console.log('initializing storage:', JSON.stringify(storageData))
+                console.log('initializing storage:', JSON.stringify(storageData))
                 const ftree = $("#ftree").fancytree("getTree");
                 ftree.reload(storageData).then(function() {
                     $('.inventory-tree').css({
                         height: $(window).innerHeight() - 120
                     });
-                    const activeNode = ftree.findFirst('new materials')
-                        //const children = ftree.getRootNode().children
-                        //const activeNode = children[0]
+                    const activeNode = $("#ftree").fancytree("getRootNode").children[0];
+                    //const activeNode = ftree.findFirst('new materials')
+                    //const children = ftree.getRootNode().children
+                    //const activeNode = children[0]
                     if (activeNode) {
                         activeNode.setExpanded();
                         activeNode.setFocus();
+                        activeNode.setTitle('workbench')
                     }
                 })
             })
@@ -519,8 +526,8 @@
                 display: 'none'
             });
 
-            bionetSetup.route('requestStorage', undefined, "Tim")
+            workbench.route('requestWorkbench')
         })
-        
+
     </script>
 </create-form>

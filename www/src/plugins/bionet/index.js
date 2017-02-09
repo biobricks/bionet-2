@@ -11,6 +11,7 @@ import errorPage from './error_page'
 import passwordReset from './password_reset'
 import bionetSetup from './bionet_setup'
 import workbench from './workbench'
+import cart from './cart'
 
 const bionetPlugin = app.addPlugin('bionet')
 
@@ -51,6 +52,10 @@ bionetPlugin.start = function () {
     //-------------------------------------------------------------------------
     // initialize bionet setup
     workbench.init();
+
+    //-------------------------------------------------------------------------
+    // initialize bionet cart
+    cart.init();
 
 }
 

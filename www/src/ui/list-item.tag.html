@@ -13,13 +13,22 @@
             <i if={!item.starred} class="material-icons right grey-text valign">{item.righticon}</i>
             <span class="right" if={item.secondary_url} onclick={clickavailability} href="{item.secondary_url}" style="cursor: pointer; cursor: hand; ">{item.secondary_url_label}</span>
         </div>
+        <yield/>
     </div>
 
     <script>
         const tag = this
         this.item = opts.item
         this.theme = app.getTheme()
+        const cart = app.getStream('cart')
 
+        this.addToCart = function(e) {
+            e.preventDefault()
+            e.stopPropagation()
+            console.log('adding item to cart:', tag.item.id)
+            cart.route('addToCart',undefined,{id: tag.item.id, name:tag.item.primary_text})
+        }
+        
         this.clickitem = function(e) {
             const item = tag.item
             e.stopPropagation()

@@ -46,7 +46,7 @@ route('/create-unknown/*', function (name) {
 route('/create', function () {
     app.dispatch(app.$.appBarConfig, {
         enableTopNav: true,
-        enableBreadCrumbs: false,
+        enableBreadCrumbs: true,
         enableSubbar: false
     })
     riot.mount('div#content', 'create-form')

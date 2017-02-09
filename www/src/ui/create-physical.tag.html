@@ -11,7 +11,7 @@
         <div if={showPhysical}>
             <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
         </div>
-
+<!--
         <div class="input-field col s12">
                 <div class="query-container">
                     <input type="text" id="q" name="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
@@ -23,7 +23,7 @@
                 </ul>
             </div>
         </div>
-
+-->
         <div if={showPhysical} each={field in fields}>
             <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
         </div>

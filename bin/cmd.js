@@ -444,7 +444,7 @@ websocket.createServer({server: server}, function(stream) {
         
         var o = {
           user: curUser.user.email,
-          physical_id: id,
+          physical_id: physical_id,
           created: unixEpochTime()
         }
         
@@ -456,11 +456,29 @@ websocket.createServer({server: server}, function(stream) {
       },
 
       // stream a user's cart
-      cartStream: rpc.syncStream(function(curUser) {
+      cartStream: function(curUser, cb) {
         var ucDB = userCartDB(curUser.user.email);
-        
-        return ucDB.createReadStream();
-      }),
+        var s = ucDB.createReadStream();
+        const results=[]
+
+        var out = s.pipe(through.obj(function(data, enc, next) {
+            console.log('cartstream:',JSON.stringify(data))
+            if(!data || !data.value || !data.value.physical_id) return next();
+            results.push(data.value);
+            next();
+        }));
+
+        s.on('close', function() {
+            cb(null,results);
+        });
+
+        out.on('error', function(err) {
+            cb(err);
+            console.error("cart stream error:", err);
+        });
+
+        return out;
+      },
 
       delFromCart: function(curUser, cb) {
         // TODO
