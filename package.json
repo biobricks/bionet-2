@@ -55,7 +55,7 @@
     "level": "^1.3.0",
     "level-changes": "0.0.1",
     "level-elasticsearch-index": "0.0.2",
-    "level-tree-index": "0.0.8",
+    "level-tree-index": "0.0.9",
     "levelup": "^1.3.3",
     "materialize-css": "^0.97.7",
     "minimist": "^1.2.0",

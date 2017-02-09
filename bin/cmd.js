@@ -93,7 +93,6 @@ multiLevelServer.on('error', function(err) {
     console.error("multilevel server error:", err);
 })
 
-//var uDB = level('./db/users');
 var userDB = sublevel(db, 'u', { valueEncoding: 'json' });
 var users = accountdown(userDB, {
     login: { basic: require('accountdown-basic') }
@@ -252,7 +251,7 @@ function userCartDB(userID) {
   return sublevel(cartDB, userID, {valueEncoding: 'json'});
 }
 
-function savePhysical(curUser, m, imageData, doPrint, cb) {
+Function savePhysical(curUser, m, imageData, doPrint, cb) {
   var mtch;
   if(imageData && (mtch = imageData.match(/^data:image\/png;base64,(.*)/))) {
 
@@ -455,17 +454,35 @@ websocket.createServer({server: server}, function(stream) {
         ucDB.put(name, o, cb);
       },
 
+
       // stream a user's cart
       cartStream: function(curUser, cb) {
         var ucDB = userCartDB(curUser.user.email);
         var s = ucDB.createReadStream();
         const results=[]
 
+        // TODO 
+        // It would be much more efficient if we simply cached the
+        // path info and the whole physical object in the cart db
+        // but then it might become out of sync with the real location.
+        // Probably better to play it safe for now and optimize later.
+
         var out = s.pipe(through.obj(function(data, enc, next) {
-            console.log('cartstream:',JSON.stringify(data))
-            if(!data || !data.value || !data.value.physical_id) return next();
-            results.push(data.value);
-            next();
+          if(!data || !data.value || !data.value.physical_id) return next();
+          
+          physicalDB.get(data.value.physical_id, function(err, o) {
+            if(err) return err;
+
+            physicalTree.path(o.id, function(err, path) {
+              if(err) return err;
+
+              results.push({
+                physical: o,
+                path: path
+              });
+              next();
+            });
+          });
         }));
 
         s.on('close', function() {
@@ -480,16 +497,38 @@ websocket.createServer({server: server}, function(stream) {
         return out;
       },
 
-      delFromCart: function(curUser, cb) {
-        // TODO
-        cb(new Error("Not yet implemented"));
+      delFromCart: function(curUser, physical_id, cb) {
+        var ucDB = userCartDB(curUser.user.email);
+
+        physicalDB.get(physical_id, function(err, o) {
+          if(err) return cb(err);
+
+          ucDB.del(o.name, cb)
+        });
       },
 
       emptyCart: function(curUser, cb) {
-        // TODO
-        cb(new Error("Not yet implemented"));
-      },
+        var ucDB = userCartDB(curUser.user.email);
+        var s = ucDB.createKeyStream();
 
+        var out = s.pipe(through.obj(function(key, enc, next) {
+          
+          ucDB.del(key, function(err) {
+            if(err) return cb(err);
+            next();
+          })
+
+        }));
+        
+        s.on('close', function() {
+          cb();
+        });
+        
+        out.on('error', function(err) {
+          cb(err);
+        });
+      },
+      
       getType: function(curUser, name, cb) {
         name = name.toLowerCase().trim().replace(/\s+/g, ' ')
         process.nextTick(function() {
