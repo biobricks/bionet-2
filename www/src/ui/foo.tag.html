@@ -4,6 +4,8 @@
 
       <button onclick={clientStream}>Client side stream over RPC</button>
 
+      <button onclick={cartStream}>Cart stream</button>
+
       <div>
         <textarea id="test-output" rows="6" cols="40"></textarea>
       </div>
@@ -12,12 +14,10 @@
       this.clientStream = function() {
         $('#test-output')[0].value = '';
 
-      console.log("app.remote.testStream:", app.remote.testStream);
         var strm = app.remote.testStream();
-      console.log("strm:", strm);
 
         strm.on('data', function(data) {
-          $('#test-output')[0].value += data.value.name + "\n";
+          $('#test-output')[0].value += data.value.id + "\n";
         });
 
         strm.on('error', function(err) {
@@ -29,5 +29,24 @@
         });
 
       }
+
+      this.cartStream = function() {
+
+        $('#test-output')[0].value = '';
+
+        app.remote.cartStream(function(err, elements) {
+          if(err) {
+            $('#test-output')[0].value = "ERROR: " + err;
+            return;
+          }
+          var i;
+          for(i=0; i < elements.length; i++) {
+            $('#test-output')[0].value += elements[i].path + "\n";
+          }
+
+        });
+
+      }
+
     </script>
 </foo>

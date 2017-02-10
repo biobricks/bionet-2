@@ -114,7 +114,7 @@ elasticIndex.add('name', function(key, val) {
     id: val.id,
     name: val.name
   };
-  console.log("BUILD:", o);
+
   return o;
 });
 
@@ -460,6 +460,7 @@ websocket.createServer({server: server}, function(stream) {
       },
 
 
+
       // stream a user's cart
       cartStream: function(curUser, cb) {
         var ucDB = userCartDB(curUser.user.email);
@@ -476,7 +477,7 @@ websocket.createServer({server: server}, function(stream) {
           if(!data || !data.value || !data.value.physical_id) return next();
           
           physicalDB.get(data.value.physical_id, function(err, o) {
-            if(err) return err;
+            if(err) return cb(err);
 
             physicalTree.path(o.id, function(err, path) {
               if(err) return err;
