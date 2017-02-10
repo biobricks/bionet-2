@@ -1,0 +1,33 @@
+<foo>
+    <div style="padding-top:100px;">
+      <h3>Test area</h3>
+
+      <button onclick={clientStream}>Client side stream over RPC</button>
+
+      <div>
+        <textarea id="test-output" rows="6" cols="40"></textarea>
+      </div>
+    <script>
+
+      this.clientStream = function() {
+        $('#test-output')[0].value = '';
+
+      console.log("app.remote.testStream:", app.remote.testStream);
+        var strm = app.remote.testStream();
+      console.log("strm:", strm);
+
+        strm.on('data', function(data) {
+          $('#test-output')[0].value += data.value.name + "\n";
+        });
+
+        strm.on('error', function(err) {
+          $('#test-output')[0].value = "ERROR: " + err;
+        });
+
+        strm.on('end', function() {
+          $('#test-output')[0].value += "Done.\n"
+        });
+
+      }
+    </script>
+</foo>

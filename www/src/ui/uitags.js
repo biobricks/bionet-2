@@ -15,6 +15,7 @@ require('./settings.tag.html')
 require('./tree-view.tag.html')
 require('./err404.tag.html')
 require('./welcome.tag.html')
+require('./foo.tag.html')
 
 require('./create-form.tag.html')
 require('./create-physical.tag.html')

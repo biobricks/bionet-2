@@ -251,7 +251,7 @@ function userCartDB(userID) {
   return sublevel(cartDB, userID, {valueEncoding: 'json'});
 }
 
-Function savePhysical(curUser, m, imageData, doPrint, cb) {
+function savePhysical(curUser, m, imageData, doPrint, cb) {
   var mtch;
   if(imageData && (mtch = imageData.match(/^data:image\/png;base64,(.*)/))) {
 
@@ -372,6 +372,11 @@ websocket.createServer({server: server}, function(stream) {
         cb(null, "Sneeple are real!");
       },
 
+      // TODO remove this when implementing private data
+      testStream: rpc.syncReadStream(function() {
+
+        return physicalDB.createReadStream();
+      }),
 
       // get user's workbench physical
       getWorkbench: function(curUser, cb) {
@@ -787,8 +792,6 @@ websocket.createServer({server: server}, function(stream) {
         });
       },
 
-
-
       // TODO doesn't work
       recentChanges: rpc.syncReadStream(function() {
         var s = recentDB.createReadStream({valueEncoding: 'utf8'});
@@ -844,7 +847,8 @@ websocket.createServer({server: server}, function(stream) {
 
   }, 'group'), {
     // the opts for rpc-multistream
-    objectMode: true // default to object mode streams
+    objectMode: true, // default to object mode streams
+    debug: false
   });
 
 

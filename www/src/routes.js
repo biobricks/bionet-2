@@ -144,3 +144,13 @@ route('/create-physical/*/..', function (typeOrID) {
     var q = route.query()
     createPhysicalRoute(typeOrID, q);
 });
+
+
+route('/foo', function () {
+    app.dispatch(app.$.appBarConfig, {
+        enableTopNav: true,
+        enableBreadCrumbs: false,
+        enableSubbar: false
+    })
+    riot.mount('div#content', 'foo')
+})
