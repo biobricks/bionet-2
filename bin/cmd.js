@@ -645,9 +645,9 @@ websocket.createServer({server: server}, function(stream) {
       // TODO implement a server side filter for the physicals tree
       inventoryTree: function(curUser, cb) {
         physicalTree.children(null, {
-          ignore: function() {
+          ignore: function(obj) {
             // ignore paths with parts beginning with _
-            var pathParts = path.split('.');
+            var pathParts = obj.path.split('.');
             var i;
             for(i=0; i < pathParts.length; i++) {
               if(pathParts[i].match(/^_/)) {
