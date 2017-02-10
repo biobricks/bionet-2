@@ -477,7 +477,10 @@ websocket.createServer({server: server}, function(stream) {
           if(!data || !data.value || !data.value.physical_id) return next();
           
           physicalDB.get(data.value.physical_id, function(err, o) {
-            if(err) return cb(err);
+            if(err) {
+              if(err.notFound) return next();
+              return cb(err);
+            }
 
             physicalTree.path(o.id, function(err, path) {
               if(err) return err;
