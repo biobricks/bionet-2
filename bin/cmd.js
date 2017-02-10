@@ -483,7 +483,7 @@ websocket.createServer({server: server}, function(stream) {
             }
 
             physicalTree.path(o.id, function(err, path) {
-              if(err) return err;
+              if(err) return cb(err);
 
               results.push({
                 physical: o,
