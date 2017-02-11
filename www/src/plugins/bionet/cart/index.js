@@ -47,7 +47,7 @@ var cart = {
                     return
                 }
                 console.log('deleteCartItem result:', JSON.stringify(result))
-                app.ui.toast(item.name + ' removed from cart')
+                app.ui.toast(itemId + ' removed from cart')
                 cart.route('requestCart')
             })
         })
