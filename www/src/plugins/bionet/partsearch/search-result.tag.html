@@ -11,6 +11,7 @@
             </form>
             <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
                 <list-item class="searchItem" no-reorder each={item in results} item={item}>
+                    <i if={item.isPhysical} class="tiny material-icons" style="float: right" >group_work</i>
                     <i class="material-icons right-align" style="cursor: pointer; cursor: hand; " onclick={addToCart}>shopping_cart</i>
                 </list-item>
             </div>

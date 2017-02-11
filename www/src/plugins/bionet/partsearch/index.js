@@ -151,6 +151,7 @@ var partsearch = {
                     q.results.push({
                         primary_text: result.name,
                         secondary_text: '',
+                        isPhysical: (result.id.indexOf('p-')>=0) ? true : false,
                         id: result.id
                     });
                 }
