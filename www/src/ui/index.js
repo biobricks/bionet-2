@@ -40,6 +40,11 @@ stdThemePlugin.start = function () {
 
     //----------------------------------------------------------------------------
     // primary nav - logged in
+    /*
+        label: 'configure',
+        action: '/bionetsetup/config'
+  }, {
+    */
     const loggedInNav = [{
         label: 'global search',
         action: '/search'
@@ -49,9 +54,6 @@ stdThemePlugin.start = function () {
   }, {
         label: 'workbench',
         action: '/create'
-  }, {
-        label: 'configure',
-        action: '/bionetsetup/config'
   }, {
         icon: 'shopping_cart',
         action: '/cart'

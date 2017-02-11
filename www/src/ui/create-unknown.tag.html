@@ -8,16 +8,16 @@
 <create-quilt>
     <div class="row">
         <div class="col s6 m6 l6 left-align">
-            <form>
-                <!--
-                <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
-                -->
-                <h5>Create biomaterials</h5>
-                <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete}/>
-                <form-text-input label="Instances" ref="instances" name="instances" value={formData.instances}/>
-                <!--
-                -->
-            </form>
+            <div id="createNodeForm">
+                <form onsubmit={addNode}>
+                    <h5>Create biomaterials</h5>
+                    <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete}/>
+                    <form-text-input label="Instances" ref="instances" name="instances" value={formData.instances}/>
+                    <div style="margin-top:30px"/>
+                    <std-button label="add to workbench" action={addNode} />
+                    <input type="submit" style="visibility:hidden" />
+                </form>
+            </div>
             <div id="scanner" style="position:absolute;top:100px; left:0px"></div>
             <div class="row" style="margin-top:25px">
                 <div each={field in fields}>
@@ -25,21 +25,31 @@
                 </div>
             </div>
 
-            <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:130px; right:25px; text-align:left" onclick={addNode}><i class="material-icons">add</i></a>
+            <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:130px; right:25px; text-align:left" onclick={addNode} data-activates="addmenu2"><i class="material-icons">queue</i></a>
 
-            <div class="fixed-action-btn" style="position:absolute; top:200px; right:25px; text-align:left">
-                <a onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></a>
-            </div>
-            
-            <h5>Create virtual</h5>
-            <ul>
-                <li each={item in virtuals}><a href="{item.url}">{item.name}</a></li>
+            <a class="btn-floating btn-large waves-effect waves-light red dropdown-button" data-constrainwidth="false" style="position:absolute; top:200px; right:25px; text-align:left" onclick={deleteNode}><i class="material-icons">delete</i></a>
+
+            <ul id="addmenu2" class="dropdown-content" style="position:absolute; top:270px; right:25px; width:200px !important; text-align:left;z-index:1000">
+                <li each={item in virtuals} class="add-type"><span onclick={createNode}>{item.name}</span></li>
             </ul>
-                <!--
+
+
+            <!--
+            <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" style="position:absolute; top:130px; right:25px; text-align:left" onclick={addNode}><i class="material-icons">add</i></a>
+            <ul id="addmenu" style="position:absolute; top:280px; right:25px; width:200px !important; text-align:left;z-index:1000">
+                <li each={item in virtuals} class="add-type"><span onclick={addNode}>{item.name}</span></li>
+            </ul>
+        <ul id="addmenu" class="dropdown-content" style="position:absolute; top:280px; right:25px; width:200px !important; text-align:left;z-index:1000">
+                <li each={item in virtuals} class="add-type"><span onclick={createVirtual}>{item.name}</span></li>
+            </ul>
             <div each={item in virtuals}>
                 <input name="selectvirtual" type="radio" id={item.name} value={item.name} onclick={setFields}/>
                 <label for={item.name}>{item.name}</label>
             </div>
+            <h5>Create virtual</h5>
+            <ul>
+                <li each={item in virtuals}><a href="{item.url}">{item.name}</a></li>
+            </ul>
                 -->
             <!--
     <div class="row">
@@ -63,6 +73,13 @@
         </div>
         -->
         </div>
+        <style>
+            li.add-type:hover {
+                background-color: #E5F3FB;
+                outline: 1px solid #70C0E7;
+            }
+
+        </style>
 
         <script>
             const tag = this
@@ -90,6 +107,18 @@
                 }
             }
             console.log("create unknown, types:%s", JSON.stringify(this.dataTypes))
+            tag.on('mount', function() {
+                $('.dropdown-button').dropdown({
+                    inDuration: 300,
+                    outDuration: 225,
+                    constrainWidth: false,
+                    hover: true,
+                    gutter: 0,
+                    belowOrigin: true,
+                    alignment: 'left',
+                    stopPropagation: false
+                });
+            })
 
             this.updateAutocomplete = function(q, cb) {
                 console.log('updateAutocomplete: ', q)
@@ -99,6 +128,7 @@
                     cb(null, results)
                 });
             }
+            
             tag.setFields = function() {
                 return
                 const type = $('input[name=selectvirtual]:checked').val()
@@ -130,6 +160,16 @@
                     bionetSetup.route('delPhysical', undefined, id)
                     node.remove()
                 }
+            }
+
+            tag.createNode = function(e) {
+                const active = $(e.target)
+                const type = active.text()
+                riot.mount('div#create-virtual', 'create-virtual-form', {
+                    type: type,
+                    query: {}
+                })
+                $('#createNodeForm').hide()
             }
 
             tag.addNode = function(e) {

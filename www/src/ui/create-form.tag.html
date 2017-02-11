@@ -41,6 +41,8 @@
         <div id="edit-physical" class="edit-physical">
             <create-physical show="false" top-margin="0px" />
         </div>
+        <div id="create-virtual" class="create-virtual">
+        </div>
         <!--
         -->
         <div id="create-physical" class="edit-physical">
@@ -95,6 +97,12 @@
         }
         
         .edit-physical {
+            overflow: auto;
+            width: calc(100% - 600px);
+            float: left;
+            margin-left: 25px;
+        }
+        .create-virtual {
             overflow: auto;
             width: calc(100% - 600px);
             float: left;
@@ -507,9 +515,6 @@
 
             workbench.addRoute('requestWorkbenchResult', function(uw) {
                 userWorkbench = uw
-                    //const ftree = $("#ftree").fancytree("getTree");
-                    //const root = ftree.getRootNode().children[0];
-                    //root.data.dbData.id = uw.id
                 workbench.route('getWorkbenchTree', undefined, userWorkbench)
             })
 
@@ -517,27 +522,13 @@
                 console.log('getWorkbenchTreeResult initializing:', JSON.stringify(storageData))
                 const ftree = $("#ftree").fancytree("getTree")
                 ftree.reload(storageData).then(function() {
-                        const children = ftree.getRootNode().children
-                        const node = children[0]
-                        if (node) {
-                            node.setExpanded();
-                            node.setFocus();
-                        }
-                    })
-                    /*
-                    ftree.clear()
-                    const root = ftree.getRootNode()
-                    const dbData = [{
-                        title: 'workbench',
-                        dbData: {
-                            id: userWorkbench.id,
-                            name: 'workbench',
-                            type: 'workbench'
-                        }
-                    }]
-                    root.addChildren(dbData)
-                    root.children[0].addChildren(storageData)
-                    */
+                    const children = ftree.getRootNode().children
+                    const node = children[0]
+                    if (node) {
+                        node.setExpanded();
+                        node.setFocus();
+                    }
+                })
             })
 
             $('#create-physical').css({
