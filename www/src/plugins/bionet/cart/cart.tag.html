@@ -7,7 +7,7 @@
                 </list-item>
             </div>
         </div>
-        <div class="edititem">
+        <div id="edit-physical" class="edititem">
             <create-physical show="false" top-margin="0px" />
         </div>
     </div>
@@ -26,8 +26,8 @@
         }
         
         .edititem {
+            width: calc(100% - 750px);
             overflow: auto;
-            width: calc(100% - 300px);
             float: left;
             margin-left: 25px;
         }
@@ -70,7 +70,7 @@
                 tag.results.push(item)
                 tag.update()
             })
-            
+
             cart.route('requestCart')
 
             const itemClick = function(item) {
@@ -83,6 +83,11 @@
                     'label': item.primary_text,
                     'url': '/cart/' + opts.terms
                 }])
+                $('#edit-physical').css({
+                    height: $(window).innerHeight() - 120,
+                    display: 'block'
+                });
+                
             }
 
             const results = tag.results
