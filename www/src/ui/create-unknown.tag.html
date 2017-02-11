@@ -16,10 +16,6 @@
                 <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete}/>
                 <form-text-input label="Instances" ref="instances" name="instances" value={formData.instances}/>
                 <!--
-                <div each={item in virtuals}>
-                    <input name="selectvirtual" type="radio" id={item.name} value={item.name} onclick={setFields}/>
-                    <label for={item.name}>{item.name}</label>
-                </div>
                 -->
             </form>
             <div id="scanner" style="position:absolute;top:100px; left:0px"></div>
@@ -34,6 +30,17 @@
             <div class="fixed-action-btn" style="position:absolute; top:200px; right:25px; text-align:left">
                 <a onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></a>
             </div>
+            
+            <h5>Create virtual</h5>
+            <ul>
+                <li each={item in virtuals}><a href="{item.url}">{item.name}</a></li>
+            </ul>
+                <!--
+            <div each={item in virtuals}>
+                <input name="selectvirtual" type="radio" id={item.name} value={item.name} onclick={setFields}/>
+                <label for={item.name}>{item.name}</label>
+            </div>
+                -->
             <!--
     <div class="row">
         <div class="col s3 m3 l3"></div>
@@ -93,6 +100,7 @@
                 });
             }
             tag.setFields = function() {
+                return
                 const type = $('input[name=selectvirtual]:checked').val()
                 tag.fields = app.getAttributesForType(type)
                 tag.update()

@@ -21,6 +21,8 @@ var accounts = require('../libs/user_accounts.js');
 var printServer = require('../libs/print_server.js');
 var Mailer = require('../libs/mailer.js');
 var IDGenerator = require('../libs/id_generator.js'); // atomically unique IDs
+var Writable = require('stream').Writable;
+var Readable = require('stream').Readable;
 
 var minimist = require('minimist');
 var argv = minimist(process.argv.slice(2), {
@@ -458,14 +460,15 @@ websocket.createServer({server: server}, function(stream) {
         // they should be unique, but are we really ensuring that?
         ucDB.put(name, o, cb);
       },
-
-
-
+        
       // stream a user's cart
-      cartStream: function(curUser, cb) {
+      cartStream: rpc.syncReadStream(function(curUser, cb) {
+          
+        const cartStream = Readable({ objectMode: true });
+        cartStream._read = function() {}
+
         var ucDB = userCartDB(curUser.user.email);
         var s = ucDB.createReadStream();
-        const results=[]
 
         // TODO 
         // It would be much more efficient if we simply cached the
@@ -475,36 +478,36 @@ websocket.createServer({server: server}, function(stream) {
 
         var out = s.pipe(through.obj(function(data, enc, next) {
           if(!data || !data.value || !data.value.physical_id) return next();
-          
+            
           physicalDB.get(data.value.physical_id, function(err, o) {
             if(err) {
               if(err.notFound) return next();
               return cb(err);
             }
-
             physicalTree.path(o.id, function(err, path) {
+                
               if(err) return cb(err);
-
-              results.push({
+              cartStream.push({
                 physical: o,
                 path: path
-              });
+              })
               next();
+              
             });
           });
         }));
 
         s.on('close', function() {
-            cb(null,results);
+            cb();
         });
 
         out.on('error', function(err) {
             cb(err);
             console.error("cart stream error:", err);
         });
-
-        return out;
-      },
+          
+        return cartStream;
+      }),
 
       delFromCart: function(curUser, physical_id, cb) {
         var ucDB = userCartDB(curUser.user.email);

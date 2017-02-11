@@ -8,7 +8,7 @@
     <script>
         const tag = this
         this.inputWidth = (opts.width) ? opts.width : 's12'
-        
+
         this.on('update', function() {
             tag.data = tag.opts.riotValue;
         })
@@ -126,7 +126,7 @@
         </div>
     </div>
     <script>
-        const tag=this
+        const tag = this
         this.inputWidth = (opts.width) ? opts.width : 's6 m6 l6'
         this.on('update', function() {
             tag.data = tag.opts.riotValue;
@@ -147,7 +147,7 @@
 </password-text-input-empty>
 
 <form-textarea-input>
-    <div class="row"  style="margin-bottom:0px;">
+    <div class="row" style="margin-bottom:0px;">
         <div class="input-field col s12">
             <textarea id={opts.name} name={opts.name} ref="inputTag" type="text" value={data} class="materialize-textarea"></textarea>
             <label for={opts.name} class="active">{opts.label}</label>
@@ -186,6 +186,11 @@
         </div>
     </div>
 </form-switch>
+
+<form-checkbox>
+    <input type="checkbox" id={opts.id} name={opts.id}/>
+    <label if={opts.label} for={opts.id}>{opts.label}</label>
+</form-checkbox>
 
 <form-image>
     <div class="row">

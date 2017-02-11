@@ -2,7 +2,9 @@
     <div class="searchheight">
         <div class="searchresult">
             <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
-                <list-item class="searchItem" no-reorder each={item in results} item={item}/>
+                <list-item class="searchItem" no-reorder each={item in results} item={item}>
+                    <form-checkbox class={left-align} id={item.id}/>
+                </list-item>
             </div>
         </div>
         <div class="edititem">
@@ -48,14 +50,27 @@
         this.on('mount', function() {
 
             console.log('cart tag')
-            cart.addRoute('cartResult', function(results) {
-                console.log('cart tag, result:', JSON.stringify(results))
-                for (var i = 0; i < results.length; i++) {
-                    results[i].click = itemClick
+            const deleteCartItem = function(e, item) {
+                console.log('iconClick', item.id)
+                cart.route('deleteCartItem', undefined, item.id)
+            }
+
+            cart.addRoute('cartResult', function(data) {
+                //console.log('cart tag, result:', JSON.stringify(data))
+                const path = (data.path.indexOf('_workbench-') >= 0) ? 'workbench' : data.path;
+                const item = {
+                    primary_text: data.physical.name,
+                    secondary_text: path,
+                    id: data.physical.id,
+                    iconClick: deleteCartItem,
+                    starred: true,
+                    righticon: 'delete',
+                    click: itemClick
                 }
-                tag.results = results
+                tag.results.push(item)
                 tag.update()
             })
+            
             cart.route('requestCart')
 
             const itemClick = function(item) {

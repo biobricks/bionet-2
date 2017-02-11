@@ -111,6 +111,7 @@
         const tag = this
         const bionetSetup = app.getStream('bionetSetup')
         const workbench = app.getStream('workbench')
+        var userWorkbench = {}
 
         app.dispatch(app.$.breadcrumbs, [{
             'label': 'workbench',
@@ -195,6 +196,11 @@
         this.matches = []
 
         this.on('mount', function() {
+
+            $('.inventory-tree').css({
+                height: $(window).innerHeight() - 120
+            });
+
             $('#name').focus()
 
             this.updateMatchListPosition = function() {
@@ -499,24 +505,39 @@
                 //app.editTextElement(e, active)
             })
 
+            workbench.addRoute('requestWorkbenchResult', function(uw) {
+                userWorkbench = uw
+                    //const ftree = $("#ftree").fancytree("getTree");
+                    //const root = ftree.getRootNode().children[0];
+                    //root.data.dbData.id = uw.id
+                workbench.route('getWorkbenchTree', undefined, userWorkbench)
+            })
 
-            bionetSetup.addRoute('storage', function(storageData) {
-                console.log('initializing storage:', JSON.stringify(storageData))
-                const ftree = $("#ftree").fancytree("getTree");
+            workbench.addRoute('getWorkbenchTreeResult', function(storageData) {
+                console.log('getWorkbenchTreeResult initializing:', JSON.stringify(storageData))
+                const ftree = $("#ftree").fancytree("getTree")
                 ftree.reload(storageData).then(function() {
-                    $('.inventory-tree').css({
-                        height: $(window).innerHeight() - 120
-                    });
-                    const activeNode = $("#ftree").fancytree("getRootNode").children[0];
-                    //const activeNode = ftree.findFirst('new materials')
-                    //const children = ftree.getRootNode().children
-                    //const activeNode = children[0]
-                    if (activeNode) {
-                        activeNode.setExpanded();
-                        activeNode.setFocus();
-                        activeNode.setTitle('workbench')
-                    }
-                })
+                        const children = ftree.getRootNode().children
+                        const node = children[0]
+                        if (node) {
+                            node.setExpanded();
+                            node.setFocus();
+                        }
+                    })
+                    /*
+                    ftree.clear()
+                    const root = ftree.getRootNode()
+                    const dbData = [{
+                        title: 'workbench',
+                        dbData: {
+                            id: userWorkbench.id,
+                            name: 'workbench',
+                            type: 'workbench'
+                        }
+                    }]
+                    root.addChildren(dbData)
+                    root.children[0].addChildren(storageData)
+                    */
             })
 
             $('#create-physical').css({
@@ -525,8 +546,8 @@
             $('#edit-physical').css({
                 display: 'none'
             });
-
             workbench.route('requestWorkbench')
+
         })
 
     </script>

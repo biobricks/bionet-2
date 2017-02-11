@@ -9,9 +9,9 @@
             <div class="left" style="cursor: pointer; cursor: hand;">{item.secondary_text}</div>
         </div>
         <div class="right" style="display: inline-block; width:30%">
-            <i if={item.starred} class="material-icons right {theme.style.color.text} valign">{item.righticon}</i>
-            <i if={!item.starred} class="material-icons right grey-text valign">{item.righticon}</i>
-            <span class="right" if={item.secondary_url} onclick={clickavailability} href="{item.secondary_url}" style="cursor: pointer; cursor: hand; ">{item.secondary_url_label}</span>
+            <i if={item.starred} class="material-icons right {theme.style.color.text} valign" style="cursor: pointer; cursor: hand;" onclick={iconclick} >{item.righticon}</i>
+            <i if={!item.starred} class="material-icons right grey-text valign" style="cursor: pointer; cursor: hand;" onclick={iconclick} >{item.righticon}</i>
+            <span class="right" if={item.secondary_url} href="{item.secondary_url}" style="cursor: pointer; cursor: hand; ">{item.secondary_url_label}</span>
         </div>
         <yield/>
     </div>
@@ -26,9 +26,12 @@
             e.preventDefault()
             e.stopPropagation()
             console.log('adding item to cart:', tag.item.id)
-            cart.route('addToCart',undefined,{id: tag.item.id, name:tag.item.primary_text})
+            cart.route('addToCart', undefined, {
+                id: tag.item.id,
+                name: tag.item.primary_text
+            })
         }
-        
+
         this.clickitem = function(e) {
             const item = tag.item
             e.stopPropagation()
@@ -39,9 +42,13 @@
                 item.click(item)
             }
         }
-
-        this.clickavailability = function(e) {
+        
+        this.iconclick = function(e) {
+            e.preventDefault()
             e.stopPropagation()
+            if (tag.item.iconClick) {
+                tag.item.iconClick(e,tag.item)
+            }
             return false;
         }
 
@@ -54,5 +61,6 @@
     </div>
     <script>
         this.theme = app.getTheme();
+
     </script>
 </list-header>

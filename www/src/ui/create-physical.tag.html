@@ -11,7 +11,7 @@
         <div if={showPhysical}>
             <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
         </div>
-<!--
+        <!--
         <div class="input-field col s12">
                 <div class="query-container">
                     <input type="text" id="q" name="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
@@ -280,24 +280,24 @@
             $('#selectVirtual').hide()
 
             bionetSetup.addRoute('getPhysicalResult', function(data) {
-                console.log('getPhysicalResult',JSON.stringify(data))
+                console.log('getPhysicalResult', JSON.stringify(data))
                 tag.formData = data
-                /*
-                tag.type = data.type
-                const dataType = app.getType(data.type)
-                if (dataType.virtual) tag.isMaterial = true
-                else tag.isMaterial = false
-                if (tag.isMaterial) {
-                    tag.refs.q.value = ''
-                    $('#selectVirtual').show()
-                    tag.updateMatchListPosition()
-                } else {
-                    $('#selectVirtual').hide()
-                }
-                tag.printNameDefault = data.name;
-                //$(tag.refs.createPhysicalHeader).html("Edit " + data.name)
-                tag.fields = app.getAttributesForType(data.type)
-                */
+                    /*
+                    tag.type = data.type
+                    const dataType = app.getType(data.type)
+                    if (dataType.virtual) tag.isMaterial = true
+                    else tag.isMaterial = false
+                    if (tag.isMaterial) {
+                        tag.refs.q.value = ''
+                        $('#selectVirtual').show()
+                        tag.updateMatchListPosition()
+                    } else {
+                        $('#selectVirtual').hide()
+                    }
+                    tag.printNameDefault = data.name;
+                    //$(tag.refs.createPhysicalHeader).html("Edit " + data.name)
+                    tag.fields = app.getAttributesForType(data.type)
+                    */
                 tag.showPhysical = true
                 tag.update()
             })
@@ -325,7 +325,7 @@
                 $('#createPhysicalForm').scrollTop(0)
                 return;
             }
-            
+
             if (opts.type) {
                 app.remote.getType(opts.type, function(err, type) {
                     if (err) {
@@ -350,14 +350,19 @@
             }
 
             this.updateMatchListPosition = function() {
-                $('#matchList').css($('#q').css(['top', 'left', 'offset']))
-                    /*
-                    var pos = $('#q').offset();
-                    if (pos === undefined) return
-                    pos.top += $('#q').innerHeight() + 2;
-                    pos.width = $('#q').innerWidth();
-                    $('#matchList').css(pos)
-                    */
+                const matchlist = $('#matchlist')
+                try {
+                    if (matchlist) matchlist.css($('#q').css(['top', 'left', 'offset']))
+                } catch (e) {
+
+                }
+                /*
+                var pos = $('#q').offset();
+                if (pos === undefined) return
+                pos.top += $('#q').innerHeight() + 2;
+                pos.width = $('#q').innerWidth();
+                $('#matchList').css(pos)
+                */
             }.bind(this)
 
             $(window).resize(function() {
