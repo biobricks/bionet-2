@@ -75,7 +75,7 @@
             const itemClick = function(item) {
                 
                 if (item.id.indexOf('p-') >= 0) {
-                    riot.mount('#edititem','create-physical')
+                    riot.mount('#edititem','create-physical',{topMargin:0})
                     bionetSetup.route('getPhysical', undefined, item.id)
                     tag.itemType='p'
                 } else if (item.id.indexOf('v-') >= 0) {
