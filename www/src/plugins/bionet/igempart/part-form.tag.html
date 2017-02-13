@@ -5,9 +5,8 @@
         </div>
     </div>
     <script>
-
         this.theme = app.getTheme()
-        // setup secondary nav
+            // setup secondary nav
         app.dispatch(app.$.secondaryNav, [{
             label: 'virtual properties',
             icon: undefined,
@@ -54,38 +53,44 @@
         </div>
         <div style="margin-bottom:30px">
             <p>
-                Created by: {formData.created.user}<br/>
-                Created: {createdDate}<br/>
-                Updated: {updatedDate}
+                Created by: {(formData.created.user) ? formData.created.user : ''}
+                <br/> Created: {createdDate}
+                <br/> Updated: {updatedDate}
             </p>
         </div>
-        <input type="submit" class="waves-effect waves-light btn darken-1" label="submit"/>
+        <input type="submit" class="waves-effect waves-light btn darken-1" label="submit" />
 
     </form>
     <script>
         const tag = this
-        tag.formData = {
-            created: {}
-        }
-        this.notify=true
-        this.createdDate=''
-        this.updatedDate=''
-
+        tag.formData = (app.state.editPart) ? app.state.editPart : {}
+        if (!tag.formData.created) tag.formData.created = {}
+        this.notify = true
+        this.createdDate = ''
+        this.updatedDate = ''
+        const partDataAccessor = app.getStream('partDataAccessor')
+            /*
+            */
         this.on('mount', function() {
-            
-            tag.formData = app.state.editPart
             this.fields = app.getAttributesForType(tag.formData.type)
             var d = new Date()
-            d.setTime(tag.formData.created.time*1000)
-            tag.createdDate = d.toDateString()
-            d = new Date()
-            d.setTime(tag.formData.updated.time*1000)
-            tag.updatedDate = d.toDateString()
+            if (tag.formData.created) {
+                d.setTime(tag.formData.created.time * 1000)
+                tag.createdDate = d.toDateString()
+            } else {
+                tag.formData.created = {}
+            }
+            if (tag.formData.updated) {
+                d = new Date()
+                d.setTime(tag.formData.updated.time * 1000)
+                tag.updatedDate = d.toDateString()
+            }
             tag.update()
+
             console.log("part-specification mount:", JSON.stringify(tag.formData))
 
             tag.saveVirtual = function() {
-                const notify=tag.notify
+                const notify = tag.notify
                 $.extend(app.state.editPart, $.formToObject('editPartForm'))
                 console.log('part-specification submit', JSON.stringify(app.state.editPart))
                 if (!app.state.editPart.id) {
@@ -102,18 +107,39 @@
                     if (notify) app.ui.toast("Material saved with ID: " + id)
                         //route('/edit/' + id);
                 });
-                this.notify=true
+                this.notify = true
             }.bind(tag)
 
+            partDataAccessor.addRoute('getVirtualResult', (virtualData) => {
+                console.log('part-specification, getVirtualResult:', JSON.stringify(virtualData))
+                tag.formData = virtualData;
+                if (tag.formData.created) {
+                    d.setTime(tag.formData.created.time * 1000)
+                    tag.createdDate = d.toDateString()
+                } else {
+                    tag.formData.created = {}
+                }
+                if (tag.formData.updated) {
+                    d = new Date()
+                    d.setTime(tag.formData.updated.time * 1000)
+                    tag.updatedDate = d.toDateString()
+                }
+                /*
+part-specification, getVirtualResult: {"type":"single-stranded","name":"myNewSingleStranded01","description":"","creator":{"user":"tsakach@gmail.com","time":"Fri Feb 10 2017"},"notes":"","bsl":"","biohazard":"","Description":"","Sequence":"","VectorLength":"","creator.user":"tsakach@gmail.com","creator.time":"Fri Feb 10 2017","id":"v-d6e4c835-16d5-4613-aef9-3c1ba1bb9a70","created":{"user":"tsakach@gmail.com","time":1486793334},"updated":{"user":"tsakach@gmail.com","time":1486793334}}
+*/
+                $.extend(app.state.editPart, tag.formData)
+                tag.update();
+            })
+
             $("#editPartForm").submit(function(e) {
-                console.log('edit part form submit event handler, e=',e)
+                console.log('edit part form submit event handler, e=', e)
                 e.preventDefault()
                 tag.saveVirtual()
             });
-            
+
             $("#editPartForm").focusout(function(e) {
                 console.log('edit part form focusout')
-                tag.notify=false
+                tag.notify = false
                 $('#editPartForm').submit()
             });
 
@@ -227,31 +253,31 @@
     </form>
     <script>
         /*
-    var formData = app.getModel('partData')
-      //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
+                                                                                    var formData = app.getModel('partData')
+                                                                                      //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
 
-    // map igem plasmid annotations to flash plasmid viewer component
-    var annotations = formData.plasmidAnnotations
-    var features = []
-    if (annotations !== undefined) {
-      for (var i = 0; i < annotations.length; i++) {
-        var annotation = annotations[i]
-        features.push({
-          name: annotation[3],
-          type: annotation[0],
-          from: annotation[1],
-          to: annotation[2]
-        })
-      }
-    }
-    var seq_obj = {
-      name: formData.name,
-      sequence: formData.sequence,
-      features: features
-    }
-    this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
-      //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
-                        */
+                                                                                    // map igem plasmid annotations to flash plasmid viewer component
+                                                                                    var annotations = formData.plasmidAnnotations
+                                                                                    var features = []
+                                                                                    if (annotations !== undefined) {
+                                                                                      for (var i = 0; i < annotations.length; i++) {
+                                                                                        var annotation = annotations[i]
+                                                                                        features.push({
+                                                                                          name: annotation[3],
+                                                                                          type: annotation[0],
+                                                                                          from: annotation[1],
+                                                                                          to: annotation[2]
+                                                                                        })
+                                                                                      }
+                                                                                    }
+                                                                                    var seq_obj = {
+                                                                                      name: formData.name,
+                                                                                      sequence: formData.sequence,
+                                                                                      features: features
+                                                                                    }
+                                                                                    this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
+                                                                                      //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
+                                                                                                        */
         const tag = this
         tag.formData = {}
         this.on('mount', function() {

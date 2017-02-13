@@ -129,28 +129,28 @@ var igempart = {
         app.addStream('putPartData')
 
         app.observe('putPartData', (partData) => {
-                const partDataStr = JSON.stringify(partData)
-                console.log('submit', partDataStr)
-                app.putLocal(partData.name, partDataStr, function (err) {
-                    const toast = app.getThemeMethod().toast
-                    if (err) {
-                        toast('ERROR saving ' + partData.name)
-                        console.log('putPartData:', err)
-                    } else {
-                        toast(partData.name + ' saved')
-                    }
-                })
+            const partDataStr = JSON.stringify(partData)
+            console.log('submit', partDataStr)
+            app.putLocal(partData.name, partDataStr, function (err) {
+                const toast = app.getThemeMethod().toast
+                if (err) {
+                    toast('ERROR saving ' + partData.name)
+                    console.log('putPartData:', err)
+                } else {
+                    toast(partData.name + ' saved')
+                }
             })
-            //----------------------------------------------------------------------------
-            // web components
-            //    require('./part-list.tag.html')
-            //    require('./part-form.tag.html')
+        })
+        //----------------------------------------------------------------------------
+        // web components
+        //    require('./part-list.tag.html')
+        //    require('./part-form.tag.html')
 
         // TODO remove these
-        app.addStreamRouter('createPart')
-        app.addStreamRouter('editPart')
-        app.addStream('getPartsList')
-        app.addStream('partsList')
+        app.addStreamRouter('createPart');
+        app.addStreamRouter('editPart');
+        app.addStream('getPartsList');
+        app.addStream('partsList');
 
 
         /*
@@ -212,17 +212,23 @@ var igempart = {
                 });
             } else {
 
-                    app.remote.get(id, function (err, data) {
+                app.remote.get(id, function (err, data) {
 
-                        if (err) {
-                            app.dispatch('error', err)
-                            return
-                        }
-                        cb(data);
-                    })
+                    if (err) {
+                        app.dispatch('error', err)
+                        return
+                    }
+                    cb(data);
+                })
 
             }
         }
+
+        partDataAccessor.addRoute('getVirtual', (virtualId) => {
+            getMaterial(virtualId, (virtualData) => {
+                partDataAccessor.route('getVirtualResult', undefined, virtualData)
+            })
+        })
 
         /*
         route('/edit...', function(partID) {
@@ -260,7 +266,7 @@ var igempart = {
                 if (section == 'sequence') {
                     riot.mount('div#edit-part-content', 'part-sequence', opts)
                 } else if (section == 'instances') {
-                    opts.topMargin=0
+                    opts.topMargin = 0
                     riot.mount('div#edit-part-content', 'create-physical', opts)
                 } else if (section == 'notes') {
                     riot.mount('div#edit-part-content', 'part-notes', opts)
@@ -272,7 +278,7 @@ var igempart = {
             });
         })
 
-        require('./create-part.tag.html')
+        require('./create-part.tag.html');
         require('./part-form.tag.html')
 
     },

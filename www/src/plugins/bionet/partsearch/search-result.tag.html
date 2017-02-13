@@ -11,13 +11,16 @@
             </form>
             <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
                 <list-item class="searchItem" no-reorder each={item in results} item={item}>
-                    <i if={item.isPhysical} class="tiny material-icons" style="float: right" >group_work</i>
-                    <i class="material-icons right-align" style="cursor: pointer; cursor: hand; " onclick={addToCart}>shopping_cart</i>
+                    <i if={item.isPhysical} class="tiny material-icons" style="float: right">group_work</i>
+                    <i if={item.isPhysical} class="material-icons right-align" style="cursor: pointer; cursor: hand; " onclick={addToCart}>shopping_cart</i>
                 </list-item>
             </div>
         </div>
-        <div class="edititem">
-            <create-physical show="false" top-margin="0px" />
+        <div id="edititem" class="edititem">
+            <!--
+            <create-physical if={itemType==='p'} show="false" top-margin="0px" />
+            <part-specification if={itemType==='v'} />
+            -->
         </div>
     </div>
 
@@ -49,6 +52,7 @@
         tag.results = []
         tag.pagination = []
         const bionetSetup = app.getStream('bionetSetup')
+        const partDataAccessor = app.getStream('partDataAccessor')
 
         this.searchClick = function(e) {
             e.preventDefault()
@@ -62,13 +66,28 @@
             'label': 'global search',
             'url': '/search'
         }]
-
+        
+        tag.itemType=''
+        
         this.on('mount', function() {
             tag.results = tag.opts.results
 
             const itemClick = function(item) {
-                console.log('itemClick:', JSON.stringify(item))
-                bionetSetup.route('getPhysical', undefined, item.id)
+                
+                if (item.id.indexOf('p-') >= 0) {
+                    riot.mount('#edititem','create-physical')
+                    bionetSetup.route('getPhysical', undefined, item.id)
+                    tag.itemType='p'
+                } else if (item.id.indexOf('v-') >= 0) {
+                    riot.mount('#edititem','part-specification')
+                    partDataAccessor.route('getVirtual', undefined, item.id)
+                    tag.itemType='v'
+                } else {
+                    tag.itemType=''
+                }
+                console.log('itemClick, type:%s %s', tag.itemType, JSON.stringify(item))
+                tag.update()
+                
                 app.dispatch(app.$.breadcrumbs, [{
                     'label': 'global search',
                     'url': '/search'
@@ -80,7 +99,7 @@
                     'url': '/search/' + opts.terms
                 }])
             }
-            
+
             const results = tag.results
             for (var i = 0; i < results.length; i++) {
                 results[i].click = itemClick
@@ -111,15 +130,16 @@
             $('.edititem').css({
                 height: $(window).innerHeight() - 120
             });
-
+            /*
             $("searchItem").on('click dblclick keydown', function(e) {
                 if (e.type === 'keydown') {
                     if (e.which !== undefined && e.which !== 13) return
                 }
                 const active = $(e.target)
                 const elementType = active.prop('nodeName');
-                console.log('elementType:', elementType)
+                console.log('search click:', elementType)
             })
+            */
         });
 
         this.on('unmount', function() {
