@@ -16,19 +16,16 @@
             <input type="text" ref={opts.ref || opts.name || 'q'} name={opts.name || 'q'} id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
             <label for={opts.name || 'q'} class="active">Name</label>
         </div>
-        <ul id="matchList_q" class="matchlist">
-            <li each={match, index in matches} class="matchlist {highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-            <li if={matches && !matches.length} class="matchlist no-match">No matches found</li>
+        <ul id="matchlist_q" class="matchlist">
+            <li each={match, index in matches} class="matchlist-element {highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
+            <li if={matches && !matches.length} class="matchlist-element no-match">No matches found</li>
         </ul>
         
         
     </div>
 
     <style>
-        .matchlist {
-            background-color: rgba(255, 255, 255, 1);
-            z-index: 1000;
-        }
+
 
     </style>
     <script>
@@ -65,6 +62,7 @@
             }.bind(this))
 
             this.selectCurrent = function() {
+
                 var sel = this.matches[this.selected]
                 this.refs[opts.ref].value = sel.name
                 this.update()
@@ -83,12 +81,15 @@
             }.bind(this)
 
             this.elementOver = function(e) {
-                if ($(e.target).hasClass('no-match')) return;
+                if($(e.target).hasClass('no-match')) return;
+
                 var lis = $('#matchlist_q').find('li');
+        console.log('OOOOO', lis.length);
                 var i;
-                for (i = 0; i < lis.length; i++) {
-                    if (lis[i] == e.target) {
-                        this.selected = i
+                for(i = 0; i < lis.length; i++) {
+
+                    if(lis[i] == e.target) {
+                        this.selected = i;
                         break
                     }
                 }

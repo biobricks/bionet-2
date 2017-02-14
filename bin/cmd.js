@@ -832,6 +832,10 @@ websocket.createServer({server: server}, function(stream) {
 
         var out = s.pipe(through.obj(function(data, enc, next) {
           if((data.value.name && data.value.name.toLowerCase().match(q.toLowerCase())) || (data.value.description && data.value.description.toLowerCase().match(q.toLowerCase()))) {
+            // skip stuff beginning with underscore
+            if(data.value.name && data.value.name[0] === '_') {
+              return;
+            }
             // this.push(data.value);
             ret.push(data.value);
           }
