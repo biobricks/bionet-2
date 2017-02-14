@@ -106,8 +106,9 @@ var workbench = {
             console.log('saveInWorkbench, item:', JSON.stringify(item))
             app.remote.saveInWorkbench(item, null, false, function (err, result) {
                 if (err) {
-                    console.log('saveInWorkbench: err ', err)
-                    return
+                  console.log('saveInWorkbench: err ', err)
+                  app.ui.toast(err);
+                  return;
                 }
                 console.log('saveInWorkbench result:', JSON.stringify(result))
                 workbench.route('requestWorkbench')

@@ -253,36 +253,77 @@ function userCartDB(userID) {
   return sublevel(cartDB, userID, {valueEncoding: 'json'});
 }
 
-function savePhysical(curUser, m, imageData, doPrint, cb) {
-  var mtch;
-  if(imageData && (mtch = imageData.match(/^data:image\/png;base64,(.*)/))) {
 
-    var imageBuffer = new Buffer(mtch[1], 'base64');
-    // TODO size check
-    var imagePath = path.join(settings.labelImageFilePath, m.id+'.png')
-    fs.writeFile(imagePath, imageBuffer, function(err) {
-      if(err) return cb(err);
+// TODO use indexes
+function getBy(field, value, cb) {
 
-      m.labelImagePath = imagePath; 
-      delete m.hidden; // don't allow users to create hidden physicals
-      if(m.name && m.name[0] === '_') return cb(new Error("Name cannot begin with an underscore")); // if name begins with an underscore than these are hidden from the normal tree index output
-
-      saveMaterialInDB(m, curUser, 'p', function(err, id) {
-        if(err) return cb(err);
-        if(!doPrint) return cb(null, id);
-
-        var relativePath = path.relative(settings.labelImageFilePath, imagePath);
-        printServer.printLabel(relativePath);
-        console.log("relative path:", relativePath);
-        cb(null, id);
-      });
-      console.log("saved with file", imagePath);
-    });
-  } else {
-    saveMaterialInDB(m, curUser, 'p', cb);
-    console.log("saved with no file");
-  }
+  var s = bioDB.createReadStream({valueEncoding: 'json'});
+  var found = false;
+  var out = s.pipe(through.obj(function(data, enc, next) {
+    if(!data || !data.value || !data.value[field]) return next()
+    if(data.value[field] == value) {
+      found = true;
+      cb(null, data.value);
+      s.destroy();
+    } else {
+      next();
+    }
+  }));
   
+  s.on('end', function() {
+    if(!found) {
+      found = true;
+      cb(null, null);
+    }
+  });
+
+  s.on('error', function(err) {
+    if(!found) {
+      found = true;
+      cb(err);
+    }
+  });
+}
+
+function savePhysical(curUser, m, imageData, doPrint, cb) {
+
+  // check for name uniqueness
+  getBy('name', m.name, function(err, value) {
+    if(err) return cb(err);
+    if(value) {
+      return cb(new Error("Error: Another physical is already named: " + m.name));
+    } 
+    
+    var mtch;
+    if(imageData && (mtch = imageData.match(/^data:image\/png;base64,(.*)/))) {
+
+      var imageBuffer = new Buffer(mtch[1], 'base64');
+      // TODO size check
+      var imagePath = path.join(settings.labelImageFilePath, m.id+'.png')
+      fs.writeFile(imagePath, imageBuffer, function(err) {
+        if(err) return cb(err);
+
+        m.labelImagePath = imagePath; 
+        delete m.hidden; // don't allow users to create hidden physicals
+        if(m.name && m.name[0] === '_') return cb(new Error("Name cannot begin with an underscore")); // if name begins with an underscore than these are hidden from the normal tree index output
+
+        saveMaterialInDB(m, curUser, 'p', function(err, id) {
+          if(err) return cb(err);
+          if(!doPrint) return cb(null, id);
+
+          var relativePath = path.relative(settings.labelImageFilePath, imagePath);
+          printServer.printLabel(relativePath);
+          console.log("relative path:", relativePath);
+          cb(null, id);
+        });
+        console.log("saved with file", imagePath);
+      });
+    } else {
+      saveMaterialInDB(m, curUser, 'p', cb);
+      console.log("saved with no file");
+    }
+
+  });    
   console.log("saving:", m);
 }
 
@@ -770,33 +811,7 @@ websocket.createServer({server: server}, function(stream) {
 
       // TODO use indexes for this!
       getBy: function(curUser, field, value, cb) {
-
-        var s = bioDB.createReadStream({valueEncoding: 'json'});
-        var found = false;
-        var out = s.pipe(through.obj(function(data, enc, next) {
-          if(!data || !data.value || !data.value[field]) return next()
-          if(data.value[field] == value) {
-            found = true;
-            cb(null, data.value);
-            s.destroy();
-          } else {
-            next();
-          }
-        }));
-        
-        s.on('end', function() {
-          if(!found) {
-            found = true;
-            cb(null, null);
-          }
-        });
-
-        s.on('error', function(err) {
-          if(!found) {
-            found = true;
-            cb(err);
-          }
-        });
+        return getBy(field, value, cb);
       },
 
       // TODO doesn't work
