@@ -69,8 +69,7 @@
         this.createdDate = ''
         this.updatedDate = ''
         const partDataAccessor = app.getStream('partDataAccessor')
-            /*
-            */
+
         this.on('mount', function() {
             this.fields = app.getAttributesForType(tag.formData.type)
             var d = new Date()
@@ -124,9 +123,7 @@
                     d.setTime(tag.formData.updated.time * 1000)
                     tag.updatedDate = d.toDateString()
                 }
-                /*
-part-specification, getVirtualResult: {"type":"single-stranded","name":"myNewSingleStranded01","description":"","creator":{"user":"tsakach@gmail.com","time":"Fri Feb 10 2017"},"notes":"","bsl":"","biohazard":"","Description":"","Sequence":"","VectorLength":"","creator.user":"tsakach@gmail.com","creator.time":"Fri Feb 10 2017","id":"v-d6e4c835-16d5-4613-aef9-3c1ba1bb9a70","created":{"user":"tsakach@gmail.com","time":1486793334},"updated":{"user":"tsakach@gmail.com","time":1486793334}}
-*/
+
                 $.extend(app.state.editPart, tag.formData)
                 tag.update();
             })

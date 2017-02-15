@@ -285,45 +285,75 @@ function getBy(field, value, cb) {
   });
 }
 
-function savePhysical(curUser, m, imageData, doPrint, cb) {
+function savePhysical(curUser, m, imageData, doPrint, cb, isUnique) {
 
-  // check for name uniqueness
-  getBy('name', m.name, function(err, value) {
-    if(err) return cb(err);
-    if(value) {
-      return cb(new Error("Error: Another physical is already named: " + m.name));
-    } 
-    
-    var mtch;
-    if(imageData && (mtch = imageData.match(/^data:image\/png;base64,(.*)/))) {
+  if(!m.id && !isUnique) { // if no id then this is a new physical
 
-      var imageBuffer = new Buffer(mtch[1], 'base64');
-      // TODO size check
-      var imagePath = path.join(settings.labelImageFilePath, m.id+'.png')
-      fs.writeFile(imagePath, imageBuffer, function(err) {
+    // check for name uniqueness
+    getBy('name', m.name, function(err, value) {
+      if(err) return cb(err);
+      if(value) {
+        return cb(new Error("Another physical is already named: " + m.name));
+      } 
+      savePhysical(curUser, m, imageData, doPrint, cb, true);
+    });
+    return;
+  }
+
+  // if a container is specified by name
+  if(m.selectContainer) {
+    // check for name uniqueness
+    getBy('name', m.name, function(err, value) {
+      if(err) return cb(err);
+      if(!value && !m.parent_id) {
+        return cb(new Error("No valid container specified"));
+      }
+      if(m.id === value.id) {
+        return cb(new Error("Physical cannot contain itself"));
+      }
+      
+      delete m.selectContainer;
+      m.parent_id = value.id;
+
+      savePhysical(curUser, m, imageData, doPrint, cb, true);
+    });
+
+    return;
+  }
+  
+  if(!m.parent_id) {
+    return cb(new Error("No container specified"));
+  }
+
+  var mtch;
+  if(imageData && (mtch = imageData.match(/^data:image\/png;base64,(.*)/))) {
+
+    var imageBuffer = new Buffer(mtch[1], 'base64');
+    // TODO size check
+    var imagePath = path.join(settings.labelImageFilePath, m.id+'.png')
+    fs.writeFile(imagePath, imageBuffer, function(err) {
+      if(err) return cb(err);
+
+      m.labelImagePath = imagePath; 
+      delete m.hidden; // don't allow users to create hidden physicals
+      if(m.name && m.name[0] === '_') return cb(new Error("Name cannot begin with an underscore")); // if name begins with an underscore than these are hidden from the normal tree index output
+
+      saveMaterialInDB(m, curUser, 'p', function(err, id) {
         if(err) return cb(err);
+        if(!doPrint) return cb(null, id);
 
-        m.labelImagePath = imagePath; 
-        delete m.hidden; // don't allow users to create hidden physicals
-        if(m.name && m.name[0] === '_') return cb(new Error("Name cannot begin with an underscore")); // if name begins with an underscore than these are hidden from the normal tree index output
-
-        saveMaterialInDB(m, curUser, 'p', function(err, id) {
-          if(err) return cb(err);
-          if(!doPrint) return cb(null, id);
-
-          var relativePath = path.relative(settings.labelImageFilePath, imagePath);
-          printServer.printLabel(relativePath);
-          console.log("relative path:", relativePath);
-          cb(null, id);
-        });
-        console.log("saved with file", imagePath);
+        var relativePath = path.relative(settings.labelImageFilePath, imagePath);
+        printServer.printLabel(relativePath);
+        console.log("relative path:", relativePath);
+        cb(null, id);
       });
-    } else {
-      saveMaterialInDB(m, curUser, 'p', cb);
-      console.log("saved with no file");
-    }
+      console.log("saved with file", imagePath);
+    });
+  } else {
+    saveMaterialInDB(m, curUser, 'p', cb);
+    console.log("saved with no file");
+  }
 
-  });    
   console.log("saving:", m);
 }
 
@@ -470,10 +500,15 @@ websocket.createServer({server: server}, function(stream) {
         s.on('data', function(data) {
           if(!data.value.name.toLowerCase().match(query)) return;
           if(data.value.hidden) return; // skip hidden physicals
+
+          a.push(data.value);
+
+/*
           a.push({
             text: data.value.name,
             id: data.key
           });
+*/
         });
 
         s.on('error', function(err) {

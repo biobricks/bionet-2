@@ -124,7 +124,7 @@
                 console.log('updateAutocomplete: ', q)
                 app.remote.createAutocomplete(null, q, function(err, results) {
                     if (err) return cb(err)
-                        //console.log('updateAutocomplete results: ', JSON.stringify(results))
+                        console.log('updateAutocomplete results: ', JSON.stringify(results))
                     cb(null, results)
                 });
             }
