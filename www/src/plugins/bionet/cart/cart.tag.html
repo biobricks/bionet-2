@@ -52,6 +52,8 @@
             console.log('cart tag')
             const deleteCartItem = function(e, item) {
                 console.log('iconClick', item.id)
+                tag.results = []
+                tag.update()
                 cart.route('deleteCartItem', undefined, item.id)
             }
 
@@ -87,7 +89,7 @@
                     height: $(window).innerHeight() - 120,
                     display: 'block'
                 });
-                
+
             }
 
             const results = tag.results
