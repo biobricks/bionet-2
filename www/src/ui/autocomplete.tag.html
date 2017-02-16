@@ -13,7 +13,7 @@
 
     <div class="input-field col s12">
         <div class="query-container">
-            <input type="text" ref={opts.ref || opts.name || 'q'} name={opts.name || 'q'} id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
+            <input type="text" ref={opts.ref || opts.name || 'q'} name={opts.ref || opts.name || 'q'} id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
             <label for={opts.name || 'q'} class="active">Name</label>
         </div>
         <ul id="matchlist_q" class="matchlist">
@@ -46,7 +46,6 @@
         this.selected = null
 
         this.on('mount', function() {
-
             searchCallback = opts.searchCallback;
 
             this.updateMatchListPosition = function() {
@@ -84,7 +83,7 @@
                 if($(e.target).hasClass('no-match')) return;
 
                 var lis = $('#matchlist_q').find('li');
-        console.log('OOOOO', lis.length);
+
                 var i;
                 for(i = 0; i < lis.length; i++) {
 
@@ -128,12 +127,10 @@
             $(this.refs[opts.ref]).on('input', function(e) {
 
                 query(this.refs[opts.ref].value, function(err, results) {
-                    //console.log('autocomplete query:', JSON.stringify(results))
+
                     if (err) return; // TODO handle
 
                     tag.matches = results.virtuals || [];
-
-                    console.log('results: ', JSON.stringify(tag.matches))
 
                     if (tag.matches && tag.matches.length) {
                         selected = 0;
