@@ -381,13 +381,14 @@
                     const type = dbData.type
                     if (type) {
                         tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
-
+                        /*
                         if (type.indexOf('box') >= 0) {
                             //console.log('activating scanner')
                             app.dispatch('startScan', {
                                 status: 'init'
                             })
                         }
+                        */
                     }
 
                     console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)

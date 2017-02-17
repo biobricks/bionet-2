@@ -111,7 +111,7 @@
 
             partDataAccessor.addRoute('getVirtualResult', (virtualData) => {
                 console.log('part-specification, getVirtualResult:', JSON.stringify(virtualData))
-                tag.formData = virtualData;
+                tag.formData = JSON.parse(JSON.stringify(virtualData));
                 if (tag.formData.created) {
                     d.setTime(tag.formData.created.time * 1000)
                     tag.createdDate = d.toDateString()
