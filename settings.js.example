@@ -148,7 +148,7 @@ module.exports = {
       name: "organism",
       virtual: true,
       fields: {
-        Description: 'text',
+        Genotype: 'text',
         Sequence: 'text'
       }
     },{
