@@ -380,8 +380,9 @@
                     const dbData = node.data.dbData
                     const type = dbData.type
                     if (type) {
-                        tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
+                        tag.createType = 'storage'
                         /*
+                        tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
                         if (type.indexOf('box') >= 0) {
                             //console.log('activating scanner')
                             app.dispatch('startScan', {
