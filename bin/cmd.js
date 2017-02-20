@@ -303,7 +303,8 @@ function savePhysical(curUser, m, imageData, doPrint, cb, isUnique) {
   // if a container is specified by name
   if(m.selectContainer) {
     // check for name uniqueness
-    getBy('name', m.name, function(err, value) {
+    //getBy('name', m.name, function(err, value) {
+    getBy('name', m.selectContainer, function(err, value) {
       if(err) return cb(err);
       if(!value && !m.parent_id) {
         return cb(new Error("No valid container specified"));
