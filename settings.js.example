@@ -76,23 +76,108 @@ module.exports = {
 
   dataTypes: 
     [{
+      name: "lab",
+      fields: {
+        Description: 'text'
+      }
+    },{
       name: "-80 freezer",
       fields: {
+        Description: 'text',
         Shelf: 'text',
         Rack: 'text',
         Box: 'text'
       }
     },{
-      name: "room",
+      name: "-20 freezer",
+      fields: {
+        Description: 'text',
+        Shelf: 'text',
+        Rack: 'text',
+        Box: 'text'
+      }
+    },{
+      name: "-4 fridge",
+      fields: {
+        Description: 'text',
+        Shelf: 'text',
+        Rack: 'text',
+        Box: 'text'
+      }
+    },{
+      name: "freezer rack",
       fields: {
         Description: 'text'
       }
     },{
-      name: "plasmid",
-      virtual: true,
+      name: "8 x 12 freezer box",
+      fields: {
+        Description: 'text'
+      }
+    },{
+      name: "9 x 9 freezer box",
+      fields: {
+        Description: 'text'
+      }
+    },{
+      name: "freezer box",
+      fields: {
+        Description: 'text'
+      }
+    },{
+      name: "shelving unit",
+      fields: {
+        Description: 'text'
+      }
+    },{
+      name: "shelf",
+      fields: {
+        Description: 'text'
+      }
+    },{
+      name: "cabinet",
+      fields: {
+        Description: 'text'
+      }
+    },{
+      name: "drawer",
+      fields: {
+        Description: 'text'
+      }
     },{
       name: "organism",
-      virtual: true
+      virtual: true,
+      fields: {
+        Description: 'text',
+        Sequence: 'text'
+      }
+    },{
+      name: "vector",
+      virtual: true,
+      fields: {
+        Description: 'text',
+        Sequence: 'text'
+      }
+    },{
+      name: "single-stranded",
+      virtual: true,
+      fields: {
+        Description: 'text',
+        Sequence: 'text'
+      }
+    },{
+      name: "double-stranded",
+      virtual: true,
+      fields: {
+        Description: 'text',
+        Sequence: 'text'
+      }
+    },{
+      name: "chemical stock",
+      virtual: true,
+      fields: {
+        Description: 'text'
+      }
     }],
 
 
