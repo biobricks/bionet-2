@@ -56,15 +56,17 @@
     <h5 id="createVirtualHeader" ref="createVirtualHeader">Create {type}</h5>
     <form id="createPartForm" ref="createPartForm" class="col s12" onsubmit={submitForm}>
         <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+        <!--
         <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
-        <form-text-input label="Created by" ref="creator" name="creator.user" value={formData.creator.user}/>
-        <form-text-input label="Created" ref="created" name="creator.time" value={formData.creator.time}/>
+        <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
         <form-textarea-input label="Biosafety level" ref="bsl" name="bsl" value={formData.bsl}/>
         <form-switch label="Biohazardous?" ref="biohazard" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
+        -->
+        <form-text-input label="Created by" ref="creator" name="creator.user" value={formData.creator.user}/>
+        <form-text-input label="Created" ref="created" name="creator.time" value={formData.creator.time}/>
         <div each={field in fields}>
             <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
         </div>
-        <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
         <std-button label="submit" action={submitForm} />
         <input type="submit" style="visibility:hidden" />
     </form>
@@ -72,27 +74,20 @@
         const tag = this
         this.type = decodeURIComponent(opts.type)
         console.log('create-virtual-form, opts:%s', JSON.stringify(this.opts))
-            /*
-        <form-textarea-input label="Sequence" ref="sequence" name="sequence" value={formData.sequence}/>
-                creator: app.user.email,
-                created: new Date().toDateString(),
-            */
 
-        this.fields = app.getAttributesForType(this.type)
-
+        // initialize global attributes for virtual part
         app.state.createPart = app.state.createPart || {}
         this.formData = {
             type: this.type,
             name: '',
-            description: '',
             creator: {
                 user: app.user.email,
                 time: new Date().toDateString()
-            },
-            notes: '',
-            bsl: '',
-            biohazard: ''
+            }
         }
+        
+        // initialize schema attributes for virtual part
+        this.fields = app.getAttributesForType(this.type)
         for (var i = 0; i < this.fields.length; i++) {
             this.formData[this.fields[i].name] = ''
         }
