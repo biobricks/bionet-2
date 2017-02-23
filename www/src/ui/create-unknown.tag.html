@@ -11,7 +11,7 @@
             <div id="createNodeForm">
                 <form onsubmit={addNode}>
                     <h5>Create biomaterials</h5>
-                    <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete}/>
+                    <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete} placeholder='select virtual'/>
                     <form-text-input label="Instances" ref="instances" name="instances" value={formData.instances}/>
                     <div style="margin-top:30px"/>
                     <std-button label="add to workbench" action={addNode} />
@@ -185,7 +185,7 @@
                 }
                 parentId = node.data.dbData.id
 
-                // initialize series prefix and number of instances
+                // initialize series prefix and 
                 const seriesName = tag.refs.selectVirtual.value
                 const instances = tag.refs.instances.value
                 
