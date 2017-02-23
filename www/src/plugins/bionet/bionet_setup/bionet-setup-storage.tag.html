@@ -429,6 +429,10 @@
                     }
                 })
             })
+            
+            bionetSetup.observe((action) => {
+                bionetSetup.route('requestStorage')
+            })
 
             bionetSetup.route('requestStorage')
 

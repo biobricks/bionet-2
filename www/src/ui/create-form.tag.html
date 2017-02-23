@@ -537,6 +537,11 @@
             $('#edit-physical').css({
                 display: 'none'
             });
+            
+            bionetSetup.observe((action) => {
+                workbench.route('requestWorkbench')
+            })
+            
             workbench.route('requestWorkbench')
 
         })

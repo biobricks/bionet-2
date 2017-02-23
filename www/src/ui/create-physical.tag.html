@@ -106,6 +106,7 @@
                 }
 
                 app.ui.toast("Saved to database")
+                bionetSetup.dispatch({msg:'update'})
                     /*
                     setTimeout(function() {
                         route('edit-physical/' + encodeURIComponent(id) + '/');

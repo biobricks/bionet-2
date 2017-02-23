@@ -174,7 +174,7 @@
 
             tag.addNode = function(e) {
 
-                // get active node
+                // get active node if any selected
                 var node = $("#ftree").fancytree("getActiveNode");
                 const ftree = $("#ftree").fancytree("getTree");
 
@@ -185,34 +185,20 @@
                 }
                 parentId = node.data.dbData.id
 
-                // initialize storage type
-                //const active = $(e.target)
-                //const type = active.text()
-                const type = $('input[name=selectvirtual]:checked').val()
-
-                // generate unique name
-                const seriesName = $('#autocomplete_q').val()
-                    //const seriesName = tag.refs.selectVirtual.value
+                // initialize series prefix and number of instances
+                const seriesName = tag.refs.selectVirtual.value
                 const instances = tag.refs.instances.value
-                const attributes = app.getAttributesForType(type)
+                
+                // generate instances of physicals
                 for (var instance = 0; instance < instances; instance++) {
                     const name = seriesName + '_' + instance
-
                     // initialize standard attributes
                     const dbData = {
                         name: name,
-                        type: type,
                         parent_id: parentId
                     }
-
-                    // initialize attributes
-                    for (var i = 0; i < attributes.length; i++) {
-                        dbData[attributes[i].name] = type + ' ' + attributes[i].name
-                    }
                     console.log('addNode: %s', instances, JSON.stringify(dbData))
-
                     workbench.route('saveInWorkbench', undefined, dbData)
-                        //bionetSetup.route('createStorageItem', undefined, dbData)
                 }
             }
 

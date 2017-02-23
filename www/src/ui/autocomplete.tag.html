@@ -13,7 +13,7 @@
 
     <div class="input-field col s12">
         <div class="query-container">
-            <input type="text" ref={opts.ref || opts.name || 'q'} name={opts.ref || opts.name || 'q'} id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} />
+            <input type="text" ref={refName} name={opts.ref || opts.name || 'q'} id="autocomplete_q" placeholder="search for container" autocomplete="off" autofocus onblur={hideMatches} value={data}/>
             <label for={opts.name || 'q'} class="active">Name</label>
         </div>
         <ul id="matchlist_q" class="matchlist">
@@ -31,8 +31,8 @@
     <script>
         const tag = this
         var searchCallback;
-
-        opts.ref = opts.ref || 'q';
+        tag.refName = opts.ref || opts.name || 'q'
+        tag.data=''
 
         function query(s, cb) {
             if (!opts.searchcallback) return;
@@ -46,6 +46,19 @@
         this.selected = null
 
         this.on('mount', function() {
+            
+            if (tag.value === undefined) {
+                Object.defineProperty(tag, "value", {
+                    get: function() {
+                        return tag.refs[tag.refName].value;
+                    },
+                    set: function(value) {
+                        tag.data = value;
+                        tag.update();
+                    }
+                });
+            }
+            
             searchCallback = opts.searchCallback;
 
             this.updateMatchListPosition = function() {
@@ -63,7 +76,7 @@
             this.selectCurrent = function() {
 
                 var sel = this.matches[this.selected]
-                this.refs[opts.ref].value = sel.name
+                this.refs[tag.refName].value = sel.name
                 this.update()
                 this.hideMatches()
             }.bind(this)
@@ -100,7 +113,7 @@
 
             this.matches = []
 
-            $(this.refs[opts.ref]).keydown(function(e) {
+            $(this.refs[tag.refName]).keydown(function(e) {
                 if (e.keyCode === 38) { // up arrow
                     e.preventDefault()
                     if (this.selected !== null && this.selected > 0) this.selected--
@@ -124,9 +137,9 @@
                 $('#matchlist_q').css("display:block")
             }
 
-            $(this.refs[opts.ref]).on('input', function(e) {
+            $(this.refs[tag.refName]).on('input', function(e) {
 
-                query(this.refs[opts.ref].value, function(err, results) {
+                query(this.refs[tag.refName].value, function(err, results) {
 
                     if (err) return; // TODO handle
 
@@ -150,7 +163,7 @@
             } else {
                 $('#matchlist_q').css('border', 'none')
             }
-            var q = this.refs[opts.ref].value
+            var q = this.refs[tag.refName].value
             q = q.trim();
             q = q.replace(/\s+/g, ' ').toLowerCase()
 

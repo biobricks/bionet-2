@@ -169,6 +169,7 @@ var bionetSetup = {
 
         // process setup message
         bionetSetup.observe(function (setup) {
+            return;
             console.log('bionetSetup:', JSON.stringify(setup))
             console.log('Configuring entity:', setup.entityName)
             var i
