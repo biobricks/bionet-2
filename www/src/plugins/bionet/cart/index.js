@@ -51,6 +51,10 @@ var cart = {
                 cart.route('requestCart')
             })
         })
+        
+        cart.addRoute('deleteCartBatch', function (itemId) {
+            app.remote.delFromCart(itemId, function (err, result) {})
+        })
 
         require('./cart.tag.html')
 

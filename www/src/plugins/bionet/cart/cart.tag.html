@@ -1,6 +1,7 @@
 <cart>
     <div class="searchheight">
         <div class="searchresult">
+            <div if={results.length===0}>Cart is empty.</div>
             <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
                 <list-item class="searchItem" no-reorder each={item in results} item={item}>
                     <form-checkbox class={left-align} id={item.id}/>
@@ -8,6 +9,7 @@
             </div>
         </div>
         <div id="edit-physical" class="edititem">
+            <div if={results.length>0} onclick={emptyCart} class="right-align" style="margin-right:20px; color:teal; cursor: pointer; cursor: hand; ">empty cart</div>
             <create-physical show="false" top-margin="0px" />
         </div>
     </div>
@@ -123,6 +125,15 @@
         this.on('unmount', function() {
             this.searchresult = undefined
         })
+
+        tag.emptyCart = function() {
+            for (var i = 0; i < tag.results.length; i++) {
+                var item = tag.results[i]
+                cart.route('deleteCartBatch', undefined, item.id)
+            }
+            tag.results = []
+            tag.update()
+        }
 
     </script>
 </cart>

@@ -18,6 +18,7 @@
             <table id="ftree" style="margin-top:15px; width:400px;border:none !important;">
                 <colgroup>
                     <col width="390px"></col>
+                    <col width="75px"></col>
                     <!--
                 <col width="*"></col>
                 <col width="250px"></col>
@@ -34,6 +35,7 @@
                 -->
                 <tbody style="border: none !important;">
                     <tr>
+                        <td></td>
                         <td></td>
                         <!--
                     <td></td>
@@ -102,6 +104,7 @@
         const dataTypes = appSettings.dataTypes
         const bionetSetup = app.getStream('bionetSetup')
         tag.formData = {}
+        const cart = app.getStream('cart')
 
         // setup secondary nav
         app.dispatch(app.$.secondaryNav, [{
@@ -258,6 +261,12 @@
                 checkbox: true,
                 icon: false,
                 renderColumns: function(event, data) {
+                    const node = data.node
+                    const dbData = node.data.dbData
+                    if (!dbData.type || dbData.type === 'physical' || dbData.type === 'box') {
+                        const $tdList = $(node.tr).find(">td");
+                        $tdList.eq(1).html('<i class="material-icons right-align" style="cursor: pointer; cursor: hand; ">shopping_cart</i>');
+                    }
                     /*
                     console.log('tdlist:')
                     const node = data.node
@@ -290,6 +299,18 @@
                         bionetSetup.route('updateStorageItem', undefined, dbData)
                     }
                     */
+                },
+                click: function(event, data) {
+                    const node = data.node;
+                    console.log('data target:', data.targetType)
+                    if (!data.targetType) {
+                        const dbData = node.data.dbData
+                        console.log('adding item to cart:', JSON.stringify(dbData))
+                        cart.route('addToCart', undefined, {
+                            id: dbData.id,
+                            name: dbData.name
+                        })
+                    }
                 },
                 dnd5: {
                     // autoExpandMS: 400,
@@ -381,15 +402,15 @@
                     const type = dbData.type
                     if (type) {
                         tag.createType = 'storage'
-                        /*
-                        tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
-                        if (type.indexOf('box') >= 0) {
-                            //console.log('activating scanner')
-                            app.dispatch('startScan', {
-                                status: 'init'
-                            })
-                        }
-                        */
+                            /*
+                            tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
+                            if (type.indexOf('box') >= 0) {
+                                //console.log('activating scanner')
+                                app.dispatch('startScan', {
+                                    status: 'init'
+                                })
+                            }
+                            */
                     }
 
                     console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
@@ -429,7 +450,7 @@
                     }
                 })
             })
-            
+
             bionetSetup.observe((action) => {
                 bionetSetup.route('requestStorage')
             })
