@@ -337,7 +337,9 @@
                     dragDrag: function(node, data) {
                         data.dataTransfer.dropEffect = "move";
                     },
-                    dragEnd: function(node, data) {},
+                    dragEnd: function(node, data) {
+                            console.log('drag end')
+                    },
 
                     // --- Drop-support:
 
@@ -372,6 +374,13 @@
                             var sameTree = (data.otherNode.tree === data.tree);
 
                             data.otherNode.moveTo(node, data.hitMode);
+                            
+                            parentId = node.data.dbData.id
+                            const movedNode = data.otherNode.data.dbData
+                            movedNode.parent_id = parentId
+                            app.route('partDataAccessor','storePhysical',undefined,movedNode)
+                            console.log('drag other node other:%s node:%s',movedNode.name,node.data.dbData.name)
+                            
                         } else if (data.otherNodeData) {
                             // Drop Fancytree node from different frame or window, so we only have
                             // JSON representation available
