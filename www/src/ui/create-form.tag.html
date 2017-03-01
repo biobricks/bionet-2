@@ -102,6 +102,7 @@
             float: left;
             margin-left: 25px;
         }
+        
         .create-virtual {
             overflow: auto;
             width: calc(100% - 600px);
@@ -120,8 +121,6 @@
         const bionetSetup = app.getStream('bionetSetup')
         const workbench = app.getStream('workbench')
         var userWorkbench = {}
-        const treeView = app.getTheme().component.treeView
-
         app.dispatch(app.$.breadcrumbs, [{
             'label': 'workbench',
             'url': '/create'
@@ -346,7 +345,7 @@
             }.bind(this))
 
             const ftSettings = {
-                extensions: ["table", "gridnav", "dnd5"],
+                extensions: ["table", "gridnav", "dnd5", "persist"],
                 source: [],
                 checkbox: true,
                 icon: false,
@@ -456,7 +455,13 @@
                         }
                         node.setExpanded();
                     }
-                }
+                },
+                persist: {
+                    cookiePrefix: 'workbench',
+                    expandLazy: false,
+                    overrideSource: true, // true: cookie takes precedence over `source` data attributes.
+                    store: "auto" // 'cookie', 'local': use localStore, 'session': sessionStore
+                },
             }
 
             $("#ftree").fancytree(ftSettings);
@@ -538,11 +543,11 @@
             $('#edit-physical').css({
                 display: 'none'
             });
-            
+
             bionetSetup.observe((action) => {
                 workbench.route('requestWorkbench')
             })
-            
+
             workbench.route('requestWorkbench')
 
         })

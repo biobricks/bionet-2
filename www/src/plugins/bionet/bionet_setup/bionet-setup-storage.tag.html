@@ -405,8 +405,7 @@
 
             $("#ftree").fancytree(ftSettings);
             
-            //const treeView = new TreeViewComponent(ftSettings)
-            
+        
             $("#ftree").on('click dblclick keydown', function(e) {
                 if (e.type === 'keydown') {
                     if (e.which !== undefined && e.which !== 13) return
