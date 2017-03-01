@@ -1,7 +1,5 @@
 const riot = require('riot')
 import bionetapi from '../bionetapi'
-const jquery_fancytree = require('jquery.fancytree/dist/jquery.fancytree-all.js')
-const jquery_fancytree_dnd5 = require('jquery.fancytree/dist/src/jquery.fancytree.dnd5.js')
 
 require('./bionet-setup-storage.tag.html')
 require('./bionet-setup-schemas.tag.html')

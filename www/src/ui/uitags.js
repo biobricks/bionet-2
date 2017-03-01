@@ -26,3 +26,8 @@ require('./autocomplete.tag.html')
 require('./create-unknown.tag.html')
 require('./view-physical.tag.html')
 require('./virtual-autocomplete.tag.html')
+const Cookies = require('js-cookie')
+window.Cookies = Cookies
+require('jquery.fancytree/dist/jquery.fancytree-all.js')
+require('jquery.fancytree/dist/src/jquery.fancytree.dnd5.js')
+require('jquery.fancytree/dist/src/jquery.fancytree.persist.js')

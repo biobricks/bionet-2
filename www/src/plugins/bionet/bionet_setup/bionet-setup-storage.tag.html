@@ -255,6 +255,7 @@
                 stopPropagation: false
             });
 
+                //extensions: ["table", "gridnav", "dnd5", "persist"],
             const ftSettings = {
                 extensions: ["table", "gridnav", "dnd5", "persist"],
                 source: [],
@@ -403,6 +404,9 @@
             }
 
             $("#ftree").fancytree(ftSettings);
+            
+            //const treeView = new TreeViewComponent(ftSettings)
+            
             $("#ftree").on('click dblclick keydown', function(e) {
                 if (e.type === 'keydown') {
                     if (e.which !== undefined && e.which !== 13) return

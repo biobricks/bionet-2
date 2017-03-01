@@ -120,6 +120,7 @@
         const bionetSetup = app.getStream('bionetSetup')
         const workbench = app.getStream('workbench')
         var userWorkbench = {}
+        const treeView = app.getTheme().component.treeView
 
         app.dispatch(app.$.breadcrumbs, [{
             'label': 'workbench',
