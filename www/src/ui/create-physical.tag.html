@@ -98,22 +98,8 @@
         var savePhysical = function(p, labelImage) {
             var doPrint = labelImage ? true : false
             console.log('savePhysical, p=', JSON.stringify(p))
-            app.remote.savePhysical(p, labelImage, doPrint, function(err, id) {
-                if (err) {
-                    app.ui.toast("Error: " + err); // TODO improve
-                    if (cb) cb(err)
-                    return;
-                }
-
-                app.ui.toast("Saved to database")
-                bionetSetup.dispatch({msg:'update'})
-                    /*
-                    setTimeout(function() {
-                        route('edit-physical/' + encodeURIComponent(id) + '/');
-                    }, 500);
-                    */
-            })
-        }.bind(this)
+            app.route('partDataAccessor','storePhysical',undefined,p)
+        }
 
         /*
            TODO:

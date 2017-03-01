@@ -88,6 +88,10 @@ var igempart = {
                 }
                 toast(physicalData.name + ' saved')
                 app.dispatch('bioPhysicalQuery', physicalData.virtual_id)
+                app.dispatch('bionetSetup', {
+                    msg: 'update',
+                    data: physicalData
+                })
             })
         })
 
@@ -129,22 +133,22 @@ var igempart = {
         app.addStream('putPartData')
 
         app.observe('putPartData', (partData) => {
-            const partDataStr = JSON.stringify(partData)
-            console.log('submit', partDataStr)
-            app.putLocal(partData.name, partDataStr, function (err) {
-                const toast = app.getThemeMethod().toast
-                if (err) {
-                    toast('ERROR saving ' + partData.name)
-                    console.log('putPartData:', err)
-                } else {
-                    toast(partData.name + ' saved')
-                }
+                const partDataStr = JSON.stringify(partData)
+                console.log('submit', partDataStr)
+                app.putLocal(partData.name, partDataStr, function (err) {
+                    const toast = app.getThemeMethod().toast
+                    if (err) {
+                        toast('ERROR saving ' + partData.name)
+                        console.log('putPartData:', err)
+                    } else {
+                        toast(partData.name + ' saved')
+                    }
+                })
             })
-        })
-        //----------------------------------------------------------------------------
-        // web components
-        //    require('./part-list.tag.html')
-        //    require('./part-form.tag.html')
+            //----------------------------------------------------------------------------
+            // web components
+            //    require('./part-list.tag.html')
+            //    require('./part-form.tag.html')
 
         // TODO remove these
         app.addStreamRouter('createPart');
