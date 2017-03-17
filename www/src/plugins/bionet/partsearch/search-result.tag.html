@@ -47,6 +47,13 @@
     </style>
 
     <script>
+        
+        const searchResult = require('./index.js')
+        
+        console.log('search result, before test')
+        searchResult.test();
+        console.log('search result, after test')
+        
         const tag = this
         tag.theme = app.getTheme()
         tag.results = []

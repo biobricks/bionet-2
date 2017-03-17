@@ -1,6 +1,7 @@
 const riot = require('riot')
 import nanoStream from '../../app/NanoStream';
 import scanner from './scanner'
+import labStorage from './labStorage'
 import bionetScannerApi from './bionetScannerApi'
 import scanProcessor from './scanProcessor'
 
@@ -58,7 +59,6 @@ bionetScanPlugin.runScanner = function () {
     //-------------------------------------------------------------------------
     // local streams
     console.log('runScanner')
-    const plugins = [];
     const s = {};
 
     // create streams
@@ -109,9 +109,10 @@ bionetScanPlugin.runScanner = function () {
     const GAME_HEIGHT = 1120;
     //PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
     //backgroundColor: 0x000000,
+    //backgroundColor: 0x303030,
     //alpha:0.8,
     const renderer = new PIXI.WebGLRenderer(GAME_WIDTH, GAME_HEIGHT, {
-        backgroundColor: 0x303030,
+        backgroundColor: 0xffffff,
         transparent: false,
         resolution: window.devicePixelRatio,
         autoResize: true
@@ -131,7 +132,7 @@ bionetScanPlugin.runScanner = function () {
         var ratio = Math.min(window.innerWidth / GAME_WIDTH, window.innerHeight / GAME_HEIGHT);
 
         // Scale the view appropriately to fill that dimension
-        stage.scale.x = stage.scale.y = ratio *0.85;
+        stage.scale.x = stage.scale.y = ratio * 0.85;
 
         // Update the renderer dimensions
         //renderer.resize(Math.ceil(GAME_WIDTH * ratio), Math.ceil(GAME_HEIGHT * ratio));
@@ -142,11 +143,13 @@ bionetScanPlugin.runScanner = function () {
 
     //-------------------------------------------------------------------------
     // initialize plugins
-    plugins.push(scanner);
+    labStorage.init(s,stage)
     scanner.init(s, stage)
-
+    
     //-------------------------------------------------------------------------
     // dispatch plugin load resources event
+    const loader = PIXI.loader;
+    loader.reset()
     s.controller.dispatch({
         cmd: 'load'
     })
@@ -172,7 +175,6 @@ bionetScanPlugin.runScanner = function () {
 
     //-------------------------------------------------------------------------
     // preload resources and start frame updates
-    const loader = PIXI.loader;
     loader.load((loader, resources) => {
         s.controller.dispatch({
             cmd: 'ready',

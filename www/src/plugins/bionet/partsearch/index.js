@@ -2,6 +2,9 @@ const riot = require('riot')
 import bionetapi from '../bionetapi'
 
 var partsearch = {
+    test: function() {
+        console.log('calling test from search tag');
+    },
     init: function () {
 
         //-------------------------------------------------------------------------
