@@ -107,8 +107,7 @@
         const cart = app.getStream('cart')
 
         // setup secondary nav
-        // TODO: messaging - error or application state
-        app.dispatch(app.$.secondaryNav, [{
+        app.setSecondaryNav([{
             label: 'storage',
             action: '/bionetsetup/storage'
         }, {

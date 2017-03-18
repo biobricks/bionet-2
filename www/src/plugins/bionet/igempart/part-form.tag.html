@@ -6,9 +6,8 @@
     </div>
     <script>
         this.theme = app.getTheme()
-            // setup secondary nav
-        // TODO: messaging - error or application state
-        app.dispatch(app.$.secondaryNav, [{
+        // setup secondary nav
+        app.setSecondaryNav([{
             label: 'virtual properties',
             icon: undefined,
             action: '/edit/' + opts.partID + '/specs'

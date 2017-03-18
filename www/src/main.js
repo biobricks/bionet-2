@@ -97,13 +97,11 @@ function connector(cb) {
         }, function (err, userData) {
             if (err) {
                 console.log("Not logged in");
-                // TODO: messaging - error or application state
-                app.dispatch('loginState', false);
+                app.setLoginState(false);
                 cb(null, remote);
             } else {
                 console.log("Logged in as: ", userData.user.email);
-                // TODO: messaging - error or application state
-                app.dispatch('loginState', true);
+                app.setLoginState(true);
                 cb(null, remote, userData.user);
             }
         });

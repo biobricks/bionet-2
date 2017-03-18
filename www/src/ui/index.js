@@ -78,8 +78,7 @@ stdThemePlugin.start = function () {
         switch (update.setting) {
             case 'colorScheme':
                 const color = (update.value === 'light') ? colorScheme.light : colorScheme.dark
-                // TODO: messaging - error or application state
-                app.dispatch(app.$.theme, {
+                app.setTheme({
                     name: 'color',
                     value: color
                 })
@@ -93,21 +92,18 @@ stdThemePlugin.start = function () {
         enableSubbar: false
     })
 
-    // TODO: messaging - error or application state
-    if (app.getLoginState()) app.dispatch(app.$.primaryNav, loggedInNav)
-    else app.dispatch(app.$.primaryNav, loggedOutNav)
+    if (app.getLoginState()) app.setPrimaryNav(loggedInNav)
+    else app.setPrimaryNav(loggedOutNav)
 
     // login state
     app.addObserver(app.$.loginState, (loginState) => {
         const toast = app.getThemeMethod().toast
         if (loginState) {
             toast('logged into bionet')
-            // TODO: messaging - error or application state
-            app.dispatch(app.$.primaryNav, loggedInNav)
+            app.setPrimaryNav(loggedInNav)
         } else {
             toast('logged out of bionet')
-            // TODO: messaging - error or application state
-            app.dispatch(app.$.primaryNav, loggedOutNav)
+            app.setPrimaryNav(loggedOutNav)
         }
     })
 

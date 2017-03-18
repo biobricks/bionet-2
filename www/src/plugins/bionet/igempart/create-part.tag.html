@@ -8,8 +8,7 @@
         this.themeClass = theme.style.color.background + ' ' + theme.style.color.text
 
         // setup secondary nav
-        // TODO: messaging - error or application state
-        app.dispatch(app.$.secondaryNav, [{
+        app.setSecondaryNav([{
             label: 'virtual properties',
             icon: undefined,
             action: '/create-virtual/' + this.opts.type

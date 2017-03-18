@@ -251,8 +251,7 @@
             if (opts.physicalID) {
                 app.remote.get(opts.physicalID, function(err, data) {
                     if (err) {
-                        // TODO: messaging - error or application state
-                        app.dispatch('error', err)
+                        app.error(err)
                         return
                     }
                     this.formData = data

@@ -283,13 +283,24 @@ class App extends EventEmitter {
         app.dispatch(app.$.breadcrumbs, breadcrumbs)
     }
 
-    error() {
-
+    error(err) {
+        app.dispatch('error', err)
+    }
+    
+    setPrimaryNav(nav) {
+        app.dispatch(app.$.primaryNav, nav)
+    }
+    
+    setSecondaryNav(nav) {
+        app.dispatch(app.$.secondaryNav, nav)
     }
 
     // theme methods
     getTheme() {
         return this.getModel(this.$.theme)
+    }
+    setTheme(theme) {
+        app.dispatch(app.$.theme, theme)
     }
 
     getThemeMethod() {

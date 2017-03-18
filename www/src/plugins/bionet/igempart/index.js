@@ -124,8 +124,7 @@ var igempart = {
             app.getLocal(id, function (err, value) {
                 if (err) {
                     console.log('getPartData:error reading part:', id, err)
-                    // TODO: messaging - error or application state
-                    app.dispatch('error', err)
+                    app.error(err)
                 } else {
                     const item = JSON.parse(value)
                     console.log('retrieved item:', JSON.stringify(item))
@@ -224,8 +223,7 @@ var igempart = {
                 app.remote.get(id, function (err, data) {
 
                     if (err) {
-                        // TODO: messaging - error or application state
-                        app.dispatch('error', err)
+                        app.error(err)
                         return
                     }
                     cb(data);

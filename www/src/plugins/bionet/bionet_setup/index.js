@@ -134,8 +134,7 @@ var bionetSetup = {
         bionetSetup.addRoute('getPhysical', function (id) {
             app.remote.get(id, function (err, data) {
                 if (err) {
-                    // TODO: messaging - error or application state
-                    app.dispatch('error', err)
+                    app.error(err)
                     return
                 }
                 // TODO: messaging async api call

@@ -39,9 +39,7 @@ var appmain = {
       action: '/#!/help'
     }]
 
-    // TODO: messaging - error or application state
-    app.dispatch(app.$.primaryNav, loggedOutNav)
-
+    app.setPrimaryNav(loggedOutNav)
 
     // signup process
     const signupClient = app.addStream('signupClient')
