@@ -46,6 +46,7 @@ var partsearch = {
 
         app.observe('bioPhysicalQuery', (q) => {
             app.remote.instancesOfVirtual(q, function (err, data) {
+                // TODO: messaging async api call
                 app.route('searchResult', 'updateList', 'toListItem', data)
             })
         })
@@ -114,12 +115,12 @@ var partsearch = {
         //---------------------------------------------------------------------
         // search route
         const globalSearch = function (terms) {
-            app.dispatch(app.$.appBarConfig, {
+            app.appbarConfig({
                 enableTopNav: true,
                 enableBreadCrumbs: true,
                 enableSubbar: false
             })
-
+            
             // todo: handle pagination
             const q = route.query()
             if (q.page !== undefined) {

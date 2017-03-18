@@ -98,6 +98,7 @@
         var savePhysical = function(p, labelImage) {
             var doPrint = labelImage ? true : false
             console.log('savePhysical, p=', JSON.stringify(p))
+            // TODO: messaging async api call
             app.route('partDataAccessor','storePhysical',undefined,p)
         }
 
@@ -250,6 +251,7 @@
             if (opts.physicalID) {
                 app.remote.get(opts.physicalID, function(err, data) {
                     if (err) {
+                        // TODO: messaging - error or application state
                         app.dispatch('error', err)
                         return
                     }

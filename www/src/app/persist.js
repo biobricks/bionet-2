@@ -30,6 +30,7 @@ const persist = {
         const streamItem = JSON.parse(data.value);
         //console.log('readStream:' + data.key, '=', JSON.stringify(streamItem));
         if (streamItem.id !== undefined) {
+          // TODO: messaging - async api
           app.dispatch('searchResult', streamItem)
         }
       })

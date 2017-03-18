@@ -28,7 +28,7 @@ var search = {
     var distance = q.params['d']
     var locationid = q.params['l'] || 'LAB'
 
-
+        // TODO: messaging - async api
       app.dispatch('bioClassQuery', q)
       console.log('search query:',JSON.stringify(q))
       app.dispatch('bioClassCache', [])

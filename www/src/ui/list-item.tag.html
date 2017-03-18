@@ -26,6 +26,7 @@
             e.preventDefault()
             e.stopPropagation()
             console.log('adding item to cart:', tag.item.id)
+            // TODO: messaging async api call
             cart.route('addToCart', undefined, {
                 id: tag.item.id,
                 name: tag.item.primary_text

@@ -52,8 +52,7 @@
             action: '/bionetsetup/strains'
         }])
 
-        // configure app bar
-        app.dispatch(app.$.appBarConfig, {
+        app.appbarConfig({
             enableTopNav: true,
             enableBreadCrumbs: true,
             enableSubbar: true
@@ -91,7 +90,7 @@
 
         this.on('mount', function() {
         // initialize breadcrumbs
-        app.dispatch(app.$.breadcrumbs, [{
+        app.setBreadcrumbs([{
             'label': 'configure',
             'url': '/'
         }, {

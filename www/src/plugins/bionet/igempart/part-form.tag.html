@@ -7,6 +7,7 @@
     <script>
         this.theme = app.getTheme()
             // setup secondary nav
+        // TODO: messaging - error or application state
         app.dispatch(app.$.secondaryNav, [{
             label: 'virtual properties',
             icon: undefined,
@@ -22,7 +23,7 @@
         }])
 
         // initialize breadcrumbs
-        app.dispatch(app.$.breadcrumbs, [{
+        app.setBreadcrumbs([{
             'label': 'inventory',
             'url': '/'
         }, {
@@ -31,7 +32,7 @@
         }]);
 
         // configure app bar
-        app.dispatch(app.$.appBarConfig, {
+        app.appbarConfig({
             enableTopNav: true,
             enableBreadCrumbs: true,
             enableSubbar: true
@@ -342,6 +343,7 @@
 
         this.on('mount', function() {
             tag.formData = app.state.editPart
+            // TODO: messaging - async api
             app.dispatch('bioPhysicalQuery', tag.formData.id)
         })
 
@@ -362,6 +364,7 @@
             partData.name = tag.refs.datamatrix.value
             partData.cassetteid = tag.refs.cassette.value
             console.log('part-instance tag submit:', JSON.stringify(partData))
+            // TODO: messaging async api call
             app.route('partDataAccessor', 'storePhysical', 'toPhysicalItem', partData)
         }
 

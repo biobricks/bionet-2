@@ -142,16 +142,18 @@ class App extends EventEmitter {
                     //console.log('retrieved userSettings:', JSON.stringify(settingsObj))
             }
             settings.init(settingsObj)
+
+            // TODO: messaging - plugins
             thisModule.dispatch(thisModule.$.plugin, 'start')
 
             thisModule.startRouter()
-            
+
             var interval = setInterval(function () {
                 app.remote.foo('foo message', function (err) {
-                        console.log('foo message response')
-                    })
+                    console.log('foo message response')
+                })
             }, 30 * 1000)
-            
+
         })
     }
 
@@ -269,6 +271,22 @@ class App extends EventEmitter {
         return this.getModel(this.$.loginState)
     }
 
+    setLoginState(newState) {
+        app.dispatch(app.$.loginState, newState)
+    }
+
+    appbarConfig(config) {
+        app.dispatch(app.$.appBarConfig, config)
+    }
+
+    setBreadcrumbs(breadcrumbs) {
+        app.dispatch(app.$.breadcrumbs, breadcrumbs)
+    }
+
+    error() {
+
+    }
+
     // theme methods
     getTheme() {
         return this.getModel(this.$.theme)
@@ -298,7 +316,7 @@ class App extends EventEmitter {
             if (type === dataType.name) {
                 var fields = dataType.fields
                 if (fields === undefined) return attributes
-                Object.keys(fields).forEach(function(key, index) {
+                Object.keys(fields).forEach(function (key, index) {
                     attributes.push({
                         name: key,
                         value: fields[key]

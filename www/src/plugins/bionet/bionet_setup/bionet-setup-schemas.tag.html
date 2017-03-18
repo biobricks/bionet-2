@@ -41,6 +41,7 @@
         const tag = this
 
         // setup secondary nav
+        // TODO: messaging - error or application state
         app.dispatch(app.$.secondaryNav, [{
             label: 'storage',
             action: '/bionetsetup/storage'
@@ -53,7 +54,7 @@
         }])
 
         // configure app bar
-        app.dispatch(app.$.appBarConfig, {
+        app.appbarConfig({
             enableTopNav: true,
             enableBreadCrumbs: true,
             enableSubbar: true
@@ -80,7 +81,7 @@
         this.on('mount', function() {
 
             // initialize breadcrumbs
-            app.dispatch(app.$.breadcrumbs, [{
+            app.setBreadcrumbs([{
                 'label': 'configure',
                 'url': '/'
             }, {
@@ -115,13 +116,15 @@
                 ftree.reload(schemaData)
                     //$("#ftree").editableTableWidget();
             })
-
+            
+            // TODO: messaging async api call
             bionetSetup.route('requestSchemas')
         })
 
 
         this.runSetup = function() {
             console.log('Run setup')
+            // TODO: messaging - async api
             app.dispatch('bionetSetup', setup)
         }
 

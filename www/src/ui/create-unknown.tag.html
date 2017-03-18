@@ -157,6 +157,7 @@
                     const node = deleteNodes[i]
                     const id = node.data.dbData.id
                     console.log('removing %s %s', node.title, id)
+                    // TODO: messaging async api call
                     bionetSetup.route('delPhysical', undefined, id)
                     node.remove()
                 }
@@ -199,6 +200,7 @@
                         parent_id: parentId
                     }
                     console.log('addNode: %s', instances, JSON.stringify(dbData))
+                    // TODO: messaging async api call
                     workbench.route('saveInWorkbench', undefined, dbData)
                 }
             }

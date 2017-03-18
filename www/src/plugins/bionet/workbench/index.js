@@ -10,6 +10,7 @@ var workbench = {
             console.log('requestWorkbench')
             app.remote.getWorkbench(function (err, userWorkbench) {
                 console.log('requestWorkbench result:', JSON.stringify(userWorkbench), err)
+                // TODO: messaging async api call
                 workbench.route('requestWorkbenchResult', undefined, userWorkbench)
             })
         })
@@ -98,6 +99,7 @@ var workbench = {
                     //console.log('inventory step 2:', JSON.stringify(treeNodes,null,2))
                     //bionetSetup.route('storage', undefined, treeNodes)
 
+                // TODO: messaging async api call
                 workbench.route('getWorkbenchTreeResult', undefined, treeNodes)
             })
         })
@@ -111,6 +113,7 @@ var workbench = {
                   return;
                 }
                 console.log('saveInWorkbench result:', JSON.stringify(result))
+                // TODO: messaging async api call
                 workbench.route('requestWorkbench')
             })
         })
@@ -118,15 +121,15 @@ var workbench = {
         require('./workbench.tag.html')
 
         const workbenchRouter = function (q) {
-
-            app.dispatch(app.$.appBarConfig, {
+            
+            app.appbarConfig({
                 enableTopNav: true,
                 enableBreadCrumbs: true,
                 enableSubbar: false
             })
 
             // todo: set inventory item
-            app.dispatch(app.$.breadcrumbs, [{
+            app.setBreadcrumbs([{
                 'label': 'workbench',
                 'url': '/inventory'
             }]);

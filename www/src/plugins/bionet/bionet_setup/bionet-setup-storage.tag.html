@@ -107,6 +107,7 @@
         const cart = app.getStream('cart')
 
         // setup secondary nav
+        // TODO: messaging - error or application state
         app.dispatch(app.$.secondaryNav, [{
             label: 'storage',
             action: '/bionetsetup/storage'
@@ -119,7 +120,7 @@
         }])
 
         // configure app bar
-        app.dispatch(app.$.appBarConfig, {
+        app.appbarConfig({
             enableTopNav: true,
             enableBreadCrumbs: true,
             enableSubbar: false
@@ -158,7 +159,7 @@
             for (var i = 0; i < attributes.length; i++) {
                 dbData[attributes[i].name] = type + ' ' + attributes[i].name
             }
-
+            // TODO: messaging async api call
             bionetSetup.route('createStorageItem', undefined, dbData)
         }
 
@@ -212,6 +213,7 @@
                 const node = deleteNodes[i]
                 const id = node.data.dbData.id
                 console.log('removing %s %s', node.title, id)
+                // TODO: messaging async api call
                 bionetSetup.route('delPhysical', undefined, id)
                 node.remove()
             }
@@ -219,15 +221,6 @@
 
         this.on('mount', function() {
             // initialize breadcrumbs
-            /*
-            app.dispatch(app.$.breadcrumbs, [{
-                'label': 'configure',
-                'url': '/'
-            }, {
-                'label': 'storage',
-                'url': '/bionetsetup/storage'
-            }]);
-            */
 
             tag.materials = []
             tag.locations = []
@@ -307,6 +300,7 @@
                     if (!data.targetType) {
                         const dbData = node.data.dbData
                         console.log('adding item to cart:', JSON.stringify(dbData))
+                        // TODO: messaging async api call
                         cart.route('addToCart', undefined, {
                             id: dbData.id,
                             name: dbData.name
@@ -379,6 +373,7 @@
                             parentId = node.data.dbData.id
                             const movedNode = data.otherNode.data.dbData
                             movedNode.parent_id = parentId
+                            // TODO: messaging async api call
                             app.route('partDataAccessor', 'storePhysical', undefined, movedNode)
                             console.log('drag other node other:%s node:%s', movedNode.name, node.data.dbData.name)
 
@@ -433,13 +428,14 @@
 
                     console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
                     tag.update()
+                    // TODO: messaging async api call
                     bionetSetup.route('getPhysical', undefined, dbData.id)
                     if (e.type === 'keydown') node.setExpanded()
                     $('.edit-physical').css({
                         height: $(window).innerHeight() - 120
                     });
 
-                    app.dispatch(app.$.breadcrumbs, [{
+                    app.setBreadcrumbs([{
                         'label': 'local inventory',
                         'url': '/inventory'
                     }, {
@@ -470,15 +466,18 @@
             })
 
             bionetSetup.observe((msg) => {
+                // TODO: messaging async api call
                 bionetSetup.route('requestStorage')
             })
 
+            // TODO: messaging async api call
             bionetSetup.route('requestStorage')
 
         })
 
         this.runSetup = function() {
             console.log('Run setup')
+            // TODO: messaging async api call
             app.dispatch('bionetSetup', setup)
         }
 

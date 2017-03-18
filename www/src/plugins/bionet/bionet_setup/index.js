@@ -36,6 +36,7 @@ var bionetSetup = {
                 }
                 schemaData.push(node)
             }
+            // TODO: messaging async api call
             bionetSetup.route('schemas', undefined, schemaData)
         })
 
@@ -108,6 +109,7 @@ var bionetSetup = {
                         }
                     })
                     //console.log('inventory step 2:', JSON.stringify(treeNodes,null,2))
+                // TODO: messaging async api call
                 bionetSetup.route('storage', undefined, treeNodes)
             });
         })
@@ -123,6 +125,7 @@ var bionetSetup = {
                 console.log('createStorageItem saved, id:', id)
                 const updatedStorageItem = JSON.parse(JSON.stringify(storageItem))
                 updatedStorageItem.id = id
+                // TODO: messaging async api call
                 bionetSetup.route('createStorageItemResult', undefined, updatedStorageItem)
             })
         })
@@ -131,9 +134,11 @@ var bionetSetup = {
         bionetSetup.addRoute('getPhysical', function (id) {
             app.remote.get(id, function (err, data) {
                 if (err) {
+                    // TODO: messaging - error or application state
                     app.dispatch('error', err)
                     return
                 }
+                // TODO: messaging async api call
                 bionetSetup.route('getPhysicalResult', undefined, data)
             })
         })

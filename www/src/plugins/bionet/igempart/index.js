@@ -25,6 +25,7 @@ var igempart = {
         app.observe('getPartsList', (q) => {
             // todo replace readTestData with bionet query
             app.readTestData(function (streamItems) {
+                // TODO: messaging - async api
                 app.dispatch('partsList', streamItems)
             })
         })
@@ -32,6 +33,7 @@ var igempart = {
 
         partDataAccessor.addRoute('cache', (partData) => {
             //console.log('partDataAccessor store:',JSON.stringify(partData))
+            // TODO: messaging - async api
             app.dispatch('partData', partData)
         })
 
@@ -87,6 +89,7 @@ var igempart = {
                     return;
                 }
                 toast(physicalData.name + ' saved')
+                // TODO: messaging - async api
                 app.dispatch('bioPhysicalQuery', physicalData.virtual_id)
                 app.dispatch('bionetSetup', {
                     msg: 'update',
@@ -121,10 +124,12 @@ var igempart = {
             app.getLocal(id, function (err, value) {
                 if (err) {
                     console.log('getPartData:error reading part:', id, err)
+                    // TODO: messaging - error or application state
                     app.dispatch('error', err)
                 } else {
                     const item = JSON.parse(value)
                     console.log('retrieved item:', JSON.stringify(item))
+                    // TODO: messaging - async api
                     app.dispatch('partData', item)
                 }
             })
@@ -219,6 +224,7 @@ var igempart = {
                 app.remote.get(id, function (err, data) {
 
                     if (err) {
+                        // TODO: messaging - error or application state
                         app.dispatch('error', err)
                         return
                     }
@@ -230,6 +236,7 @@ var igempart = {
 
         partDataAccessor.addRoute('getVirtual', (virtualId) => {
             getMaterial(virtualId, (virtualData) => {
+                // TODO: messaging async api call
                 partDataAccessor.route('getVirtualResult', undefined, virtualData)
             })
         })

@@ -49,7 +49,6 @@
     <script>
         
         const searchResult = require('./index.js')
-        
         console.log('search result, before test')
         searchResult.test();
         console.log('search result, after test')
@@ -83,10 +82,14 @@
                 
                 if (item.id.indexOf('p-') >= 0) {
                     riot.mount('#edititem','create-physical',{topMargin:0})
+                    
+                    // TODO: messaging async api call
                     bionetSetup.route('getPhysical', undefined, item.id)
                     tag.itemType='p'
                 } else if (item.id.indexOf('v-') >= 0) {
                     riot.mount('#edititem','part-specification')
+                    
+                    // TODO: messaging async api call
                     partDataAccessor.route('getVirtual', undefined, item.id)
                     tag.itemType='v'
                 } else {
@@ -95,7 +98,7 @@
                 console.log('itemClick, type:%s %s', tag.itemType, JSON.stringify(item))
                 tag.update()
                 
-                app.dispatch(app.$.breadcrumbs, [{
+                app.setBreadcrumbs([{
                     'label': 'global search',
                     'url': '/search'
                 }, {
@@ -120,7 +123,8 @@
                 $('#search-label').addClass('active')
             }
 
-            app.dispatch(app.$.breadcrumbs, breadcrumbs);
+            // TODO: messaging - error or application state
+            app.setBreadcrumbs(breadcrumbs);
             $('#search-form').submit(function(e) {
                 console.log('search-form submit')
                 tag.searchClick(e)

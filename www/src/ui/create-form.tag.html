@@ -121,7 +121,7 @@
         const bionetSetup = app.getStream('bionetSetup')
         const workbench = app.getStream('workbench')
         var userWorkbench = {}
-        app.dispatch(app.$.breadcrumbs, [{
+        app.setBreadcrumbs([{
             'label': 'workbench',
             'url': '/create'
         }])
@@ -498,6 +498,7 @@
                         */
 
                     tag.update()
+                    // TODO: messaging async api call
                     bionetSetup.route('getPhysical', undefined, dbData.id)
                     if (e.type === 'keydown') node.setExpanded()
                     $('#edit-physical').css({
@@ -505,7 +506,7 @@
                         display: 'block'
                     });
 
-                    app.dispatch(app.$.breadcrumbs, [{
+                    app.setBreadcrumbs([{
                         'label': 'workbench',
                         'url': '/inventory'
                     }, {
@@ -521,6 +522,7 @@
 
             workbench.addRoute('requestWorkbenchResult', function(uw) {
                 userWorkbench = uw
+                // TODO: messaging async api call
                 workbench.route('getWorkbenchTree', undefined, userWorkbench)
             })
 
@@ -545,9 +547,11 @@
             });
 
             bionetSetup.observe((action) => {
+                // TODO: messaging async api call
                 workbench.route('requestWorkbench')
             })
-
+            
+            // TODO: messaging async api call
             workbench.route('requestWorkbench')
 
         })

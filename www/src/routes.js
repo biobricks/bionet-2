@@ -14,7 +14,7 @@ function isUUID(str) {
 }
 
 route('/', function () {
-    app.dispatch(app.$.appBarConfig, {
+    app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false
@@ -29,13 +29,13 @@ route('/logout', function () {
         if (err) {
             app.ui.toast("Error logout route: " + err) // TODO handle better
         }
-        app.dispatch(app.$.loginState, false)
+        app.setLoginState(false)
         route('/');
     });
 })
 
 route('/create-unknown/*', function (name) {
-    app.dispatch(app.$.appBarConfig, {
+    app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false
@@ -44,7 +44,7 @@ route('/create-unknown/*', function (name) {
 })
 
 route('/create', function () {
-    app.dispatch(app.$.appBarConfig, {
+    app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: true,
         enableSubbar: false
@@ -53,7 +53,7 @@ route('/create', function () {
 })
 
 route('/scan', function () {
-    app.dispatch(app.$.appBarConfig, {
+    app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false
@@ -63,7 +63,7 @@ route('/scan', function () {
 
 
 route('/p/*', function (id) {
-    app.dispatch(app.$.appBarConfig, {
+    app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false
@@ -77,7 +77,7 @@ route('/p/*', function (id) {
 
 // TODO remove again
 route('/print', function () {
-    app.dispatch(app.$.appBarConfig, {
+    app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false
@@ -86,8 +86,7 @@ route('/print', function () {
 })
 
 function editPhysicalRoute(typeOrID) {
-
-    app.dispatch(app.$.appBarConfig, {
+    app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false
@@ -116,7 +115,7 @@ route('/edit-physical/*', editPhysicalRoute);
 
 function createPhysicalRoute(typeOrID, q) {
 
-    app.dispatch(app.$.appBarConfig, {
+    app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false
@@ -147,7 +146,7 @@ route('/create-physical/*/..', function (typeOrID) {
 
 
 route('/foo', function () {
-    app.dispatch(app.$.appBarConfig, {
+    app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false

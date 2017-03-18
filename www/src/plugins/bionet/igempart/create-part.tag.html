@@ -8,6 +8,7 @@
         this.themeClass = theme.style.color.background + ' ' + theme.style.color.text
 
         // setup secondary nav
+        // TODO: messaging - error or application state
         app.dispatch(app.$.secondaryNav, [{
             label: 'virtual properties',
             icon: undefined,
@@ -23,7 +24,7 @@
         }])
 
         // initialize breadcrumbs
-        app.dispatch(app.$.breadcrumbs, [{
+        app.setBreadcrumbs([{
             'label': 'inventory',
             'url': '/'
         }, {
@@ -32,7 +33,7 @@
         }]);
 
         // configure app bar
-        app.dispatch(app.$.appBarConfig, {
+        app.appbarConfig({
             enableTopNav: true,
             enableBreadCrumbs: true,
             enableSubbar: false

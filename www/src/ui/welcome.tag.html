@@ -72,8 +72,10 @@
             const q = {
                 q: this.refs.searchbio.value
             }
+            // TODO: messaging - async api
             app.dispatch('bioClassQuery', q)
             console.log('search query:', JSON.stringify(q))
+            // TODO: messaging - async api
             app.dispatch('bioClassCache', [])
             route('search/' + encodeURIComponent(this.refs.searchbio.value))
         }.bind(this)
@@ -178,11 +180,8 @@
                     if (err) return app.ui.toast("Login failed: " + err) // TODO better error handling
 
                     app.state.signup = {} // reset signup state
-
-                    // TODO get rid of this
-                    // UI components should listen for app.user change
-                    app.dispatch(app.$.loginState, true)
-
+                    app.setLoginState(true)
+                    
                     riot.mount('div#home-page-content', 'mpassword-form')
                 })
             }.bind(this))

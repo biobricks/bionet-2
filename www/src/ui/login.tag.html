@@ -31,13 +31,13 @@
             app.login(this.refs.username.value, this.refs.loginpassword.value, function(err, user) {
                 if (err) {
                     app.ui.toast("Wrong username or password") // TODO better error handling
-                    app.dispatch(app.$.loginState, false)
+                    app.setLoginState(false)
                     return;
                 }
                 this.refs.username.value = ''
                 this.refs.loginpassword.value = ''
                 this.closeLogin()
-                app.dispatch(app.$.loginState, true)
+                app.setLoginState(true)
             }.bind(this));
         }.bind(this)
 

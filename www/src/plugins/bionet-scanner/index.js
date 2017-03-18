@@ -41,7 +41,7 @@ bionetScanPlugin.start = function () {
     //-------------------------------------------------------------------------
     // routes
     app.addRoute('/scanner', function () {
-        app.dispatch(app.$.appBarConfig, {
+        app.appbarConfig({
             enableTopNav: false,
             enableBreadCrumbs: false,
             enableSubbar: false
@@ -143,9 +143,9 @@ bionetScanPlugin.runScanner = function () {
 
     //-------------------------------------------------------------------------
     // initialize plugins
-    labStorage.init(s,stage)
+    labStorage.init(s, stage)
     scanner.init(s, stage)
-    
+
     //-------------------------------------------------------------------------
     // dispatch plugin load resources event
     const loader = PIXI.loader;

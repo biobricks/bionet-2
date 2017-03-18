@@ -14,6 +14,7 @@ var cart = {
             });
             
             cartStream.on('data', function (item) {
+                // TODO: messaging async api call
                 cart.route('cartResult', undefined, item)
             });
 
@@ -59,15 +60,14 @@ var cart = {
         require('./cart.tag.html')
 
         const cartRouter = function () {
-
-            app.dispatch(app.$.appBarConfig, {
+            app.appbarConfig({
                 enableTopNav: true,
                 enableBreadCrumbs: true,
                 enableSubbar: false
             })
 
             // todo: set inventory item
-            app.dispatch(app.$.breadcrumbs, [{
+            app.setBreadcrumbs([{
                 'label': 'cart',
                 'url': '/cart'
             }]);

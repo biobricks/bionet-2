@@ -74,13 +74,14 @@
                 tag.results.push(item)
                 tag.update()
             })
-
+            // TODO: messaging async api call
             cart.route('requestCart')
 
             const itemClick = function(item) {
                 console.log('itemClick:', JSON.stringify(item))
+                // TODO: messaging async api call
                 bionetSetup.route('getPhysical', undefined, item.id)
-                app.dispatch(app.$.breadcrumbs, [{
+                app.setBreadcrumbs([{
                     'label': 'cart',
                     'url': '/cart'
                 }, {
@@ -98,8 +99,8 @@
             for (var i = 0; i < results.length; i++) {
                 results[i].click = itemClick
             }
-
-            app.dispatch(app.$.breadcrumbs, breadcrumbs);
+            
+            app.setBreadcrumbs(breadcrumbs);
 
             tag.primaryHeader = 'Search results for "' + opts.terms + '"'
             tag.secondaryHeader = tag.results.length + ' items'
@@ -129,6 +130,7 @@
         tag.emptyCart = function() {
             for (var i = 0; i < tag.results.length; i++) {
                 var item = tag.results[i]
+                // TODO: messaging async api call
                 cart.route('deleteCartBatch', undefined, item.id)
             }
             tag.results = []

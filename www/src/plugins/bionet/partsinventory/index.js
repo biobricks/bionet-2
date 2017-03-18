@@ -10,14 +10,14 @@ var partsInventory = {
         const inventoryRouter = function (q) {
             //var q = route.query()
 
-            app.dispatch(app.$.appBarConfig, {
+            app.appbarConfig({
                 enableTopNav: true,
                 enableBreadCrumbs: true,
                 enableSubbar: false
             })
 
             // todo: set inventory item
-            app.dispatch(app.$.breadcrumbs, [{
+            app.setBreadcrumbs([{
                 'label': 'local inventory',
                 'url': '/inventory'
             }]);

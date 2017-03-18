@@ -39,6 +39,7 @@ var appmain = {
       action: '/#!/help'
     }]
 
+    // TODO: messaging - error or application state
     app.dispatch(app.$.primaryNav, loggedOutNav)
 
 
@@ -75,12 +76,14 @@ var appmain = {
         case 'mpassword':
           bionetapi.checkMasterPassword(value, function (result, err) {
             if (result) {
+              // TODO: messaging - async api
               signupClient.dispatch({
                 name: 'email',
                 err: false,
                 msg: ''
               })
             } else {
+              // TODO: messaging - async api
               signupClient.dispatch({
                 name: stepName,
                 err: true,
@@ -100,6 +103,7 @@ var appmain = {
                 msg: ''
               })
             } else {
+              // TODO: messaging - async api
               signupClient.dispatch({
                 name: stepName,
                 err: true,
@@ -115,12 +119,14 @@ var appmain = {
             if (result) {
               bionetapi.createUser(step.email, step.password, function (result, createerr) {
                 if (result) {
+                  // TODO: messaging - async api
                   signupClient.dispatch({
                     name: 'complete',
                     err: false,
                     msg: 'sign up, mpassword=' + step.mpassword + ' email= ' + step.email + ' password=' + step.password
                   })
                 } else {
+                  // TODO: messaging - async api
                   signupClient.dispatch({
                     name: stepName,
                     err: true,
@@ -129,6 +135,7 @@ var appmain = {
                 }
               })
             } else {
+              // TODO: messaging - async api
               signupClient.dispatch({
                 name: stepName,
                 err: true,
@@ -144,18 +151,6 @@ var appmain = {
     // routes
 
     // TODO JUUL move non-namespaced routes to main file
-
-
-    /*
-    app.addRoute('/logout', function () {
-      console.log("logging out");
-      app.logout(function() {
-        console.log("logged out");
-        app.dispatch(app.$.loginState, false)
-        route('/')
-      });
-    })
-    */
   },
   remove: function() {
     
