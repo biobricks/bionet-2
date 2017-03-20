@@ -3,15 +3,17 @@
     <div if={opts.topMargin===undefined} id="createPhysical" style="margin-top:100px" />
     <!--
     <form id="createPhysicalForm" ref="createPhysicalForm" class="col s12" onsubmit={submitForm}>
+    <div style="width:50%; min-width:290px; overflow:scroll;">
     -->
-    <form id="createPhysicalForm" ref="createPhysicalForm" onsubmit={submitForm}>
+    <div style="min-width:290px; overflow:scroll;">
+        <form id="createPhysicalForm" ref="createPhysicalForm" onsubmit={submitForm}>
 
-        <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
+            <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
 
-        <div if={showPhysical}>
-            <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
-        </div>
-        <!--
+            <div if={showPhysical}>
+                <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+            </div>
+            <!--
         <div class="input-field col s12">
                 <div class="query-container">
                     <input type="text" id="q" name="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
@@ -24,41 +26,41 @@
             </div>
         </div>
 -->
-        <div if={showPhysical} each={field in fields}>
-            <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
-        </div>
-
-        <div if={showPhysical} class="row">
-            <div class="col">
-                <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+            <div if={showPhysical} each={field in fields}>
+                <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
             </div>
-        </div>
-        <div if={showPhysical}>
-            <div style="margin-top:30px" />
-            <form-text-input label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
-        </div>
-        <div if={showPhysical} class="row">
-            <div class="col">
-                <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a>
-                <div id="autocomplete-container">
-                  <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name"/>
+
+            <div if={showPhysical} class="row">
+                <div class="col">
+                    <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
                 </div>
             </div>
-        </div>
-
-        <div if={showPhysical} class="row">
-            <div class="col">
+            <div if={showPhysical}>
                 <div style="margin-top:30px" />
-                <std-button label="submit" action={submitForm} />
+                <form-text-input label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
             </div>
-        </div>
+            <div if={showPhysical} class="row">
+                <div class="col">
+                    <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a>
+                    <div id="autocomplete-container">
+                        <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name" />
+                    </div>
+                </div>
+            </div>
 
-        <input type="hidden" ref="id" name="id" value={formData.id} />
-        <input type="hidden" ref="type" name="type" value={type} />
-        <input type="hidden" ref="virtual_id" name="virtual_id" value={formData.virtual_id} />
-        <input type="submit" style="visibility:hidden" />
-    </form>
+            <div if={showPhysical} class="row">
+                <div class="col">
+                    <div style="margin-top:30px" />
+                    <std-button label="submit" action={submitForm} />
+                </div>
+            </div>
 
+            <input type="hidden" ref="id" name="id" value={formData.id} />
+            <input type="hidden" ref="type" name="type" value={type} />
+            <input type="hidden" ref="virtual_id" name="virtual_id" value={formData.virtual_id} />
+            <input type="submit" style="visibility:hidden" />
+        </form>
+    </div>
     <div id="scanModal" ref="scanModal" class="scanModal modal"></div>
     <div id="printModal" ref="printModal" class="printModal modal"></div>
 
@@ -84,9 +86,11 @@
 
 
         this.updateAutocomplete = function(query, cb) {
-          app.remote.physicalAutocomplete(query, function(err, results) {
-            cb(err, {virtuals: results});
-          })
+            app.remote.physicalAutocomplete(query, function(err, results) {
+                cb(err, {
+                    virtuals: results
+                });
+            })
         };
 
 
@@ -98,8 +102,8 @@
         var savePhysical = function(p, labelImage) {
             var doPrint = labelImage ? true : false
             console.log('savePhysical, p=', JSON.stringify(p))
-            // TODO: messaging async api call
-            app.route('partDataAccessor','storePhysical',undefined,p)
+                // TODO: messaging async api call
+            app.route('partDataAccessor', 'storePhysical', undefined, p)
         }
 
         /*
