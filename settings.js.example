@@ -56,6 +56,18 @@ module.exports = {
   // Relative to userFilePath
   labelImageFilePath: 'labels',
 
+  blast: {
+    mode: 'blastdb', // keep on-disk blast databases
+    binPath: undefined, // where are BLAST+ binaries. Must be in PATH if undefined
+    path: 'blast' // where to store BLAST databases (relative to app root)
+  },
+
+  // which ElasticSearch server to use
+  elasticSearch: {
+    hostname: 'localhost',
+    port: 9200
+  },
+
   // Settings related to label printing
   printing: {
 
@@ -191,5 +203,13 @@ module.exports = {
    // IF true userSignupPassword must also be set
    // or it will still be possible for anyone to create users
    // the setting in this file only affects the UI and provides no security
-   restrictUserSignup: true
+   restrictUserSignup: true,
+
+   // other bionet peers that we know about
+   peers: [
+     {
+       hostname: "localhost",
+       port: 9876
+     }
+   ]
 };

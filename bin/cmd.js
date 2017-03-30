@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
 var net = require('net');
 var http = require('http');
@@ -17,6 +17,7 @@ var uuid = require('uuid').v4;
 var through = require('through2');
 var treeIndex = require('level-tree-index');
 var ElasticIndex = require('level-elasticsearch-index');
+var blastLevel = require('blast-level');
 var accounts = require('../libs/user_accounts.js');
 var printServer = require('../libs/print_server.js');
 var Mailer = require('../libs/mailer.js');
@@ -107,7 +108,39 @@ var physicalTree = treeIndex(physicalDB, sublevel(indexDB, 't'), {
   parentProp: 'parent_id'
 });
 
-var elasticIndex = ElasticIndex(bioDB);
+
+var blastDB;
+if(settings.blast) {
+
+  settings.blast.path = path.join(__dirname, '..', settings.blast.path);
+
+  fs.ensureDir(settings.blast.path, function(err) {
+    if(err) throw new Error(err);
+
+    blastDB = blastLevel(db, {
+      mode: settings.blast.mode,
+      type: 'nt',
+      seqProp: 'files', // key in 'mydb' that stores the sequence data
+      seqIsFile: true,
+      seqFileBasePath: settings.userFilePath,
+      seqFormatted: true,
+      changeProp: 'updated.time',
+      path: settings.blast.path, // directory to use for storing BLAST dbs
+      binPath: settings.blast.binPath // path to BLAST+ binaries
+    });
+  });
+}
+
+
+// TODO make it run without elasticsearch as a hard requirement
+if(!settings.elasticSearch) {
+  throw new Error("Your settings.js file is missing the elasticSearch property");
+}
+
+var elasticIndex = ElasticIndex(bioDB, {
+  hostname: settings.elasticSearch.hostname,
+  port: settings.elasticSearch.port
+});
 
 elasticIndex.add('name', function(key, val) {
   val = JSON.parse(val); // TODO this should not be needed
@@ -358,6 +391,18 @@ function savePhysical(curUser, m, imageData, doPrint, cb, isUnique) {
   console.log("saving:", m);
 }
 
+
+// connected peers
+var peers = [];
+
+// call a function for each connected peer
+function peerDo(f, cb) {
+  async.eachSeries(peers, function(peer, cb) {
+    if(!peer.rpc) return cb(); // skip if disconnected
+    cb(peer);
+  }, cb);
+}
+
 websocket.createServer({server: server}, function(stream) {
 
   var rpcServer = rpc(auth({
@@ -439,6 +484,50 @@ websocket.createServer({server: server}, function(stream) {
 
     completePasswordReset: function(curUser, resetCode, password, cb) {
       accounts.completePasswordReset(users, resetCode, password, cb);
+    },
+
+    blast: rpc.syncReadStream(function(curUser, query) {
+      if(!blastDB) return cb(new Error("BLAST queries not supported by this node"));
+      return blastDB.query(query);
+    }),
+
+    // TODO switch to using a stream as output rather than a callback
+    peerBlast: function(curUser, query, cb) {
+      var streams = [];
+
+      function onError(err) {
+        // do we really care about remote errors? probably not
+      }
+
+      function onResult(peerInfo, result) {
+        cb(peerInfo, result);
+      }
+
+      if(blastDB) {
+        streams.push({          
+          stream: blastDB.query(query)
+        });
+      }
+
+      // for each connected peer
+      peerDo(function(peer, next) {
+
+        // run a streaming blast query
+        var s = peer.rpc.blast(query)
+
+        s.on('error', onError);
+
+        s.on('data', function(data) {
+          cb(null, peer.info, data);
+        });
+        streams.push(s);
+
+        next();
+
+      }, function(err) {
+        if(err) return cb(err);
+        
+      });
     },
 
     user: { // only users in the group 'user' can access this namespace
