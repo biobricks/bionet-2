@@ -767,6 +767,33 @@ websocket.createServer({server: server}, function(stream) {
         return out;
       },
 
+      getLocationPath: function (curUser, id, cb) {
+          
+        if (id[0] !== 'p') {
+            cb(new Error("getLocationPath only works for physicals"));
+        }
+          
+        const db = physicalDB;
+        const results = [];
+
+        const getParentLocation = function (id) {
+            db.get(id, {
+                valueEncoding: 'json'
+            }, function (err, p1) {
+                if (err) {
+                    return cb(err, null);
+                }
+                results.push(p1);
+                if (p1.parent_id) {
+                    getParentLocation(p1.parent_id);
+                } else {
+                    return cb(null, results);
+                }
+            });
+        }
+        getParentLocation(id);
+      },
+        
       get: function(curUser, id, cb) {
         console.log("getting:", id);
         var first = id[0];
