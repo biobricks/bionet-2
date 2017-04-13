@@ -13,12 +13,9 @@ module.exports = {
   // Port for low-level access to db via multilevel.
   dbPort: 13377, 
 
-  // e.g. if this web app is at http://mydomain.org/foo/bar/
-  // then set this to 'foo/bar'
-  relativePath: '',
-
   // The url where this app is accessed
   // Used for generating email links
+  // and as the universally unique peer name
   baseUrl: 'http://localhost:8000',
 
   // set debug to true for lots of helpful debug info on console

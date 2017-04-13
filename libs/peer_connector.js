@@ -4,21 +4,111 @@ var async = require('async');
 var backoff = require('backoff');
 var rpc = require('rpc-multistream');
 
-function PeerConnector(initialPeers, opts) {
+function PeerConnector(peerID, initialPeers, opts) {
 
   this.initialPeers = initialPeers;
+
+  this.id = peerID; // this peer's identifier
 
   // websocket instances
   this.peers = {};
 
-  this.attemptConnection = function(peer) {
-    var self = this;
+  this._connectFail = function(peer) {
+    peer.connected = false;
+    
+    peer.rpc.die(); // prevent a future 'death' event
 
-    if(this.peers[peer.peerUrl]) {
-      delete this.peers[peer.peerUrl];
+    if(peer.stopTrying) {
+      delete this.peers[peer.id]
+      return;
     }
 
-    if(peer.stream) stream.destroy();
+    try {
+      peer.backoff.backoff(); // start backoff timer if not already started
+    } catch(e) {}
+  };
+
+  this._connectToPeer = function(peer) {
+    var self = this;
+    console.log("Connecting to:", peer.url);
+
+    var stream = websocket(peer.url);
+
+    var rpcClient = rpc({
+      getPeerInfo: function(cb) {
+        cb(null, {
+          id: self.id
+        });
+      },
+      // the other side can ask this side to stop reconnecting
+      permanentlyDisconnect: function() {
+        peer.stopTrying = true;
+        peer.stream.socket.close();
+      }
+    }, {
+      objectMode: true,
+      heartbeat: 5000,
+      debug: false
+    });
+
+    rpcClient.pipe(stream).pipe(rpcClient);
+
+    peer.stream = stream;
+    peer.rpc = rpcClient;
+    peer.incoming = false; // this is an outgoing connection
+
+    rpcClient.on('methods', function(remote) {
+      peer.connected = true;
+      peer.backoff.reset(); // stop backoff timer
+
+      peer.remote = remote;
+
+      console.log("CONNECTED TO", peer.url);
+
+      remote.getPeerInfo(function(err, info) {
+        if(err) return peer.stream.socket.close();
+        peer.id = info.id;
+        self.peers[peer.id] = peer;
+      });
+
+    });
+
+    stream.socket.on('close', function(code, reason) {
+      console.log("[peer websocket closed]", peer.url, code, reason);
+      self._connectFail(peer);
+    });
+
+    stream.on('error', function(err) {
+
+      // TODO are there any error codes that aren't cause for reconnecting?
+
+      console.log('[peer websocket]', peer.url, err.message || err);
+      self._connectFail(peer);
+    });
+
+    rpcClient.on('error', function(err) {
+      console.log('[peer rpc]', peer.url, err.message || err);
+      self._connectFail(peer);
+    });
+
+    rpcClient.on('death', function() {
+      console.log('[peer rpc death]', peer.url);
+      self._connectFail(peer);
+    });
+  };
+ 
+  // -------------------------
+  // public functions below
+  // -------------------------
+
+  this._attemptConnection = function(peer) {
+    var self = this;
+
+    if(this.peers[peer.id]) {
+      delete this.peers[peer.id];
+    }
+
+    if(peer.stream) stream.socket.close();
     peer.connected = false;
 
     var bo = backoff.fibonacci({
@@ -29,83 +119,59 @@ function PeerConnector(initialPeers, opts) {
 
     // reached backoff timeout
     bo.on('ready', function(number, delay) {
-      self.connectToPeer(peer);
+      self._connectToPeer(peer);
     });
 
     peer.backoff = bo;
 
-    this.connectToPeer(peer);
+    this._connectToPeer(peer);
   };
 
-  this.connectToPeer = function(peer) {
-    console.log("Connecting to:", peer.url);
+  this.registerIncoming = function(peerID, stream, rpc, cb) {
+    var peer = this.peers[peerID];
+    console.log("INCOMING:", peerID);
 
-    var stream = websocket(peer.url);
+    if(peer) {
+      if(peer.connected && !peer.incoming) {
+        var err = new Error("You already have an active connection to this peer in the other direction (initiated by the peer).")
+        err._permaFail = true;
+        return cb(err);
+      }
+      // cancel any existing connection attempt
+      if(peer.stream) stream.socket.close();
+      if(peer.backoff) backoff.reset();
+    }
 
-    var rpcClient = rpc(null, {
-      objectMode: true,
-      heartbeat: 5000
+    peer = {
+      id: peerID,
+      rpc: rpc,
+      stream: stream,
+      incoming: true, // peer connected to us (rather than us connecting to peer)
+      connected: true
+    };
+
+    stream.socket.on('close', function(code, reason) {
+      delete self.peers[peer.id];
     });
 
-    rpcClient.pipe(stream).pipe(rpcClient);
-
-    peer.stream = stream;
-    peer.rpc = rpcClient;
-
-    rpcClient.on('methods', function(remote) {
-      peer.connected = true;
-
-      peer.backoff.reset(); // stop backoff timer
-
-      console.log("CONNECTED TO", peer.url);
-    });
-
-    stream.on('error', function(err) {
-      // TODO are there any error codes that aren't cause for reconnecting?
-
-      console.log('[peer websocket]', peer.url, err.code || err);
-
-      peer.rpc.die(); // prevent a future 'death' event
-      try {
-        peer.backoff.backoff(); // start backoff timer if not already started
-      } catch(e) {}
-    });
-
-    rpcClient.on('error', function(err) {
-      console.log('[peer rpc]', peer.url, err);
-      peer.connected = false;
-
-      peer.rpc.die(); // prevent a future 'death' event
-      try {
-        peer.backoff.backoff(); // start backoff timer if not already started
-      } catch(e) {}
-    });
-
-    rpcClient.on('death', function() {
-      console.log('[peer rpc death]', peer.url);
-      peer.connected = false;
-      try {
-        peer.backoff.backoff(); // start backoff timer if not already started
-      } catch(e) {}
-    });
-
-    this.peers[peer.url] = peer;
+    this.peers[peer.id] = peer;
+    cb();
   };
-   
+
   // call a function for each connected peer
   this.peerDo = function(f, cb) {
-    async.eachSeries(peers, function(peer, cb) {
-      if(!peer.rpc) return cb(); // skip if disconnected
+    async.each(this.peers, function(peer, cb) {
+      if(!peer.connected) return cb(); // skip if disconnected
       f(peer, cb);
     }, cb);
   };
- 
+
 
   this.connect = function() {
     if(!this.initialPeers) return;
     var i;
     for(i=0; i < this.initialPeers.length; i++) {
-      this.attemptConnection(this.initialPeers[i]);
+      this._attemptConnection(this.initialPeers[i]);
     }
   }; 
 

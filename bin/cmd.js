@@ -45,6 +45,8 @@ var argv = minimist(process.argv.slice(2), {
 
 var settings = require(argv.settings);
 
+settings.peerID = uuid();
+
 settings.debug = argv.debug || settings.debug;
 if(settings.debug) {
     // don't actually end emails in debug mode
@@ -420,6 +422,12 @@ websocket.createServer({
       });
     }
   }, {
+
+    getPeerInfo: function(curUser, cb) {
+      cb(null, {
+        id: settings.peerID
+      });
+    },
     
     foo: function(curUser, user, cb) {
       console.log("foo called");
@@ -502,10 +510,10 @@ websocket.createServer({
       }
 
       // for each connected peer
-      peerDo(function(peer, next) {
+      peerConnector.peerDo(function(peer, next) {
 
         // run a streaming blast query
-        var s = peer.rpc.blast(query)
+        var s = peer.remote.blast(query)
 
         s.on('error', onError);
 
@@ -518,7 +526,6 @@ websocket.createServer({
 
       }, function(err) {
         if(err) return cb(err);
-        
       });
     },
 
@@ -1004,10 +1011,32 @@ websocket.createServer({
   });
 
 
+  rpcServer.on('methods', function(remote) {
+
+    // if the remote node exports an rpc function called 'getPeerInfo'
+    // then we assume it's a peer
+    if(remote.getPeerInfo) {
+      // Peers call this to register themselves.
+      // They must supply peerUrl to identify themselves
+      remote.getPeerInfo(function(err, info) {
+
+        if(err) return stream.socket.close();
+        peerConnector.registerIncoming(info.id, stream, rpcServer, function(err) {
+          if(err && err._permaFail) {
+            console.log("Failing permanently for:", info.id, err.message);
+            remote.permanentlyDisconnect(function(){});
+            return;
+          }
+          console.log("incoming peer connected:", info.id);
+        });
+      });
+    }
+  });
+
   rpcServer.pipe(stream).pipe(rpcServer);
 });
 
 
-var peerConnector = new PeerConnector(settings.peers);
+var peerConnector = new PeerConnector(settings.peerID, settings.peers);
 peerConnector.connect();
 
