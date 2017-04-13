@@ -35,7 +35,7 @@
 //    var datamatrix = require('../../../../biomatrix-scratch');
     
     function getIDFromURL(url) {
-      var m = url.match(new RegExp('^'+settings.base_url+'/p/(\\d+)'));
+      var m = url.match(new RegExp('^'+settings.baseUrl+'/p/(\\d+)'));
       if(!m || (m.length < 2)) return null;
       return parseInt(m[1]);
     }

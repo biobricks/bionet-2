@@ -13,9 +13,13 @@ module.exports = {
   // Port for low-level access to db via multilevel.
   dbPort: 13377, 
 
+  // e.g. if this web app is at http://mydomain.org/foo/bar/
+  // then set this to 'foo/bar'
+  relativePath: '',
+
   // The url where this app is accessed
   // Used for generating email links
-  base_url: 'http://localhost:8000',
+  baseUrl: 'http://localhost:8000',
 
   // set debug to true for lots of helpful debug info on console
   // debug mode enables sending of emails and instead prints them to console
@@ -206,10 +210,12 @@ module.exports = {
    restrictUserSignup: true,
 
    // other bionet peers that we know about
+   /*
    peers: [
      {
-       hostname: "localhost",
-       port: 9876
+       name: "Local test server on port 9000",
+       url: "ws://localhost:9000/peer"
      }
    ]
+   */
 };

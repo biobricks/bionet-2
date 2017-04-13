@@ -24,6 +24,7 @@ var Mailer = require('../libs/mailer.js');
 var IDGenerator = require('../libs/id_generator.js'); // atomically unique IDs
 var Writable = require('stream').Writable;
 var Readable = require('stream').Readable;
+var PeerConnector = require('../libs/peer_connector');
 
 var minimist = require('minimist');
 var argv = minimist(process.argv.slice(2), {
@@ -50,7 +51,7 @@ if(settings.debug) {
     settings.mailer.type = 'console';
 }
 
-var mailer = new Mailer(settings.mailer, settings.base_url);
+var mailer = new Mailer(settings.mailer, settings.baseUrl);
 
 // serve static files
 settings.staticPath = path.join(__dirname, '..', settings.staticPath);
@@ -392,18 +393,9 @@ function savePhysical(curUser, m, imageData, doPrint, cb, isUnique) {
 }
 
 
-// connected peers
-var peers = [];
-
-// call a function for each connected peer
-function peerDo(f, cb) {
-  async.eachSeries(peers, function(peer, cb) {
-    if(!peer.rpc) return cb(); // skip if disconnected
-    cb(peer);
-  }, cb);
-}
-
-websocket.createServer({server: server}, function(stream) {
+websocket.createServer({
+  server: server
+}, function(stream) {
 
   var rpcServer = rpc(auth({
     userDataAsFirstArgument: true, 
@@ -487,7 +479,7 @@ websocket.createServer({server: server}, function(stream) {
     },
 
     blast: rpc.syncReadStream(function(curUser, query) {
-      if(!blastDB) return cb(new Error("BLAST queries not supported by this node"));
+      if(!blastDB) throw new Error("BLAST queries not supported by this node");
       return blastDB.query(query);
     }),
 
@@ -530,7 +522,11 @@ websocket.createServer({server: server}, function(stream) {
       });
     },
 
-    user: { // only users in the group 'user' can access this namespace
+    // ---------------------------------------------------------
+    // only users in the group 'user' can access this namespace
+    // ---------------------------------------------------------
+
+    user: { 
       secret: function(curUser, cb) {
         cb(null, "Sneeple are real!");
       },
@@ -1010,4 +1006,8 @@ websocket.createServer({server: server}, function(stream) {
 
   rpcServer.pipe(stream).pipe(rpcServer);
 });
+
+
+var peerConnector = new PeerConnector(settings.peers);
+peerConnector.connect();
 
