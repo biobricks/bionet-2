@@ -1,62 +1,46 @@
-<!--
 <inventory-treeview>
-    <bionet-setup-storage/>
-</inventory-treeview>
-<bionet-setup-storage>
--->
-<inventory-treeview>
-
-    <div class="content-height">
-        <!--
-        <div class="fixed-action-btn" style="bottom:100px; left:25px; width:50px; text-align:left">
-            <a class="btn-floating btn-large waves-effect waves-light green dropdown-button"><i class="material-icons" data-activates="addmenu">add</i></a>
-        </div>
-        -->
-
-        <div class="inventory-tree">
-            <table id="ftree" style="margin-top:15px; width:400px;border:none !important;">
-                <colgroup>
-                    <col width="50%"></col>
-                    <col width="10%"></col>
-                </colgroup>
-                <!--
-                    <col width="390px"></col>
-                    <col width="75px"></col>
-                <thead>
-                    <tr>
-                        <th style="padding-left:10px">Name</th>
-                    </tr>
-                </thead>
-                -->
-                <tbody style="border: none !important;">
-                    <tr>
-                        <td></td>
-                        <td></td>
+    <div class="inventory-height">
+        <div class="row">
+            <div id="treeview" class="inventory-tree col s4">
+                <table id="ftree" style="margin-top:15px; border:none !important;">
+                    <colgroup>
+                        <col></col>
+                        <col></col>
+                    </colgroup>
+                    <tbody style="border: none !important;">
+                        <tr>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="physical-view" class="col s8">
+                <div class="row">
+                    <div id="pixijsdiv" class="pixijs">
+                        <bionet-storage-location width={pixiwidth}/>
                         <!--
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    -->
-                    </tr>
-                </tbody>
-            </table>
+                        <babylon-3d></babylon-3d>
+                        -->
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="physical-storage" class="edit-physical">
+                        <create-physical show="false" top-margin="0px" />
+                    </div>
+                </div>
+            </div>
         </div>
-        <div id="physical-storage" class="edit-physical">
-            <create-physical show="false" top-margin="0px" />
-        </div>
-        <div id="scanner" style="position:absolute;top:100px; left:0px"></div>
-
-        <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:130px; right:25px; text-align:left" data-activates="addmenu"><i class="material-icons">add</i></a>
-        <ul id="addmenu" class="dropdown-content" style="position:absolute; top:130px; right:25px; width:200px !important; text-align:left;z-index:1000">
-            <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.name}</span></li>
-            <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.name}</span></li>
-        </ul>
-
-        <div class="fixed-action-btn" style="position:absolute; top:200px; right:25px; text-align:left">
-            <a onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></a>
-        </div>
-
     </div>
+
+    <!-- add or delete buttons -->
+    <div id="addicon" class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:130px; left:400px; width:55px; height:55px;" data-activates="addmenu"><i class="material-icons">add</i></div>
+    <ul id="addmenu" class="dropdown-content" style="position:absolute; top:130px; left:400px; width:200px !important; text-align:left;z-index:1000">
+        <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.name}</span></li>
+        <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.name}</span></li>
+    </ul>
+    <div id="deleteicon" style="position:absolute; top:200px; left:400px; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></div>
+
     <style>
         table.fancytree-ext-table tr td {
             border: none !important;
@@ -64,11 +48,23 @@
             display: table-cell;
         }
         
-        .inventory-tree {
-            overflow: auto;
+        .pixijs {
+            margin-top: 15px;
+            width: 100%;
             float: left;
-            margin-left: 25px;
-            width: 400px;
+            z-index: 2000;
+        }
+        
+        .inventory-tree {
+            float: left;
+            overflow: auto;
+            display: block;
+        }
+        
+        .edit-physical {
+            width: 100%;
+            float: left;
+            display: block;
         }
         
         span.fancytree-edit {
@@ -80,20 +76,13 @@
             outline: 1px solid #70C0E7;
         }
         
-        .edit-physical {
-            overflow: auto;
-            width: calc(100% - 600px);
-            float: left;
-            //margin-left: 25px;
-        }
-        
-        div.content-height {
-            margin-top: 115px;
-            height: calc(100% - 100px)
+        .inventory-height {
+            margin-top: 100px;
         }
 
     </style>
     <script>
+
         const tag = this
         const appSettings = app.getAppSettings()
         const dataTypes = appSettings.dataTypes
@@ -207,7 +196,7 @@
                 const node = deleteNodes[i]
                 const id = node.data.dbData.id
                 console.log('removing %s %s', node.title, id)
-                // TODO: messaging async api call
+                    // TODO: messaging async api call
                 bionetSetup.route('delPhysical', undefined, id)
                 node.remove()
             }
@@ -215,6 +204,25 @@
 
         this.on('mount', function() {
             // initialize breadcrumbs
+            $('.inventory-height').css({
+                height: $(window).innerHeight() - $('#appbar').height()
+            });
+            tag.pixiwidth = $('#physical-view').width()
+
+            const treeViewIconX = $('#treeview').width() - 60
+            $('#addicon').css({
+                left: treeViewIconX
+            });
+            $('#deleteicon').css({
+                left: treeViewIconX
+            });
+            $('#addmenu').css({
+                left: treeViewIconX
+            });
+
+            $('.inventory-height').css({
+                height: $(window).innerHeight() - $('#appbar').height()
+            });
 
             tag.materials = []
             tag.locations = []
@@ -242,7 +250,7 @@
                 stopPropagation: false
             });
 
-                //extensions: ["table", "gridnav", "dnd5", "persist"],
+            //extensions: ["table", "gridnav", "dnd5", "persist"],
             const ftSettings = {
                 extensions: ["table", "gridnav", "dnd5", "persist"],
                 source: [],
@@ -294,7 +302,7 @@
                     if (!data.targetType) {
                         const dbData = node.data.dbData
                         console.log('adding item to cart:', JSON.stringify(dbData))
-                        // TODO: messaging async api call
+                            // TODO: messaging async api call
                         cart.route('addToCart', undefined, {
                             id: dbData.id,
                             name: dbData.name
@@ -367,7 +375,7 @@
                             parentId = node.data.dbData.id
                             const movedNode = data.otherNode.data.dbData
                             movedNode.parent_id = parentId
-                            // TODO: messaging async api call
+                                // TODO: messaging async api call
                             app.route('partDataAccessor', 'storePhysical', undefined, movedNode)
                             console.log('drag other node other:%s node:%s', movedNode.name, node.data.dbData.name)
 
@@ -393,9 +401,12 @@
             }
 
             $("#ftree").fancytree(ftSettings);
-            
-        
+
+
             $("#ftree").on('click dblclick keydown', function(e) {
+                $('.edit-physical').css({
+                    height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-layout').height() - 45
+                });
                 if (e.type === 'keydown') {
                     if (e.which !== undefined && e.which !== 13) return
                 }
@@ -409,25 +420,13 @@
                     const type = dbData.type
                     if (type) {
                         tag.createType = 'storage'
-                            /*
-                            tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
-                            if (type.indexOf('box') >= 0) {
-                                //console.log('activating scanner')
-                                app.dispatch('startScan', {
-                                    status: 'init'
-                                })
-                            }
-                            */
                     }
 
                     console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
                     tag.update()
-                    // TODO: messaging async api call
+                        // TODO: messaging async api call
                     bionetSetup.route('getPhysical', undefined, dbData.id)
                     if (e.type === 'keydown') node.setExpanded()
-                    $('.edit-physical').css({
-                        height: $(window).innerHeight() - 120
-                    });
 
                     app.setBreadcrumbs([{
                         'label': 'local inventory',
@@ -448,14 +447,29 @@
                 const ftree = $("#ftree").fancytree("getTree");
                 ftree.reload(storageData).then(function() {
                     $('.inventory-tree').css({
-                        height: $(window).innerHeight() - 120
+                        height: $(window).innerHeight() - $('#appbar').height() - 15
                     });
-                    const children = ftree.getRootNode().children
-                    const activeNode = children[0]
-                    if (activeNode) {
-                        activeNode.setExpanded();
-                        activeNode.setFocus();
+                    //tag.pixiwidth = $('#ftree').width() - 40
+
+                    //const children = ftree.getRootNode().children
+                    //const node = children[0]
+                    var node = ftree.getActiveNode();
+                    if (node) {
+                        node.setExpanded();
+                        node.setFocus();
+                        const dbData = node.data.dbData
+                        console.log('ftree reload, active node:', JSON.stringify(dbData, null, 2))
+                            // TODO: messaging async api call
+                        bionetSetup.route('getPhysical', undefined, dbData.id)
+                    } else {
+                        const children = ftree.getRootNode().children
+                        node = children[0]
+                        if (node) {
+                            node.setExpanded();
+                            node.setFocus();
+                        }
                     }
+                    tag.update()
                 })
             })
 
@@ -471,7 +485,7 @@
 
         this.runSetup = function() {
             console.log('Run setup')
-            // TODO: messaging async api call
+                // TODO: messaging async api call
             app.dispatch('bionetSetup', setup)
         }
 

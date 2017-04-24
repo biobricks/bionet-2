@@ -1,26 +1,30 @@
 <search-result>
-    <div class="searchheight">
-        <div class="searchresult">
-            <form id="search-form">
-                <div class="input-field col">
-                    <i class="material-icons postfix" style="cursor: pointer; cursor: hand; " onclick={searchClick}>search</i>
-                    <input id="search" ref="search" type="text" value={opts.terms} autofocus style="width:390px" />
-                    <label id="search-label" class="active" for="search">Search biomaterials</label>
+    <div class="searchheight row">
+        <div class="col s4">
+            <div class="row">
+                <form id="search-form">
+                    <div class="input-field col" style="width:100%">
+                        <i class="material-icons postfix" style="cursor: pointer; cursor: hand; " onclick={searchClick}>search</i>
+                        <input id="search" ref="search" type="text" value={opts.terms} autofocus/>
+                        <label id="search-label" class="active" for="search">Search biomaterials</label>
+                    </div>
+                    <input type="submit" style="display:none" />
+                </form>
+            </div>
+            <div class="row">
+                <div class="searchresult"  style="width:100%">
+                    <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
+                        <list-item class="searchItem" no-reorder each={item in results} item={item}>
+                            <i if={item.isPhysical} class="tiny material-icons" style="float: right">group_work</i>
+                            <i if={item.isPhysical} class="material-icons right-align" style="cursor: pointer; cursor: hand; " onclick={addToCart}>shopping_cart</i>
+                        </list-item>
+                    </div>
                 </div>
-                <input type="submit" style="display:none" />
-            </form>
-            <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
-                <list-item class="searchItem" no-reorder each={item in results} item={item}>
-                    <i if={item.isPhysical} class="tiny material-icons" style="float: right">group_work</i>
-                    <i if={item.isPhysical} class="material-icons right-align" style="cursor: pointer; cursor: hand; " onclick={addToCart}>shopping_cart</i>
-                </list-item>
             </div>
         </div>
-        <div id="edititem" class="edititem">
-            <!--
+        <div id="edititem" class="edititem col s7">
             <create-physical if={itemType==='p'} show="false" top-margin="0px" />
             <part-specification if={itemType==='v'} />
-            -->
         </div>
     </div>
 
@@ -31,28 +35,21 @@
         }
         
         .searchresult {
-            overflow: auto;
             float: left;
-            margin-left: 25px;
-            width: 400px;
         }
         
         .edititem {
-            overflow: auto;
-            width: calc(100% - 600px);
             float: left;
-            margin-left: 25px;
         }
 
     </style>
 
     <script>
-        
         const searchResult = require('./index.js')
         console.log('search result, before test')
         searchResult.test();
         console.log('search result, after test')
-        
+
         const tag = this
         tag.theme = app.getTheme()
         tag.results = []
@@ -72,32 +69,34 @@
             'label': 'global search',
             'url': '/search'
         }]
-        
-        tag.itemType=''
-        
+
+        tag.itemType = ''
+
         this.on('mount', function() {
             tag.results = tag.opts.results
 
             const itemClick = function(item) {
-                
+
                 if (item.id.indexOf('p-') >= 0) {
-                    riot.mount('#edititem','create-physical',{topMargin:0})
-                    
+                    riot.mount('#edititem', 'create-physical', {
+                        topMargin: 0
+                    })
+
                     // TODO: messaging async api call
                     bionetSetup.route('getPhysical', undefined, item.id)
-                    tag.itemType='p'
+                    tag.itemType = 'p'
                 } else if (item.id.indexOf('v-') >= 0) {
-                    riot.mount('#edititem','part-specification')
-                    
+                    riot.mount('#edititem', 'part-specification')
+
                     // TODO: messaging async api call
                     partDataAccessor.route('getVirtual', undefined, item.id)
-                    tag.itemType='v'
+                    tag.itemType = 'v'
                 } else {
-                    tag.itemType=''
+                    tag.itemType = ''
                 }
                 console.log('itemClick, type:%s %s', tag.itemType, JSON.stringify(item))
                 tag.update()
-                
+
                 app.setBreadcrumbs([{
                     'label': 'global search',
                     'url': '/search'

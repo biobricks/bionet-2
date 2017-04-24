@@ -16,7 +16,10 @@
    id="svg4841"
    version="1.1"
    inkscape:version="0.91 r"
-   sodipodi:docname="locationView.svg">
+   sodipodi:docname="locationView.svg"
+   inkscape:export-filename="/home/tim/dev/biobricks/docs/BionetInventoryStorageOverview.png"
+   inkscape:export-xdpi="120.00046"
+   inkscape:export-ydpi="120.00046">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -25,7 +28,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.8599788"
-     inkscape:cx="526.1811"
+     inkscape:cx="492.30975"
      inkscape:cy="372.04724"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -140,13 +143,6 @@
        id="path5461-0"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccc" />
-    <rect
-       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ff0000;fill-opacity:0.27796613;fill-rule:evenodd;stroke:#ff0000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-       id="rect5484-3"
-       width="86.46946"
-       height="26.536066"
-       x="637.47858"
-       y="902.48022" />
     <path
        style="fill:#ff0000;fill-opacity:0.27796613;fill-rule:evenodd;stroke:#ff0000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="M 723.7071,902.59694 967.75051,731.8535 545.68362,731.31586 637.67761,903.58065"
@@ -175,17 +171,6 @@
          id="tspan5544-9"
          x="183.63388"
          y="712.466">F0-80c</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:22.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="651.23651"
-       y="923.18188"
-       id="text5542-2"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan5544-2"
-         x="651.23651"
-         y="923.18188">B 2,3</tspan></text>
     <g
        id="g5713"
        transform="translate(0,1.3011475)"
@@ -310,66 +295,89 @@
      id="layer6"
      inkscape:label="grid" />
   <g
-     id="g9044"
-     inkscape:label="Grid_Polar:X5:Y4"
-     transform="matrix(0.85615422,0,0,0.2629214,552.19905,541.77733)">
-    <g
-       id="g9046"
-       inkscape:label="MajorXGridlines">
-      <path
-         id="path9048"
-         inkscape:label="MajorXDiv1"
-         style="fill:none;stroke:#000000;stroke-width:2"
-         d="m 100,0 0,400"
-         inkscape:connector-curvature="0" />
-      <path
-         id="path9050"
-         inkscape:label="MajorXDiv2"
-         style="fill:none;stroke:#000000;stroke-width:2"
-         d="m 200,0 0,400"
-         inkscape:connector-curvature="0" />
-      <path
-         id="path9052"
-         inkscape:label="MajorXDiv3"
-         style="fill:none;stroke:#000000;stroke-width:2"
-         d="m 300,0 0,400"
-         inkscape:connector-curvature="0" />
-      <path
-         id="path9054"
-         inkscape:label="MajorXDiv4"
-         style="fill:none;stroke:#000000;stroke-width:2"
-         d="m 400,0 0,400"
-         inkscape:connector-curvature="0" />
-    </g>
-    <g
-       id="g9056"
-       inkscape:label="MajorYGridlines">
-      <path
-         id="path9058"
-         inkscape:label="MajorYDiv1"
-         style="fill:none;stroke:#000000;stroke-width:2"
-         d="m 0,100 500,0"
-         inkscape:connector-curvature="0" />
-      <path
-         id="path9060"
-         inkscape:label="MajorYDiv2"
-         style="fill:none;stroke:#000000;stroke-width:2"
-         d="m 0,200 500,0"
-         inkscape:connector-curvature="0" />
-      <path
-         id="path9062"
-         inkscape:label="MajorYDiv3"
-         style="fill:none;stroke:#000000;stroke-width:2"
-         d="m 0,300 500,0"
-         inkscape:connector-curvature="0" />
-    </g>
+     id="g9848">
     <rect
-       id="rect9064"
-       inkscape:label="Border"
-       y="0"
-       x="0"
-       width="500"
-       style="fill:none;stroke:#000000;stroke-width:2"
-       height="400" />
+       y="902.48022"
+       x="637.47858"
+       height="26.536066"
+       width="86.46946"
+       id="rect5484-3"
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ff0000;fill-opacity:0.27796613;fill-rule:evenodd;stroke:#ff0000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       transform="translate(0,-308.26772)" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text5542-2"
+       y="923.18188"
+       x="651.23651"
+       style="font-style:normal;font-weight:normal;font-size:22.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"
+       transform="translate(0,-308.26772)"><tspan
+         y="923.18188"
+         x="651.23651"
+         id="tspan5544-2"
+         sodipodi:role="line">B 2,3</tspan></text>
+    <g
+       transform="matrix(0.85615422,0,0,0.2629214,552.19905,541.77733)"
+       inkscape:label="Grid_Polar:X5:Y4"
+       id="g9044">
+      <g
+         inkscape:label="MajorXGridlines"
+         id="g9046">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 100,0 0,400"
+           style="fill:none;stroke:#000000;stroke-width:2"
+           inkscape:label="MajorXDiv1"
+           id="path9048" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 200,0 0,400"
+           style="fill:none;stroke:#000000;stroke-width:2"
+           inkscape:label="MajorXDiv2"
+           id="path9050" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 300,0 0,400"
+           style="fill:none;stroke:#000000;stroke-width:2"
+           inkscape:label="MajorXDiv3"
+           id="path9052" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 400,0 0,400"
+           style="fill:none;stroke:#000000;stroke-width:2"
+           inkscape:label="MajorXDiv4"
+           id="path9054" />
+      </g>
+      <g
+         inkscape:label="MajorYGridlines"
+         id="g9056">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 0,100 500,0"
+           style="fill:none;stroke:#000000;stroke-width:2"
+           inkscape:label="MajorYDiv1"
+           id="path9058" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 0,200 500,0"
+           style="fill:none;stroke:#000000;stroke-width:2"
+           inkscape:label="MajorYDiv2"
+           id="path9060" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 0,300 500,0"
+           style="fill:none;stroke:#000000;stroke-width:2"
+           inkscape:label="MajorYDiv3"
+           id="path9062" />
+      </g>
+      <rect
+         height="400"
+         style="fill:none;stroke:#000000;stroke-width:2"
+         width="500"
+         x="0"
+         y="0"
+         inkscape:label="Border"
+         id="rect9064" />
+    </g>
   </g>
 </svg>

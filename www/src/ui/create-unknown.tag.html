@@ -6,35 +6,34 @@
     </div>
 </create-unknown>
 <create-quilt>
-    <div class="row">
-        <div class="col s6 m6 l6 left-align">
-            <div id="createNodeForm">
-                <form onsubmit={addNode}>
-                    <h5>Create biomaterials</h5>
-                    <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete} placeholder='select virtual'/>
-                    <form-text-input label="Instances" ref="instances" name="instances" value={formData.instances}/>
-                    <div style="margin-top:30px"/>
-                    <std-button label="add to workbench" action={addNode} />
-                    <input type="submit" style="visibility:hidden" />
-                </form>
+    <div style="padding-top:0; margin-top:0;width:100%">
+        <div id="createNodeForm">
+            <form onsubmit={addNode}>
+                <h5>Create biomaterials</h5>
+                <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete} placeholder='select virtual' />
+                <form-text-input label="Instances" ref="instances" name="instances" value={formData.instances}/>
+                <div style="margin-top:30px" />
+                <std-button label="add to workbench" action={addNode} />
+                <input type="submit" style="visibility:hidden" />
+            </form>
+        </div>
+        
+        <div style="margin-top:25px">
+            <div each={field in fields}>
+                <form-text-input3 label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
             </div>
-            <div id="scanner" style="position:absolute;top:100px; left:0px"></div>
-            <div class="row" style="margin-top:25px">
-                <div each={field in fields}>
-                    <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
-                </div>
-            </div>
+        </div>
 
-            <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:130px; right:25px; text-align:left" onclick={addNode} data-activates="addmenu2"><i class="material-icons">queue</i></a>
+        <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:130px; right:25px; text-align:left" onclick={addNode} data-activates="addmenu2"><i class="material-icons">queue</i></a>
 
-            <a class="btn-floating btn-large waves-effect waves-light red dropdown-button" data-constrainwidth="false" style="position:absolute; top:200px; right:25px; text-align:left" onclick={deleteNode}><i class="material-icons">delete</i></a>
+        <a class="btn-floating btn-large waves-effect waves-light red dropdown-button" data-constrainwidth="false" style="position:absolute; top:200px; right:25px; text-align:left" onclick={deleteNode}><i class="material-icons">delete</i></a>
 
-            <ul id="addmenu2" class="dropdown-content" style="position:absolute; top:270px; right:25px; width:200px !important; text-align:left;z-index:1000">
-                <li each={item in virtuals} class="add-type"><span onclick={createNode}>{item.name}</span></li>
-            </ul>
+        <ul id="addmenu2" class="dropdown-content" style="position:absolute; top:270px; right:25px; width:200px !important; text-align:left;z-index:1000">
+            <li each={item in virtuals} class="add-type"><span onclick={createNode}>{item.name}</span></li>
+        </ul>
 
 
-            <!--
+        <!--
             <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" style="position:absolute; top:130px; right:25px; text-align:left" onclick={addNode}><i class="material-icons">add</i></a>
             <ul id="addmenu" style="position:absolute; top:280px; right:25px; width:200px !important; text-align:left;z-index:1000">
                 <li each={item in virtuals} class="add-type"><span onclick={addNode}>{item.name}</span></li>
@@ -51,7 +50,7 @@
                 <li each={item in virtuals}><a href="{item.url}">{item.name}</a></li>
             </ul>
                 -->
-            <!--
+        <!--
     <div class="row">
         <div class="col s3 m3 l3"></div>
         <div class="col s6 m6 l6 left-align">
@@ -72,138 +71,138 @@
             </ul>
         </div>
         -->
-        </div>
-        <style>
-            li.add-type:hover {
-                background-color: #E5F3FB;
-                outline: 1px solid #70C0E7;
+    </div>
+    <style>
+        li.add-type:hover {
+            background-color: #E5F3FB;
+            outline: 1px solid #70C0E7;
+        }
+
+    </style>
+
+    <script>
+        const tag = this
+        tag.formData = {
+            name: '',
+            instances: '1'
+        }
+        tag.fields = []
+        const bionetSetup = app.getStream('bionetSetup')
+        const workbench = app.getStream('workbench')
+
+        const appSettings = app.getAppSettings()
+
+        this.virtuals = []
+        this.locations = []
+        this.dataTypes = appSettings.dataTypes
+        for (var i = 0; i < this.dataTypes.length; i++) {
+            const type = this.dataTypes[i]
+            if (type.virtual === true) {
+                type.url = '/create-virtual/' + encodeURI(type.name)
+                this.virtuals.push(type)
+            } else {
+                type.url = '/create-physical/' + encodeURI(type.name)
+                this.locations.push(type)
             }
+        }
+        console.log("create unknown, types:%s", JSON.stringify(this.dataTypes))
+        tag.on('mount', function() {
+            $('.dropdown-button').dropdown({
+                inDuration: 300,
+                outDuration: 225,
+                constrainWidth: false,
+                hover: true,
+                gutter: 0,
+                belowOrigin: true,
+                alignment: 'left',
+                stopPropagation: false
+            });
+        })
 
-        </style>
+        this.updateAutocomplete = function(q, cb) {
+            console.log('updateAutocomplete: ', q)
+            app.remote.createAutocomplete(null, q, function(err, results) {
+                if (err) return cb(err)
+                console.log('updateAutocomplete results: ', JSON.stringify(results))
+                cb(null, results)
+            });
+        }
 
-        <script>
-            const tag = this
-            tag.formData = {
-                name: '',
-                instances: '1'
-            }
-            tag.fields = []
-            const bionetSetup = app.getStream('bionetSetup')
-            const workbench = app.getStream('workbench')
+        tag.setFields = function() {
+            return
+            const type = $('input[name=selectvirtual]:checked').val()
+            tag.fields = app.getAttributesForType(type)
+            tag.update()
+        }
 
-            const appSettings = app.getAppSettings()
-
-            this.virtuals = []
-            this.locations = []
-            this.dataTypes = appSettings.dataTypes
-            for (var i = 0; i < this.dataTypes.length; i++) {
-                const type = this.dataTypes[i]
-                if (type.virtual === true) {
-                    type.url = '/create-virtual/' + encodeURI(type.name)
-                    this.virtuals.push(type)
-                } else {
-                    type.url = '/create-physical/' + encodeURI(type.name)
-                    this.locations.push(type)
+        tag.deleteNode = function() {
+            const ftree = $("#ftree").fancytree("getTree")
+            const deleteNodes = []
+            const delChildren = function(node) {
+                if (!node.children) return
+                for (var i = 0; i < node.children.length; i++) {
+                    const childNode = node.children[i]
+                    delChildren(childNode)
+                    deleteNodes.push(childNode)
                 }
             }
-            console.log("create unknown, types:%s", JSON.stringify(this.dataTypes))
-            tag.on('mount', function() {
-                $('.dropdown-button').dropdown({
-                    inDuration: 300,
-                    outDuration: 225,
-                    constrainWidth: false,
-                    hover: true,
-                    gutter: 0,
-                    belowOrigin: true,
-                    alignment: 'left',
-                    stopPropagation: false
-                });
+            ftree.visit(function(node) {
+                if (node.isSelected()) {
+                    delChildren(node)
+                    deleteNodes.push(node)
+                }
             })
-
-            this.updateAutocomplete = function(q, cb) {
-                console.log('updateAutocomplete: ', q)
-                app.remote.createAutocomplete(null, q, function(err, results) {
-                    if (err) return cb(err)
-                        console.log('updateAutocomplete results: ', JSON.stringify(results))
-                    cb(null, results)
-                });
-            }
-            
-            tag.setFields = function() {
-                return
-                const type = $('input[name=selectvirtual]:checked').val()
-                tag.fields = app.getAttributesForType(type)
-                tag.update()
-            }
-
-            tag.deleteNode = function() {
-                const ftree = $("#ftree").fancytree("getTree")
-                const deleteNodes = []
-                const delChildren = function(node) {
-                    if (!node.children) return
-                    for (var i = 0; i < node.children.length; i++) {
-                        const childNode = node.children[i]
-                        delChildren(childNode)
-                        deleteNodes.push(childNode)
-                    }
-                }
-                ftree.visit(function(node) {
-                    if (node.isSelected()) {
-                        delChildren(node)
-                        deleteNodes.push(node)
-                    }
-                })
-                for (var i = 0; i < deleteNodes.length; i++) {
-                    const node = deleteNodes[i]
-                    const id = node.data.dbData.id
-                    console.log('removing %s %s', node.title, id)
+            for (var i = 0; i < deleteNodes.length; i++) {
+                const node = deleteNodes[i]
+                const id = node.data.dbData.id
+                console.log('removing %s %s', node.title, id)
                     // TODO: messaging async api call
-                    bionetSetup.route('delPhysical', undefined, id)
-                    node.remove()
-                }
+                bionetSetup.route('delPhysical', undefined, id)
+                node.remove()
             }
+        }
 
-            tag.createNode = function(e) {
-                const active = $(e.target)
-                const type = active.text()
-                riot.mount('div#create-virtual', 'create-virtual-form', {
-                    type: type,
-                    query: {}
-                })
-                $('#createNodeForm').hide()
+        tag.createNode = function(e) {
+            const active = $(e.target)
+            const type = active.text()
+            riot.mount('div#workbench-form', 'create-virtual-form', {
+                type: type,
+                query: {}
+            })
+            $('#createNodeForm').hide()
+        }
+
+        tag.addNode = function(e) {
+
+            // get active node if any selected
+            var node = $("#ftree").fancytree("getActiveNode");
+            const ftree = $("#ftree").fancytree("getTree");
+
+            // initialize parent id
+            var parentId
+            if (!node) {
+                node = ftree.getRootNode().children[0]
             }
+            parentId = node.data.dbData.id
 
-            tag.addNode = function(e) {
+            // initialize series prefix and 
+            const seriesName = tag.refs.selectVirtual.value
+            const instances = tag.refs.instances.value
 
-                // get active node if any selected
-                var node = $("#ftree").fancytree("getActiveNode");
-                const ftree = $("#ftree").fancytree("getTree");
-
-                // initialize parent id
-                var parentId
-                if (!node) {
-                    node = ftree.getRootNode().children[0]
-                }
-                parentId = node.data.dbData.id
-
-                // initialize series prefix and 
-                const seriesName = tag.refs.selectVirtual.value
-                const instances = tag.refs.instances.value
-                
-                // generate instances of physicals
-                for (var instance = 0; instance < instances; instance++) {
-                    const name = seriesName + '_' + instance
+            // generate instances of physicals
+            for (var instance = 0; instance < instances; instance++) {
+                const name = seriesName + '_' + instance
                     // initialize standard attributes
-                    const dbData = {
-                        name: name,
-                        type:'physical',
-                        parent_id: parentId
-                    }
-                    console.log('addNode: %s', instances, JSON.stringify(dbData))
-                    // TODO: messaging async api call
-                    workbench.route('saveInWorkbench', undefined, dbData)
+                const dbData = {
+                    name: name,
+                    type: 'physical',
+                    parent_id: parentId
                 }
+                console.log('addNode: %s', instances, JSON.stringify(dbData))
+                    // TODO: messaging async api call
+                workbench.route('saveInWorkbench', undefined, dbData)
             }
+        }
 
-        </script>
+    </script>
 </create-quilt>

@@ -1,15 +1,17 @@
 <app>
     <appbar/>
-    <div id="content-container" class="{theme.style.color.background} {theme.style.color.text}">
-        <div class="contentHeight">
-            <div id="content" class="{theme.style.color.background+' '+theme.style.color.text}" />
+    <div id="content-container" class="content-height {theme.style.color.background} {theme.style.color.text}">
+        <div class="content-height">
+            <div id="content" class="content-height {theme.style.color.background+' '+theme.style.color.text}" />
         </div>
     </div>
     <div style="height:48px"></div>
     <!--  <footer-tag background={theme.style.color.highlightBackground} /> -->
     <style>
-        div.contentHeight {
-            height:calc(100% - 100px)
+        .content-height {
+            height: -moz-calc(100% - 100px);
+            height: -webkit-calc(100% - 100px);
+            height: calc(100% - 100px);
         }
     </style>
     <script>

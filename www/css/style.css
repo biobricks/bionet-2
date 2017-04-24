@@ -8,169 +8,171 @@
  * Made By MaterializeCSS.com
  */
 
+html,
+body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
 nav ul a,
 nav .brand-logo {
-  color: #444;
+    color: #444;
 }
-
 p {
-  line-height: 2rem;
+    line-height: 2rem;
 }
-
 .button-collapse {
-  color: #26a69a;
+    color: #26a69a;
 }
-
 .parallax-container {
-  min-height: 380px;
-  line-height: 0;
-  height: auto;
-  color: rgba(255, 255, 255, .9);
+    min-height: 380px;
+    line-height: 0;
+    height: auto;
+    color: rgba(255, 255, 255, .9);
 }
-
 .parallax-container .section {
-  width: 100%;
+    width: 100%;
 }
-
 @media only screen and (max-width: 992px) {
-  .parallax-container .section {
-    position: absolute;
-    top: 40%;
-  }
-  #index-banner .section {
-    top: 10%;
-  }
-}
-
-@media only screen and (max-width: 600px) {
-  #index-banner .section {
-    top: 0;
-  }
-}
-
-.icon-block {
-  padding: 0 15px;
-}
-
-.icon-block .material-icons {
-  font-size: inherit;
-}
-
-footer.page-footer {
-  margin: 0;
-}
-
-@media (max-width:600px) {
-  .heading3 {
-    font-size: 4vw;
-  }
-  .heading2 {
-    font-size: 5vw;
-  }
-  .heading1 {
-    font-size: 6vw;
-  }
-}
-
-@media (min-width:601px) {
-  .heading3 {
-    font-size: 2.5vw;
-  }
-  .heading2 {
-    font-size: 3vw;
-  }
-  .heading1 {
-    font-size: 4vw;
-  }
-}
-
-@media (min-width:992px) {
-  .heading3 {
-    font-size: 1.1vw;
-  }
-  .heading2 {
-    font-size: 1.3vw;
-  }
-  .heading1 {
-    font-size: 2.5vw;
-  }
-}
-
-@media (min-width:1200px) {
-  .heading3 {
-    font-size: 1vw;
-  }
-  .heading2 {
-    font-size: 1.3vw;
-  }
-  .heading1 {
-    font-size: 1.6vw;
-  }
-}
-
-@media (min-width:1200px) {
-  .heading2 {
-    font-size: 1.3vw;
-  }
-  .heading1 {
-    font-size: 1.6vw;
-  }
-}
-
-.collection .collection-item.avatar2 {
-  padding-left: 72px;
-  position: relative;
-}
-
-.collection .collection-item .circle {
-  position: absolute;
-  width: 42px;
-  height: 42px;
-  overflow: hidden;
-  left: 15px;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.collection .collection-item .square {
-  position: absolute;
-  width: 42px;
-  height: 42px;
-  overflow: hidden;
-  right: 15px;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.collection .collection-item .title {
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.parallax-container-sm {
-  position: relative;
-  overflow: hidden;
-  height: 200px;
-}
-
-li.search {
-  position: absolute;
-  margin-top: 1px;
-  padding: 1px 0 0 0;
-  z-index: 2;
-}
-
-.postfix {
-  position: absolute;
-  right: 0px;
-  width: 3rem;
-  font-size: 2rem;
-  transition: color .2s;
-}
-    @font-face {
-      font-family: 'Roboto';
-      src: url('../fonts/roboto/Roboto-Medium.eot');
-      src: url('../fonts/roboto/Roboto-Medium.eot?#iefix') format('embedded-opentype'), url('../fonts/roboto/Roboto-Medium.woff') format('woff'), url('../fonts/roboto/Roboto-Medium.ttf') format('truetype');
-      font-weight: normal;
-      font-style: normal;
+    .parallax-container .section {
+        position: absolute;
+        top: 40%;
     }
+    #index-banner .section {
+        top: 10%;
+    }
+}
+@media only screen and (max-width: 600px) {
+    #index-banner .section {
+        top: 0;
+    }
+}
+.icon-block {
+    padding: 0 15px;
+}
+.icon-block .material-icons {
+    font-size: inherit;
+}
+footer.page-footer {
+    margin: 0;
+}
+@media (max-width:600px) {
+    .heading3 {
+        font-size: 4vw;
+    }
+    .heading2 {
+        font-size: 5vw;
+    }
+    .heading1 {
+        font-size: 6vw;
+    }
+}
+@media (min-width:601px) {
+    .heading3 {
+        font-size: 2.5vw;
+    }
+    .heading2 {
+        font-size: 3vw;
+    }
+    .heading1 {
+        font-size: 4vw;
+    }
+}
+@media (min-width:992px) {
+    .heading3 {
+        font-size: 1.1vw;
+    }
+    .heading2 {
+        font-size: 1.3vw;
+    }
+    .heading1 {
+        font-size: 2.5vw;
+    }
+}
+@media (min-width:1200px) {
+    .heading3 {
+        font-size: 1vw;
+    }
+    .heading2 {
+        font-size: 1.3vw;
+    }
+    .heading1 {
+        font-size: 1.6vw;
+    }
+}
+@media (min-width:1200px) {
+    .heading2 {
+        font-size: 1.3vw;
+    }
+    .heading1 {
+        font-size: 1.6vw;
+    }
+}
+.collection .collection-item.avatar2 {
+    padding-left: 72px;
+    position: relative;
+}
+.collection .collection-item .circle {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    overflow: hidden;
+    left: 15px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.collection .collection-item .square {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    overflow: hidden;
+    right: 15px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.collection .collection-item .title {
+    font-size: 16px;
+    font-weight: bold;
+}
+.parallax-container-sm {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+}
+li.search {
+    position: absolute;
+    margin-top: 1px;
+    padding: 1px 0 0 0;
+    z-index: 2;
+}
+.postfix {
+    position: absolute;
+    right: 0px;
+    width: 3rem;
+    font-size: 2rem;
+    transition: color .2s;
+}
+@font-face {
+    font-family: 'Roboto';
+    src: url('../fonts/roboto/Roboto-Medium.eot');
+    src: url('../fonts/roboto/Roboto-Medium.eot?#iefix') format('embedded-opentype'), url('../fonts/roboto/Roboto-Medium.woff') format('woff'), url('../fonts/roboto/Roboto-Medium.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+NotoColorEmoji
+/*
+src: url('../fonts/emojione/EmojiOneColor-SVGinOT.ttf');
+    src: url('../fonts/emojione/NotoColorEmoji.ttf');
+*/
+@font-face {
+    font-family: 'Noto Color Emoji';
+    src: url('../fonts/emojione/EmojiOneColor-SVGinOT.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'material icons';
+    src: url('../fonts/materialicons/MaterialIcons-Regular.ttf');
+    font-weight: normal;
+    font-style: normal;
+}

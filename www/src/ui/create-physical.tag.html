@@ -1,66 +1,46 @@
 <create-physical>
     <div if={opts.topMargin!==undefined} id="createPhysical" style="margin-top:{opts.topMargin}px" />
     <div if={opts.topMargin===undefined} id="createPhysical" style="margin-top:100px" />
-    <!--
-    <form id="createPhysicalForm" ref="createPhysicalForm" class="col s12" onsubmit={submitForm}>
-    <div style="width:50%; min-width:290px; overflow:scroll;">
-    -->
-    <div style="min-width:290px; overflow:scroll;">
-        <form id="createPhysicalForm" ref="createPhysicalForm" onsubmit={submitForm}>
-
-            <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
-
-            <div if={showPhysical}>
-                <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+    <form id="createPhysicalForm" ref="createPhysicalForm" onsubmit={submitForm}>
+        <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
+        <div if={showPhysical}>
+            
+            <div class="pixijs">
+                <bionet-container width="200" />
             </div>
+            
+            <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
             <!--
-        <div class="input-field col s12">
-                <div class="query-container">
-                    <input type="text" id="q" name="q" ref="q" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
-                    <label for="q" class="active">Instance of {type}</label>
-                </div>
-                <ul id="matchList" class="matchlist">
-                    <li each={match, index in matches} class="matchlist {highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-                    <li if={matches && !matches.length} class="matchlist no-match">No matches found</li>
-                </ul>
-            </div>
-        </div>
--->
-            <div if={showPhysical} each={field in fields}>
+            <form-text-input label="Type" ref="type" name="type" value={formData.type}/>
+            <form-text-input3 label="Parent X" ref="locationid" name="parent_x" value={formData.parent_x}/>
+            <form-text-input3 label="Parent Y" ref="locationid" name="parent_y" value={formData.parent_y}/>
+            -->
+
+            <div each={field in fields}>
                 <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
             </div>
 
-            <div if={showPhysical} class="row">
-                <div class="col">
-                    <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
-                </div>
-            </div>
-            <div if={showPhysical}>
-                <div style="margin-top:30px" />
-                <form-text-input label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
-            </div>
-            <div if={showPhysical} class="row">
-                <div class="col">
-                    <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a>
-                    <div id="autocomplete-container">
-                        <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name" />
-                    </div>
-                </div>
+            <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+
+            <div style="margin-top:30px" />
+            <form-text-input3 label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
+
+            <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a>
+            <div id="autocomplete-container">
+                <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name" />
             </div>
 
-            <div if={showPhysical} class="row">
-                <div class="col">
-                    <div style="margin-top:30px" />
-                    <std-button label="submit" action={submitForm} />
-                </div>
-            </div>
+
+            <div style="margin-top:30px" />
+            <std-button label="submit" action={submitForm} />
 
             <input type="hidden" ref="id" name="id" value={formData.id} />
             <input type="hidden" ref="type" name="type" value={type} />
             <input type="hidden" ref="virtual_id" name="virtual_id" value={formData.virtual_id} />
             <input type="submit" style="visibility:hidden" />
-        </form>
-    </div>
+        </div>
+        </div>
+    </form>
     <div id="scanModal" ref="scanModal" class="scanModal modal"></div>
     <div id="printModal" ref="printModal" class="printModal modal"></div>
 
@@ -69,21 +49,24 @@
             background-color: rgba(255, 255, 255, 1);
             z-index: 1000;
         }
+        .pixijs {
+            margin-top: 15px;
+            width: 100%;
+            float: left;
+        }
 
     </style>
     <script>
         const tag = this
         console.log("create physical tag, opts:%s", JSON.stringify(opts))
         this.fields = app.getAttributesForType(opts.type)
-        this.type = opts.type
+        tag.type = opts.type
         this.isMaterial = false
         this.showPhysical = true
-
         if (opts.show === undefined || opts.show === true) this.showPhysical = true
         else this.showPhysical = false
 
         const bionetSetup = app.getStream('bionetSetup')
-
 
         this.updateAutocomplete = function(query, cb) {
             app.remote.physicalAutocomplete(query, function(err, results) {
@@ -98,6 +81,7 @@
             name: '',
             notes: ''
         }
+        tag.container = {}
 
         var savePhysical = function(p, labelImage) {
             var doPrint = labelImage ? true : false
@@ -113,7 +97,8 @@
         this.submitForm = function(e) {
             e.preventDefault()
             var formData = $.formToObject('createPhysicalForm') || {};
-            formData.label = this.labelFormData;
+            formData.label = tag.labelFormData;
+            formData.type = tag.type
 
             if (!formData.parent_id) {
                 if (formData.parent_name) {
@@ -246,7 +231,7 @@
 
             if (opts.query && opts.query.name && opts.query.name.trim()) {
                 this.formData.name = decodeURIComponent(opts.query.name);
-                this.type = this.formData.name
+                //this.type = this.formData.name
             }
 
             this.update();
@@ -259,11 +244,13 @@
                         return
                     }
                     this.formData = data
-                    this.type = data.type
+                    tag.type = data.type
 
                     this.printNameDefault = data.name;
                     $(this.refs.createPhysicalHeader).html("Edit " + data.name)
                     this.update()
+
+
                 }.bind(this))
                 $('#createPhysicalForm').scrollTop(0)
                 return;
@@ -274,22 +261,11 @@
             bionetSetup.addRoute('getPhysicalResult', function(data) {
                 console.log('getPhysicalResult', JSON.stringify(data))
                 tag.formData = data
-                    /*
-                    tag.type = data.type
-                    const dataType = app.getType(data.type)
-                    if (dataType.virtual) tag.isMaterial = true
-                    else tag.isMaterial = false
-                    if (tag.isMaterial) {
-                        tag.refs.q.value = ''
-                        $('#selectVirtual').show()
-                        tag.updateMatchListPosition()
-                    } else {
-                        $('#selectVirtual').hide()
-                    }
-                    tag.printNameDefault = data.name;
-                    //$(tag.refs.createPhysicalHeader).html("Edit " + data.name)
-                    tag.fields = app.getAttributesForType(data.type)
-                    */
+                tag.type = data.type
+                
+                const bionetStorageLocation = app.getStream('bionetStorageLocation')
+                bionetStorageLocation.dispatch('configure', data.id)
+                
                 tag.showPhysical = true
                 tag.update()
             })
@@ -376,14 +352,16 @@
             this.selectCurrent = function() {
                 var sel = this.matches[this.selected]
                 this.refs.q.value = sel.name
-                    /*
-                if (sel.pre === 'type') {
-                    //this.setSelectedType(sel)
-                    this.refs.q.value = ''
-                } else {
-                    this.refs.q.value = sel.name
-                }
-                */
+                tag.formData.parent_name = sel.name
+                app.remote.getBy('name', formData.parent_name, function(err, m) {
+                    if (err) return app.ui.toast("Error:" + err);
+                    if (!m) {
+                        app.ui.toast("Warning: Invalid container");
+                    } else {
+                        tag.formData.parent_id = m.id;
+                        tag.update();
+                    }
+                }.bind(this))
                 this.hideMatches()
             }.bind(this)
 

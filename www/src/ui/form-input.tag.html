@@ -31,6 +31,37 @@
     </script>
 </form-text-input>
 
+<form-text-input3>
+    <div class="input-field">
+        <input id={opts.name} name={opts.name} ref="inputTag" type="text" value={data}>
+        <label for={opts.name} class="active">{opts.label}</label>
+    </div>
+    <script>
+        const tag = this
+        this.inputWidth = (opts.width) ? opts.width : 's12'
+
+        this.on('update', function() {
+            tag.data = tag.opts.riotValue;
+        })
+
+        this.on('mount', function() {
+            //console.log("form-text-input, opts:", JSON.stringify(tag.opts))
+            tag.data = tag.opts.riotValue
+            tag.update()
+            Object.defineProperty(tag, "value", {
+                get: function() {
+                    return $(tag.refs.inputTag).val()
+                },
+                set: function(value) {
+                    tag.data = value;
+                    $(tag.refs.inputTag).val(value)
+                }
+            });
+        })
+
+    </script>
+</form-text-input3>
+
 
 <form-select-input>
     <div class="row">

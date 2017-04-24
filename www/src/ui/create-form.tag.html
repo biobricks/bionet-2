@@ -1,70 +1,26 @@
 <create-form>
     <div class="content-height">
-        <!--
-        <div class="fixed-action-btn" style="bottom:100px; left:25px; width:50px; text-align:left">
-            <a class="btn-floating btn-large waves-effect waves-light green dropdown-button"><i class="material-icons" data-activates="addmenu">add</i></a>
-        </div>
-        -->
-
-
-        <div class="inventory-tree">
-            <table id="ftree" style="margin-top:15px; width:400px;border:none !important;">
-                <colgroup>
-                    <col width="390px"></col>
-                    <!--
-                <col width="*"></col>
-                <col width="250px"></col>
-                <col width="150px"></col>
-                <col width="100px"></col>
-            -->
-                </colgroup>
-                <!--
-                <thead>
-                    <tr>
-                        <th style="padding-left:10px">Name</th>
-                    </tr>
-                </thead>
-                -->
-                <tbody style="border: none !important;">
-                    <tr>
-                        <td></td>
-                        <!--
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    -->
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div id="edit-physical" class="edit-physical">
-            <create-physical show="false" top-margin="0px" />
-        </div>
-        <div id="create-virtual" class="create-virtual">
-        </div>
-        <!--
-        -->
-        <div id="create-physical" class="edit-physical">
-            <create-quilt/>
-
-            <!--
-            <form ref="createForm2" onsubmit={submitForm2}>
-                <div id="selectVirtual2" class="row">
-                    <div class="input-field col s6">
-                        <div class="query-container">
-                            <input type="text" id="q2" name="q2" ref="q2" placeholder="enter partial or complete name" autocomplete="off" autofocus onblur={hideMatches} />
-                            <label for="q2" class="active">Instance of {type}</label>
-                        </div>
-                        <ul id="matchList2" class="matchlist">
-                            <li each={match, index in matches} class="matchlist {highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
-                            <li if={matches && !matches.length} class="matchlist no-match">No matches found</li>
-                        </ul>
+        <div class="row">
+            <div class="inventory-tree col s4">
+                <table id="ftree" style="margin-top:15px; border:none !important;">
+                    <tbody style="border: none !important;">
+                        <tr>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="physical-storage" class="col s7">
+                <div if={showStorage} class="row">
+                    <div id="pixijsdiv" class="pixijs">
+                        <bionet-storage-location width={pixiwidth}/>
                     </div>
                 </div>
-                <input type="submit" style="display:none" />
-            </form>
-            -->
+                <div class="row">
+                    <div id="workbench-form" class="edit-physical">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -81,10 +37,7 @@
         }
         
         .inventory-tree {
-            overflow: auto;
             float: left;
-            margin-left: 25px;
-            width: 400px;
         }
         
         span.fancytree-edit {
@@ -97,17 +50,13 @@
         }
         
         .edit-physical {
-            overflow: auto;
-            width: calc(100% - 600px);
+            width: 100%;
             float: left;
-            margin-left: 25px;
+            display: block;
         }
         
         .create-virtual {
-            overflow: auto;
-            width: calc(100% - 600px);
             float: left;
-            margin-left: 25px;
         }
         
         div.content-height {
@@ -118,6 +67,8 @@
     </style>
     <script>
         const tag = this
+        tag.showStorage = false
+
         const bionetSetup = app.getStream('bionetSetup')
         const workbench = app.getStream('workbench')
         var userWorkbench = {}
@@ -125,42 +76,6 @@
             'label': 'workbench',
             'url': '/create'
         }])
-
-        this.submitForm2 = function(e) {
-            e.preventDefault();
-
-            //     this.selectCurrent();
-            var val = this.refs.q2.value.trim()
-
-            if (!this.selectedType && val) {
-                app.remote.getVirtualBy('name', val, function(err, o) {
-                    if (err) return app.ui.toast("Error: " + err); // TODO handle better
-
-                    if (!o) {
-                        route('/create-unknown/' + encodeURIComponent(val));
-                    } else {
-                        route('/create-physical/' + o.id);
-                    }
-                });
-                return;
-            } else if (this.selectedType) {
-                if (this.selectedType.virtual) {
-                    var url = '/create-virtual/' + encodeURIComponent(this.selectedType.name);
-                    if (val) {
-                        url += '/?name=' + encodeURIComponent(val);
-                    }
-                    route(url);
-                } else {
-                    var url = '/create-physical/' + encodeURIComponent(this.selectedType.name);
-                    if (val) {
-                        url += '/?name=' + encodeURIComponent(val);
-                    }
-                    route(url);
-                }
-            } else {
-                // do nothing
-            }
-        }.bind(this);
 
         function query(type, q, cb) {
             app.remote.createAutocomplete(type, q, function(err, results) {
@@ -185,18 +100,6 @@
             }
             const newNode = parentNode.addChildren(newNodeData)
             parentNode.setExpanded()
-                //dbData.name = type + '_' + newNode.getIndexHier()
-                //console.log('add node :', JSON.stringify(dbData))
-                /*
-                const ftree = $("#ftree").fancytree("getTree")
-                ftree.visit(function(node) {
-                    if (node.data.dbData.name === storageItem.name) {
-                        node.setTitle(storageItem.name)
-                        node.data.dbData.id = storageItem.id
-                        console.log('createStorageItemResult %s updated with id %s', storageItem.name, storageItem.id)
-                    }
-                })
-                */
         })
 
         this.selected = null
@@ -209,7 +112,8 @@
                 height: $(window).innerHeight() - 120
             });
 
-            $('#name').focus()
+            //$('#name').focus()
+            tag.pixiwidth = $('physical-storage').width()
 
             this.updateMatchListPosition = function() {
                 var pos = $('#q2').offset();
@@ -349,106 +253,40 @@
                 source: [],
                 checkbox: true,
                 icon: false,
-                renderColumns: function(event, data) {
-                    /*
-                    console.log('tdlist:')
-                    const node = data.node
-                    const $tdList = $(node.tr).find(">td");
-                    const dbData = node.data.dbData
-                    const type = (dbData.type) ? dbData.type : ''
-                    const barcode = (dbData.barcode) ? dbData.barcode : ' '
-                    $tdList.eq(1).html('<span class="fancytree-edit">' + dbData.Description + '</span>');
-                    $tdList.eq(2).html('<span class="fancytree-edit">' + type + '</span>');
-                    $tdList.eq(3).html('<span class="fancytree-edit">' + barcode + '</span>');
-                    //$tdList.eq(3).html('<span>' + node.getIndexHier() + '</span>');
-                    */
-                },
+                renderColumns: function(event, data) {},
                 beforeSelect: function(event, data) {},
                 modifyChild: function(event, data) {
                     if (data.operation === 'remove') {
                         const deleteNode = data.childNode
                     }
                 },
-                keydown: function(event, data) {
-                    /*
-                    const node = data.node;
-                    if (event.which === 13) {
-                        event.preventDefault();
-                        console.log('setup-storage - save item: ', node)
-                        const $tdList = $(node.tr).find(">td");
-                        const dbData = node.data.dbData
-                            //dbData.name = $tdList.eq(0).text()
-                            //console.log('title: %s node.data:%s',node.title,JSON.stringify(dbData))
-                        bionetSetup.route('updateStorageItem', undefined, dbData)
-                    }
-                    */
-                },
+                keydown: function(event, data) {},
                 dnd5: {
-                    // autoExpandMS: 400,
-                    // preventForeignNodes: true, 
-                    // preventNonNodes: true, 
-                    // preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
-                    // preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
-                    // scroll: true,
-                    // scrollSpeed: 7,
-                    // scrollSensitivity: 10,
-
-                    // --- Drag-support:
-
                     dragStart: function(node, data) {
-                        /* This function MUST be defined to enable dragging for the tree.
-                         *
-                         * Return false to cancel dragging of node.
-                         * data.dataTransfer.setData() and .setDragImage() is available
-                         * here.
-                         */
-                        //          data.dataTransfer.setDragImage($("<div>hurz</div>").appendTo("body")[0], -10, -10);
                         return true;
                     },
                     dragDrag: function(node, data) {
                         data.dataTransfer.dropEffect = "move";
                     },
                     dragEnd: function(node, data) {},
-
-                    // --- Drop-support:
-
                     dragEnter: function(node, data) {
-                        // node.debug("dragEnter", data);
                         data.dataTransfer.dropEffect = "move";
-                        // data.dataTransfer.effectAllowed = "copy";
                         return true;
                     },
                     dragOver: function(node, data) {
                         data.dataTransfer.dropEffect = "move";
-                        // data.dataTransfer.effectAllowed = "copy";
                     },
                     dragLeave: function(node, data) {},
                     dragDrop: function(node, data) {
-                        /* This function MUST be defined to enable dropping of items on
-                         * the tree.
-                         */
                         var transfer = data.dataTransfer;
 
-                        node.debug("drop", data);
-
-                        // alert("Drop on " + node + ":\n"
-                        //   + "source:" + JSON.stringify(data.otherNodeData) + "\n"
-                        //   + "hitMode:" + data.hitMode
-                        //   + ", dropEffect:" + transfer.dropEffect 
-                        //   + ", effectAllowed:" + transfer.effectAllowed);
-
                         if (data.otherNode) {
-                            // Drop another Fancytree node from same frame
-                            // (maybe from another tree however)
                             var sameTree = (data.otherNode.tree === data.tree);
 
                             data.otherNode.moveTo(node, data.hitMode);
                         } else if (data.otherNodeData) {
-                            // Drop Fancytree node from different frame or window, so we only have
-                            // JSON representation available
                             node.addChild(data.otherNodeData, data.hitMode);
                         } else {
-                            // Drop a non-node
                             node.addNode({
                                 title: transfer.getData("text")
                             }, data.hitMode);
@@ -472,39 +310,29 @@
                 const active = $(e.target)
                 const elementType = active.prop('nodeName');
                 console.log('elementType:', elementType)
-                    //if (!active.hasClass('fancytree-edit')) {
+
                 var node = $("#ftree").fancytree("getActiveNode");
                 if (node) {
                     if (node.data.dbData.type === 'workbench') {
-                        $('#create-physical').css({
-                            display: 'block'
-                        });
-                        $('#edit-physical').css({
-                            display: 'none'
-                        });
+                        tag.showStorage = false
+                        riot.mount('div#workbench-form', 'create-quilt')
+                        tag.update()
                         return
                     }
 
                     const dbData = node.data.dbData
                     console.log('select physical:', JSON.stringify(dbData))
-                        /*
-                        const type = dbData.type
-                        tag.createType = (type.indexOf('box') >= 0 || type.indexOf('shelf') >= 0 || type.indexOf('cabinet') >= 0 || type.indexOf('drawer') >= 0) ? 'material' : 'storage'
 
-                        if (type.indexOf('box') >= 0) {
-                            //console.log('activating scanner')
-                            //app.dispatch('startScan',{status:'init'})
-                        }
-                        */
-
+                    tag.showStorage = true
                     tag.update()
+
+                    riot.mount('div#workbench-form', 'create-physical', {
+                        topMargin: '0px'
+                    })
+
                     // TODO: messaging async api call
                     bionetSetup.route('getPhysical', undefined, dbData.id)
                     if (e.type === 'keydown') node.setExpanded()
-                    $('#edit-physical').css({
-                        height: $(window).innerHeight() - 120,
-                        display: 'block'
-                    });
 
                     app.setBreadcrumbs([{
                         'label': 'workbench',
@@ -513,16 +341,13 @@
                         'label': node.title,
                         'url': '/inventory'
                     }]);
-
+                    tag.update()
                 }
-                //}
-                //if (!active.text()) return
-                //app.editTextElement(e, active)
             })
 
             workbench.addRoute('requestWorkbenchResult', function(uw) {
                 userWorkbench = uw
-                // TODO: messaging async api call
+                    // TODO: messaging async api call
                 workbench.route('getWorkbenchTree', undefined, userWorkbench)
             })
 
@@ -536,21 +361,19 @@
                         node.setExpanded();
                         node.setFocus();
                     }
+                    $('.inventory-tree').css({
+                        height: $(window).innerHeight() - $('#appbar').height() - 15
+                    });
+                    tag.pixiwidth = $('#ftree').width() - 40
+                    tag.update()
                 })
             })
-
-            $('#create-physical').css({
-                display: 'block'
-            });
-            $('#edit-physical').css({
-                display: 'none'
-            });
 
             bionetSetup.observe((action) => {
                 // TODO: messaging async api call
                 workbench.route('requestWorkbench')
             })
-            
+
             // TODO: messaging async api call
             workbench.route('requestWorkbench')
 

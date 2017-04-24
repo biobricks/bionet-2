@@ -1,6 +1,6 @@
 <cart>
-    <div class="searchheight">
-        <div class="searchresult">
+    <div class="searchheight row">
+        <div id="searchresult" class="searchresult col s4">
             <div if={results.length===0}>Cart is empty.</div>
             <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
                 <list-item class="searchItem" no-reorder each={item in results} item={item}>
@@ -8,8 +8,17 @@
                 </list-item>
             </div>
         </div>
-        <div id="edit-physical" class="edititem">
+        <!--
+        <div id="display-location" class="edititem col s7">
+            <div if={showscanner===true}>
+                <scanner/>
+            </div>
+        </div>
+        -->
+        <div id="edit-physical" class="edititem col s7">
             <div if={results.length>0} onclick={emptyCart} class="right-align" style="margin-right:20px; color:teal; cursor: pointer; cursor: hand; ">empty cart</div>
+            <bionet-storage-location width="{pixiwidth}" />
+            <babylon-3d></babylon-3d>
             <create-physical show="false" top-margin="0px" />
         </div>
     </div>
@@ -21,17 +30,11 @@
         }
         
         .searchresult {
-            overflow: auto;
             float: left;
-            margin-left: 25px;
-            width: 700px;
         }
         
         .edititem {
-            width: calc(100% - 750px);
-            overflow: auto;
             float: left;
-            margin-left: 25px;
         }
 
     </style>
@@ -41,6 +44,7 @@
         tag.theme = app.getTheme()
         tag.results = tag.opts.results || []
         tag.pagination = []
+        tag.showscanner = false
         const bionetSetup = app.getStream('bionetSetup')
         const cart = app.getStream('cart')
 
@@ -50,6 +54,7 @@
         }]
 
         this.on('mount', function() {
+            tag.pixiwidth = $('#edit-physical').width()
 
             console.log('cart tag')
             const deleteCartItem = function(e, item) {
@@ -60,51 +65,58 @@
             }
 
             cart.addRoute('cartResult', function(data) {
-                //console.log('cart tag, result:', JSON.stringify(data))
-                const path = (data.path.indexOf('_workbench-') >= 0) ? 'workbench' : data.path;
-                const item = {
-                    primary_text: data.physical.name,
-                    secondary_text: path,
-                    id: data.physical.id,
-                    iconClick: deleteCartItem,
-                    starred: true,
-                    righticon: 'delete',
-                    click: itemClick
-                }
-                tag.results.push(item)
-                tag.update()
-            })
-            // TODO: messaging async api call
+                    //console.log('cart tag, result:', JSON.stringify(data))
+                    const path = (data.path.indexOf('_workbench-') >= 0) ? 'workbench' : '';
+                    const item = {
+                        primary_text: data.physical.name,
+                        secondary_text: path,
+                        id: data.physical.id,
+                        iconClick: deleteCartItem,
+                        starred: true,
+                        righticon: 'delete',
+                        click: itemClick
+                    }
+                    tag.results.push(item)
+                    tag.update()
+                })
+                // TODO: messaging async api call
             cart.route('requestCart')
 
             const itemClick = function(item) {
                 console.log('itemClick:', JSON.stringify(item))
-                // TODO: messaging async api call
+                    // TODO: messaging async api call
                 bionetSetup.route('getPhysical', undefined, item.id)
                 app.setBreadcrumbs([{
-                    'label': 'cart',
-                    'url': '/cart'
-                }, {
-                    'label': item.primary_text,
-                    'url': '/cart/' + opts.terms
-                }])
-                $('#edit-physical').css({
-                    height: $(window).innerHeight() - 120,
-                    display: 'block'
-                });
-
+                        'label': 'cart',
+                        'url': '/cart'
+                    }, {
+                        'label': item.primary_text,
+                        'url': '/cart/' + opts.terms
+                    }])
+                    /*
+                    tag.showscanner=true
+                    tag.update()
+                    const storageLocationView = app.getStream('storageLocationView')
+                    storageLocationView.route('storageLocationView', null, item)
+                    */
+                    //app.route('','')
+                    /*
+                    $('#edit-physical').css({
+                        height: $(window).innerHeight() - 120,
+                        display: 'block'
+                    });
+                    */
             }
 
             const results = tag.results
             for (var i = 0; i < results.length; i++) {
                 results[i].click = itemClick
             }
-            
+
             app.setBreadcrumbs(breadcrumbs);
 
             tag.primaryHeader = 'Search results for "' + opts.terms + '"'
             tag.secondaryHeader = tag.results.length + ' items'
-            tag.update()
 
             $('.searchresult').css({
                 height: $(window).innerHeight() - 120
@@ -121,6 +133,7 @@
                 const elementType = active.prop('nodeName');
                 console.log('elementType:', elementType)
             })
+            tag.update()
         });
 
         this.on('unmount', function() {
@@ -130,7 +143,7 @@
         tag.emptyCart = function() {
             for (var i = 0; i < tag.results.length; i++) {
                 var item = tag.results[i]
-                // TODO: messaging async api call
+                    // TODO: messaging async api call
                 cart.route('deleteCartBatch', undefined, item.id)
             }
             tag.results = []

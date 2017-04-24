@@ -1,0 +1,138 @@
+<bionet-storage-location>
+    <div id="bionet-storage-location-canvas"></div>
+    <script>
+        const PIXI = require('pixi.js')
+        const MiniSignal = require('mini-signals')
+        const bionetLabLayout = require('./bionetLabLayout')
+        const pixijsutils = require('./pixijsutils')
+
+        const tag = this
+        const PIXI_WIDTH = 500
+        const PIXI_HEIGHT = 240
+
+        const pixiController = app.getStream('bionetStorageLocation')
+        tag.pixiController = pixiController
+
+        this.on('mount', function() {
+            console.log('bionetStorageLocation tag mount')
+
+            const pixiEvents = new MiniSignal()
+            tag.pixiEvents = pixiEvents
+
+            tag.width = opts.width || PIXI_WIDTH
+            tag.height = opts.height || PIXI_HEIGHT
+
+            const renderScene = function() {
+                const bionetLabLayoutScene = new PIXI.Container()
+                bionetLabLayout.createScene(bionetLabLayoutScene)
+                pixijsutils.scaleToFit(bionetLabLayoutScene)
+                pixijsutils.appendToStage(bionetLabLayoutScene)
+                pixijsutils.renderStage()
+            }
+
+            bionetLabLayout.initializeTypes()
+            const loader = PIXI.loader
+            loader.reset()
+            bionetLabLayout.loadResources()
+            loader.load((loader, resources) => {
+                bionetLabLayout.setResources(resources)
+                if (!tag.resources) {
+                    renderScene()
+                    tag.resources = resources
+                }
+            });
+
+            const canvas = document.getElementById('bionet-storage-location-canvas')
+            pixijsutils.initStage(tag.width, tag.height)
+            pixijsutils.attachRenderer(canvas)
+
+            const config = {}
+
+            // handler functions for pixi client events
+            function onPixiEvent(cmd, msgdata) {
+                if (cmd === undefined) return;
+                const pixiMsgHandler = {
+                    selectCell: function(msg) {
+                        bionetLabLayout.connectCells()
+                        pixijsutils.renderStage()
+
+                        //update container with new coordinates
+                        const locationPath = tag.locationPath
+                        const id = msg.id
+                        var container = {}
+                        for (var i = 0; i < locationPath.length; i++) {
+                            container = locationPath[i]
+                            if (container.id === id) {
+                                break;
+                            }
+                        }
+                        if (container.id !== id) return
+                        const cell = msg.cell
+                        container.parent_x = cell.x
+                        container.parent_y = cell.y
+                        const doPrint = false
+                        const labelImage = null
+                        const toast = app.getThemeMethod().toast
+                        console.log('selectCell %s %s', JSON.stringify(cell), JSON.stringify(container, null, 2))
+                        app.remote.savePhysical(container, labelImage, doPrint, function(err, id) {
+                            if (err) {
+                                toast('ERROR saving ' + container.name + ' ' + err)
+                                if (cb) cb(err)
+                                return;
+                            }
+                            //toast(container.name + ' saved at ' + container.parent_x + ' ' + container.parent_y)
+                            console.log(container.name + ' saved at ' + container.parent_x + ' ' + container.parent_y)
+                        })
+                    },
+                    configure: function(msg) {
+                        //todo: this may be invoked before resources have loaded
+                        const id = msg
+                        console.log('bionetStorageLocation tag configure function, id=', id)
+                        app.remote.getLocationPath(id, function(err, locationPath) {
+                            if (err) {
+                                console.log('getLocationPath error:', err)
+                                return
+                            }
+                            console.log('bionet storage location getLocationPath result:', JSON.stringify(locationPath))
+
+                            const container = locationPath[0]
+                            const parent = locationPath[1]
+                            tag.container = container
+                            tag.locationPath = locationPath
+
+                            pixijsutils.initStage(tag.width, tag.height)
+
+                            // add lab storage to stage and render
+                            const config = {
+                                locationPath: locationPath,
+                                title: container.name
+                            }
+                            bionetLabLayout.initializeModel(config)
+
+                            // render if resources loaded otherwise defer
+                            if (tag.resources) {
+                                renderScene()
+                            }
+                        })
+                    },
+                    resize: function(msg) {
+                        pixijsutils.resizeStage(tag.width, 600)
+                    },
+                    render: function(msg) {
+                        bionetLabLayout.connectCells()
+                    }
+                }
+                pixiMsgHandler[cmd](msgdata);
+            }
+            // setup listener for pixi events
+            var eventBinding = pixiController.add(onPixiEvent);
+            tag.update()
+        })
+
+        this.on('updated', function() {
+            tag.width = opts.width || PIXI_WIDTH
+            tag.height = opts.height || PIXI_HEIGHT
+        })
+
+    </script>
+</bionet-storage-location>

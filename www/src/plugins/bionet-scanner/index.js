@@ -1,15 +1,21 @@
 const riot = require('riot')
 import nanoStream from '../../app/NanoStream';
 import scanner from './scanner'
-import labStorage from './labStorage'
 import bionetScannerApi from './bionetScannerApi'
 import scanProcessor from './scanProcessor'
+import pixijsutils from './pixijsutils'
+const PIXI = require('pixi.js')
+const tween = require('pixi-tween')
+const MiniSignal = require('mini-signals');
+const babylon = require('./3d/babylon.tag.html')
 
 const bionetScanPlugin = app.addPlugin('bionetScan2')
 require('./scanner.tag.html')
+require('./bionetStorageLocation.tag.html')
 
 bionetScanPlugin.start = function () {
     console.log('starting bionet_scanner plugin')
+    pixijsutils.initRenderer()
 
     // todo:
     // handle scaling for mobile devices
@@ -18,6 +24,8 @@ bionetScanPlugin.start = function () {
     // data streams
     const startScan = app.addStream('startScan')
     const scanResult = app.addStream('scanResult')
+    const pixiController = new MiniSignal()
+    app.addStream('bionetStorageLocation', pixiController)
     const thisModule = this
     startScan.observe((msg) => {
         switch (msg.status) {
@@ -66,6 +74,8 @@ bionetScanPlugin.runScanner = function () {
     s.controller = new nanoStream();
     s.plugin = new nanoStream();
 
+    const storageLocationView = app.addStreamRouter('storageLocationView')
+
     const thisModule = this
     const q = route.query()
     const config = {}
@@ -105,20 +115,25 @@ bionetScanPlugin.runScanner = function () {
     //-------------------------------------------------------------------------
     // initialize pixi
     // create webgl renderer
-    const GAME_WIDTH = 1600;
-    const GAME_HEIGHT = 1120;
+    const GAME_WIDTH = 1100;
+    const GAME_HEIGHT = 750;
+    //const GAME_WIDTH = 1600;
+    //const GAME_HEIGHT = 1120;
     //PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
-    //backgroundColor: 0x000000,
-    //backgroundColor: 0x303030,
-    //alpha:0.8,
-    const renderer = new PIXI.WebGLRenderer(GAME_WIDTH, GAME_HEIGHT, {
-        backgroundColor: 0xffffff,
-        transparent: false,
-        resolution: window.devicePixelRatio,
-        autoResize: true
-    });
-
-    // attach pixi to html element in tag
+    const backgroundColor = 0xffffff
+        //backgroundColor: 0x000000,
+        //backgroundColor: 0x303030,
+        //alpha:0.8,
+        /*
+        const renderer = new PIXI.WebGLRenderer(GAME_WIDTH, GAME_HEIGHT, {
+            backgroundColor: backgroundColor,
+            transparent: false,
+            resolution: window.devicePixelRatio,
+            autoResize: true
+        });
+        PIXI.TRANSFORM_MODE.DEFAULT = PIXI.TRANSFORM_MODE.DYNAMIC;
+        */
+        // attach pixi to html element in tag
     const widgetDiv = document.getElementById("scanner-widget")
     widgetDiv.appendChild(renderer.view);
 
@@ -129,13 +144,11 @@ bionetScanPlugin.runScanner = function () {
     // setup dynamic resizing
     const resize = function () {
         // Determine which screen dimension is most constrained
-        var ratio = Math.min(window.innerWidth / GAME_WIDTH, window.innerHeight / GAME_HEIGHT);
+        var ratio = Math.min((window.innerWidth - 300) / GAME_WIDTH, window.innerHeight / GAME_HEIGHT);
 
         // Scale the view appropriately to fill that dimension
         stage.scale.x = stage.scale.y = ratio * 0.85;
 
-        // Update the renderer dimensions
-        //renderer.resize(Math.ceil(GAME_WIDTH * ratio), Math.ceil(GAME_HEIGHT * ratio));
     }
 
     window.onresize = () => resize();
@@ -143,34 +156,29 @@ bionetScanPlugin.runScanner = function () {
 
     //-------------------------------------------------------------------------
     // initialize plugins
-    labStorage.init(s, stage)
+    //labStorage.init(s, stage)
     scanner.init(s, stage)
 
     //-------------------------------------------------------------------------
     // dispatch plugin load resources event
-    const loader = PIXI.loader;
+    const loader = PIXI.loader
     loader.reset()
-    s.controller.dispatch({
-        cmd: 'load'
-    })
     s.controller.dispatch({
         cmd: 'configure',
         data: this.config
     })
+    s.controller.dispatch({
+        cmd: 'load'
+    })
 
     //-------------------------------------------------------------------------
     // update frame handler
-    this.running = true
-
-    const update = function () {
-        if (!thisModule.running) return
-
-        requestAnimationFrame(() => {
-            update();
-        });
-        PIXI.tweenManager.update();
-        s.update.dispatch({});
-        renderer.render(stage);
+    this.animationReq = {}
+    const update = function (timestamp) {
+        PIXI.tweenManager.update()
+        s.update.dispatch({})
+        renderer.render(stage)
+        thisModule.animationReq = window.requestAnimationFrame(update)
     }
 
     //-------------------------------------------------------------------------
@@ -181,8 +189,9 @@ bionetScanPlugin.runScanner = function () {
             data: resources
         })
         console.log('starting renderer')
-        update();
-        // fetch cassette data if available
+        thisModule.animationReq = window.requestAnimationFrame(update)
+            //update();
+            // fetch cassette data if available
         setTimeout(function () {
             s.controller.dispatch({
                 cmd: 'scan'
@@ -195,14 +204,13 @@ bionetScanPlugin.runScanner = function () {
         close: function () {
             $("#scanner-widget").remove()
             window.onresize = undefined
-            thisModule.running = false
+            window.cancelAnimationFrame(thisModule.animationReq)
 
             // route back to physical instance search result
             route('/q?partid=' + config.q.partid)
         },
         run: function () {
-            thisModule.running = true
-            update()
+            thisModule.animationReq = window.requestAnimationFrame(update)
         }
     }
 
@@ -219,7 +227,7 @@ bionetScanPlugin.runScanner = function () {
 }
 
 bionetScanPlugin.stopScanner = function () {
-    this.running = false
+    window.cancelAnimationFrame(this.animationReq)
 }
 
 module.exports = bionetScanPlugin

@@ -1,0 +1,548 @@
+<babylon-3d>
+    <div id="babylon-container">
+        <canvas id="render-canvas"></canvas>
+    </div>
+    <style>
+        #babylon-container {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #render-canvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+    </style>
+    <script>
+        const tag = this
+        const pixiController = app.getStream('bionetStorageLocation')
+
+        const bionetLabLayout = require('../bionetLabLayout')
+        bionetLabLayout.initializeTypes()
+        tag.types = bionetLabLayout.types
+
+        this.on('mount', function() {
+
+            const canvas = document.getElementById('render-canvas');
+            const engine = new BABYLON.Engine(canvas, true);
+            var scene = {}
+            var lab = {}
+            var highlightPathObj = []
+
+            const moveCameraToElement = function(name) {
+                const targetObj = scene.getMeshByName(name);
+                if (!targetObj) return
+                var x = targetObj.position.x
+                    //x = Math.max(Math.min(x, 3), -1)
+                var y = Math.max(targetObj.position.y - 1, 1)
+                y = Math.min(y, 2)
+                moveCamera(null, x, y)
+            }
+
+            const setupLocationPath = function(locationPath) {
+                const target = locationPath[locationPath.length - 1]
+                const locationPathSpecs = []
+                var element = lab
+                var parentLocation = null
+                for (var i = locationPath.length - 1; i >= 0; i--) {
+                    const locationSpec = locationPath[i]
+                    if (locationSpec.type === undefined) {
+                        if (locationSpec.name === 'endy lab') {
+                            locationSpec.type = 'lab'
+                        }
+                    }
+                    const type = locationSpec.type
+                    const typeSpec = tag.types[type]
+                    if (type === undefined || typeSpec == undefined) {
+                        console.log('undefined type:%s %s', locationSpec.name, type)
+                        continue
+                    }
+                    const location = {
+                        name: locationSpec.name,
+                        id: locationSpec.id,
+                        type: type,
+                        x: locationSpec.parent_x,
+                        y: locationSpec.parent_y,
+                        image: typeSpec.image,
+                        xc: typeSpec.xc,
+                        yc: typeSpec.yc
+                    }
+                    const childLocation = locationPath[i - 1]
+                    if (childLocation !== undefined) console.log('searching model for %s %s %s, i=%s', childLocation.type, childLocation.parent_x, childLocation.parent_y, i)
+                    locationPathSpecs.push(location)
+                    if (element.children === undefined) break
+                    for (var index = 0; index < element.children.length && childLocation !== undefined; index++) {
+                        const childElement = element.children[index]
+                        if (childLocation.type.indexOf('box') >= 0) {
+                            //console.log('testing box element %s %s %s', childElement.type, childLocation.parent_x, childElement.x)
+                            if (childLocation.parent_x == childElement.x && childLocation.parent_y == childElement.y) {
+                                const color = (childElement.children !== undefined) ? new BABYLON.Color3(1.0, 0.0, 0) : new BABYLON.Color3(1.0, 0, 0)
+                                highlightElement(childElement.name, true, color, childElement.alpha)
+                                highlightPathObj.push(childElement)
+                                element = childElement
+                                console.log('highlighting element %s %s', childElement.name, index)
+                                if (i === 1) {
+                                    moveCameraToElement(childElement.name)
+                                }
+                                break;
+                            }
+                        } else {
+                            var i1 = childElement.x
+                            var i2 = childLocation.parent_x
+                            var alpha = null
+                            if (childElement.type.indexOf('shelf') >= 0) {
+                                i1 = childElement.x
+                                i2 = childLocation.parent_y
+                                alpha = 1
+                            } else {
+
+                            }
+                            //console.log('testing element %s %s %s', childElement.type, i1, i2)
+                            if (i1 == i2) {
+                                const color = (childElement.children !== undefined) ? new BABYLON.Color3(1.0, 1.0, 0) : new BABYLON.Color3(1.0, 0, 0)
+                                highlightElement(childElement.name, true, color, alpha)
+                                if (childLocation.type.indexOf('physical') >= 0) {
+                                    moveCameraToElement(element.name)
+                                } else if (i === 1) {
+                                    moveCameraToElement(childElement.name)
+                                }
+                                highlightPathObj.push(childElement)
+                                element = childElement
+                                console.log('highlighting element %s %s', childElement.name, index)
+                                break;
+                            }
+                        }
+                    }
+                }
+                //var select = Math.round(Math.random() * (parent.children.length - 1))
+                //element = parent.children[select]
+            }
+
+            const highlightElement = function(name, highlight, color, origAlpha) {
+                const obj = scene.getMeshByName(name);
+                if (obj === null || obj === undefined) return
+                console.log('highlighting object: %s %s %s %s', obj.name, highlight, color, origAlpha)
+                var highlightColor = (color !== undefined) ? color : new BABYLON.Color3(0, 1, 1)
+                var alpha = 0.25
+                if (origAlpha === undefined || origAlpha === null) {
+                    alpha = (highlight === true) ? 0.5 : 0.25
+                } else {
+                    alpha = origAlpha
+                }
+                console.log('highlighting object, alpha=', alpha)
+
+                var visible = true
+                if (highlight === true) {
+                    highlightColor = (color !== undefined) ? color : new BABYLON.Color3(1, 0, 0)
+                } else {
+                    if (name.indexOf('box') >= 0) visible = false
+                }
+                var highlightMaterial = new BABYLON.StandardMaterial("highlightTexture", scene);
+                highlightMaterial.alpha = alpha;
+                highlightMaterial.diffuseColor = highlightColor;
+                highlightMaterial.ambientColor = highlightColor;
+                highlightMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+                obj.material = highlightMaterial;
+
+                obj.visibility = visible
+            }
+
+            const highlightPath = function(parent) {
+                if (parent === undefined) return
+                if (parent.name !== undefined) {
+                    //console.log('highlighting object: ', parent.name)
+                    const color = (parent.children !== undefined) ? new BABYLON.Color3(1.0, 1.0, 0) : new BABYLON.Color3(1.0, 0, 0)
+                    highlightElement(parent.name, true, color)
+                    highlightPathObj.push(parent.name)
+                }
+                if (parent.children !== undefined) {
+                    var select = Math.round(Math.random() * (parent.children.length - 1))
+                    var element = parent.children[select]
+                    if (element !== undefined) {
+                        //console.log('highlighting child element ', select)
+                        highlightPath(element)
+                    } else {
+                        console.log('error highlighting element')
+                    }
+                }
+            }
+
+            const unhighlightPath = function() {
+                console.log('unhighlighting path')
+                for (var i = 0; i < highlightPathObj.length; i++) {
+                    var element = highlightPathObj[i]
+                        //console.log('unhighlighting element ',JSON.stringify(element))
+                    highlightElement(element.name, false, element.color, element.alpha)
+                }
+                highlightPathObj = []
+            }
+
+            const createElement = function(props) {
+                const name = props.name
+                const width = props.width
+                const height = props.height
+                const depth = props.depth
+                const x = props.x
+                const y = props.y
+                const z = props.z
+                const boxColor = (props.color) ? props.color : new BABYLON.Color3(0, 0.25, 1)
+                const alpha = (props.alpha) ? props.alpha : 1
+
+                var box = BABYLON.MeshBuilder.CreateBox(name, {
+                    height: height,
+                    width: width,
+                    depth: depth,
+                }, scene);
+                box.position.x = x
+                box.position.y = y
+                box.position.z = z
+                if (props.visible !== undefined) box.visibility = props.visible
+                    //box.showBoundingBox = true
+
+                var materialBox1 = new BABYLON.StandardMaterial("texture1", scene);
+                materialBox1.alpha = alpha;
+                materialBox1.diffuseColor = boxColor;
+                materialBox1.ambientColor = boxColor;
+                materialBox1.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+                box.material = materialBox1;
+
+                //box.zOrder = 0
+                //materialBox1.hasAlpha = true
+                /*
+                materialBox1.needAlphaTesting = () => {
+                        return true
+                    }
+                    */
+                //materialBox1.backFaceCulling = false                
+                //materialBox1.wireframe = true;
+                //materialBox1.diffuseTexture.hasAlpha = true;
+                //materialBox1.emissiveColor = new BABYLON.Color3(1, .2, .7);
+                /*
+                const boxColors = [
+                    boxColor,
+                    boxColor,
+                    boxColor,
+                    boxColor,
+                    boxColor,
+                    boxColor
+                ]
+                */
+                //faceColors: boxColors
+                //box.hasVertexAlpha = true
+
+            }
+            const freezerWidth = 3
+
+            const createBox = function(id, x, y, z, highlight, xindex, yindex) {
+                const width = (freezerWidth / 4) - 0.3
+                const height = 0.7 / 4
+                const depth = 1.8 / 5
+                const color = (highlight === true) ? new BABYLON.Color3(1, 0, 0) : new BABYLON.Color3(0, 1, 1)
+                const alpha = (highlight === true) ? 1 : 0.25
+                const elementProps = {
+                    name: id,
+                    width: width,
+                    height: height,
+                    depth: depth,
+                    x: x + ((freezerWidth / 4) - 0.2) / 2 + 0.1,
+                    y: y + 0.8 / 2 + 0.1,
+                    z: z + depth / 2,
+                    color: color,
+                    alpha: 1,
+                    visible: false
+                }
+                createElement(elementProps)
+                const boxObj = {
+                    name: id,
+                    children: [],
+                    x: xindex,
+                    y: yindex,
+                    alpha: 1,
+                    type: '8 x 12 freezer box'
+                }
+                return boxObj
+            }
+
+            const createRack = function(id, x, y, index) {
+                const width = (freezerWidth) / 4 - 0.2
+                const height = 0.8
+                const depth = 2
+                const z = -0.05
+                const color = new BABYLON.Color3(0, 1, 1)
+                const elementProps = {
+                    name: id,
+                    width: width,
+                    height: height,
+                    depth: depth,
+                    x: x + width / 2 + 0.1,
+                    y: y + height / 2,
+                    z: z,
+                    color: color,
+                    alpha: 0.25
+                }
+                createElement(elementProps)
+                const bx = x - 0.1
+                const zd = z + depth / -2
+                const rack = {
+                    name: id,
+                    type: 'freezer rack',
+                    x: index + 1,
+                    color: color,
+                    children: []
+                }
+                for (var row = 0; row < 4; row++) {
+                    var by = y + (row * height / 4) - (height / 2)
+                    for (var col = 0; col < 5; col++) {
+                        var boxId = id + ".box" + row + "," + col
+                        var bz = zd + col * depth / 5
+                        var highlight = (Math.random() > 0.99) ? true : false
+                            //if (highlight === true) {
+                        var boxObj = createBox(boxId, bx, by, bz, false, 5 - col, 4 - row)
+                        rack.children.push(boxObj)
+                            //}
+                    }
+                }
+                return rack
+            }
+
+            const createShelf = function(id, x, y, index) {
+                const width = freezerWidth
+                const height = 0.1
+                const depth = 2.1
+                const color = new BABYLON.Color3(0, 0.75, 0.75)
+                const elementProps = {
+                    name: id,
+                    width: width,
+                    height: height,
+                    depth: depth,
+                    x: x,
+                    y: y + height / 2,
+                    z: 0,
+                    color: color
+                }
+                createElement(elementProps)
+                const shelf = {
+                    name: id,
+                    type: 'shelf',
+                    x: index,
+                    color: color,
+                    alpha: 1,
+                    children: []
+                }
+                for (var rack = 0; rack < 4; rack++) {
+                    var rackId = id + ".rack" + rack
+                    var rackObj = createRack(rackId, x + (rack * freezerWidth / 4) - freezerWidth / 2, y + height, rack)
+                    shelf.children.push(rackObj)
+                }
+                return shelf
+            }
+
+            const createFreezer = function(id, x, y, index) {
+                //createElement("freezer1", 4, 5, 2, 0, 2.5, 0, scene)
+
+                var plane = BABYLON.MeshBuilder.CreatePlane("plane", {
+                    width: 5,
+                    height: 5
+                }, scene);
+                plane.position = new BABYLON.Vector3(x, 0, -3);
+                var planeMaterial = new BABYLON.StandardMaterial("plane material", scene);
+                planeMaterial.backFaceCulling = false;
+                var planeTexture = new BABYLON.DynamicTexture("dynamic texture", 512, scene, true);
+                planeTexture.hasAlpha = true;
+                planeTexture.diffuseColor = new BABYLON.Color3(0, 0, 0)
+                planeTexture.drawText(id, null, 150, "bold 80px roboto", "black", "blue")
+                planeMaterial.diffuseTexture = planeTexture;
+                plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+                plane.material = planeMaterial;
+                plane.alpha = 0.5
+
+                const freezer = {
+                    name: id,
+                    type: '-80 freezer',
+                    x: index,
+                    children: []
+                }
+                for (var shelf = 0; shelf < 5; shelf++) {
+                    var shelfId = id + ".shelf" + shelf
+                    var shelfObj = createShelf(shelfId, x, shelf + y, 5 - shelf)
+                    freezer.children.push(shelfObj)
+                }
+                return freezer
+            }
+
+            /*
+            babylon-3d getLocationPath result: [{"name":"8 x 12 freezer box 1 3","parent_id":"p-26a02870-d259-4aae-a6fc-b23617e54bb4","parent_x":1,"parent_y":3,"id":"p-b41a7cb7-dd7f-4d18-baad-43a88ba97cd1","type":"8 x 12 freezer box","created":{"user":"tsakach@gmail.com","time":1491200596},"updated":{"user":"tsakach@gmail.com","time":1491526286},"pareny_y":2},{"name":"freezer rack 1 a","parent_id":"p-5dcb1adf-f85e-4de8-aa00-a98defa826d0","parent_x":1,"parent_y":1,"id":"p-26a02870-d259-4aae-a6fc-b23617e54bb4","type":"freezer rack","created":{"user":"tsakach@gmail.com","time":1491201205},"updated":{"user":"tsakach@gmail.com","time":1492065824}},{"name":"shelf 1","parent_id":"p-fb364307-3093-4936-9bb0-b2a7956ef525","parent_x":"1","parent_y":"1","id":"p-5dcb1adf-f85e-4de8-aa00-a98defa826d0","type":"shelf","created":{"user":"tsakach@gmail.com","time":1491200246},"updated":{"user":"tsakach@gmail.com","time":1491200246}},{"name":"BACKUP -80C","type":"-80 freezer","parent_x":"0","parent_id":"p-e76f2493-c8a8-41bd-8e99-793eead746ee","id":"p-fb364307-3093-4936-9bb0-b2a7956ef525","created":{"user":"tsakach@gmail.com","time":1492058205},"updated":{"user":"tsakach@gmail.com","time":1492058205}},{"name":"lab_.1","type":"lab","Description":"lab Description","id":"p-e76f2493-c8a8-41bd-8e99-793eead746ee","created":{"user":"tsakach@gmail.com","time":1487133264},"updated":{"user":"tsakach@gmail.com","time":1487133264}}]
+            */
+
+            const createScene = function() {
+                // create a basic BJS Scene object
+                scene = new BABYLON.Scene(engine);
+
+                // create a FreeCamera, and set its position to (x:0, y:5, z:-10)
+                //var camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 4, -9), scene);
+                var camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", 0, 0, 0, new BABYLON.Vector3(0, 4, -9), scene);
+
+                // target the camera to scene origin
+                camera.setTarget(new BABYLON.Vector3(0, 2, 0));
+
+                // attach the camera to the canvas
+                camera.attachControl(canvas, false);
+
+                // create a basic light, aiming 0,1,0 - meaning, to the sky
+                var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), scene);
+
+                // create a built-in "sphere" shape; its constructor takes 4 params: name, subdivisions, radius, scene
+                //var sphere = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, scene);
+                //sphere.position.y = 1;
+                const y = 0
+                lab = {
+                    name: 'endylab',
+                    type: 'lab',
+                    children: []
+                }
+                for (var x = 0; x < 4; x++) {
+                    var freezerId = "freezer" + x
+                    var freezerObj = createFreezer(freezerId, x * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, x)
+                    lab.children.push(freezerObj)
+                }
+
+
+                // create a built-in "ground" shape; its constructor takes 5 params: name, width, height, subdivisions and scene
+                var ground = BABYLON.Mesh.CreateGround('ground1', 4.5 * 4 + 2, 6, 2, scene);
+                var materialGround = new BABYLON.StandardMaterial("groundTexture", scene);
+                materialGround.alpha = 1;
+                materialGround.diffuseColor = new BABYLON.Color3(0.75, 0.75, 0.75);
+                materialGround.ambientColor = new BABYLON.Color3(0.75, 0.75, 0.75);
+                materialGround.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+                ground.material = materialGround;
+
+                var VJC = new BABYLON.VirtualJoysticksCamera("VJC", BABYLON.Vector3.Zero(), scene);
+                scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+                //scene.activeCamera = VJC;
+                // return the created scene
+                return scene;
+            }
+
+            const moveCamera = function(callback, dx, dy) {
+                console.log('move camera ', dx, dy)
+                var translatex = new BABYLON.Animation("camTranslatex", "target.x", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+                var keysx = [{
+                    frame: 0,
+                    value: scene.activeCamera.target.x
+                }, {
+                    frame: 100,
+                    value: dx
+                }];
+                translatex.setKeys(keysx);
+                scene.activeCamera.animations.push(translatex);
+
+                var translatey = new BABYLON.Animation("camTranslatey", "target.y", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+                var keysy = [{
+                    frame: 0,
+                    value: scene.activeCamera.target.y
+                }, {
+                    frame: 100,
+                    value: dy
+                }];
+                translatey.setKeys(keysy);
+                scene.activeCamera.animations.push(translatey);
+
+                var translatez = new BABYLON.Animation("camTranslatez", "target.z", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+                var keysz = [{
+                    frame: 0,
+                    value: scene.activeCamera.target.z
+                }, {
+                    frame: 100,
+                    value: 1.5
+                }];
+                translatez.setKeys(keysz);
+                scene.activeCamera.animations.push(translatez);
+
+                /*
+                var startRadius = scene.activeCamera.radius;
+                var endRadius = this.scene.activeCamera.radius;
+                var radius = new BABYLON.Animation("camAlpha", "radius", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+                var keys2 = [{
+                    frame: 0,
+                    value: startRadius
+                }, {
+                    frame: 100,
+                    value: endRadius
+                }];
+                radius.setKeys(keys2);
+                scene.activeCamera.animations.push(radius);
+                */
+
+                scene.beginAnimation(scene.activeCamera, 0, 100, false, 5.0, callback);
+            }
+
+            function onPixiEvent(cmd, msgdata) {
+                if (cmd === undefined) return;
+                const pixiMsgHandler = {
+                    selectCell: function(msg) {
+                        // find item in the location path that was clicked
+                        const locationPath = tag.locationPath
+                        const id = msg.id
+                        for (var i = 0; i < locationPath.length; i++) {
+                            const locationSpec = locationPath[i]
+                            if (locationSpec.id === id) {
+                                const cell = msg.cell
+                                locationSpec.parent_x = cell.x
+                                locationSpec.parent_y = cell.y
+                                unhighlightPath()
+                                setupLocationPath(locationPath)
+                                break
+                            }
+
+                        }
+                    },
+                    configure: function(msg) {
+                        //todo: this may be invoked before resources have loaded
+                        const id = msg
+                        console.log('babylon-3d tag configure function, id=', id)
+                        app.remote.getLocationPath(id, function(err, locationPath) {
+                            if (err) {
+                                console.log('getLocationPath error:', err)
+                                return
+                            }
+                            console.log('babylon-3d getLocationPath result:', JSON.stringify(locationPath))
+
+                            const container = locationPath[0]
+                            const parent = locationPath[1]
+                            tag.container = container
+                            tag.locationPath = locationPath
+
+                            // add lab storage to stage and render
+                            const config = {
+                                locationPath: locationPath,
+                                title: container.name
+                            }
+                            const meshName = ''
+                            unhighlightPath()
+                            setupLocationPath(locationPath)
+                                //highlightPath(lab)
+                        })
+                    }
+                }
+                pixiMsgHandler[cmd](msgdata);
+            }
+            var eventBinding = pixiController.add(onPixiEvent);
+
+
+            scene = createScene();
+            engine.runRenderLoop(function() {
+                //scene.activeCamera.alpha += .01;
+                scene.render();
+            });
+            window.addEventListener('resize', function() {
+                engine.resize();
+            });
+        })
+
+    </script>
+</babylon-3d>

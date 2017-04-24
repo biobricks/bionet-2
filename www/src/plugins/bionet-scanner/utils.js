@@ -1,3 +1,5 @@
+const PIXI = require('pixi.js')
+
 class utils {
 
     static svgToImage(svg, resolve, reject) {

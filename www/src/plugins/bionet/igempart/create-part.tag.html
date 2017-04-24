@@ -53,23 +53,19 @@
 </create-part>
 
 <create-virtual-form>
-    <h5 id="createVirtualHeader" ref="createVirtualHeader">Create {type}</h5>
-    <form id="createPartForm" ref="createPartForm" class="col s12" onsubmit={submitForm}>
-        <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
-        <!--
-        <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
-        <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
-        <form-textarea-input label="Biosafety level" ref="bsl" name="bsl" value={formData.bsl}/>
-        <form-switch label="Biohazardous?" ref="biohazard" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
-        -->
-        <form-text-input label="Created by" ref="creator" name="creator.user" value={formData.creator.user}/>
-        <form-text-input label="Created" ref="created" name="creator.time" value={formData.creator.time}/>
-        <div each={field in fields}>
-            <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
-        </div>
-        <std-button label="submit" action={submitForm} />
-        <input type="submit" style="visibility:hidden" />
-    </form>
+    <div style="margin:0;padding:0;width:100%">
+        <h5 id="createVirtualHeader" ref="createVirtualHeader">Create {type}</h5>
+        <form id="createPartForm" ref="createPartForm" class="col s12" onsubmit={submitForm}>
+            <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+            <form-text-input label="Created by" ref="creator" name="creator.user" value={formData.creator.user}/>
+            <form-text-input label="Created" ref="created" name="creator.time" value={formData.creator.time}/>
+            <div each={field in fields}>
+                <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
+            </div>
+            <std-button label="submit" action={submitForm} />
+            <input type="submit" style="visibility:hidden" />
+        </form>
+    </div>
     <script>
         const tag = this
         this.type = decodeURIComponent(opts.type)
@@ -85,7 +81,7 @@
                 time: new Date().toDateString()
             }
         }
-        
+
         // initialize schema attributes for virtual part
         this.fields = app.getAttributesForType(this.type)
         for (var i = 0; i < this.fields.length; i++) {

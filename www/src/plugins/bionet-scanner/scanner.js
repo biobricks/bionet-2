@@ -2,7 +2,8 @@ import nanoStream from '../../app/NanoStream';
 import nanoRoute from '../../app/NanoRoute';
 import utils from './utils'
 import Slideout from './slideout'
-import ScanGrid from './scanGrid'
+import StorageGrid from './storageGrid'
+const PIXI = require('pixi.js')
 
 const scanner = {
 
@@ -43,7 +44,7 @@ const scanner = {
 
     load: function () {
         console.log('scanner load function')
-        var loader = PIXI.loader;
+        const loader = PIXI.loader
         loader.baseUrl = this.assets
         loader.add('transparentPixel', 'pixel.png');
         loader.add('scanImage', 'scan_sm.png');
@@ -61,6 +62,7 @@ const scanner = {
 
     onLoadComplete: function (resources) {
         console.log('scanner onLoadComplete function')
+        return;
         const trayFormat = (this.configuration.cassetteType)
 
         const s = this.streams;
@@ -156,11 +158,11 @@ const scanner = {
 
         this.stage.addChild(scanImage);
 
-        var scanGrid = {}
+        var boxGrid = {}
         if (trayFormat === 1) {
-            scanGrid = new ScanGrid(12, 8, scanTexture.width, scanTexture.height)
+            boxGrid = new StorageGrid(12, 8, scanTexture.width, scanTexture.height)
         } else {
-            scanGrid = new ScanGrid(10, 10, scanTexture.width, scanTexture.height)
+            boxGrid = new StorageGrid(10, 10, scanTexture.width, scanTexture.height)
         }
 
         const closeButton = utils.clickSprite(this.stage, this.assets + 'closeButton.svg', undefined, 1500, -1000, function (e) {
@@ -274,7 +276,7 @@ const scanner = {
             ident = 0
             nc = 0
             scanCellsContainer.removeChildren()
-            scanGrid.process(s.scanIndicator, highlight)
+            boxGrid.process(s.scanIndicator, highlight)
             isScanning = true
             microsphere.visible = isScanning
             datamatrix.visible = isScanning
@@ -287,15 +289,15 @@ const scanner = {
                 scanSprite.visible = true
                 scanSprite.alpha = 0.75
             } else {
-                cassetteText.text = thisModule.configuration.cassette.locationid + trayFormatStr + ' ' + scanGrid.getCellCoordinates(highlight[0])
+                cassetteText.text = thisModule.configuration.cassette.locationid + trayFormatStr + ' ' + boxGrid.getCellCoordinates(highlight[0])
             }
 
         }
         const scanButton = utils.clickSprite(scanTray, this.assets + 'scannerScanButton.svg', this.assets + 'scannerScanButtonActive.svg', 919, 99, this.startScan);
 
-        const scanGridContainer = new PIXI.Container()
-        scanImage.addChild(scanGridContainer)
-        scanGrid.drawGrid(scanGridContainer)
+        const boxGridContainer = new PIXI.Container()
+        scanImage.addChild(boxGridContainer)
+        boxGrid.drawGrid(boxGridContainer)
         var scannerP1 = new PIXI.Point(2500, 320)
             //var scannerP1 = new PIXI.Point(0, 320)
 
@@ -313,10 +315,10 @@ const scanner = {
                 scanImage.texture = scanTexture
                 scanImage.x = 300 + gridAdjustment.x
                 scanImage.width = 902 + gridAdjustment.width
-                scanGrid.xcells = 12
-                scanGrid.ycells = 8
-                scanGrid.width = resources.scanImage.texture.width
-                scanGrid.height = resources.scanImage.texture.height
+                boxGrid.xcells = 12
+                boxGrid.ycells = 8
+                boxGrid.width = resources.scanImage.texture.width
+                boxGrid.height = resources.scanImage.texture.height
                 scannerP1 = new PIXI.Point(2500, 320)
 
                 // configure 10x10 tray
@@ -327,15 +329,15 @@ const scanner = {
                 scanImage.texture = scanTexture
                 scanImage.x = 450 + gridAdjustment.x
                 scanImage.width = 600 + gridAdjustment.width
-                scanGrid.xcells = 10
-                scanGrid.ycells = 10
-                scanGrid.width = resources.scanImage10x10.texture.width
-                scanGrid.height = resources.scanImage10x10.texture.height
+                boxGrid.xcells = 10
+                boxGrid.ycells = 10
+                boxGrid.width = resources.scanImage10x10.texture.width
+                boxGrid.height = resources.scanImage10x10.texture.height
                 scannerP1 = new PIXI.Point(2800, 310)
             }
-            scanGridContainer.removeChildren()
+            boxGridContainer.removeChildren()
             scanCellsContainer.removeChildren()
-            scanGrid.drawGrid(scanGridContainer)
+            boxGrid.drawGrid(boxGridContainer)
         });
 
         const scanLine = new PIXI.Container()

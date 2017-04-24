@@ -1,3 +1,5 @@
+const PIXI = require('pixi.js')
+
 const slideoutApi = function (resourceUrl, x, y, x2, y2, slideoutButton, stage, visible) {
 
   this.x = x
