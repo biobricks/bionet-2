@@ -114,6 +114,9 @@
 
             //$('#name').focus()
             tag.pixiwidth = $('physical-storage').width()
+            
+            // set default create form to create quilt
+            riot.mount('div#workbench-form', 'create-quilt')
 
             this.updateMatchListPosition = function() {
                 var pos = $('#q2').offset();

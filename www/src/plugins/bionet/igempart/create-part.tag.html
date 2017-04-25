@@ -62,6 +62,9 @@
             <div each={field in fields}>
                 <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
             </div>
+            <!-- create physical instances option -->
+            <form-text-input label="Physical Instances" ref="instances" name="instances" value={physicalInstances}/>
+
             <std-button label="submit" action={submitForm} />
             <input type="submit" style="visibility:hidden" />
         </form>
@@ -70,6 +73,8 @@
         const tag = this
         this.type = decodeURIComponent(opts.type)
         console.log('create-virtual-form, opts:%s', JSON.stringify(this.opts))
+        tag.physicalInstances = '0'
+        const workbenchData = app.getStream('workbenchData')
 
         // initialize global attributes for virtual part
         app.state.createPart = app.state.createPart || {}
@@ -103,26 +108,37 @@
             $(tag.refs.createPartForm).change(function(e) {
                 $.extend(app.state.createPart, $.formToObject('createPartForm'))
             });
-
         });
 
-        // TODO JUUl this doesn't work if using $(this.createPartForm)
-        // probably because it needs to be run from within on('mount')
-
-        this.submitForm = function(e) {
+        tag.submitForm = function(e) {
             e.preventDefault()
+            const virtualName = app.state.createPart.name
+            const physicalInstances = app.state.createPart.instances
+
+            // remove instances property from app.state.createPart - not to be stored with virtual data
+            delete app.state.createPart.instances
 
             app.remote.saveVirtual(app.state.createPart, function(err, id) {
                 if (err) return app.ui.toast("Error: " + err) // TODO handle error
 
-                app.ui.toast("Virtual created with ID: " + id)
                 app.state.editPart = app.state.createPart
-                    //route('/edit/' + id);
+
+                if (physicalInstances !== undefined && physicalInstances !== '0') {
+                    const msg = {
+                        name: virtualName,
+                        instances: physicalInstances
+                    }
+                    workbenchData.dispatch('generatePhysicals', msg)
+                    app.ui.toast('Created '+physicalInstances+' instances of '+opts.type+' '+virtualName)
+                } else {
+                    app.ui.toast('Created '+opts.type+' '+virtualName)
+                }
             });
+
+
             tag.unmount(true)
             $('#createNodeForm').show()
-
-        }.bind(this)
+        }
 
     </script>
 </create-virtual-form>

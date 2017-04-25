@@ -37,29 +37,30 @@ Untracked files:
 	cmd.js
 	endysettings.js
 	index.html
-	www/assets/lab-storage/-80 freezer.svg
-	www/assets/lab-storage/endylab.png
-	www/assets/lab-storage/endylab_thumb.png
-	www/assets/lab-storage/freezer rack.svg
-	www/assets/lab-storage/freezer%20rack.svg
-	www/assets/lab-storage/storageTube.png
-	www/assets/lab-storage/workbench.png
-	www/fonts/emojione/
-	www/js/babylon.2.5.js
-	www/js/pixi-tween.old.js
-	www/js/pixi.min.old.js
-	www/src/plugins/bionet-scanner/3d/
-	www/src/plugins/bionet-scanner/BionetStream.js
-	www/src/plugins/bionet-scanner/bionetContainer.tag-xxx.html
-	www/src/plugins/bionet-scanner/bionetLabLayout.js
-	www/src/plugins/bionet-scanner/bionetStorageContainer.js
-	www/src/plugins/bionet-scanner/bionetStorageLocation.tag.html
-	www/src/plugins/bionet-scanner/labStorage-xxx.js
-	www/src/plugins/bionet-scanner/moveAndZoomXform.js
-	www/src/plugins/bionet-scanner/pixijs.tag-xxx.html
-	www/src/plugins/bionet-scanner/pixijsutils.js
-	www/src/plugins/bionet-scanner/storageArray.js
-	www/src/plugins/bionet-scanner/storageDetails.js
-	www/src/plugins/bionet-scanner/storageGrid.js
+
+git add www/assets/lab-storage/endylab.png \
+www/assets/lab-storage/endylab_thumb.png \
+www/assets/lab-storage/storageTube.png \
+www/assets/lab-storage/workbench.png \
+www/src/plugins/bionet-scanner/bionetLabLayout.js \
+www/src/plugins/bionet-scanner/bionetStorageContainer.js \
+www/src/plugins/bionet-scanner/bionetStorageLocation.tag.html \
+www/src/plugins/bionet-scanner/moveAndZoomXform.js \
+www/src/plugins/bionet-scanner/pixijsutils.js \
+www/src/plugins/bionet-scanner/storageArray.js \
+www/src/plugins/bionet-scanner/storageDetails.js \
+www/src/plugins/bionet-scanner/storageGrid.js \
+
+www/assets/lab-storage/freezer rack.svg \
+www/assets/lab-storage/freezer%20rack.svg \
+git add www/assets/lab-storage/-80 freezer.svg \
+www/src/plugins/bionet-scanner/BionetStream.js
+www/src/plugins/bionet-scanner/pixijs.tag-xxx.html
+www/src/plugins/bionet-scanner/labStorage-xxx.js
+www/src/plugins/bionet-scanner/bionetContainer.tag-xxx.html
+www/js/babylon.2.5.js
+www/js/pixi-tween.old.js
+www/js/pixi.min.old.js
+
 
 no changes added to commit (use "git add" and/or "git commit -a")

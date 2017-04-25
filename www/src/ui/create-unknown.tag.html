@@ -82,6 +82,7 @@
 
     <script>
         const tag = this
+        
         tag.formData = {
             name: '',
             instances: '1'
@@ -89,6 +90,7 @@
         tag.fields = []
         const bionetSetup = app.getStream('bionetSetup')
         const workbench = app.getStream('workbench')
+        const workbenchData = app.getStream('workbenchData')
 
         const appSettings = app.getAppSettings()
 
@@ -173,35 +175,7 @@
         }
 
         tag.addNode = function(e) {
-
-            // get active node if any selected
-            var node = $("#ftree").fancytree("getActiveNode");
-            const ftree = $("#ftree").fancytree("getTree");
-
-            // initialize parent id
-            var parentId
-            if (!node) {
-                node = ftree.getRootNode().children[0]
-            }
-            parentId = node.data.dbData.id
-
-            // initialize series prefix and 
-            const seriesName = tag.refs.selectVirtual.value
-            const instances = tag.refs.instances.value
-
-            // generate instances of physicals
-            for (var instance = 0; instance < instances; instance++) {
-                const name = seriesName + '_' + instance
-                    // initialize standard attributes
-                const dbData = {
-                    name: name,
-                    type: 'physical',
-                    parent_id: parentId
-                }
-                console.log('addNode: %s', instances, JSON.stringify(dbData))
-                    // TODO: messaging async api call
-                workbench.route('saveInWorkbench', undefined, dbData)
-            }
+            workbenchData.dispatch('generatePhysicals', {name:tag.refs.selectVirtual.value, instances:tag.refs.instances.value})
         }
 
     </script>

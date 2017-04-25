@@ -1,16 +1,47 @@
 const riot = require('riot')
 import bionetapi from '../bionetapi'
+const MiniSignal = require('mini-signals')
 
 var workbench = {
     init: function () {
         const workbench = app.addStreamRouter('workbench')
         const bionetSetup = app.getStream('bionetSetup')
 
+        const workbenchData = new MiniSignal()
+        app.addStream('workbenchData', workbenchData)
+
+        const workbenchMsgHandler = {
+            //workbenchData.dispatch('generatePhysicals', {name:seriesName, instances:instances, parent:parentId})
+            generatePhysicals: function (msg) {
+                const seriesName = msg.name
+                const instances = msg.instances
+                const workbenchId = app.user.workbenchID
+                for (var instance = 0; instance < instances; instance++) {
+                    // todo: generate hash value for new physical instance
+                    const name = seriesName + '_' + instance
+                    const dbData = {
+                        name: name,
+                        type: 'physical',
+                        parent_id: workbenchId
+                    }
+                    console.log('addNode: %s', instances, JSON.stringify(dbData))
+                        // TODO: messaging async api call
+                        // todo: invoke local save function
+                    workbench.route('saveInWorkbench', undefined, dbData)
+                }
+            }
+        }
+
+        const onWorkbenchDataEvent = function (cmd, msg) {
+            workbenchMsgHandler[cmd](msg)
+        }
+        const eventBinding = workbenchData.add(onWorkbenchDataEvent);
+
         workbench.addRoute('requestWorkbench', function () {
             console.log('requestWorkbench')
             app.remote.getWorkbench(function (err, userWorkbench) {
                 console.log('requestWorkbench result:', JSON.stringify(userWorkbench), err)
-                // TODO: messaging async api call
+                    // TODO: messaging async api call
                 workbench.route('requestWorkbenchResult', undefined, userWorkbench)
             })
         })
@@ -18,7 +49,7 @@ var workbench = {
         workbench.addRoute('getWorkbenchTree', function (root) {
             const cartData = []
             app.remote.workbenchTree(function (err, result) {
-                
+
                 // reconstruct inventory hierarchy sent as array as a single json object
                 console.log('getWorkbenchTree result:', JSON.stringify(result), err)
                 if (err) return console.error(err);
@@ -108,12 +139,12 @@ var workbench = {
             console.log('saveInWorkbench, item:', JSON.stringify(item))
             app.remote.saveInWorkbench(item, null, false, function (err, result) {
                 if (err) {
-                  console.log('saveInWorkbench: err ', err)
-                  app.ui.toast(err);
-                  return;
+                    console.log('saveInWorkbench: err ', err)
+                    app.ui.toast(err);
+                    return;
                 }
                 console.log('saveInWorkbench result:', JSON.stringify(result))
-                // TODO: messaging async api call
+                    // TODO: messaging async api call
                 workbench.route('requestWorkbench')
             })
         })
@@ -121,7 +152,7 @@ var workbench = {
         require('./workbench.tag.html')
 
         const workbenchRouter = function (q) {
-            
+
             app.appbarConfig({
                 enableTopNav: true,
                 enableBreadCrumbs: true,
