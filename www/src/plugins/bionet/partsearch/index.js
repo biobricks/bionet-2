@@ -14,6 +14,7 @@ var partsearch = {
         // TODO are these still used?
         app.addStream('bioClassQuery')
         app.addStream('bioInstanceQuery')
+        
         const bioPhysicalQuery = app.addStream('bioPhysicalQuery')
         const searchResult = app.addStreamRouter('searchResult')
         const searchCache = app.addStream('searchCache').init(undefined)
@@ -50,67 +51,6 @@ var partsearch = {
                 app.route('searchResult', 'updateList', 'toListItem', data)
             })
         })
-
-        /*
-
-        app.remote.inventoryTree(function (err, children) {
-            if (err) return console.error(err);
-
-            // TODO rewrite this matching algorithm 
-            //      so we can do single-pass matching
-            //      so we can use a stream
-            //      And move it to the level-tree-index module
-
-            var matches = [];
-            var nodes = [];
-
-            var i, cur, indent, a;
-            for (i = 0; i < children.length; i++) {
-                cur = children[i].path;
-                if (cur.match(q)) matches.push(cur);
-            }
-
-            var j, m, add, perfect;
-            for (i = 0; i < children.length; i++) {
-                cur = children[i].path;
-                a = cur.split('.');
-                indent = a.length - 1;
-                add = false
-                perfect = false
-                for (j = 0; j < matches.length; j++) {
-                    m = matches[j];
-                    if (m.indexOf(cur) === 0) {
-                        add = true;
-                        if (m.length === cur.length) perfect = true;
-                        break;
-                    }
-                }
-                if (add) {
-                    const bioPhysical = {
-                        indent: indent,
-                        url: 'edit-physical/' + children[i].path + "/?id=" + children[i].key,
-                        primary_text: a[a.length - 1],
-                        id: children[i].key,
-                        highlight: perfect
-                    };
-                    nodes.push(bioPhysical)
-                }
-            }
-            app.route('searchResult', 'list', null, nodes)
-        });
-        */
-
-        /*
-                return {
-                  url: '/edit/' + x.id,
-                  secondary_url: '/q?partid=' + x.id,
-                  secondary_url_label: 'view availabilty',
-                  righticon: 'star',
-                  primary_text: x.id,
-                  secondary_text: x.description,
-                  starred: false,
-                  data: x.data
-        */
 
         //---------------------------------------------------------------------
         // search route

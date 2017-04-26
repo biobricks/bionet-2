@@ -1,52 +1,13 @@
 const riot = require('riot')
 import bionetapi from '../bionetapi'
 const MiniSignal = require('mini-signals')
-
 var workbench = {
     init: function () {
-        const workbench = app.addStreamRouter('workbench')
-        const bionetSetup = app.getStream('bionetSetup')
+        const thisModule = this
+        
+        BIONET.signal.getWorkbenchTreeResult = new MiniSignal()
 
-        const workbenchData = new MiniSignal()
-        app.addStream('workbenchData', workbenchData)
-
-        const workbenchMsgHandler = {
-            //workbenchData.dispatch('generatePhysicals', {name:seriesName, instances:instances, parent:parentId})
-            generatePhysicals: function (msg) {
-                const seriesName = msg.name
-                const instances = msg.instances
-                const workbenchId = app.user.workbenchID
-                for (var instance = 0; instance < instances; instance++) {
-                    // todo: generate hash value for new physical instance
-                    const name = seriesName + '_' + instance
-                    const dbData = {
-                        name: name,
-                        type: 'physical',
-                        parent_id: workbenchId
-                    }
-                    console.log('addNode: %s', instances, JSON.stringify(dbData))
-                        // TODO: messaging async api call
-                        // todo: invoke local save function
-                    workbench.route('saveInWorkbench', undefined, dbData)
-                }
-            }
-        }
-
-        const onWorkbenchDataEvent = function (cmd, msg) {
-            workbenchMsgHandler[cmd](msg)
-        }
-        const eventBinding = workbenchData.add(onWorkbenchDataEvent);
-
-        workbench.addRoute('requestWorkbench', function () {
-            console.log('requestWorkbench')
-            app.remote.getWorkbench(function (err, userWorkbench) {
-                console.log('requestWorkbench result:', JSON.stringify(userWorkbench), err)
-                    // TODO: messaging async api call
-                workbench.route('requestWorkbenchResult', undefined, userWorkbench)
-            })
-        })
-
-        workbench.addRoute('getWorkbenchTree', function (root) {
+        const getWorkbenchTree = function (root) {
             const cartData = []
             app.remote.workbenchTree(function (err, result) {
 
@@ -128,14 +89,20 @@ var workbench = {
                         }
                     })
                     //console.log('inventory step 2:', JSON.stringify(treeNodes,null,2))
-                    //bionetSetup.route('storage', undefined, treeNodes)
 
-                // TODO: messaging async api call
-                workbench.route('getWorkbenchTreeResult', undefined, treeNodes)
+                BIONET.signal.getWorkbenchTreeResult.dispatch(treeNodes)
             })
-        })
+        }
+        
+        const requestWorkbench = function () {
+            app.remote.getWorkbench(function (err, userWorkbench) {
+                getWorkbenchTree(userWorkbench)
+            })
+        }
+        BIONET.signal.requestWorkbench = new MiniSignal()
+        BIONET.signal.requestWorkbench.add(requestWorkbench)
 
-        workbench.addRoute('saveInWorkbench', function (item) {
+        const saveInWorkbench = function (item) {
             console.log('saveInWorkbench, item:', JSON.stringify(item))
             app.remote.saveInWorkbench(item, null, false, function (err, result) {
                 if (err) {
@@ -143,11 +110,25 @@ var workbench = {
                     app.ui.toast(err);
                     return;
                 }
-                console.log('saveInWorkbench result:', JSON.stringify(result))
-                    // TODO: messaging async api call
-                workbench.route('requestWorkbench')
+                requestWorkbench()
             })
-        })
+        }
+
+        const generatePhysicals = function (seriesName, instances) {
+            const workbenchId = app.user.workbenchID
+            for (var instance = 0; instance < instances; instance++) {
+                // todo: generate hash value for new physical instance to avoid naming collisions
+                const name = seriesName + '_' + instance
+                const dbData = {
+                    name: name,
+                    type: 'physical',
+                    parent_id: workbenchId
+                }
+                saveInWorkbench(dbData)
+            }
+        }.bind(this)
+        BIONET.signal.generatePhysicals = new MiniSignal()
+        BIONET.signal.generatePhysicals.add(generatePhysicals)
 
         require('./workbench.tag.html')
 

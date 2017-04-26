@@ -74,7 +74,6 @@
         this.type = decodeURIComponent(opts.type)
         console.log('create-virtual-form, opts:%s', JSON.stringify(this.opts))
         tag.physicalInstances = '0'
-        const workbenchData = app.getStream('workbenchData')
 
         // initialize global attributes for virtual part
         app.state.createPart = app.state.createPart || {}
@@ -124,11 +123,7 @@
                 app.state.editPart = app.state.createPart
 
                 if (physicalInstances !== undefined && physicalInstances !== '0') {
-                    const msg = {
-                        name: virtualName,
-                        instances: physicalInstances
-                    }
-                    workbenchData.dispatch('generatePhysicals', msg)
+                    BIONET.signal.generatePhysicals.dispatch(virtualName, physicalInstances)
                     app.ui.toast('Created '+physicalInstances+' instances of '+opts.type+' '+virtualName)
                 } else {
                     app.ui.toast('Created '+opts.type+' '+virtualName)

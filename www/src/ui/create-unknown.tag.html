@@ -89,8 +89,6 @@
         }
         tag.fields = []
         const bionetSetup = app.getStream('bionetSetup')
-        const workbench = app.getStream('workbench')
-        const workbenchData = app.getStream('workbenchData')
 
         const appSettings = app.getAppSettings()
 
@@ -175,7 +173,7 @@
         }
 
         tag.addNode = function(e) {
-            workbenchData.dispatch('generatePhysicals', {name:tag.refs.selectVirtual.value, instances:tag.refs.instances.value})
+            BIONET.signal.generatePhysicals.dispatch(tag.refs.selectVirtual.value, tag.refs.instances.value)
         }
 
     </script>

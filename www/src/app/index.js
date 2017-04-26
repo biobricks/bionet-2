@@ -19,7 +19,9 @@ class App extends EventEmitter {
 
     constructor() {
         super()
-
+        
+        window.BIONET = this
+        
         this.state = {}
 
         this.remote = undefined // RPC connection to server
@@ -29,6 +31,7 @@ class App extends EventEmitter {
         this.logout = undefined
 
         this.stream = {}
+        this.signal = {}
         this.plugin = {}
 
         // built-in streams
