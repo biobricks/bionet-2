@@ -4,11 +4,11 @@
     <form id="createPhysicalForm" ref="createPhysicalForm" onsubmit={submitForm}>
         <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
         <div if={showPhysical}>
-            
+
             <div class="pixijs">
                 <bionet-container width="200" />
             </div>
-            
+
             <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
             <!--
             <form-text-input label="Type" ref="type" name="type" value={formData.type}/>
@@ -49,6 +49,7 @@
             background-color: rgba(255, 255, 255, 1);
             z-index: 1000;
         }
+        
         .pixijs {
             margin-top: 15px;
             width: 100%;
@@ -58,15 +59,13 @@
     </style>
     <script>
         const tag = this
-        console.log("create physical tag, opts:%s", JSON.stringify(opts))
+        console.log("create physical tag init, opts:%s", JSON.stringify(opts))
         this.fields = app.getAttributesForType(opts.type)
         tag.type = opts.type
         this.isMaterial = false
         this.showPhysical = true
         if (opts.show === undefined || opts.show === true) this.showPhysical = true
         else this.showPhysical = false
-
-        const bionetSetup = app.getStream('bionetSetup')
 
         this.updateAutocomplete = function(query, cb) {
             app.remote.physicalAutocomplete(query, function(err, results) {
@@ -223,8 +222,25 @@
         this.selected = null
         this.selectedType = null
 
-        this.on('mount', function() {
+        const getPhysicalResult = function(data) {
+            console.log('getPhysicalResult', JSON.stringify(data))
+            this.formData = data
+            this.type = data.type
 
+            this.showPhysical = true
+            this.update()
+        }.bind(this)
+        
+        var getPhysicalResultBinding = {}
+        this.on('unmount', function() {
+            BIONET.signal.getPhysicalResult.detach(getPhysicalResultBinding)
+        })
+
+        this.on('mount', function() {
+            console.log("create physical tag mount, opts:%s", JSON.stringify(opts))
+
+            getPhysicalResultBinding = BIONET.signal.getPhysicalResult.add(getPhysicalResult)
+            
             if (!this.formData) {
                 this.formData = {};
             }
@@ -239,36 +255,24 @@
             // if we are editing
             if (opts.physicalID) {
                 app.remote.get(opts.physicalID, function(err, data) {
-                    if (err) {
-                        app.error(err)
-                        return
-                    }
-                    this.formData = data
-                    tag.type = data.type
+                        if (err) {
+                            app.error(err)
+                            return
+                        }
+                        this.formData = data
+                        tag.type = data.type
 
-                    this.printNameDefault = data.name;
-                    $(this.refs.createPhysicalHeader).html("Edit " + data.name)
-                    this.update()
+                        this.printNameDefault = data.name;
+                        $(this.refs.createPhysicalHeader).html("Edit " + data.name)
+                        this.update()
 
 
-                }.bind(this))
-                $('#createPhysicalForm').scrollTop(0)
+                    }.bind(this))
+                    //$('#createPhysicalForm').scrollTop(0)
                 return;
             }
 
             $('#selectVirtual').hide()
-
-            bionetSetup.addRoute('getPhysicalResult', function(data) {
-                console.log('getPhysicalResult', JSON.stringify(data))
-                tag.formData = data
-                tag.type = data.type
-                
-                const bionetStorageLocation = app.getStream('bionetStorageLocation')
-                bionetStorageLocation.dispatch('configure', data.id)
-                
-                tag.showPhysical = true
-                tag.update()
-            })
 
             if (opts.isVirtual) {
                 tag.isMaterial = true

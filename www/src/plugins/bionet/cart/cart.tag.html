@@ -18,7 +18,9 @@
         <div id="edit-physical" class="edititem col s7">
             <div if={results.length>0} onclick={emptyCart} class="right-align" style="margin-right:20px; color:teal; cursor: pointer; cursor: hand; ">empty cart</div>
             <bionet-storage-location width="{pixiwidth}" />
+            <!--
             <babylon-3d></babylon-3d>
+            -->
             <create-physical show="false" top-margin="0px" />
         </div>
     </div>
@@ -45,7 +47,6 @@
         tag.results = tag.opts.results || []
         tag.pagination = []
         tag.showscanner = false
-        const bionetSetup = app.getStream('bionetSetup')
         const cart = app.getStream('cart')
 
         const breadcrumbs = [{
@@ -84,8 +85,7 @@
 
             const itemClick = function(item) {
                 console.log('itemClick:', JSON.stringify(item))
-                    // TODO: messaging async api call
-                bionetSetup.route('getPhysical', undefined, item.id)
+                BIONET.signal.getPhysical.dispatch(item.id)
                 app.setBreadcrumbs([{
                         'label': 'cart',
                         'url': '/cart'

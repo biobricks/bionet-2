@@ -91,10 +91,7 @@ var igempart = {
                 toast(physicalData.name + ' saved')
                 // TODO: messaging - async api
                 app.dispatch('bioPhysicalQuery', physicalData.virtual_id)
-                app.dispatch('bionetSetup', {
-                    msg: 'update',
-                    data: physicalData
-                })
+                BIONET.signal.physicalUpdated.dispatch(physicalData)
             })
         })
 

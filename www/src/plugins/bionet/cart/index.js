@@ -4,7 +4,6 @@ import bionetapi from '../bionetapi'
 var cart = {
     init: function () {
         const cart = app.addStreamRouter('cart')
-        const bionetSetup = app.getStream('bionetSetup')
 
         cart.addRoute('requestCart', function () {
             console.log('requestCart')

@@ -54,7 +54,6 @@
         tag.theme = app.getTheme()
         tag.results = []
         tag.pagination = []
-        const bionetSetup = app.getStream('bionetSetup')
         const partDataAccessor = app.getStream('partDataAccessor')
 
         this.searchClick = function(e) {
@@ -82,8 +81,7 @@
                         topMargin: 0
                     })
 
-                    // TODO: messaging async api call
-                    bionetSetup.route('getPhysical', undefined, item.id)
+                    BIONET.signal.getPhysical.dispatch(item.id)
                     tag.itemType = 'p'
                 } else if (item.id.indexOf('v-') >= 0) {
                     riot.mount('#edititem', 'part-specification')

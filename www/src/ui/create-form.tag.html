@@ -69,7 +69,6 @@
         const tag = this
         tag.showStorage = false
 
-        const bionetSetup = app.getStream('bionetSetup')
         app.setBreadcrumbs([{
             'label': 'workbench',
             'url': '/create'
@@ -83,7 +82,7 @@
         }
 
 
-        bionetSetup.addRoute('createStorageItemResult', function(storageItem) {
+        const createStorageItemResult = function(storageItem) {
             console.log('createStorageItemResult', JSON.stringify(storageItem))
 
             const newNodeData = {
@@ -98,7 +97,27 @@
             }
             const newNode = parentNode.addChildren(newNodeData)
             parentNode.setExpanded()
-        })
+        }
+        BIONET.signal.createStorageItemResult.add(createStorageItemResult)
+
+        const getWorkbenchTreeResult = function(storageData) {
+            console.log('getWorkbenchTreeResult initializing:', JSON.stringify(storageData))
+            const ftree = $("#ftree").fancytree("getTree")
+            ftree.reload(storageData).then(function() {
+                const children = ftree.getRootNode().children
+                const node = children[0]
+                if (node) {
+                    node.setExpanded();
+                    node.setFocus();
+                }
+                $('.inventory-tree').css({
+                    height: $(window).innerHeight() - $('#appbar').height() - 15
+                });
+                tag.pixiwidth = $('#ftree').width() - 40
+                tag.update()
+            })
+        }
+        BIONET.signal.getWorkbenchTreeResult.add(getWorkbenchTreeResult)
 
         this.selected = null
         this.selectedType = null
@@ -331,8 +350,7 @@
                         topMargin: '0px'
                     })
 
-                    // TODO: messaging async api call
-                    bionetSetup.route('getPhysical', undefined, dbData.id)
+                    BIONET.signal.getPhysical.dispatch(dbData.id)
                     if (e.type === 'keydown') node.setExpanded()
 
                     app.setBreadcrumbs([{
@@ -345,30 +363,11 @@
                     tag.update()
                 }
             })
-
-            const getWorkbenchTreeResult = function(storageData) {
-                console.log('getWorkbenchTreeResult initializing:', JSON.stringify(storageData))
-                const ftree = $("#ftree").fancytree("getTree")
-                ftree.reload(storageData).then(function() {
-                    const children = ftree.getRootNode().children
-                    const node = children[0]
-                    if (node) {
-                        node.setExpanded();
-                        node.setFocus();
-                    }
-                    $('.inventory-tree').css({
-                        height: $(window).innerHeight() - $('#appbar').height() - 15
-                    });
-                    tag.pixiwidth = $('#ftree').width() - 40
-                    tag.update()
-                })
-            }
-            BIONET.signal.getWorkbenchTreeResult.add(getWorkbenchTreeResult)
-            
-            bionetSetup.observe((action) => {
+            const physicalUpdated = function(physicalData) {
+                // todo: only update single node in tree
                 BIONET.signal.requestWorkbench.dispatch()
-            })
-
+            }
+            BIONET.signal.physicalUpdated.add(physicalUpdated)
             BIONET.signal.requestWorkbench.dispatch()
 
         })

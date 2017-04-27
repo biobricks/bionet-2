@@ -1,5 +1,6 @@
 const riot = require('riot')
 import bionetapi from '../bionetapi'
+const MiniSignal = require('mini-signals')
 
 require('./bionet-setup-storage.tag.html')
 require('./bionet-setup-schemas.tag.html')
@@ -8,39 +9,8 @@ require('./bionet-setup-strains.tag.html')
 var bionetSetup = {
     init: function () {
         // setup streams and routes
-        const bionetSetup = app.addStreamRouter('bionetSetup')
 
-        bionetSetup.addRoute('requestSchemas', function () {
-            const schemaData = []
-            const dataTypes = app.getAppSettings().dataTypes
-            var key = 1
-            for (var i = 0; i < dataTypes.length; i++) {
-                var dataType = dataTypes[i]
-                var node = {
-                    title: dataType.name,
-                    key: key.toString(),
-                    type: '',
-                    children: []
-                }
-                key++
-                var fields = app.getAttributesForType(dataType.name)
-                for (var j = 0; j < fields.length; j++) {
-                    var field = fields[j]
-                    var nodeType = {
-                        title: field.name,
-                        key: key.toString(),
-                        type: field.value
-                    }
-                    key++
-                    node.children.push(nodeType)
-                }
-                schemaData.push(node)
-            }
-            // TODO: messaging async api call
-            bionetSetup.route('schemas', undefined, schemaData)
-        })
-
-        bionetSetup.addRoute('requestStorage', function (q) {
+        const requestStorage = function (q) {
             app.remote.inventoryTree(function (err, children) {
                 if (err) return console.error(err);
 
@@ -109,12 +79,14 @@ var bionetSetup = {
                         }
                     })
                     //console.log('inventory step 2:', JSON.stringify(treeNodes,null,2))
-                // TODO: messaging async api call
-                bionetSetup.route('storage', undefined, treeNodes)
+                BIONET.signal.requestStorageResult.dispatch(treeNodes)
             });
-        })
+        }
+        BIONET.signal.requestStorageResult = new MiniSignal()
+        BIONET.signal.requestStorage = new MiniSignal()
+        BIONET.signal.requestStorage.add(requestStorage)
 
-        bionetSetup.addRoute('createStorageItem', function (storageItem) {
+        const createStorageItem = function (storageItem) {
             console.log('createStorageItem:', JSON.stringify(storageItem))
             app.remote.savePhysical(storageItem, null, false, function (err, id) {
                 if (err) {
@@ -125,36 +97,30 @@ var bionetSetup = {
                 console.log('createStorageItem saved, id:', id)
                 const updatedStorageItem = JSON.parse(JSON.stringify(storageItem))
                 updatedStorageItem.id = id
-                // TODO: messaging async api call
-                bionetSetup.route('createStorageItemResult', undefined, updatedStorageItem)
+                BIONET.signal.createStorageItemResult.dispatch(updatedStorageItem)
             })
-        })
+        }
+        BIONET.signal.createStorageItemResult = new MiniSignal()
+        BIONET.signal.createStorageItem = new MiniSignal()
+        BIONET.signal.createStorageItem.add(createStorageItem)
 
-
-        bionetSetup.addRoute('getPhysical', function (id) {
+        const getPhysical = function (id) {
             app.remote.get(id, function (err, data) {
                 if (err) {
                     app.error(err)
                     return
                 }
-                // TODO: messaging async api call
-                bionetSetup.route('getPhysicalResult', undefined, data)
+                BIONET.signal.getPhysicalResult.dispatch(data)
+                const bionetStorageLocation = app.getStream('bionetStorageLocation')
+                bionetStorageLocation.dispatch('configure', data.id)
             })
-        })
+        }
+        BIONET.signal.getPhysicalResult = new MiniSignal()
+        BIONET.signal.getPhysical = new MiniSignal()
+        BIONET.signal.getPhysical.add(getPhysical)
+        BIONET.signal.physicalUpdated = new MiniSignal()
 
-        bionetSetup.addRoute('updateStorageItem', function (storageItem) {
-            console.log('updateStorageItem:', JSON.stringify(storageItem))
-            app.remote.savePhysical(storageItem, null, false, function (err, id) {
-                if (err) {
-                    console.log('updateStorageItem error: %s', err)
-                    if (cb) cb(err)
-                    return;
-                }
-                console.log('updateStorageItem saved')
-            })
-        })
-
-        bionetSetup.addRoute('delPhysical', function (id) {
+        const delPhysical = function (id) {
             console.log('delPhysical:', JSON.stringify(id))
             app.remote.delPhysical(id, function (err, cbid) {
                 if (err) {
@@ -164,11 +130,41 @@ var bionetSetup = {
                 }
                 console.log('delPhysical %s deleted', id)
             })
+        }
+        BIONET.signal.delPhysical = new MiniSignal()
+        BIONET.signal.delPhysical.add(delPhysical)
+        
+        //todo: refactor
+        const bionetSetup = app.addStreamRouter('bionetSetup')
+        bionetSetup.addRoute('requestSchemas', function () {
+            const schemaData = []
+            const dataTypes = app.getAppSettings().dataTypes
+            var key = 1
+            for (var i = 0; i < dataTypes.length; i++) {
+                var dataType = dataTypes[i]
+                var node = {
+                    title: dataType.name,
+                    key: key.toString(),
+                    type: '',
+                    children: []
+                }
+                key++
+                var fields = app.getAttributesForType(dataType.name)
+                for (var j = 0; j < fields.length; j++) {
+                    var field = fields[j]
+                    var nodeType = {
+                        title: field.name,
+                        key: key.toString(),
+                        type: field.value
+                    }
+                    key++
+                    node.children.push(nodeType)
+                }
+                schemaData.push(node)
+            }
+            // TODO: messaging async api call
+            bionetSetup.route('schemas', undefined, schemaData)
         })
-
-
-        bionetSetup.addRoute('requestStrains', function () {})
-
         // process setup message
         bionetSetup.observe(function (setup) {
             return;

@@ -82,11 +82,9 @@
 
     </style>
     <script>
-
         const tag = this
         const appSettings = app.getAppSettings()
         const dataTypes = appSettings.dataTypes
-        const bionetSetup = app.getStream('bionetSetup')
         tag.formData = {}
         const cart = app.getStream('cart')
 
@@ -142,11 +140,10 @@
             for (var i = 0; i < attributes.length; i++) {
                 dbData[attributes[i].name] = type + ' ' + attributes[i].name
             }
-            // TODO: messaging async api call
-            bionetSetup.route('createStorageItem', undefined, dbData)
+            BIONET.signal.createStorageItem.dispatch(dbData)
         }
 
-        bionetSetup.addRoute('createStorageItemResult', function(storageItem) {
+        const createStorageItemResult = function(storageItem) {
             console.log('createStorageItemResult', JSON.stringify(storageItem))
 
             const newNodeData = {
@@ -161,19 +158,8 @@
             }
             const newNode = parentNode.addChildren(newNodeData)
             parentNode.setExpanded()
-                //dbData.name = type + '_' + newNode.getIndexHier()
-                //console.log('add node :', JSON.stringify(dbData))
-                /*
-                const ftree = $("#ftree").fancytree("getTree")
-                ftree.visit(function(node) {
-                    if (node.data.dbData.name === storageItem.name) {
-                        node.setTitle(storageItem.name)
-                        node.data.dbData.id = storageItem.id
-                        console.log('createStorageItemResult %s updated with id %s', storageItem.name, storageItem.id)
-                    }
-                })
-                */
-        })
+        }
+        BIONET.signal.createStorageItemResult.add(createStorageItemResult)
 
         this.deleteNode = function() {
             const ftree = $("#ftree").fancytree("getTree")
@@ -196,12 +182,41 @@
                 const node = deleteNodes[i]
                 const id = node.data.dbData.id
                 console.log('removing %s %s', node.title, id)
-                    // TODO: messaging async api call
-                bionetSetup.route('delPhysical', undefined, id)
+                BIONET.signal.delPhysical.dispatch(id)``
                 node.remove()
             }
         }
 
+        const requestStorageResult = function(storageData) {
+            //console.log('initializing storage:', JSON.stringify(storageData))
+            const ftree = $("#ftree").fancytree("getTree");
+            ftree.reload(storageData).then(function() {
+                $('.inventory-tree').css({
+                    height: $(window).innerHeight() - $('#appbar').height() - 15
+                });
+                //tag.pixiwidth = $('#ftree').width() - 40
+
+                //const children = ftree.getRootNode().children
+                //const node = children[0]
+                var node = ftree.getActiveNode();
+                if (node) {
+                    node.setExpanded();
+                    node.setFocus();
+                    const dbData = node.data.dbData
+                    console.log('ftree reload, active node:', JSON.stringify(dbData, null, 2))
+                    BIONET.signal.getPhysical.dispatch(dbData.id)
+                } else {
+                    const children = ftree.getRootNode().children
+                    node = children[0]
+                    if (node) {
+                        node.setExpanded();
+                        node.setFocus();
+                    }
+                }
+                tag.update()
+            })
+        }
+        BIONET.signal.requestStorageResult.add(requestStorageResult)
         this.on('mount', function() {
             // initialize breadcrumbs
             $('.inventory-height').css({
@@ -283,18 +298,6 @@
                     }
                 },
                 keydown: function(event, data) {
-                    /*
-                    const node = data.node;
-                    if (event.which === 13) {
-                        event.preventDefault();
-                        console.log('setup-storage - save item: ', node)
-                        const $tdList = $(node.tr).find(">td");
-                        const dbData = node.data.dbData
-                            //dbData.name = $tdList.eq(0).text()
-                            //console.log('title: %s node.data:%s',node.title,JSON.stringify(dbData))
-                        bionetSetup.route('updateStorageItem', undefined, dbData)
-                    }
-                    */
                 },
                 click: function(event, data) {
                     const node = data.node;
@@ -424,8 +427,8 @@
 
                     console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
                     tag.update()
-                        // TODO: messaging async api call
-                    bionetSetup.route('getPhysical', undefined, dbData.id)
+
+                    BIONET.signal.getPhysical.dispatch(dbData.id)
                     if (e.type === 'keydown') node.setExpanded()
 
                     app.setBreadcrumbs([{
@@ -441,45 +444,14 @@
                 //if (!active.text()) return
                 //app.editTextElement(e, active)
             })
-
-            bionetSetup.addRoute('storage', function(storageData) {
-                //console.log('initializing storage:', JSON.stringify(storageData))
-                const ftree = $("#ftree").fancytree("getTree");
-                ftree.reload(storageData).then(function() {
-                    $('.inventory-tree').css({
-                        height: $(window).innerHeight() - $('#appbar').height() - 15
-                    });
-                    //tag.pixiwidth = $('#ftree').width() - 40
-
-                    //const children = ftree.getRootNode().children
-                    //const node = children[0]
-                    var node = ftree.getActiveNode();
-                    if (node) {
-                        node.setExpanded();
-                        node.setFocus();
-                        const dbData = node.data.dbData
-                        console.log('ftree reload, active node:', JSON.stringify(dbData, null, 2))
-                            // TODO: messaging async api call
-                        bionetSetup.route('getPhysical', undefined, dbData.id)
-                    } else {
-                        const children = ftree.getRootNode().children
-                        node = children[0]
-                        if (node) {
-                            node.setExpanded();
-                            node.setFocus();
-                        }
-                    }
-                    tag.update()
-                })
-            })
-
-            bionetSetup.observe((msg) => {
-                // TODO: messaging async api call
-                bionetSetup.route('requestStorage')
-            })
-
-            // TODO: messaging async api call
-            bionetSetup.route('requestStorage')
+            
+            const physicalUpdated = function(physicalData) {
+                // todo: only update node in tree
+                BIONET.signal.requestStorage.dispatch()
+            }
+            BIONET.signal.physicalUpdated.add(physicalUpdated)
+            
+            BIONET.signal.requestStorage.dispatch()
 
         })
 
