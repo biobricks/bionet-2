@@ -281,7 +281,12 @@ function saveMaterialInDB(m, userData, dbType, cb) {
     db.put(m.id, m, {valueEncoding: 'json'}, function(err) {
       if(err) return cb(err);
       addToIndex(m);
-      cb(null, m.id);
+
+      // TODO temporary workaround for level-tree-index fix
+      physicalTree.rebuild(function(err) {
+        if(err) return cb(err);
+        cb(null, m.id);
+      });
     });
   })
 }
@@ -1037,20 +1042,22 @@ websocket.createServer({
   rpcServer.pipe(stream).pipe(rpcServer);
 });
 
+if(settings.dhtChannel) {
 
-var peerConnector = new PeerConnector(settings.peerID, settings.hostname, settings.port, {ssl: settings.ssl});
-var peerDiscover = new PeerDiscover(function(err, peer, type) {
-  if(err) {
-    console.error("Peer discovery error:", err);
-    return;
-  }
+  var peerConnector = new PeerConnector(settings.peerID, settings.hostname, settings.port, {ssl: settings.ssl});
+  var peerDiscover = new PeerDiscover(function(err, peer, type) {
+    if(err) {
+      console.error("Peer discovery error:", err);
+      return;
+    }
 
-  peerConnector.connect({
-    hostname: peer.host,
-    port: peer.port
+    peerConnector.connect({
+      hostname: peer.host,
+      port: peer.port
+    });
+    
   });
-  
-});
+}
 
 
 

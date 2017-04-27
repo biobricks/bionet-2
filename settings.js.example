@@ -207,6 +207,7 @@ module.exports = {
    // the setting in this file only affects the UI and provides no security
    restrictUserSignup: true,
 
-   // DHT channel name used to discovering other nodes
+   // DHT channel name used to discovering other nodes 
+   // comment this out to disable discovery
    dhtChannel: 'bionet-nodes'
 };
