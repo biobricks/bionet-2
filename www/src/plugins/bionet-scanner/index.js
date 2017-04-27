@@ -25,7 +25,12 @@ bionetScanPlugin.start = function () {
     const startScan = app.addStream('startScan')
     const scanResult = app.addStream('scanResult')
     const pixiController = new MiniSignal()
-    app.addStream('bionetStorageLocation', pixiController)
+    BIONET.stream.bionetStorageLocation = pixiController
+    
+    BIONET.signal.highlightStorageCell = new MiniSignal()
+    BIONET.signal.storageLocationViewReady = new MiniSignal()
+    BIONET.signal.activate3D = new MiniSignal()
+    
     const thisModule = this
     startScan.observe((msg) => {
         switch (msg.status) {

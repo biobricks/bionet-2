@@ -34,6 +34,10 @@ const bionetLabLayout = {
         this.resources = resources
     },
 
+    clear: function () {
+        delete this.locations
+    },
+
     initializeTypes: function () {
         const types = {}
         this.types = types
@@ -214,8 +218,13 @@ const bionetLabLayout = {
         };
         const containerOutlineColor = 0x000000
         const containerFillColor = 0x000000
-        const celldx = 190
-        const celldy = 150
+
+        const celldx = Math.max(1600 / locations.length, 250)
+        const celldy = (150 / 190) * celldx
+
+        //const celldx = 190
+        //const celldy = 150
+
         const marginx = 30
         const marginy = 30
         var lx = marginx;
@@ -234,7 +243,7 @@ const bionetLabLayout = {
         const centerStage = {
             x: marginx,
             y: celldy + marginy * 3,
-            scale: 3.2
+            scale: 2
         }
 
         const centerSprite = function (w, h, obj) {
@@ -315,8 +324,6 @@ const bionetLabLayout = {
             fill: textColor
         };
         //const moveRightButtonText = String.fromCharCode(parseInt(0xE315, 16))
-        const moveRightButtonText = '\ue315'
-        const moveLeftButtonText = '\ue314'
 
         const makeInteractive = function (sprite, clickFunction) {
             sprite.interactive = true
@@ -375,7 +382,11 @@ const bionetLabLayout = {
         const moveRight = function () {
             moveNextItem(1)
         }
-        const moveIconY = 320
+        const moveRightButtonText = '\ue315'
+        const moveLeftButtonText = '\ue314'
+        const activate3dButtonText = '\ue84d'
+
+        const moveIconY = celldy + marginy * 3.5
         const moveLeftButton = new PIXI.Text(moveLeftButtonText, iconFontProps)
         moveLeftButton.x = 25
         moveLeftButton.y = moveIconY
@@ -387,8 +398,20 @@ const bionetLabLayout = {
         moveRightButton.x = 1600
         moveRightButton.y = moveIconY
             //moveRightButton.anchor = new PIXI.Point(0.5, 0.5)
-        //sceneRoot.addChild(moveRightButton)
+        sceneRoot.addChild(moveRightButton)
         makeInteractive(moveRightButton, moveRight)
+
+        if (BIONET.state.toggle3d === undefined) BIONET.state.toggle3d = false
+        const toggle3d = function () {
+            BIONET.state.toggle3d = !BIONET.state.toggle3d
+            BIONET.signal.activate3D.dispatch(BIONET.state.toggle3d)
+        }
+        const threedbutton = new PIXI.Text(activate3dButtonText, iconFontProps)
+        threedbutton.x = 800
+        threedbutton.y = moveIconY
+        threedbutton.anchor = new PIXI.Point(0, 0)
+        sceneRoot.addChild(threedbutton)
+        makeInteractive(threedbutton, toggle3d)
             //EmojiOneColor-SVGinOT.ttf
 
         for (var i = 0; i < locations.length; i++) {
@@ -446,7 +469,7 @@ const bionetLabLayout = {
 
             var bounds = storageContainer.getBounds()
             const centerContainer = {
-                x: (1600 - bounds.width*centerStage.scale) / 2,
+                x: (1600 - bounds.width * centerStage.scale) / 2,
                 y: centerStage.y,
                 scale: centerStage.scale
             }
@@ -472,17 +495,48 @@ const bionetLabLayout = {
             storageContainer.updateTransform();
 
             storageLocations.push({
+                id: storageItem.id,
                 sprite: storageSprite,
                 container: storageContainer,
                 bionetStorage: bionetStorageContainer,
                 grid: grid,
                 mz: mz
             })
+
         }
         this.storageLocations = storageLocations
         this.connectCells()
         console.log('lab storage initialized')
     },
+
+    highlightCell: function (id, data, x, y) {
+        const storageLocations = this.storageLocations
+        for (var i = 0; i < storageLocations.length; i++) {
+            var loc = storageLocations[i]
+            if (loc.id === id) {
+                if (loc.grid !== undefined && loc.grid.highlightId !== undefined) {
+                    loc.grid.highlightId(id, data, x, y, loc.bionetStorage.gridSprite, true)
+                }
+            }
+        }
+    },
+
+    highlightCellArray: function (id, cells) {
+        const storageLocations = this.storageLocations
+        for (var i = 0; i < storageLocations.length; i++) {
+            var loc = storageLocations[i]
+            if (loc.id === id) {
+                if (loc.grid !== undefined && loc.grid.highlightId !== undefined) {
+                    for (var j = 0; j < cells.length; j++) {
+                        const partData = cells[j]
+                        loc.grid.highlightId(partData.parent_id, partData, partData.parent_x, partData.parent_y, loc.bionetStorage.gridSprite, true)
+                    }
+                }
+                break;
+            }
+        }
+    },
+
     connectCells: function () {
         const storageLocations = this.storageLocations
         const sceneRoot = this.sceneRoot
@@ -494,6 +548,7 @@ const bionetLabLayout = {
         for (var i = 0; i < storageLocations.length; i++) {
             var loc = storageLocations[i]
             if (loc.grid !== undefined && loc.grid.p1 !== undefined && loc.grid.p2 !== undefined) {
+                //loc.grid.highlight(cellCoordinates.x, cellCoordinates.y, gridSprite)
                 hpoints.push({
                     p1: loc.grid.p1.toGlobal(hp),
                     p2: loc.grid.p2.toGlobal(hp)

@@ -2,7 +2,7 @@
     <div class="inventory-height">
         <div class="row">
             <div id="treeview" class="inventory-tree col s4">
-                <table id="ftree" style="margin-top:15px; border:none !important;">
+                <table id="ftree" style="margin-top:15px; margin-left:65px; border:none !important;">
                     <colgroup>
                         <col></col>
                         <col></col>
@@ -19,27 +19,27 @@
                 <div class="row">
                     <div id="pixijsdiv" class="pixijs">
                         <bionet-storage-location width={pixiwidth}/>
-                        <!--
                         <babylon-3d></babylon-3d>
-                        -->
                     </div>
                 </div>
                 <div class="row">
+                    <div id="box" class="edit-physical">
+                        <box-contents />
+                    </div>
                     <div id="physical-storage" class="edit-physical">
                         <create-physical show="false" top-margin="0px" />
                     </div>
                 </div>
             </div>
         </div>
+        <!-- add or delete buttons -->
+        <div id="addicon" class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:110px; left:10px; width:55px; height:55px;" data-activates="addmenu"><i class="material-icons">add</i></div>
+        <ul id="addmenu" class="dropdown-content" style="position:absolute; top:110px; left:10px; width:200px !important; text-align:left;z-index:1000">
+            <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.name}</span></li>
+            <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.name}</span></li>
+        </ul>
+        <div id="deleteicon" style="position:absolute; top:180px; left:10px; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></div>
     </div>
-
-    <!-- add or delete buttons -->
-    <div id="addicon" class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:130px; left:400px; width:55px; height:55px;" data-activates="addmenu"><i class="material-icons">add</i></div>
-    <ul id="addmenu" class="dropdown-content" style="position:absolute; top:130px; left:400px; width:200px !important; text-align:left;z-index:1000">
-        <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.name}</span></li>
-        <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.name}</span></li>
-    </ul>
-    <div id="deleteicon" style="position:absolute; top:200px; left:400px; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></div>
 
     <style>
         table.fancytree-ext-table tr td {
@@ -57,6 +57,7 @@
         
         .inventory-tree {
             float: left;
+            margin-left: 65px;
             overflow: auto;
             display: block;
         }
@@ -182,7 +183,8 @@
                 const node = deleteNodes[i]
                 const id = node.data.dbData.id
                 console.log('removing %s %s', node.title, id)
-                BIONET.signal.delPhysical.dispatch(id)``
+                BIONET.signal.delPhysical.dispatch(id)
+                ``
                 node.remove()
             }
         }
@@ -200,11 +202,17 @@
                 //const node = children[0]
                 var node = ftree.getActiveNode();
                 if (node) {
-                    node.setExpanded();
                     node.setFocus();
                     const dbData = node.data.dbData
                     console.log('ftree reload, active node:', JSON.stringify(dbData, null, 2))
                     BIONET.signal.getPhysical.dispatch(dbData.id)
+                    if (dbData.type.indexOf('box') >= 0) {
+                        BIONET.signal.getBoxContents.dispatch(dbData.id)
+                    } else {
+                        node.setExpanded();
+                    }
+                    $('#physical-view').scrollTop(0)
+
                 } else {
                     const children = ftree.getRootNode().children
                     node = children[0]
@@ -217,6 +225,7 @@
             })
         }
         BIONET.signal.requestStorageResult.add(requestStorageResult)
+
         this.on('mount', function() {
             // initialize breadcrumbs
             $('.inventory-height').css({
@@ -225,19 +234,18 @@
             tag.pixiwidth = $('#physical-view').width()
 
             const treeViewIconX = $('#treeview').width() - 60
-            $('#addicon').css({
-                left: treeViewIconX
-            });
-            $('#deleteicon').css({
-                left: treeViewIconX
-            });
-            $('#addmenu').css({
-                left: treeViewIconX
-            });
+                /*
+                $('#addicon').css({
+                    left: treeViewIconX
+                });
+                $('#deleteicon').css({
+                    left: treeViewIconX
+                });
+                $('#addmenu').css({
+                    left: treeViewIconX
+                });
+                */
 
-            $('.inventory-height').css({
-                height: $(window).innerHeight() - $('#appbar').height()
-            });
 
             tag.materials = []
             tag.locations = []
@@ -297,19 +305,24 @@
                         const deleteNode = data.childNode
                     }
                 },
-                keydown: function(event, data) {
-                },
+                keydown: function(event, data) {},
                 click: function(event, data) {
                     const node = data.node;
                     console.log('data target:', data.targetType)
-                    if (!data.targetType) {
-                        const dbData = node.data.dbData
-                        console.log('adding item to cart:', JSON.stringify(dbData))
+                        // todo: move add to cart to box view tag
+                        /*
+                         */
+                    const dbData = node.data.dbData
+                    const type = dbData.type
+                    if (data.targetType==='title' && type === 'physical' || type.indexOf('box') >= 0) {
+                        //console.log('adding item to cart:', JSON.stringify(dbData))
                             // TODO: messaging async api call
+                        /*
                         cart.route('addToCart', undefined, {
                             id: dbData.id,
                             name: dbData.name
                         })
+                        */
                     }
                 },
                 dnd5: {
@@ -423,6 +436,11 @@
                     const type = dbData.type
                     if (type) {
                         tag.createType = 'storage'
+                        if (type.indexOf('box') >= 0) {
+                            BIONET.signal.getBoxContents.dispatch(dbData.id)
+                        } else {
+                            BIONET.signal.getBoxContentsResult.dispatch(dbData.id, [])
+                        }
                     }
 
                     console.log('beforeSelect:%s %s %s', node.title, type, tag.createType)
@@ -444,13 +462,13 @@
                 //if (!active.text()) return
                 //app.editTextElement(e, active)
             })
-            
+
             const physicalUpdated = function(physicalData) {
                 // todo: only update node in tree
                 BIONET.signal.requestStorage.dispatch()
             }
             BIONET.signal.physicalUpdated.add(physicalUpdated)
-            
+
             BIONET.signal.requestStorage.dispatch()
 
         })

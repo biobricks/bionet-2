@@ -1,4 +1,5 @@
 const PIXI = require('pixi.js')
+const pixijsutils = require('./pixijsutils')
 
 const StorageGrid = function (xcells, ycells, width, height, xalpha, yalpha) {
     this.xcells = xcells
@@ -9,6 +10,7 @@ const StorageGrid = function (xcells, ycells, width, height, xalpha, yalpha) {
     this.yalpha = (yalpha === undefined) ? yalpha : false
     this.dx = width / xcells
     this.dy = height / ycells
+    this.mouseoverSprite = new PIXI.Container()
 }
 
 // generate grid
@@ -34,7 +36,7 @@ StorageGrid.prototype.drawGrid = function (container) {
 
     // grid labels text style
     const textProps = {
-        fontFamily: 'Arial',
+        fontFamily: 'Roboto',
         fontSize: '70px',
         fill: textColor,
         fontWeight: 1600,
@@ -106,6 +108,7 @@ StorageGrid.prototype.drawGrid = function (container) {
         }
     }
     container.addChild(graphics);
+    container.addChild(this.mouseoverSprite)
     this.sprite = graphics
 }
 
@@ -141,28 +144,86 @@ Object.defineProperty(StorageGrid, "p2", {
     }
 });
 
-StorageGrid.prototype.highlight = function (x, y, container) {
+StorageGrid.prototype.highlightMouseover = function (name, x, y, container) {
+    var annotation = this.mouseoverSprite
+    annotation.removeChildren()
+    annotation.x = x
+    annotation.y = y
+    const graphics = new PIXI.Graphics();
+    annotation.addChild(graphics)
+        //container.addChild(annotation)
+
+    const textColor = '#000000'
+    const textProps = {
+        fontFamily: 'Roboto',
+        fontSize: '70px',
+        fill: textColor,
+        fontWeight: 1600,
+        backgroundColor: '#00000000',
+        wordWrap: false
+    }
+    const label = new PIXI.Text(name, textProps);
+    annotation.addChild(label)
+
+    annotation.updateTransform()
+    annotation.calculateBounds()
+    const bounds = annotation.getLocalBounds()
+    const margin = 6
+    const bw = bounds.width
+    const bh = bounds.height
+    graphics.beginFill(0xffffff);
+    graphics.drawRect(0, 0, bw, bh)
+    graphics.endFill();
+
+    this.mouseoverSprite.visible = true
+}
+
+StorageGrid.prototype.highlightId = function (id, data, x, y, container, multiple) {
+    const graphics = this.highlight(x, y, container, multiple, 0x00ffff)
+    graphics.interactive = true
+    graphics.mouseover = function () {
+        console.log('cell highlight mouseover ', data.name, x, y)
+        const dx = this.dx
+        const dy = this.dy
+        const p1x = (x - 1) * dx
+        const p1y = (y - 1) * dy
+        this.highlightMouseover(data.name + ' (' + x + ',' + y + ')', p1x, p1y, container)
+        pixijsutils.renderStage()
+    }.bind(this)
+    graphics.mouseout = function () {
+        console.log('cell highlight mouseout ', name, x, y)
+        //this.mouseoverSprite.visible = false
+        pixijsutils.renderStage()
+    }.bind(this)
+}
+
+StorageGrid.prototype.highlight = function (x, y, container, multiple, highlightColor) {
     const dx = this.dx
     const dy = this.dy
     const p1x = (x - 1) * dx
     const p1y = (y - 1) * dy
 
-    this.p1 = new PIXI.Sprite()
-    this.p1.x = p1x
-    this.p1.y = p1y
-    container.addChild(this.p1)
-    this.p1.updateTransform()
+    const p1 = new PIXI.Sprite()
+    p1.x = p1x
+    p1.y = p1y
+    container.addChild(p1)
+    p1.updateTransform()
 
     const p2x = p1x + dx
     const p2y = p1y + dy
 
-    this.p2 = new PIXI.Sprite()
-    this.p2.x = p2x
-    this.p2.y = p2y
-    container.addChild(this.p2)
-    this.p2.updateTransform()
+    const p2 = new PIXI.Sprite()
+    p2.x = p2x
+    p2.y = p2y
+    container.addChild(p2)
+    p2.updateTransform()
 
-    this.drawHighlight(p1x, p1y, p2x, p2y, container)
+    const graphics = this.drawHighlight(p1x, p1y, p2x, p2y, container, multiple, highlightColor)
+    if (multiple !== true) {
+        this.p1 = p1
+        this.p2 = p2
+    }
+    return graphics
 }
 
 StorageGrid.prototype.initHighlight = function (x1, y1, x2, y2, container) {
@@ -186,23 +247,30 @@ StorageGrid.prototype.initHighlight = function (x1, y1, x2, y2, container) {
     this.drawHighlight(p1x, p1y, p2x, p2y, container)
 }
 
-StorageGrid.prototype.drawHighlight = function (p1x, p1y, p2x, p2y, container) {
-    if (this.highlightSprite) {
-        container.removeChild(this.highlightSprite)
+StorageGrid.prototype.drawHighlight = function (p1x, p1y, p2x, p2y, container, multiple, highlightColor) {
+    const color = (highlightColor !== undefined) ? highlightColor : 0xff0000
+    var pos = 0
+    if (multiple !== true) {
+        if (this.highlightSprite) {
+            container.removeChild(this.highlightSprite)
+        }
+        pos = (container.children !== undefined && container.children.length > 0) ? container.children.length - 1 : 0
     }
     const alpha = 0.3
+        //const alpha = 1
     var graphics = new PIXI.Graphics();
-    graphics.lineStyle(6, 0xff0000, alpha);
+    graphics.lineStyle(6, color, alpha);
     graphics.moveTo(p1x, p1y)
     graphics.lineTo(p2x, p1y)
     graphics.lineTo(p2x, p2y)
     graphics.lineTo(p1x, p2y)
     graphics.lineTo(p1x, p1y)
-    graphics.beginFill(0xff0000, alpha);
+    graphics.beginFill(color, alpha);
     graphics.drawRect(p1x, p1y, p2x - p1x, p2y - p1y)
     graphics.endFill();
-    container.addChild(graphics);
+    container.addChildAt(graphics, pos);
     this.highlightSprite = graphics
+    return graphics
 }
 
 // process grid cells

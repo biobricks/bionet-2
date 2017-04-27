@@ -1,21 +1,28 @@
 <create-form>
     <div class="content-height">
         <div class="row">
-            <div class="inventory-tree col s4">
-                <table id="ftree" style="margin-top:15px; border:none !important;">
+            <div id="treeview" class="inventory-tree col s4">
+                <table id="ftree" style="margin-top:15px; margin-left:75px; border:none !important;">
+                    <colgroup>
+                        <col></col>
+                        <col></col>
+                    </colgroup>
                     <tbody style="border: none !important;">
                         <tr>
+                            <td></td>
                             <td></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div id="physical-storage" class="col s7">
+            <div id="physical-storage" class="col s8">
+                <!--
                 <div if={showStorage} class="row">
                     <div id="pixijsdiv" class="pixijs">
                         <bionet-storage-location width={pixiwidth}/>
                     </div>
                 </div>
+                -->
                 <div class="row">
                     <div id="workbench-form" class="edit-physical">
                     </div>
@@ -38,6 +45,9 @@
         
         .inventory-tree {
             float: left;
+            margin-left: 65px;
+            overflow: auto;
+            display: block;
         }
         
         span.fancytree-edit {
@@ -60,8 +70,7 @@
         }
         
         div.content-height {
-            margin-top: 115px;
-            height: calc(100% - 100px)
+            margin-top: 100px;
         }
 
     </style>
@@ -111,9 +120,13 @@
                     node.setFocus();
                 }
                 $('.inventory-tree').css({
+                    top:5,
                     height: $(window).innerHeight() - $('#appbar').height() - 15
                 });
-                tag.pixiwidth = $('#ftree').width() - 40
+                $('#ftree').css({
+                    width: $('#treeview').width()-75
+                });
+                tag.pixiwidth = $('#physical-storage').width()
                 tag.update()
             })
         }
@@ -125,12 +138,12 @@
 
         this.on('mount', function() {
 
-            $('.inventory-tree').css({
-                height: $(window).innerHeight() - 120
+            $('.inventory-height').css({
+                height: $(window).innerHeight() - $('#appbar').height()
             });
 
             //$('#name').focus()
-            tag.pixiwidth = $('physical-storage').width()
+            tag.pixiwidth = $('#physical-storage').width()
 
             // set default create form to create quilt
             riot.mount('div#workbench-form', 'create-quilt')
@@ -370,6 +383,9 @@
             BIONET.signal.physicalUpdated.add(physicalUpdated)
             BIONET.signal.requestWorkbench.dispatch()
 
+        })
+        tag.on('update', function() {
+            tag.pixiwidth = $('#physical-storage').width()
         })
 
     </script>

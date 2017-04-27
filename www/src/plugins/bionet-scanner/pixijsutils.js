@@ -13,6 +13,7 @@ const pixijsUtils = {
         PIXI.TRANSFORM_MODE.TRANSFORM_MODE = PIXI.TRANSFORM_MODE.DYNAMIC;
         this.renderer = renderer
         this.stage = new PIXI.Container()
+        renderer.render(this.stage)
     },
     attachRenderer: function (element) {
         /*
@@ -27,10 +28,11 @@ const pixijsUtils = {
     initStage: function (width, height) {
         this.stage.removeChildren()
         const w = Math.round(width)
-        this.renderer.resize(w, height)
-        this.renderer.clear(this.pixiBackgroundColor)
+        //this.renderer.clear(this.pixiBackgroundColor)
         this.width = w
         this.height = height
+        this.renderer.render(this.stage)
+        this.renderer.resize(w, height)
     },
     resizeStage: function(width,height) {
         this.width = w

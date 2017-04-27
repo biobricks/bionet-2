@@ -464,6 +464,10 @@ websocket.createServer({server: server}, function(stream) {
 
         physicalTree.childrenFromKey(curUser.user.workbenchID, cb);
       },
+        
+      getChildren: function(curUser, id, cb) {
+        physicalTree.childrenFromKey(id, cb);
+      },
 
       saveInWorkbench: function(curUser, m, imageData, doPrint, cb) {
         if(!curUser.user.workbenchID) return cb(new Error("User workbench missing"));

@@ -13,6 +13,10 @@
         const pixiController = app.getStream('bionetStorageLocation')
         tag.pixiController = pixiController
 
+        this.on('unmount', function() {
+            pixijsutils.initStage(tag.width, tag.height)
+        })
+
         this.on('mount', function() {
             console.log('bionetStorageLocation tag mount')
 
@@ -22,9 +26,24 @@
             tag.width = opts.width || PIXI_WIDTH
             tag.height = opts.height || PIXI_HEIGHT
 
-            const renderScene = function() {
+            tag.locationPath = undefined
+            const canvas = document.getElementById('bionet-storage-location-canvas')
+            pixijsutils.initStage(tag.width, tag.height)
+            pixijsutils.attachRenderer(canvas)
+            bionetLabLayout.clear()
+            
+            const renderScene = function(locationPath) {
                 const bionetLabLayoutScene = new PIXI.Container()
                 bionetLabLayout.createScene(bionetLabLayoutScene)
+                    //const locationPath = tag.locationPath
+                if (locationPath) {
+                    for (var i = 0; i < locationPath.length; i++) {
+                        BIONET.signal.getContainerContents.dispatch(locationPath[i].id)
+                    }
+                    bionetLabLayout.connectCells()
+                }
+                BIONET.signal.storageLocationViewReady.dispatch()
+
                 pixijsutils.scaleToFit(bionetLabLayoutScene)
                 pixijsutils.appendToStage(bionetLabLayoutScene)
                 pixijsutils.renderStage()
@@ -37,16 +56,31 @@
             loader.load((loader, resources) => {
                 bionetLabLayout.setResources(resources)
                 if (!tag.resources) {
-                    renderScene()
+                    renderScene(tag.locationPath)
                     tag.resources = resources
                 }
             });
 
-            const canvas = document.getElementById('bionet-storage-location-canvas')
-            pixijsutils.initStage(tag.width, tag.height)
-            pixijsutils.attachRenderer(canvas)
 
             const config = {}
+
+            const highlightStorageCell = function(id, data, x, y) {
+                bionetLabLayout.highlightCell(id, data, x, y)
+                pixijsutils.renderStage()
+            }
+            BIONET.signal.highlightStorageCell.add(highlightStorageCell)
+
+            const highlightOccupiedCells = function(id, physicals) {
+                if (physicals === undefined || physicals.length === 0) return
+                const cells = []
+                for (var i = 0; i < physicals.length; i++) {
+                    const cellData = physicals[i].value
+                    if (cellData.parent_id === id) cells.push(cellData)
+                }
+                bionetLabLayout.highlightCellArray(id, cells)
+                pixijsutils.renderStage()
+            }
+            BIONET.signal.getContainerContentsResult.add(highlightOccupiedCells)
 
             // handler functions for pixi client events
             function onPixiEvent(cmd, msgdata) {
@@ -82,6 +116,7 @@
                             }
                             //toast(container.name + ' saved at ' + container.parent_x + ' ' + container.parent_y)
                             console.log(container.name + ' saved at ' + container.parent_x + ' ' + container.parent_y)
+                            BIONET.signal.getBoxContents.dispatch(container.parent_id)
                         })
                     },
                     configure: function(msg) {
@@ -110,8 +145,9 @@
                             bionetLabLayout.initializeModel(config)
 
                             // render if resources loaded otherwise defer
+
                             if (tag.resources) {
-                                renderScene()
+                                renderScene(locationPath)
                             }
                         })
                     },

@@ -21,16 +21,39 @@
     <script>
         const tag = this
         const pixiController = app.getStream('bionetStorageLocation')
+        tag.engine = {}
+        var scene = {}
 
         const bionetLabLayout = require('../bionetLabLayout')
         bionetLabLayout.initializeTypes()
         tag.types = bionetLabLayout.types
 
+        const runRenderLoop = function() {
+            $('#render-canvas').show()
+            tag.engine.runRenderLoop(function() {
+                //scene.activeCamera.alpha += .01;
+                scene.render();
+            });
+        }
+        const pauseRenderLoop = function() {
+            $('#render-canvas').hide()
+            tag.engine.stopRenderLoop()
+        }
+
+        tag.active = false
+        const activate3d = function(activeState) {
+            if (activeState) runRenderLoop()
+            else pauseRenderLoop()
+            tag.active = activeState
+            tag.update()
+        }
+        BIONET.signal.activate3D.add(activate3d)
+
         this.on('mount', function() {
 
             const canvas = document.getElementById('render-canvas');
-            const engine = new BABYLON.Engine(canvas, true);
-            var scene = {}
+            tag.engine = new BABYLON.Engine(canvas, true);
+            const engine = tag.engine
             var lab = {}
             var highlightPathObj = []
 
@@ -119,8 +142,11 @@
                         }
                     }
                 }
-                //var select = Math.round(Math.random() * (parent.children.length - 1))
-                //element = parent.children[select]
+
+                if (BIONET.state.toggle3d) runRenderLoop()
+                else pauseRenderLoop()
+
+                //$('#render-canvas').hide()
             }
 
             const highlightElement = function(name, highlight, color, origAlpha) {
@@ -345,6 +371,7 @@
             const createFreezer = function(id, x, y, index) {
                 //createElement("freezer1", 4, 5, 2, 0, 2.5, 0, scene)
 
+                /*
                 var plane = BABYLON.MeshBuilder.CreatePlane("plane", {
                     width: 5,
                     height: 5
@@ -360,6 +387,7 @@
                 plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
                 plane.material = planeMaterial;
                 plane.alpha = 0.5
+                */
 
                 const freezer = {
                     name: id,
@@ -532,13 +560,7 @@
                 pixiMsgHandler[cmd](msgdata);
             }
             var eventBinding = pixiController.add(onPixiEvent);
-
-
             scene = createScene();
-            engine.runRenderLoop(function() {
-                //scene.activeCamera.alpha += .01;
-                scene.render();
-            });
             window.addEventListener('resize', function() {
                 engine.resize();
             });
