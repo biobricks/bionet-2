@@ -9,6 +9,7 @@ module.exports = {
 
   hostname: 'localhost', // bind to this hostname or IP (assumes all if undefined)
   port: 8000, // bind to this port
+  ssl: false, // use SSL urls? (SSL must be provided by a revese proxy if true)
 
   // Port for low-level access to db via multilevel.
   dbPort: 13377, 
@@ -206,13 +207,6 @@ module.exports = {
    // the setting in this file only affects the UI and provides no security
    restrictUserSignup: true,
 
-   // other bionet peers that we know about
-   /*
-   peers: [
-     {
-       name: "Local test server on port 9000",
-       url: "ws://localhost:9000/peer"
-     }
-   ]
-   */
+   // DHT channel name used to discovering other nodes
+   dhtChannel: 'bionet-nodes'
 };

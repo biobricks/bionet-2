@@ -25,6 +25,7 @@ var IDGenerator = require('../libs/id_generator.js'); // atomically unique IDs
 var Writable = require('stream').Writable;
 var Readable = require('stream').Readable;
 var PeerConnector = require('../libs/peer_connector');
+var PeerDiscover = require('../libs/peer_discovery');
 
 var minimist = require('minimist');
 var argv = minimist(process.argv.slice(2), {
@@ -1021,7 +1022,7 @@ websocket.createServer({
       remote.getPeerInfo(function(err, info) {
 
         if(err) return stream.socket.close();
-        peerConnector.registerIncoming(info.id, stream, rpcServer, function(err) {
+        peerConnector.registerIncoming(info, stream, rpcServer, function(err) {
           if(err && err._permaFail) {
             console.log("Failing permanently for:", info.id, err.message);
             remote.permanentlyDisconnect(function(){});
@@ -1037,6 +1038,19 @@ websocket.createServer({
 });
 
 
-var peerConnector = new PeerConnector(settings.peerID, settings.peers);
-peerConnector.connect();
+var peerConnector = new PeerConnector(settings.peerID, settings.hostname, settings.port, {ssl: settings.ssl});
+var peerDiscover = new PeerDiscover(function(err, peer, type) {
+  if(err) {
+    console.error("Peer discovery error:", err);
+    return;
+  }
+
+  peerConnector.connect({
+    hostname: peer.host,
+    port: peer.port
+  });
+  
+});
+
+
 

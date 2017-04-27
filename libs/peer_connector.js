@@ -4,22 +4,32 @@ var async = require('async');
 var backoff = require('backoff');
 var rpc = require('rpc-multistream');
 
-function PeerConnector(peerID, initialPeers, opts) {
+function PeerConnector(peerID, hostname, port, opts) {
 
-  this.initialPeers = initialPeers;
+  this.hostname = hostname;
+  this.port = port;
+
+  this.opts = opts || {}
+  this.opts.maxAttempts = this.opts.maxAttempts || 10; // max reconnection attempts
 
   this.id = peerID; // this peer's identifier
 
-  // websocket instances
-  this.peers = {};
+  this.peers = {}; // connected peers
+  this.urls = {}; // same as this.peers but indexed by peer.url
 
   this._connectFail = function(peer) {
     peer.connected = false;
     
     peer.rpc.die(); // prevent a future 'death' event
 
-    if(peer.stopTrying) {
-      delete this.peers[peer.id]
+    if(peer.attempts >= this.opts.maxAttempts || !peer.wasConnected || peer.stopTrying) {
+      if(peer.url === 'ws://172.30.0.26:8000/' || peer.url === 'ws://172.30.0.26:9000/') {
+        console.log("FAIL FAIL:", peer.url, peer.attempts, this.opts.maxAttempts, peer.wasConnected, peer.stopTrying);
+      }
+      if(this.urls[peer.url]) {
+        //delete this.urls[peer.url];
+        delete this.peers[peer.id];
+      }
       return;
     }
 
@@ -28,16 +38,33 @@ function PeerConnector(peerID, initialPeers, opts) {
     } catch(e) {}
   };
 
+  this._toUrl = function(hostname, port) {
+    var prefix;
+    if(this.opts.ssl) {
+      prefix = 'wss://';
+    } else {
+      prefix = 'ws://';
+    }
+    return prefix+hostname+':'+port+'/';
+  };
+
+
+  this.ownUrl = this._toUrl(this.hostname, this.port);
+
   this._connectToPeer = function(peer) {
     var self = this;
-    console.log("Connecting to:", peer.url);
+
+//    console.log("Connecting to:", peer.url);
+    peer.attempts++;
 
     var stream = websocket(peer.url);
 
     var rpcClient = rpc({
       getPeerInfo: function(cb) {
         cb(null, {
-          id: self.id
+          id: self.id,
+          hostname: self.hostname,
+          port: self.port
         });
       },
       // the other side can ask this side to stop reconnecting
@@ -63,26 +90,34 @@ function PeerConnector(peerID, initialPeers, opts) {
 
       peer.remote = remote;
 
-      console.log("CONNECTED TO", peer.url);
+      console.log("======================== CONNECTED TO", peer.url);
+      peer.wasConnected = true;
 
       remote.getPeerInfo(function(err, info) {
-        if(err) return peer.stream.socket.close();
+        if(err) {
+          console.error('[peer getPeerInfo error]', err);
+          return peer.stream.socket.close();
+        }
         peer.id = info.id;
         self.peers[peer.id] = peer;
+        self.urls[peer.url] = peer;
       });
 
     });
 
     stream.socket.on('close', function(code, reason) {
-      console.log("[peer websocket closed]", peer.url, code, reason);
+      if(code !== 1006) {
+        console.log("[peer outgoing websocket closed]", peer.url, code, reason);
+      }
       self._connectFail(peer);
     });
 
     stream.on('error', function(err) {
 
       // TODO are there any error codes that aren't cause for reconnecting?
-
-      console.log('[peer websocket]', peer.url, err.message || err);
+      if(!err.message.match(/ECONNREFUSED/)) {
+        console.log('[peer websocket]', peer.url, err.message || err);
+      }
       self._connectFail(peer);
     });
 
@@ -104,12 +139,27 @@ function PeerConnector(peerID, initialPeers, opts) {
   this._attemptConnection = function(peer) {
     var self = this;
 
-    if(this.peers[peer.id]) {
+    peer.url = this._toUrl(peer.hostname, peer.port);
+    
+    // don't connect to ourselves
+    if(peer.url === this.ownUrl) {
+      return;
+    }
+
+    console.log("WANT TO ATTEMPT:", peer.url);
+    console.log(this.urls[peer.url] ? "  got it" : "  not there");
+
+    // alredy connected to this peer
+    if(this.urls[peer.url]) return;
+
+    if(peer.id && this.peers[peer.id]) {
+      delete this.urls[peer.url];
       delete this.peers[peer.id];
     }
 
     if(peer.stream) stream.socket.close();
     peer.connected = false;
+    peer.attempts = 0;
 
     var bo = backoff.fibonacci({
       randomisationFactor: 0,
@@ -127,9 +177,13 @@ function PeerConnector(peerID, initialPeers, opts) {
     this._connectToPeer(peer);
   };
 
-  this.registerIncoming = function(peerID, stream, rpc, cb) {
-    var peer = this.peers[peerID];
-    console.log("INCOMING:", peerID);
+  this.registerIncoming = function(peerInfo, stream, rpc, cb) {
+    var self = this;
+    var peer = this.peers[peerInfo.id];
+
+    // TODO check options and reject if e.g. hostname or port missing
+
+    console.log("INCOMING:", peerInfo.id);
 
     if(peer) {
       if(peer.connected && !peer.incoming) {
@@ -143,18 +197,26 @@ function PeerConnector(peerID, initialPeers, opts) {
     }
 
     peer = {
-      id: peerID,
+      id: peerInfo.id,
+      url: this._toUrl(peerInfo.hostname, peerInfo.port),
       rpc: rpc,
       stream: stream,
       incoming: true, // peer connected to us (rather than us connecting to peer)
-      connected: true
+      connected: true,
+      wasConnected: true
     };
 
+    console.log("==================== INCOMING established:", peer.url);
+
     stream.socket.on('close', function(code, reason) {
+      console.log("[peer incoming connection closed]", code, reason);
       delete self.peers[peer.id];
+      delete self.urls[peer.url];
     });
 
     this.peers[peer.id] = peer;
+    this.urls[peer.url] = peer;
+
     cb();
   };
 
@@ -166,15 +228,23 @@ function PeerConnector(peerID, initialPeers, opts) {
     }, cb);
   };
 
+  this.connect = function(peer) {
+    this._attemptConnection(peer);
+//    if(!this.initialPeers) return;
+//    var i;
+//    for(i=0; i < this.initialPeers.length; i++) {
+//      this._attemptConnection(this.initialPeers[i]);
+//    }
+//  }; 
+  };
 
-  this.connect = function() {
-    if(!this.initialPeers) return;
-    var i;
-    for(i=0; i < this.initialPeers.length; i++) {
-      this._attemptConnection(this.initialPeers[i]);
+  setInterval(function() {
+    var key;
+    for(key in this.urls) {
+      console.log("    ~~~~~~~~~~~", key);
     }
-  }; 
-
+    
+  }.bind(this), 3000);
 };
 
 
