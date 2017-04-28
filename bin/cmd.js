@@ -245,11 +245,7 @@ function saveMaterialInDB(m, userData, dbType, cb) {
       if(err) return cb(err);
       addToIndex(m);
 
-      // TODO temporary workaround for level-tree-index fix
-      physicalTree.rebuild(function(err) {
-        if(err) return cb(err);
-        cb(null, m.id);
-      });
+      cb(null, m.id);
     });
   })
 }
