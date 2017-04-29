@@ -307,7 +307,11 @@ function savePhysical(curUser, m, imageData, doPrint, cb, isUnique) {
     //getBy('name', m.name, function(err, value) {
     getBy('name', m.selectContainer, function(err, value) {
       if(err) return cb(err);
-      if(!value && !m.parent_id) {
+      if(!value) {
+        if(m.parent_id) {
+          savePhysical(curUser, m, imageData, doPrint, cb, true);
+          return;
+        }
         return cb(new Error("No valid container specified"));
       }
       if(m.id === value.id) {
