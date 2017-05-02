@@ -244,13 +244,15 @@ function saveMaterialInDB(m, userData, dbType, cb) {
     db.put(m.id, m, {valueEncoding: 'json'}, function(err) {
       if(err) return cb(err);
       addToIndex(m);
+        cb(null, m.id);
 
       // TODO temporary workaround for level-tree-index fix
+    /*
       physicalTree.rebuild(function(err) {
         if(err) return cb(err);
         cb(null, m.id);
       });
-
+      */
     });
   })
 }
@@ -478,12 +480,19 @@ websocket.createServer({server: server}, function(stream) {
       getChildren: function(curUser, id, cb) {
         physicalTree.childrenFromKey(id, cb);
       },
-
+        
       saveInWorkbench: function(curUser, m, imageData, doPrint, cb) {
         if(!curUser.user.workbenchID) return cb(new Error("User workbench missing"));
         
-        m.parent_id = curUser.user.workbenchID;
-        savePhysical(curUser, m, imageData, doPrint, cb);
+        if (Array.isArray(m)) {
+            for (var i = 0; i < m.length; i++) {
+                m[i].parent_id = curUser.user.workbenchID;
+                savePhysical(curUser, m[i], imageData, doPrint, cb);
+            }
+        } else {
+            m.parent_id = curUser.user.workbenchID;
+            savePhysical(curUser, m, imageData, doPrint, cb);
+        }
       },
 
       getID: function(curUser, cb) {
