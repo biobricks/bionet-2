@@ -149,31 +149,34 @@ StorageGrid.prototype.highlightMouseover = function (name, x, y, container) {
     annotation.removeChildren()
     annotation.x = x
     annotation.y = y
+    annotation.updateTransform()
     const graphics = new PIXI.Graphics();
     annotation.addChild(graphics)
         //container.addChild(annotation)
 
     const textColor = '#000000'
     const textProps = {
-        fontFamily: 'Roboto',
-        fontSize: '70px',
+        fontFamily: 'Ariel',
+        fontSize: '64px',
         fill: textColor,
-        fontWeight: 1600,
-        backgroundColor: '#00000000',
-        wordWrap: false
+        fontWeight: 1600
     }
     const label = new PIXI.Text(name, textProps);
+    label.scale.x = label.scale.y = 3
     annotation.addChild(label)
+    label.updateTransform()
+    label.calculateBounds()
 
     annotation.updateTransform()
     annotation.calculateBounds()
-    const bounds = annotation.getLocalBounds()
+    const bounds = label.getLocalBounds()
     const margin = 6
     const bw = bounds.width
     const bh = bounds.height
     graphics.beginFill(0xffffff);
     graphics.drawRect(0, 0, bw, bh)
     graphics.endFill();
+    graphics.scale.x = graphics.scale.y = 3
 
     this.mouseoverSprite.visible = true
 }
@@ -192,7 +195,7 @@ StorageGrid.prototype.highlightId = function (id, data, x, y, container, multipl
     }.bind(this)
     graphics.mouseout = function () {
         console.log('cell highlight mouseout ', name, x, y)
-        //this.mouseoverSprite.visible = false
+            //this.mouseoverSprite.visible = false
         pixijsutils.renderStage()
     }.bind(this)
 }
@@ -269,7 +272,9 @@ StorageGrid.prototype.drawHighlight = function (p1x, p1y, p2x, p2y, container, m
     graphics.drawRect(p1x, p1y, p2x - p1x, p2y - p1y)
     graphics.endFill();
     container.addChildAt(graphics, pos);
-    this.highlightSprite = graphics
+    if (multiple !== true) {
+        this.highlightSprite = graphics
+    }
     return graphics
 }
 

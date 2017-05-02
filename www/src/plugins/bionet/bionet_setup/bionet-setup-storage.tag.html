@@ -160,7 +160,7 @@
             const newNode = parentNode.addChildren(newNodeData)
             parentNode.setExpanded()
         }
-        BIONET.signal.createStorageItemResult.add(createStorageItemResult)
+        const createStorageItemResultBinding = BIONET.signal.createStorageItemResult.add(createStorageItemResult)
 
         this.deleteNode = function() {
             const ftree = $("#ftree").fancytree("getTree")
@@ -224,7 +224,7 @@
                 tag.update()
             })
         }
-        BIONET.signal.requestStorageResult.add(requestStorageResult)
+        const requestStorageResultBinding = BIONET.signal.requestStorageResult.add(requestStorageResult)
 
         this.on('mount', function() {
             // initialize breadcrumbs
@@ -314,9 +314,9 @@
                          */
                     const dbData = node.data.dbData
                     const type = dbData.type
-                    if (data.targetType==='title' && type === 'physical' || type.indexOf('box') >= 0) {
+                    if (data.targetType === 'title' && type === 'physical' || type.indexOf('box') >= 0) {
                         //console.log('adding item to cart:', JSON.stringify(dbData))
-                            // TODO: messaging async api call
+                        // TODO: messaging async api call
                         /*
                         cart.route('addToCart', undefined, {
                             id: dbData.id,
@@ -467,11 +467,16 @@
                 // todo: only update node in tree
                 BIONET.signal.requestStorage.dispatch()
             }
-            BIONET.signal.physicalUpdated.add(physicalUpdated)
-
+            const physicalUpdatedBinding = BIONET.signal.physicalUpdated.add(physicalUpdated)
+            
+            this.on('unmount', function() {
+                physicalUpdatedBinding.detach()
+                createStorageItemResultBinding.detach()
+                requestStorageResultBinding.detach()
+            })
             BIONET.signal.requestStorage.dispatch()
-
         })
+
 
         this.runSetup = function() {
             console.log('Run setup')
