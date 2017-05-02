@@ -245,7 +245,12 @@ function saveMaterialInDB(m, userData, dbType, cb) {
       if(err) return cb(err);
       addToIndex(m);
 
-      cb(null, m.id);
+      // TODO temporary workaround for level-tree-index fix
+      physicalTree.rebuild(function(err) {
+        if(err) return cb(err);
+        cb(null, m.id);
+      });
+
     });
   })
 }
@@ -307,7 +312,11 @@ function savePhysical(curUser, m, imageData, doPrint, cb, isUnique) {
     //getBy('name', m.name, function(err, value) {
     getBy('name', m.selectContainer, function(err, value) {
       if(err) return cb(err);
-      if(!value && !m.parent_id) {
+      if(!value) {
+        if(m.parent_id) {
+          savePhysical(curUser, m, imageData, doPrint, cb, true);
+          return;
+        }
         return cb(new Error("No valid container specified"));
       }
       if(m.id === value.id) {
