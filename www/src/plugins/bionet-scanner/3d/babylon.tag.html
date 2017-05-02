@@ -1,6 +1,6 @@
 <babylon-3d>
     <div id="babylon-container">
-        <canvas id="render-canvas"></canvas>
+        <canvas class="render-canvas" id="render-canvas"></canvas>
     </div>
     <style>
         #babylon-container {
@@ -11,17 +11,18 @@
             padding: 0;
         }
         
-        #render-canvas {
+        .render-canvas {
             width: 100%;
             height: 100%;
-            touch-action: none;
+            bottom: 0px;
+            right: 0px;
         }
 
     </style>
     <script>
         const tag = this
         const pixiController = app.getStream('bionetStorageLocation')
-        tag.engine = {}
+        tag.engine = null
         var scene = {}
 
         const bionetLabLayout = require('../bionetLabLayout')
@@ -42,16 +43,33 @@
 
         tag.active = false
         const activate3d = function(activeState) {
-            if (activeState) runRenderLoop()
-            else pauseRenderLoop()
+            if (tag.engine !== null) {
+                if (activeState) {
+                    const canvas = document.getElementById('render-canvas');
+                    $(canvas).css({
+                        bottom: window.innerHeight - 60
+                    })
+                    const scale = 720.0 / window.innerHeight
+                        //tag.engine.setHardwareScalingLevel(scale,scale)
+                    runRenderLoop()
+                } else pauseRenderLoop()
+            }
             tag.active = activeState
             tag.update()
         }
-        BIONET.signal.activate3D.add(activate3d)
+        const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
+
+        this.on('unmount', function() {
+            pauseRenderLoop()
+            activate3DBinding.detach()
+        })
 
         this.on('mount', function() {
 
             const canvas = document.getElementById('render-canvas');
+            $(canvas).css({
+                bottom: window.innerHeight
+            })
             tag.engine = new BABYLON.Engine(canvas, true);
             const engine = tag.engine
             var lab = {}
@@ -142,9 +160,10 @@
                         }
                     }
                 }
-
-                if (BIONET.state.toggle3d) runRenderLoop()
-                else pauseRenderLoop()
+                if (tag.engine !== null) {
+                    if (BIONET.state.toggle3d) runRenderLoop()
+                    else pauseRenderLoop()
+                }
 
                 //$('#render-canvas').hide()
             }
@@ -557,7 +576,7 @@
                         })
                     }
                 }
-                pixiMsgHandler[cmd](msgdata);
+                if (pixiMsgHandler[cmd] !== undefined) pixiMsgHandler[cmd](msgdata);
             }
             var eventBinding = pixiController.add(onPixiEvent);
             scene = createScene();

@@ -107,7 +107,7 @@
             const newNode = parentNode.addChildren(newNodeData)
             parentNode.setExpanded()
         }
-        BIONET.signal.createStorageItemResult.add(createStorageItemResult)
+        const createStorageItemResultBinding = BIONET.signal.createStorageItemResult.add(createStorageItemResult)
 
         const getWorkbenchTreeResult = function(storageData) {
             console.log('getWorkbenchTreeResult initializing:', JSON.stringify(storageData))
@@ -120,17 +120,17 @@
                     node.setFocus();
                 }
                 $('.inventory-tree').css({
-                    top:5,
+                    top: 5,
                     height: $(window).innerHeight() - $('#appbar').height() - 15
                 });
                 $('#ftree').css({
-                    width: $('#treeview').width()-75
+                    width: $('#treeview').width() - 75
                 });
                 tag.pixiwidth = $('#physical-storage').width()
                 tag.update()
             })
         }
-        BIONET.signal.getWorkbenchTreeResult.add(getWorkbenchTreeResult)
+        const getWorkbenchTreeResultBinding = BIONET.signal.getWorkbenchTreeResult.add(getWorkbenchTreeResult)
 
         this.selected = null
         this.selectedType = null
@@ -380,8 +380,14 @@
                 // todo: only update single node in tree
                 BIONET.signal.requestWorkbench.dispatch()
             }
-            BIONET.signal.physicalUpdated.add(physicalUpdated)
+            const physicalUpdatedBinding = BIONET.signal.physicalUpdated.add(physicalUpdated)
             BIONET.signal.requestWorkbench.dispatch()
+
+            this.on('unmount', function() {
+                getWorkbenchTreeResultBinding.detach()
+                createStorageItemResultBinding.detach()
+                physicalUpdatedBinding.detach()
+            })
 
         })
         tag.on('update', function() {

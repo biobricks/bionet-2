@@ -12,6 +12,8 @@ const bionetLabLayout = {
         console.log('labStorage load function')
         const loader = PIXI.loader
         loader.baseUrl = this.assets
+        
+        loader.add('threedicon','ic_3d_rotation_black_24px.svg')
 
         if (this.types !== undefined) {
             const types = this.types
@@ -318,11 +320,6 @@ const bionetLabLayout = {
             fill: '#000000',
         };
 
-        var iconFontProps = {
-            fontFamily: 'Material Icons',
-            fontSize: '64px',
-            fill: textColor
-        };
         //const moveRightButtonText = String.fromCharCode(parseInt(0xE315, 16))
 
         const makeInteractive = function (sprite, clickFunction) {
@@ -386,6 +383,12 @@ const bionetLabLayout = {
         const moveLeftButtonText = '\ue314'
         const activate3dButtonText = '\ue84d'
 
+        var iconFontProps = {
+            fontFamily: 'Material Icons',
+            fontSize: '64px',
+            fill: textColor
+        };
+        
         const moveIconY = celldy + marginy * 3.5
         const moveLeftButton = new PIXI.Text(moveLeftButtonText, iconFontProps)
         moveLeftButton.x = 25
@@ -406,10 +409,13 @@ const bionetLabLayout = {
             BIONET.state.toggle3d = !BIONET.state.toggle3d
             BIONET.signal.activate3D.dispatch(BIONET.state.toggle3d)
         }
-        const threedbutton = new PIXI.Text(activate3dButtonText, iconFontProps)
+        const threedbutton = new PIXI.Sprite(this.resources.threedicon.texture)
+        //const threedbutton = new PIXI.Text(activate3dButtonText, iconFontProps)
         threedbutton.x = 800
         threedbutton.y = moveIconY
-        threedbutton.anchor = new PIXI.Point(0, 0)
+        //threedbutton.anchor = new PIXI.Point(0, -0.5)
+        threedbutton.width = threedbutton.height = 48
+        //threedbutton.scale.x = threedbutton.scale.y = 0.75
         sceneRoot.addChild(threedbutton)
         makeInteractive(threedbutton, toggle3d)
             //EmojiOneColor-SVGinOT.ttf

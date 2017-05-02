@@ -68,7 +68,7 @@
                 bionetLabLayout.highlightCell(id, data, x, y)
                 pixijsutils.renderStage()
             }
-            BIONET.signal.highlightStorageCell.add(highlightStorageCell)
+            const highlightStorageCellBinding = BIONET.signal.highlightStorageCell.add(highlightStorageCell)
 
             const highlightOccupiedCells = function(id, physicals) {
                 if (physicals === undefined || physicals.length === 0) return
@@ -80,7 +80,7 @@
                 bionetLabLayout.highlightCellArray(id, cells)
                 pixijsutils.renderStage()
             }
-            BIONET.signal.getContainerContentsResult.add(highlightOccupiedCells)
+            const getContainerContentsResultBinding = BIONET.signal.getContainerContentsResult.add(highlightOccupiedCells)
 
             // handler functions for pixi client events
             function onPixiEvent(cmd, msgdata) {
@@ -161,7 +161,12 @@
                 pixiMsgHandler[cmd](msgdata);
             }
             // setup listener for pixi events
-            var eventBinding = pixiController.add(onPixiEvent);
+            var eventBinding = pixiController.add(onPixiEvent)
+            
+            this.on('unmount',function(){
+                highlightStorageCellBinding.detach()
+                getContainerContentsResultBinding.detach()
+            })
             tag.update()
         })
 

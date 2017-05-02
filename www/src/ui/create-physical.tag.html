@@ -234,15 +234,13 @@
             document.body.scrollTop = document.documentElement.scrollTop = 0;
         }.bind(this)
 
-        var getPhysicalResultBinding = {}
-        this.on('unmount', function() {
-            BIONET.signal.getPhysicalResult.detach(getPhysicalResultBinding)
-        })
-
         this.on('mount', function() {
             console.log("create physical tag mount, opts:%s", JSON.stringify(opts))
 
-            getPhysicalResultBinding = BIONET.signal.getPhysicalResult.add(getPhysicalResult)
+            const getPhysicalResultBinding = BIONET.signal.getPhysicalResult.add(getPhysicalResult)
+            this.on('unmount', function() {
+                getPhysicalResultBinding.detach()
+            })
 
             if (!this.formData) {
                 this.formData = {};
