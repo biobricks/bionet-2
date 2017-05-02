@@ -386,7 +386,7 @@ websocket.createServer({server: server}, function(stream) {
   }, {
     
     foo: function(curUser, user, cb) {
-      console.log("foo called");
+     //console.log("foo called");
       cb(null, "foo says hi");
     },
 
@@ -696,7 +696,7 @@ websocket.createServer({server: server}, function(stream) {
       },
 
       saveVirtual: function(curUser, m, cb) {
-
+        console.log('saveVirtual, m=',JSON.stringify(m))
         saveMaterialInDB(m, curUser, 'v', function(err, id) {
           if(err) return cb(err);
           
