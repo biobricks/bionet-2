@@ -567,6 +567,7 @@ websocket.createServer({server: server}, function(stream) {
         
         saveMaterialInDB({
           type: '_ref',
+          name: '_ref_' + uuid(),
           parent_id: curUser.user.favLocationsID,
           material_id: m.id
         }, curUser, 'p', cb);
