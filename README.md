@@ -51,7 +51,7 @@ cp settings.js.example settings.js
 
 Then edit each of the settings.js files to suit your needs.
 
-# Generate key pair for print server
+# Generate key pair for print/scan server
 
 ```
 cd print_host_keys/
@@ -59,13 +59,7 @@ ssh-keygen -t rsa -f myhostkey -N ""
 cd ../
 ```
 
-and for the client:
-
-```
-cd print_client_keys/
-ssh-keygen -t rsa -f mykey -N ""
-cd ../
-```
+and copy the ssh public key for the client to `print_client_keys/mykey.pub`.
 
 # Building
 

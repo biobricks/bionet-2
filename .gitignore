@@ -6,3 +6,5 @@ static/*.*
 www/settings.js
 db/**
 www/js/bionet.js
+print_client_keys/**
+print_host_keys/**
