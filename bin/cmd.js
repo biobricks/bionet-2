@@ -292,6 +292,69 @@ function getBy(field, value, cb) {
   });
 }
 
+function ensureUserData(users, user, cb) {
+  
+  function ensureWorkbench(user, cb) {
+    if(user.workbenchID) {
+      process.nextTick(function() {
+        cb(null, user, false);
+      });
+    }
+
+    saveMaterialInDB({
+      type: 'workbench',
+      name: '_workbench-'+uuid(),
+      hidden: true
+    }, {user: user}, 'p', function(err, id) {
+      if(err) return cb(err);
+      
+      // associate workbench with user
+      user.workbenchID = id;
+
+      cb(null, user, true);
+    });
+  }
+
+  function ensureFavLocations(user, cb) {
+    if(user.favLocationsID) {
+      process.nextTick(function() {
+        cb(null, user, false);
+      });
+    }
+
+    saveMaterialInDB({
+      type: 'fav_locations',
+      name: '_fav_locations-'+uuid(),
+      hidden: true
+    }, {user: user}, 'p', function(err, id) {
+      if(err) return cb(err);
+      
+      // associate favorite locations physical with user
+      user.favLocationsID = id;
+
+      cb(null, user, true);
+    });
+  }
+
+  ensureWorkbench(user, function(err, user, changed1) {
+    if(err) return cb(err);
+
+    ensureFavLocations(user, function(err, user, changed2) {
+      if(err) return cb(err);
+
+      if(!changed1 && !changed2) {
+        return cb(null, user);
+      }
+
+      accounts.update(users, user, function(err) {
+        if(err) return cb(err);
+        cb(null, user);
+      });
+    });
+  })
+}
+
+
 function savePhysical(curUser, m, imageData, doPrint, cb, isUnique) {
 
   if(!m.id && !isUnique) { // if no id then this is a new physical
@@ -388,8 +451,12 @@ websocket.createServer({server: server}, function(stream) {
         users.get(id, function(err, user) {
           if(err) return cb(err);
 
-          // ToDo don't hard-code group
-          cb(null, id, {user: user, group: 'user'});
+          ensureUserData(users, user, function(err, user) {
+          if(err) return cb(err);            
+
+            // ToDo don't hard-code group
+            cb(null, id, {user: user, group: 'user'});
+          });
         });
       });
     }
@@ -421,28 +488,9 @@ websocket.createServer({server: server}, function(stream) {
       var user = {email: email};
 
       accounts.create(users, user, password, mailer, function(err) {
-        saveMaterialInDB({
-          type: 'workbench',
-          name: '_workbench-'+uuid(),
-          hidden: true
-        }, {user: user}, 'p', function(err, id) {
-          if(err) return cb(err);
-          
-          // associate workbench with user
-          user.workbenchID = id;
+        if(err) return cb(err);
 
-          saveMaterialInDB({
-            type: 'fav_locations',
-            name: '_fav_locations-'+uuid(),
-            hidden: true
-          }, {user: user}, 'p', function(err, id) {
-            if(err) return cb(err);
-            
-            // associate favorite locations physical with user
-            user.favLocationsID = id;
-            accounts.update(users, user, cb);
-          });
-        });
+        ensureUserData(user, user, cb)
       });
     }, 
 
