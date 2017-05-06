@@ -550,12 +550,10 @@ websocket.createServer({server: server}, function(stream) {
         physicalTree.childrenFromKey(curUser.user.favLocationsID, function(err, children) {
           if(err) return cb(err);
 
-          console.log("AAAAAAAAAA", children[0]);
-
           var out = [];
 
           async.eachSeries(children, function(child, cb) {
-            physicalDB.get(child.material.id, function(err, m) {
+            physicalDB.get(child.value.material_id, function(err, m) {
               if(err) return cb(err);
               out.push({
                 favorite: child,
