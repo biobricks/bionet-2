@@ -116,6 +116,7 @@ var workbench = {
 
         const generatePhysicals = function (seriesName, instances) {
             const workbenchId = app.user.workbenchID
+            const instancesList=[]
             for (var instance = 0; instance < instances; instance++) {
                 // todo: generate hash value for new physical instance to avoid naming collisions
                 const name = seriesName + '_' + instance
@@ -124,8 +125,10 @@ var workbench = {
                     type: 'physical',
                     parent_id: workbenchId
                 }
-                saveInWorkbench(dbData)
+                instancesList.push(dbData)
+                //saveInWorkbench(dbData)
             }
+            saveInWorkbench(instancesList)
         }.bind(this)
         BIONET.signal.generatePhysicals = new MiniSignal()
         BIONET.signal.generatePhysicals.add(generatePhysicals)
