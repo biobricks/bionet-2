@@ -7,6 +7,9 @@ var path = require('path');
 
 var settings = {
 
+  // name of lab to create on first run
+  lab: "name of my lab",
+
   hostname: 'localhost', // bind to this hostname or IP (assumes all if undefined)
   port: 8000, // bind to this port
 

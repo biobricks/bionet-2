@@ -77,6 +77,28 @@ var virtualDB = sublevel(bioDB, 'v-', {valueEncoding: 'json'});
 var physicalDB = sublevel(bioDB, 'p-', {valueEncoding: 'json'});
 var cartDB = sublevel(bioDB, 'c-', {valueEncoding: 'json'});
 
+function createInitialLab() {
+  var count = 0;
+  var stream = physicalDB.createReadStream({limit: 1});
+
+  stream.on('data', function(data) {
+    count++;
+  });
+  stream.on('end', function() {
+    if(count) return;
+
+    var m = {
+      id: uuid(),
+      name: settings.lab,
+    };
+    
+    physicalDB.put(m.id, m, {valueEncoding: 'json'}, function(err) {
+      if(err) return console.error("Creating initial lab failed");
+      console.log("Created initial lab");
+    });
+  });
+}
+
 // Start multilevel server for low level db access (e.g. backups)
 var multiLevelServer = net.createServer(function(con) {
   con.pipe(multilevel.server(db)).pipe(con);
@@ -492,7 +514,7 @@ websocket.createServer({server: server}, function(stream) {
       accounts.create(users, user, password, mailer, function(err) {
         if(err) return cb(err);
 
-        ensureUserData(user, user, cb)
+        ensureUserData(users, user, cb)
       });
     }, 
 
@@ -1079,3 +1101,4 @@ websocket.createServer({server: server}, function(stream) {
   rpcServer.pipe(stream).pipe(rpcServer);
 });
 
+createInitialLab();
