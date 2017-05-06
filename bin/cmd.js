@@ -550,6 +550,8 @@ websocket.createServer({server: server}, function(stream) {
         physicalTree.childrenFromKey(curUser.user.favLocationsID, function(err, children) {
           if(err) return cb(err);
 
+          console.log("AAAAAAAAAA", children[0]);
+
           var out = [];
 
           async.eachSeries(children, function(child, cb) {
