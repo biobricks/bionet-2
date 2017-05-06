@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require('fs');
+var async = require('async');
 var path = require('path');
 var net = require('net');
 var http = require('http');
