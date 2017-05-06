@@ -27,7 +27,9 @@ function logError(str) {
 
    The client API:
 
-   identify(cb): reports {id: "clients uuid", name: "human readable name"}
+   identify(cb): reports {
+     id: "clients uuid", name: "human readable name", deviceType: "printer"
+   }
    print(readstream, cb): takes a png label file stream and prints it
 
 */
@@ -38,6 +40,11 @@ var clients = {};
 var serverRPC = {
   identify: function(cb) {
     return cb(null, settings.baseUrl);
+  },
+  reportScan: function(code, cb) {
+    cb = cb || function(){};
+    console.log("Got scan result:", code)
+    cb();
   }
 };
 
@@ -74,7 +81,7 @@ function Client(client, session, test) {
           self.name = info.name;
           clients[self.id] = self;
 
-          if(test) test(self);
+          if(test) test(self, info);
         });
       });
 
@@ -108,7 +115,7 @@ function Client(client, session, test) {
 
 }
 
-var printServer = {
+var labDeviceServer = {
 
   _server: null, 
 
@@ -191,4 +198,4 @@ var printServer = {
 
 // ToDo clean up after disconnect (remove key from clients var)
 
-module.exports = printServer;
+module.exports = labDeviceServer;

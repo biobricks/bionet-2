@@ -19,7 +19,7 @@ var through = require('through2');
 var treeIndex = require('level-tree-index');
 var ElasticIndex = require('level-elasticsearch-index');
 var accounts = require('../libs/user_accounts.js');
-var printServer = require('../libs/print_server.js');
+var labDeviceServer = require('../libs/lab_device_server.js');
 var Mailer = require('../libs/mailer.js');
 var IDGenerator = require('../libs/id_generator.js'); // atomically unique IDs
 var Writable = require('stream').Writable;
@@ -199,10 +199,10 @@ function unixEpochTime(days) {
 }
 
 
-printServer.start(settings, function(err) {
+labDeviceServer.start(settings, function(err) {
     if(err) return console.error(err);
 
-    console.log("Printserver started");
+    console.log("Lab device server started");
 });
 
 
@@ -420,7 +420,7 @@ function savePhysical(curUser, m, imageData, doPrint, cb, isUnique) {
         if(!doPrint) return cb(null, id);
 
         var relativePath = path.relative(settings.labelImageFilePath, imagePath);
-        printServer.printLabel(relativePath);
+        labDeviceServer.printLabel(relativePath);
         console.log("relative path:", relativePath);
         cb(null, id);
       });
