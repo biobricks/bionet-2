@@ -1,230 +1,191 @@
 
-
 var fs = require('fs');
 var path = require('path');
 var ssh2 = require('ssh2');
 var buffersEqual = require('buffer-equal-constant-time');
-var ndjson = require('ndjson');
+var rpc = require('rpc-multistream');
 
 var settings;
 
 function log(str) {
-    console.log('[printserver] ' + str);
+  console.log('[printserver] ' + str);
 }
 
 function logError(str) {
-    console.error('[printserver] ' + str);
+  console.error('[printserver] ' + str);
 }
 
 /* 
-  This server understands two commands:
+   This ssh server only understands one command: "stream".
 
-  msgChannel clientID
+   The only purpose of that command is to open a duplex stream over the
+   ssh2 connection which is then wrapped in an rpc-multistream.
 
-    Open a JSON-based duplex message channel between client and server
-    that stays open for the duration of the connection.
-    The client ID is a human-readable identifier for the client.
-    It must be unique within all clients connecting to the server
-    and does never changes for that client.
-    It can contain only [\w\d\.\-_]+ 
-    It will be displayed in the UI.
+   The server API:
 
-    The clients will send a periodic message: {type: "heartbeat"}
-    The server must respond with the same message: {type: "heartbeat"}
+   identify(cb): reports settings.baseUrl to identify the server
 
-    The server will send a message when it wants the client to print a label:
+   The client API:
 
-      {type: "print", filename: "labelFilenameOnServer.png"}
-
-    The client will respond to this message by sending the getLabel command
-    with the filename specified in the message.
-
-    The client will send a message when a label has been printed:
-
-      {type: "labelPrinted", filename: "labelFilenameOnServer.png"}
-
-  getLabel filename
-
-     Request that the server sends a binary stream with the label 
-     png file data identified by filename and then closes the stream.
+   identify(cb): reports {id: "clients uuid", name: "human readable name"}
+   print(readstream, cb): takes a png label file stream and prints it
 
 */
 
 // clients indexed by their IDs
 var clients = {};
 
-function Client(client, session) {
-    this.client = client;
-    this.session = session;
-    this.id = undefined;
+var serverRPC = {
+  identify: function(cb) {
+    return cb(null, settings.baseUrl);
+  }
+};
 
-    this.outStream = null;
-    this.inStream = null;
+function Client(client, session, test) {
+  this.client = client;
+  this.session = session;
+  this.id = undefined;
+  this.name = undefined;
+  this.remote = undefined;
 
-    this.client.on('end', function() {
-        if(clients[this.id]) {
-            log("client " + this.id + " disconnected");
-            delete clients[this.id];
-        }
-    }.bind(this));
+  this.client.on('end', function() {
+    if(clients[this.id]) {
+      log("client " + this.id + " disconnected");
+      delete clients[this.id];
+    }
+  }.bind(this));
 
-    this.session.on('exec', function(accept, reject, info) {
-        var m;
-        console.log("got command:", info.command);
-        if(m = info.command.match(/^msgChannel\s+([\w\d\.\-_]+)/)) {
-            var stream = accept();
-            this.id = m[1];
-            log("got id: " + info.command);
-            clients[this.id] = this;
-            this.msgChannelCmd(stream);
-        } else if(m = info.command.match(/^getLabel\s+([\w\d\.\-_]+)/)) {
-            var stream = accept();
-            var filename = m[1];
-            console.log("getLabel:", filename);
-            this.getLabelCmd(stream, filename);
-            
-        } else {
-            console.log("bad");
-            reject();
-            return;
-        }
-    }.bind(this));
+  this.session.on('exec', function(accept, reject, info) {
+    var self = this;
+    var m;
+    if(m = info.command.match(/^stream.*/)) {
+      var stream = accept();
 
-    this.msgChannelCmd = function(stream) {
-        log("message channel opened");
-        
-        this.inStream = stream.pipe(ndjson.parse());
-        var jsonStream = ndjson.serialize();
-        jsonStream.pipe(stream);
-        this.outStream = jsonStream;
+      var server = rpc(serverRPC, {});
 
-        this.inStream.on('data', function(msg) {
-            if(msg.type === 'heartbeat') {
-                this.sendHeartbeat();
-            } else {
-                log("Received unknown message with type: " + String(type));
-                return;
-            }
-        }.bind(this));
-    };
+      stream.pipe(server).pipe(stream)
+      server.on('methods', function(remote) {
+        self.remote = remote;
 
-    this.sendHeartbeat = function() {
-        if(!this.outStream) return;
-        this.outStream.write({type: 'heartbeat'});
-    };
+        remote.identify(function(err, info) {
+          if(err) return console.error(err);
+
+          self.id = info.id;
+          self.name = info.name;
+          clients[self.id] = self;
+
+          if(test) test(self);
+        });
+      });
+
+      //            this.msgChannelCmd(stream);
+      //            this.getLabelCmd(stream, filename);
+    } else {
+      console.log("invalid command from print client");
+      reject();
+      return;
+    }
+  }.bind(this));
+
+ 
+  this.printLabel = function(filename, cb) {
+    if(!this.remote) return cb("could not print to client: rpc not yet initialized");
     
-    // tell the client that we have a label available for printing
-    this.printLabel = function(filename, cb) {
-        if(!this.outStream) return cb("message channel not open (client disconnected or not yet connected)");
-        
-        this.outStream.write({type: 'print', filename: filename});
-    };
+    var filePath = path.join(settings.printing.labelImageFilePath, filename);
+    var labelStream = fs.createReadStream(filePath);
+    
+    labelStream.on('error', function(err) {
+      logError(err);
+      cb(err);
+    });
+    labelStream.on('end', function() {
+      cb();
+    });
 
-    this.getLabelCmd = function(stream, filename) {
-        log("getLabelCmd: " + filename);
-
-        var filePath = path.join(settings.labelImageFilePath, filename);
-        
-        var labelStream = fs.createReadStream(filePath);
-        
-        labelStream.on('data', function(data) {
-            console.log("data:", data.length);
-        });
-        
-        labelStream.on('error', function(err) {
-            logError(err);
-            stream.stderr.write("Error reading file\n");
-            stream.exit(1);
-            stream.end();
-        });
-        labelStream.on('end', function() {
-            stream.exit(0);
-            stream.end();
-        });
-        labelStream.pipe(stream);
-    };
+    this.remote.print(labelStream, cb);
+  };
 
 
 }
 
 var printServer = {
 
-    _server: null, 
+  _server: null, 
 
-    stop: function(cb) {
-      cb = cb || function(){};
-      if(!this._server) return cb("No server running");
-      this._server.close(cb);
-    },
+  stop: function(cb) {
+    cb = cb || function(){};
+    if(!this._server) return cb("No server running");
+    this._server.close(cb);
+  },
 
-    start: function(settingsOpt, opts, cb) {
-        if(typeof opts === 'function') {
-            cb = opts;
-            opts = {};
-        }
-        settings = settingsOpt;
-
-        if(!settings.printing.hostKey || !settings.printing.clientKey) return cb("Missing host or client key. Printserver not started.");
-        
-        var pubKey = ssh2.utils.genPublicKey(ssh2.utils.parseKey(fs.readFileSync(settings.printing.clientKey)));
-        
-        this._server = new ssh2.Server({
-            hostKeys: [fs.readFileSync(settings.printing.hostKey)]
-        }, function(client) {
-            log('client connected!');
-
-            client.on('error', function(err) {
-                log('error:', err);
-            });
-            
-            client.on('authentication', function(ctx) {
-                if(ctx.method === 'publickey') {
-                    if(ctx.key.algo === pubKey.fulltype && buffersEqual(ctx.key.data, pubKey.public)) {
-                        ctx.accept();
-                        return;
-                    }
-                }
-                ctx.reject();
-            });
-            
-            client.on('ready', function() {
-                log('client authenticated!');
-                
-                client.on('session', function(accept, reject) {
-                    var session = accept();
-                    log("session accepted");
-
-                    var c = new Client(client, session)
-
-                });
-            });
-
-            client.on('end', function() {
-                log("client disconnected");
-            });
-            
-        });
-        var listenHost = settings.printing.serverHost || settings.hostname;
-        this._server.listen(settings.printing.serverPort, listenHost, function() {
-            log("listening on "+listenHost+":"+settings.printing.serverPort);
-            cb(null, this._server);
-        });
-    },
-
-    printLabel: function(filePath) {
-        var key;
-        // ToDo only print to one printer
-        // ToDo proper callback
-        for(key in clients) {
-            clients[key].printLabel(filePath, function(err) {
-                if(err) {
-                    console.error("Printing failed for ", filePath, err);
-                    return;
-                }
-                console.log("Printing:", filePath);
-            })
-        }
+  start: function(settingsOpt, opts, cb) {
+    if(typeof opts === 'function') {
+      cb = opts;
+      opts = {};
     }
+    settings = settingsOpt;
+
+    if(!settings.printing.hostKey || !settings.printing.clientKey) return cb("Missing host or client key. Printserver not started.");
+    
+    var pubKey = ssh2.utils.genPublicKey(ssh2.utils.parseKey(fs.readFileSync(settings.printing.clientKey)));
+    
+    this._server = new ssh2.Server({
+      hostKeys: [fs.readFileSync(settings.printing.hostKey)]
+    }, function(client) {
+      log('client connected!');
+
+      client.on('error', function(err) {
+        log('error:', err);
+      });
+      
+      client.on('authentication', function(ctx) {
+        if(ctx.method === 'publickey') {
+          if(ctx.key.algo === pubKey.fulltype && buffersEqual(ctx.key.data, pubKey.public)) {
+            ctx.accept();
+            return;
+          }
+        }
+        ctx.reject();
+      });
+      
+      client.on('ready', function() {
+        log('client authenticated!');
+        
+        client.on('session', function(accept, reject) {
+          var session = accept();
+          log("session accepted");
+
+          var c = new Client(client, session, opts.test)
+
+        });
+      });
+
+      client.on('end', function() {
+        log("client disconnected");
+      });
+      
+    });
+    var listenHost = settings.printing.serverHost || settings.hostname;
+    this._server.listen(settings.printing.serverPort, listenHost, function() {
+      log("listening on "+listenHost+":"+settings.printing.serverPort);
+      cb(null, this._server);
+    });
+  },
+
+  printLabel: function(filePath) {
+    var key;
+    // ToDo only print to one printer
+    // ToDo proper callback
+    for(key in clients) {
+      clients[key].printLabel(filePath, function(err) {
+        if(err) {
+          console.error("Printing failed for client", clients[key].name, filePath, err);
+          return;
+        }
+        console.log("Sent to printer on", clients[key].name, ":", filePath);
+      })
+    }
+  }
 
 };
 

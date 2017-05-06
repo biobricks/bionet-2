@@ -69,7 +69,6 @@ var userStatic = require('ecstatic')({
     gzip: true,
     cache: 0
 });
-settings.labelImageFilePath = path.resolve(path.join(settings.userFilePath, settings.labelImageFilePath));
 
 var db = level(settings.dbPath || './db');
 var bioDB = sublevel(db, 'b');
@@ -341,7 +340,7 @@ function savePhysical(curUser, m, imageData, doPrint, cb, isUnique) {
 
     var imageBuffer = new Buffer(mtch[1], 'base64');
     // TODO size check
-    var imagePath = path.join(settings.labelImageFilePath, m.id+'.png')
+    var imagePath = path.join(settings.printing.labelImageFilePath, m.id+'.png')
     fs.writeFile(imagePath, imageBuffer, function(err) {
       if(err) return cb(err);
 
@@ -429,7 +428,18 @@ websocket.createServer({server: server}, function(stream) {
           
           // associate workbench with user
           user.workbenchID = id;
-          accounts.update(users, user, cb);
+
+          saveMaterialInDB({
+            type: 'fav_locations',
+            name: '_fav_locations-'+uuid(),
+            hidden: true
+          }, {user: user}, 'p', function(err, id) {
+            if(err) return cb(err);
+            
+            // associate favorite locations physical with user
+            user.favLocationsID = id;
+            accounts.update(users, user, cb);
+          });
         });
       });
     }, 
@@ -469,11 +479,26 @@ websocket.createServer({server: server}, function(stream) {
         physicalDB.get(curUser.user.workbenchID, cb);
       },
 
-      workbenchTree: function(curUser, cb) {
-        if(!curUser.user.workbenchID) return cb(new Error("User workbench missing"));
+      // get user's workbench physical
+      getFavLocations: function(curUser, cb) {
+        if(!curUser.user.favLocationsID) return cb(new Error("User favorite locations missing"));
 
-        physicalTree.childrenFromKey(curUser.user.workbenchID, cb);
+        physicalDB.get(curUser.user.favLocationsID, cb);
       },
+
+      favLocationsTree: function(curUser, cb) {
+        if(!curUser.user.favLocationsID) return cb(new Error("User favorite locations missing"));
+
+        physicalTree.childrenFromKey(curUser.user.favLocationsID, cb);
+      },
+
+      saveFavLocation: function(curUser, m, imageData, doPrint, cb) {
+        if(!curUser.user.favLocationsID) return cb(new Error("User favorite locations missing"));
+        
+        m.parent_id = curUser.user.favLocationsID;
+        savePhysical(curUser, m, imageData, doPrint, cb);
+      },
+
         
       getChildren: function(curUser, id, cb) {
         physicalTree.childrenFromKey(id, cb);
