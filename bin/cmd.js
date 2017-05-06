@@ -530,6 +530,12 @@ websocket.createServer({server: server}, function(stream) {
         physicalDB.get(curUser.user.workbenchID, cb);
       },
 
+      workbenchTree: function(curUser, cb) {
+        if(!curUser.user.workbenchID) return cb(new Error("User workbench missing"));
+
+        physicalTree.childrenFromKey(curUser.user.workbenchID, cb);
+      },
+
       // get user's workbench physical
       getFavLocations: function(curUser, cb) {
         if(!curUser.user.favLocationsID) return cb(new Error("User favorite locations missing"));
