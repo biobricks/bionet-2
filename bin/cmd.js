@@ -552,7 +552,7 @@ websocket.createServer({server: server}, function(stream) {
 
           var out = [];
 
-          async.eachSerial(children, function(child, cb) {
+          async.eachSeries(children, function(child, cb) {
             physicalDB.get(child.material_id, function(err, m) {
               if(err) return cb(err);
               out.push({
