@@ -561,6 +561,7 @@ websocket.createServer({server: server}, function(stream) {
                 favorite: child,
                 material: m
               });
+              cb();
             });
           }, function(err) {
             if(err) return cb(err);
