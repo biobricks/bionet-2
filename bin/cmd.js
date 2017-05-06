@@ -355,6 +355,7 @@ function ensureUserData(users, user, cb) {
 }
 
 
+
 function savePhysical(curUser, m, imageData, doPrint, cb, isUnique) {
 
   if(!m.id && !isUnique) { // if no id then this is a new physical
@@ -539,14 +540,36 @@ websocket.createServer({server: server}, function(stream) {
       favLocationsTree: function(curUser, cb) {
         if(!curUser.user.favLocationsID) return cb(new Error("User favorite locations missing"));
 
-        physicalTree.childrenFromKey(curUser.user.favLocationsID, cb);
+        physicalTree.childrenFromKey(curUser.user.favLocationsID, function(err, children) {
+          if(err) return cb(err);
+
+          var out = [];
+
+          async.eachSerial(children, function(child, cb) {
+            physicalDB.get(child.material_id, function(err, m) {
+              if(err) return cb(err);
+              out.push({
+                favorite: child,
+                material: m
+              });
+            });
+          }, function(err) {
+            if(err) return cb(err);
+            cb(null, out);
+          })
+        });
       },
 
       saveFavLocation: function(curUser, m, imageData, doPrint, cb) {
         if(!curUser.user.favLocationsID) return cb(new Error("User favorite locations missing"));
         
         m.parent_id = curUser.user.favLocationsID;
-        savePhysical(curUser, m, imageData, doPrint, cb);
+        
+        saveMaterialInDB({
+          type: '_ref',
+          parent_id: curUser.user.favLocationsID,
+          material_id: m.id
+        }, curUser, 'p', cb);
       },
 
         
