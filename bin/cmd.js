@@ -553,7 +553,7 @@ websocket.createServer({server: server}, function(stream) {
           var out = [];
 
           async.eachSeries(children, function(child, cb) {
-            physicalDB.get(child.material_id, function(err, m) {
+            physicalDB.get(child.material.id, function(err, m) {
               if(err) return cb(err);
               out.push({
                 favorite: child,
