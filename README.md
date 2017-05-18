@@ -51,15 +51,15 @@ cp settings.js.example settings.js
 
 Then edit each of the settings.js files to suit your needs.
 
-# Generate key pair for print/scan server
+# Generate key pair for labdevice (printer/scanner) server
 
 ```
-cd print_host_keys/
-ssh-keygen -t rsa -f myhostkey -N ""
+cd labdevice/
+ssh-keygen -t rsa -f hostkey -N ""
 cd ../
 ```
 
-and copy the ssh public key for the client to `print_client_keys/mykey.pub`.
+and copy the ssh public key for each labdevice client to the `labdevice/client_keys/ directory` to authorize the client.
 
 # Building
 

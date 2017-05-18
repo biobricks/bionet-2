@@ -24,6 +24,8 @@ var Mailer = require('../libs/mailer.js');
 var IDGenerator = require('../libs/id_generator.js'); // atomically unique IDs
 var Writable = require('stream').Writable;
 var Readable = require('stream').Readable;
+var PeerConnector = require('../libs/peer_connector');
+var PeerDiscover = require('../libs/peer_discovery');
 
 var minimist = require('minimist');
 var argv = minimist(process.argv.slice(2), {
@@ -43,6 +45,7 @@ var argv = minimist(process.argv.slice(2), {
 });
 
 var settings = require(argv.settings);
+settings.peerID = uuid(); // TODO only generate on first startup
 
 settings.debug = argv.debug || settings.debug;
 if(settings.debug) {
@@ -50,7 +53,7 @@ if(settings.debug) {
     settings.mailer.type = 'console';
 }
 
-var mailer = new Mailer(settings.mailer, settings.base_url);
+var mailer = new Mailer(settings.mailer, settings.baseUrl);
 
 // serve static files
 settings.staticPath = path.join(__dirname, '..', settings.staticPath);
@@ -487,6 +490,12 @@ websocket.createServer({server: server}, function(stream) {
     }
   }, {
     
+    getPeerInfo: function(curUser, cb) {
+      cb(null, {
+        id: settings.peerID
+      });
+    },
+
     foo: function(curUser, user, cb) {
      //console.log("foo called");
       cb(null, "foo says hi");
@@ -534,6 +543,49 @@ websocket.createServer({server: server}, function(stream) {
 
     completePasswordReset: function(curUser, resetCode, password, cb) {
       accounts.completePasswordReset(users, resetCode, password, cb);
+    },
+
+    blast: rpc.syncReadStream(function(curUser, query) {
+      if(!blastDB) throw new Error("BLAST queries not supported by this node");
+      return blastDB.query(query);
+    }),
+
+    // TODO switch to using a stream as output rather than a callback
+    peerBlast: function(curUser, query, cb) {
+      var streams = [];
+
+      function onError(err) {
+        // do we really care about remote errors? probably not
+      }
+
+      function onResult(peerInfo, result) {
+        cb(peerInfo, result);
+      }
+
+      if(blastDB) {
+        streams.push({          
+          stream: blastDB.query(query)
+        });
+      }
+
+      // for each connected peer
+      peerConnector.peerDo(function(peer, next) {
+
+        // run a streaming blast query
+        var s = peer.remote.blast(query)
+
+        s.on('error', onError);
+
+        s.on('data', function(data) {
+          cb(null, peer.info, data);
+        });
+        streams.push(s);
+
+        next();
+
+      }, function(err) {
+        if(err) return cb(err);
+      });
     },
 
     user: { // only users in the group 'user' can access this namespace
@@ -1099,7 +1151,48 @@ websocket.createServer({server: server}, function(stream) {
   });
 
 
+  rpcServer.on('methods', function(remote) {
+
+    // if the remote node exports an rpc function called 'getPeerInfo'
+    // then we assume it's a peer
+    if(remote.getPeerInfo) {
+      // Peers call this to register themselves.
+      // They must supply peerUrl to identify themselves
+      remote.getPeerInfo(function(err, info) {
+
+        if(err) return stream.socket.close();
+        peerConnector.registerIncoming(info, stream, rpcServer, function(err) {
+          if(err && err._permaFail) {
+            console.log("Failing permanently for:", info.id, err.message);
+            remote.permanentlyDisconnect(function(){});
+            return;
+          }
+          console.log("incoming peer connected:", info.id);
+        });
+      });
+    }
+  });
+
+
   rpcServer.pipe(stream).pipe(rpcServer);
 });
 
 createInitialLab();
+
+
+if(settings.dhtChannel) {
+
+  var peerConnector = new PeerConnector(settings.peerID, settings.hostname, settings.port, {ssl: settings.ssl});
+  var peerDiscover = new PeerDiscover(function(err, peer, type) {
+    if(err) {
+      console.error("Peer discovery error:", err);
+      return;
+    }
+
+    peerConnector.connect({
+      hostname: peer.host,
+      port: peer.port
+    });
+    
+  });
+}

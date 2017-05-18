@@ -132,9 +132,40 @@ var labDeviceServer = {
     }
     settings = settingsOpt;
 
-    if(!settings.printing.hostKey || !settings.printing.clientKey) return cb("Missing host or client key. Printserver not started.");
+    if(!settings.printing.hostKey || !settings.printing.clientKeys) return cb("Missing host or client key. Printserver not started.");
     
-    var pubKey = ssh2.utils.genPublicKey(ssh2.utils.parseKey(fs.readFileSync(settings.printing.clientKey)));
+    var pubKeys = [];
+    try {
+      var pubKeyFiles = fs.readdirSync(settings.printing.clientKey);
+    } catch(err) {
+      return cb(err);
+    }
+
+
+    var i, pubKey, data;
+    for(i=0; i < pubKeyFiles.length; i++) {
+      if(pubKeyFiles[i].match(/^\./)) {
+        console.log("Warning: Ignoring Lab Device SSH client key `"+pubKeyFiles[i]+"` because filename begins with a `.` (period)");
+        continue;
+      }
+      if(pubKeyFiles[i].match(/~$/)) {
+        console.log("Warning: Ignoring Lab Device SSH client key `"+pubKeyFiles[i]+"` because it ends with a `~` (tilde)");
+        continue;
+      }
+      if(pubKeyFiles[i].match(/^#.*#$/)) {
+        console.log("Warning: Ignoring Lab Device SSH client key `"+pubKeyFiles[i]+"` because it begins and ends with a `#` (hash)");
+        continue;
+      }
+      
+      try {
+        data = fs.readFileSync(pubKeyFiles[i]);
+        pubKey = ssh2.utils.genPublicKey(ssh2.utils.parseKey(data));
+      } catch(err) {
+        return cb(err);
+      }
+
+      pubKeys.push(pubKey);
+    }
     
     this._server = new ssh2.Server({
       hostKeys: [fs.readFileSync(settings.printing.hostKey)]
@@ -146,13 +177,16 @@ var labDeviceServer = {
       });
       
       client.on('authentication', function(ctx) {
-        if(ctx.method === 'publickey') {
-          if(ctx.key.algo === pubKey.fulltype && buffersEqual(ctx.key.data, pubKey.public)) {
-            ctx.accept();
-            return;
+        if(ctx.method !== 'publickey') return ctx.reject();
+        if(ctx.key.algo !== pubKey.fulltype) return ctx.reject();
+
+        var i;
+        for(i=0; i < pubKeys.length; i++) {          
+          if(buffersEqual(ctx.key.data, pubKeys[i].public)) {
+            return ctx.accept();
           }
+          ctx.reject();
         }
-        ctx.reject();
       });
       
       client.on('ready', function() {
