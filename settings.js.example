@@ -69,7 +69,7 @@ var settings = {
   },
 
   // Settings related to label printing
-  printing: {
+  labDevice: {
 
     // Where label image files are stored.
     // Relative to userFilePath

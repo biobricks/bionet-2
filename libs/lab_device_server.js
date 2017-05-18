@@ -97,8 +97,8 @@ function Client(client, session, test) {
  
   this.printLabel = function(filename, cb) {
     if(!this.remote) return cb("could not print to client: rpc not yet initialized");
-    
-    var filePath = path.join(settings.printing.labelImageFilePath, filename);
+
+    var filePath = path.join(settings.labDevice.labelImageFilePath, filename);
     var labelStream = fs.createReadStream(filePath);
     
     labelStream.on('error', function(err) {
@@ -132,15 +132,14 @@ var labDeviceServer = {
     }
     settings = settingsOpt;
 
-    if(!settings.printing.hostKey || !settings.printing.clientKeys) return cb("Missing host or client key. Printserver not started.");
+    if(!settings.labDevice.hostKey || !settings.labDevice.clientKeys) return cb("Missing host or client key. Printserver not started.");
     
     var pubKeys = [];
     try {
-      var pubKeyFiles = fs.readdirSync(settings.printing.clientKey);
+      var pubKeyFiles = fs.readdirSync(settings.labDevice.clientKeys);
     } catch(err) {
       return cb(err);
     }
-
 
     var i, pubKey, data;
     for(i=0; i < pubKeyFiles.length; i++) {
@@ -158,17 +157,25 @@ var labDeviceServer = {
       }
       
       try {
-        data = fs.readFileSync(pubKeyFiles[i]);
+        data = fs.readFileSync(path.join(settings.labDevice.clientKeys, pubKeyFiles[i]));
+
+        if(!data.length) continue;
         pubKey = ssh2.utils.genPublicKey(ssh2.utils.parseKey(data));
       } catch(err) {
-        return cb(err);
+        console.log("Warning: Invalid Lab Device SSH client key: `"+pubKeyFiles[i]+"`:", err);
+        continue;
       }
-
       pubKeys.push(pubKey);
     }
     
+    try {
+      var hostKey = fs.readFileSync(settings.labDevice.hostKey);
+    } catch(err) {
+      return cb(err);
+    }
+
     this._server = new ssh2.Server({
-      hostKeys: [fs.readFileSync(settings.printing.hostKey)]
+      hostKeys: [hostKey]
     }, function(client) {
       log('client connected!');
 
@@ -178,15 +185,16 @@ var labDeviceServer = {
       
       client.on('authentication', function(ctx) {
         if(ctx.method !== 'publickey') return ctx.reject();
-        if(ctx.key.algo !== pubKey.fulltype) return ctx.reject();
 
         var i;
         for(i=0; i < pubKeys.length; i++) {          
-          if(buffersEqual(ctx.key.data, pubKeys[i].public)) {
-            return ctx.accept();
-          }
-          ctx.reject();
+          if(ctx.key.algo !== pubKeys[i].fulltype) continue;
+          if(!buffersEqual(ctx.key.data, pubKeys[i].public)) continue;
+
+          ctx.accept();
+          return;
         }
+        ctx.reject();
       });
       
       client.on('ready', function() {
@@ -206,9 +214,9 @@ var labDeviceServer = {
       });
       
     });
-    var listenHost = settings.printing.serverHost || settings.hostname;
-    this._server.listen(settings.printing.serverPort, listenHost, function() {
-      log("listening on "+listenHost+":"+settings.printing.serverPort);
+    var listenHost = settings.labDevice.serverHost || settings.hostname;
+    this._server.listen(settings.labDevice.serverPort, listenHost, function() {
+      log("listening on "+listenHost+":"+settings.labDevice.serverPort);
       cb(null, this._server);
     });
   },

@@ -45,7 +45,6 @@ var argv = minimist(process.argv.slice(2), {
 });
 
 var settings = require(argv.settings);
-settings.peerID = uuid(); // TODO only generate on first startup
 
 settings.debug = argv.debug || settings.debug;
 if(settings.debug) {
@@ -133,7 +132,9 @@ var physicalTree = treeIndex(physicalDB, sublevel(indexDB, 't'), {
   parentProp: 'parent_id'
 });
 
-var elasticIndex = ElasticIndex(bioDB);
+var elasticIndex = ElasticIndex(bioDB, {
+  
+});
 
 elasticIndex.add('name', function(key, val) {
   val = JSON.parse(val); // TODO this should not be needed
@@ -152,10 +153,13 @@ physicalTree.rebuild(function(err) {
   console.log("Finished inventory tree rebuild");
 });
 
-elasticIndex.rebuildAll(function(err) {
-  if(err) return console.error("elastic index rebuild error:", err);
-  console.log("Finished elastic index rebuild");
-});
+elasticIndex.ping(function(err) {
+  if(err) return console.error("Warning: Could not connect to ElasticSearch server. Proceeding without ElasticSearch indexing.\n", err);
+  elasticIndex.rebuildAll(function(err) {
+    if(err) return console.error("elastic index rebuild error:", err);
+    console.log("Finished elastic index rebuild");
+  });
+})
 
 var miscDB = sublevel(db, 'm');
 var idGenerator = new IDGenerator(miscDB);
@@ -492,7 +496,7 @@ websocket.createServer({server: server}, function(stream) {
     
     getPeerInfo: function(curUser, cb) {
       cb(null, {
-        id: settings.peerID
+        id: settings.baseUrl
       });
     },
 
@@ -1157,7 +1161,7 @@ websocket.createServer({server: server}, function(stream) {
     // then we assume it's a peer
     if(remote.getPeerInfo) {
       // Peers call this to register themselves.
-      // They must supply peerUrl to identify themselves
+      // They must supply baseUrl to identify themselves
       remote.getPeerInfo(function(err, info) {
 
         if(err) return stream.socket.close();
@@ -1185,7 +1189,12 @@ if(settings.dhtChannel) {
   var peerConnector = new PeerConnector(settings.peerID, settings.hostname, settings.port, {ssl: settings.ssl});
   var peerDiscover = new PeerDiscover(function(err, peer, type) {
     if(err) {
-      console.error("Peer discovery error:", err);
+      // TODO
+      // We sometimes initially get:
+      // "Peer discovery error: Error: No nodes to query" 
+      // but then it seems to proceed to work correctly
+      // or possibly only DNS discovery works after this.
+      // The error originates in the bittorrent-dht .announce function
       return;
     }
 

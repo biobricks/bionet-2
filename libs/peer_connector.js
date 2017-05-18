@@ -20,12 +20,14 @@ function PeerConnector(peerID, hostname, port, opts) {
   this._connectFail = function(peer) {
     peer.connected = false;
     
+    console.log("_connectFail");
+
     peer.rpc.die(); // prevent a future 'death' event
 
     if(peer.attempts >= this.opts.maxAttempts || !peer.wasConnected || peer.stopTrying) {
-      if(peer.url === 'ws://172.30.0.26:8000/' || peer.url === 'ws://172.30.0.26:9000/') {
+//      if(peer.url === 'ws://172.30.0.26:8000/' || peer.url === 'ws://72.244.126.50:9009/') {
         console.log("FAIL FAIL:", peer.url, peer.attempts, this.opts.maxAttempts, peer.wasConnected, peer.stopTrying);
-      }
+//      }
       if(this.urls[peer.url]) {
         //delete this.urls[peer.url];
         delete this.peers[peer.id];
@@ -54,7 +56,7 @@ function PeerConnector(peerID, hostname, port, opts) {
   this._connectToPeer = function(peer) {
     var self = this;
 
-//    console.log("Connecting to:", peer.url);
+    console.log("Connecting to:", peer.url);
     peer.attempts++;
 
     var stream = websocket(peer.url);
@@ -147,7 +149,7 @@ function PeerConnector(peerID, hostname, port, opts) {
     }
 
     console.log("WANT TO ATTEMPT:", peer.url);
-    console.log(this.urls[peer.url] ? "  got it" : "  not there");
+    console.log(this.urls[peer.url] ? "  already connected" : "  not yet connected");
 
     // alredy connected to this peer
     if(this.urls[peer.url]) return;
@@ -169,6 +171,7 @@ function PeerConnector(peerID, hostname, port, opts) {
 
     // reached backoff timeout
     bo.on('ready', function(number, delay) {
+      console.log("RETRYING");
       self._connectToPeer(peer);
     });
 
@@ -238,6 +241,7 @@ function PeerConnector(peerID, hostname, port, opts) {
 //  }; 
   };
 
+/*
   setInterval(function() {
     var key;
     for(key in this.urls) {
@@ -245,6 +249,7 @@ function PeerConnector(peerID, hostname, port, opts) {
     }
     
   }.bind(this), 3000);
+*/
 };
 
 
