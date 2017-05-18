@@ -6,7 +6,7 @@ var settings = require("../settings.js");
 labDeviceServer.start(settings, {
   // this test gets run whenever a client connects
   test: function(client, clientInfo) {
-    if(clientInfo.deviceType === 'printer') {
+    if(clientInfo.type === 'printer') {
       client.printLabel("example.png", function(err) {
         if(err) return console.error(err);
         

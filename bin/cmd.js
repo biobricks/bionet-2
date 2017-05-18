@@ -88,8 +88,9 @@ function createInitialLab() {
     if(count) return;
 
     var m = {
-      id: uuid(),
+      id: 'p-' + uuid(),
       name: settings.lab,
+      type: 'lab'
     };
     
     physicalDB.put(m.id, m, {valueEncoding: 'json'}, function(err) {
