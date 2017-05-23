@@ -213,6 +213,19 @@ var settings = {
    dhtChannel: 'bionet-nodes'
 };
 
-settings.printing.labelImageFilePath = path.resolve(path.join(settings.userFilePath, settings.printing.labelImageFilePath));
+module.exports = function(argv) {
 
-module.exports = settings;
+  settings.labDevice.labelImageFilePath = path.resolve(path.join(settings.userFilePath, settings.labDevice.labelImageFilePath));
+  
+  
+  settings.staticPath = path.join(__dirname, '..', settings.staticPath);
+  settings.userFilePath = path.join(__dirname, '..', settings.userFilePath);
+  
+  settings.debug = argv.debug || settings.debug;
+  if(settings.debug) {
+    // don't actually end emails in debug mode
+    settings.mailer.type = 'console';
+  }
+
+  return settings;
+};

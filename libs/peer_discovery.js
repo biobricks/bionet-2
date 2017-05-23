@@ -1,7 +1,7 @@
 
 var DC = require('discovery-channel')
 var xtend = require('xtend');
-var settings = require('../settings.js');
+;
 
 function discover(opts, cb) {
   if(!(this instanceof discover)) return new discover(opts, cb);
@@ -12,8 +12,8 @@ function discover(opts, cb) {
   }
 
   opts = xtend({
-    channel: settings.dhtChannel,
-    port: settings.port,
+    channel: 'bionet-nodes',
+    port: '443',
     dhtInterval: 10 * 60 * 1000,
     dnsInterval: 60 * 1000 
   }, opts || {});
