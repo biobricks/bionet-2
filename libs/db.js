@@ -4,7 +4,7 @@ var sublevel = require('subleveldown'); // leveldb multiplexing
 var IDGenerator = require('../libs/id_generator.js'); // atomically unique IDs
 var labDeviceServer = require('../libs/lab_device_server.js');
 
-module.exports = function(settings) {
+module.exports = function(settings, users, acccounts) {
 
   var db = level(settings.dbPath || './db');
   var userDB = sublevel(db, 'u', { valueEncoding: 'json' });
@@ -20,7 +20,7 @@ module.exports = function(settings) {
   var cartDB = sublevel(bioDB, 'c-', {valueEncoding: 'json'});
   
 
-  function ensureUserData(users, user, cb) {
+  function ensureUserData(users, user, accounts, cb) {
     
     function ensureWorkbench(user, cb) {
       if(user.workbenchID) {
@@ -291,6 +291,14 @@ module.exports = function(settings) {
     bio: bioDB,
     virtual: virtualDB,
     physical: physicalDB,
+
+    // functions
+    idGenerator: idGenerator,
+    saveMaterial: saveMaterialInDB,
+    savePhysical: savePhysical,
+    userCart: userCartDB,
+    unixEpochTime: unixEpochTime,
+    ensureUserData: ensureUserData,
 
     init: init
 

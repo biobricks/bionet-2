@@ -1,7 +1,8 @@
 
+var async = require('async');
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
-module.exports = function(settings) { 
+module.exports = function(settings, db, index) { 
   return {
     secret: function(curUser, cb) {
       cb(null, "Sneeple are real!");
@@ -10,7 +11,7 @@ module.exports = function(settings) {
     // TODO remove this when implementing private data
     testStream: rpc.syncReadStream(function() {
 
-      return physicalDB.createReadStream();
+      return db.physical.createReadStream();
     }),
 
     // get user's workbench physical
@@ -23,20 +24,20 @@ module.exports = function(settings) {
     workbenchTree: function(curUser, cb) {
       if(!curUser.user.workbenchID) return cb(new Error("User workbench missing"));
 
-      physicalTree.childrenFromKey(curUser.user.workbenchID, cb);
+      index.inventoryTree.childrenFromKey(curUser.user.workbenchID, cb);
     },
 
     // get user's workbench physical
     getFavLocations: function(curUser, cb) {
       if(!curUser.user.favLocationsID) return cb(new Error("User favorite locations missing"));
 
-      physicalDB.get(curUser.user.favLocationsID, cb);
+      db.physical.get(curUser.user.favLocationsID, cb);
     },
 
     favLocationsTree: function(curUser, cb) {
       if(!curUser.user.favLocationsID) return cb(new Error("User favorite locations missing"));
 
-      physicalTree.childrenFromKey(curUser.user.favLocationsID, function(err, children) {
+      index.inventoryTree.childrenFromKey(curUser.user.favLocationsID, function(err, children) {
         if(err) return cb(err);
 
         var out = [];
@@ -44,7 +45,7 @@ module.exports = function(settings) {
         async.eachSeries(children, function(child, cb) {
           if(!child.value.material_id) return cb();
 
-          physicalDB.get(child.value.material_id, function(err, m) {
+          db.physical.get(child.value.material_id, function(err, m) {
             if(err) return cb(err);
             out.push({
               favorite: child,
@@ -64,7 +65,7 @@ module.exports = function(settings) {
       
       m.parent_id = curUser.user.favLocationsID;
       
-      saveMaterialInDB({
+      db.saveMaterial({
         type: '_ref',
         name: '_ref_' + uuid(),
         parent_id: curUser.user.favLocationsID,
@@ -74,7 +75,7 @@ module.exports = function(settings) {
 
     
     getChildren: function(curUser, id, cb) {
-      physicalTree.childrenFromKey(id, cb);
+      index.inventoryTree.childrenFromKey(id, cb);
     },
     
     saveInWorkbench: function(curUser, m, imageData, doPrint, cb) {
@@ -83,30 +84,30 @@ module.exports = function(settings) {
       if (Array.isArray(m)) {
         for (var i = 0; i < m.length; i++) {
           m[i].parent_id = curUser.user.workbenchID;
-          savePhysical(curUser, m[i], imageData, doPrint, cb);
+          db.savePhysical(curUser, m[i], imageData, doPrint, cb);
         }
       } else {
         m.parent_id = curUser.user.workbenchID;
-        savePhysical(curUser, m, imageData, doPrint, cb);
+        db.savePhysical(curUser, m, imageData, doPrint, cb);
       }
     },
 
     getID: function(curUser, cb) {
-      idGenerator.next(cb);
+      db.idGenerator.next(cb);
     },
 
     delMaterial: function(curUser, id, cb) {
       console.log('delMaterial:',id);
       if(!id) return cb("Missing id");
       
-      //bioDB.del(id, cb);
-      physicalDB.del(id, cb);
+      db.physical.del(id, cb);
     },
     
     delPhysical: function(curUser, id, cb) {
       console.log('delPhysical:',id);
       if(!id) return cb("Missing id");
-      physicalDB.del(id, cb);
+
+      db.physical.del(id, cb);
     },
 
     physicalAutocomplete: function(curUser, query, cb) {
@@ -114,21 +115,14 @@ module.exports = function(settings) {
       query = query.trim().toLowerCase();
       var a = [];
 
-      // TODO improve
-      var s = physicalDB.createReadStream();
+      // TODO this is a super inefficient way of autocompleting
+      var s = db.physical.createReadStream();
       
       s.on('data', function(data) {
         if(!data.value.name.toLowerCase().match(query)) return;
         if(data.value.hidden) return; // skip hidden physicals
 
         a.push(data.value);
-
-        /*
-          a.push({
-          text: data.value.name,
-          id: data.key
-          });
-        */
       });
 
       s.on('error', function(err) {
@@ -147,10 +141,10 @@ module.exports = function(settings) {
       var o = {
         user: curUser.user.email,
         physical_id: physical_id,
-        created: unixEpochTime()
+        created: db.unixEpochTime()
       }
       
-      var ucDB = userCartDB(o.user);
+      var ucDB = db.userCart(o.user);
       
       // TODO is it too dangerous to use the physical's name as a key here?
       // they should be unique, but are we really ensuring that?
@@ -163,7 +157,7 @@ module.exports = function(settings) {
       const cartStream = Readable({ objectMode: true });
       cartStream._read = function() {}
 
-      var ucDB = userCartDB(curUser.user.email);
+      var ucDB = db.userCart(curUser.user.email);
       var s = ucDB.createReadStream();
 
       // TODO 
@@ -175,12 +169,12 @@ module.exports = function(settings) {
       var out = s.pipe(through.obj(function(data, enc, next) {
         if(!data || !data.value || !data.value.physical_id) return next();
         
-        physicalDB.get(data.value.physical_id, function(err, o) {
+        db.physical.get(data.value.physical_id, function(err, o) {
           if(err) {
             if(err.notFound) return next();
             return cb(err);
           }
-          physicalTree.path(o.id, function(err, path) {
+          db.physical.path(o.id, function(err, path) {
             
             if(err) return cb(err);
             cartStream.push({
@@ -206,9 +200,9 @@ module.exports = function(settings) {
     }),
 
     delFromCart: function(curUser, physical_id, cb) {
-      var ucDB = userCartDB(curUser.user.email);
+      var ucDB = db.userCart(curUser.user.email);
 
-      physicalDB.get(physical_id, function(err, o) {
+      db.physical.get(physical_id, function(err, o) {
         if(err) return cb(err);
 
         ucDB.del(o.name, cb)
@@ -216,7 +210,7 @@ module.exports = function(settings) {
     },
 
     emptyCart: function(curUser, cb) {
-      var ucDB = userCartDB(curUser.user.email);
+      var ucDB = db.userCart(curUser.user.email);
       var s = ucDB.createKeyStream();
 
       var out = s.pipe(through.obj(function(key, enc, next) {
@@ -278,7 +272,7 @@ module.exports = function(settings) {
         type = type.name.toLowerCase().trim()
       }
       
-      var s = virtualDB.createReadStream({valueEncoding: 'json'});
+      var s = db.virtual.createReadStream({valueEncoding: 'json'});
       
       var out = s.pipe(through.obj(function(data, enc, cb) {
 
@@ -311,7 +305,7 @@ module.exports = function(settings) {
 
     saveVirtual: function(curUser, m, cb) {
       console.log('saveVirtual, m=',JSON.stringify(m))
-      saveMaterialInDB(m, curUser, 'v', function(err, id) {
+      db.saveMaterial(m, curUser, 'v', function(err, id) {
         if(err) return cb(err);
         
         return cb(null, id);
@@ -319,12 +313,12 @@ module.exports = function(settings) {
     },
 
     savePhysical: function(curUser, m, imageData, doPrint, cb) {
-      savePhysical(curUser, m, imageData, doPrint, cb);
+      db.savePhysical(curUser, m, imageData, doPrint, cb);
     },
 
     elasticSearch: function(curUser, query, cb) {
 
-      elasticIndex.search('name', {
+      index.elastic.search('name', {
         query: {
           "match_phrase_prefix": {
             "name": {
@@ -343,7 +337,7 @@ module.exports = function(settings) {
     // get the entire physical inventory tree
     // TODO implement a server side filter for the physicals tree
     inventoryTree: function(curUser, cb) {
-      physicalTree.children(null, {
+      index.inventoryTree.children(null, {
         ignore: function(obj) {
           // ignore paths with parts beginning with _
           var pathParts = obj.path.split('.');
@@ -362,7 +356,7 @@ module.exports = function(settings) {
     // TODO create an index for this
     instancesOfVirtual: function(curUser, virtual_id, cb) {
       var results=[];
-      var s = physicalDB.createReadStream({
+      var s = db.physical.createReadStream({
         valueEncoding: 'json'
       });
       var out = s.pipe(through.obj(function(data, enc, next) {
@@ -392,10 +386,11 @@ module.exports = function(settings) {
         cb(new Error("getLocationPath only works for physicals"));
       }
       
-      const db = physicalDB;
-      const results = [];
+      var db = db.physical;
+      var results = [];
 
-      const getParentLocation = function (id) {
+      // TODO this should be done with the level-tree-index API
+      var getParentLocation = function (id) {
         db.get(id, {
           valueEncoding: 'json'
         }, function (err, p1) {
@@ -433,7 +428,7 @@ module.exports = function(settings) {
     // TODO use indexes for this!
     getByHumanID: function(curUser, humanID, cb) {
 
-      var s = bioDB.createReadStream({valueEncoding: 'json'});
+      var s = db.bio.createReadStream({valueEncoding: 'json'});
       var found = false;
       var out = s.pipe(through.obj(function(data, enc, next) {
         if(!data || !data.value || !data.value.label) return next()
@@ -463,7 +458,7 @@ module.exports = function(settings) {
     // TODO use indexes for this
     getVirtualBy: function(curUser, field, value, cb) {
 
-      var s = virtualDB.createReadStream({valueEncoding: 'json'});
+      var s = db.virtual.createReadStream({valueEncoding: 'json'});
       var found = false;
       var out = s.pipe(through.obj(function(data, enc, next) {
         if(!data || !data.value || !data.value[field]) return next()
@@ -503,7 +498,7 @@ module.exports = function(settings) {
       var count = 0;
       var out = s.pipe(through(function(data, enc, cb) {
 
-        bioDB.get(data.value, function(err, p) {
+        db.bio.get(data.value, function(err, p) {
           if(!err && p) {
             this.push(JSON.stringify(p));
             count++;
@@ -523,7 +518,7 @@ module.exports = function(settings) {
 
     search: function(curUser, q, cb) {
       console.log("CALLED SEARCH:", q);
-      var s = bioDB.createReadStream({valueEncoding: 'json'});
+      var s = db.bio.createReadStream({valueEncoding: 'json'});
 
       var ret = [];
 

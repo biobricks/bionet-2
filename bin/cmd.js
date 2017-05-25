@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 var fs = require('fs');
-var async = require('async');
 var path = require('path');
 var net = require('net');
 var http = require('http');
@@ -13,8 +12,6 @@ var multilevel = require('multileveldown'); // share one leveldb between process
 var accountdown = require('accountdown'); // user/login management
 var uuid = require('uuid').v4;
 var through = require('through2');
-var treeIndex = require('level-tree-index');
-var ElasticIndex = require('level-elasticsearch-index');
 var accounts = require('../libs/user_accounts.js');
 var Mailer = require('../libs/mailer.js');
 
@@ -40,7 +37,8 @@ default: {
 
 var settings = require(argv.settings)(argv);
 
-var db = require('../libs/db.js')(settings);
+var db = require('../libs/db.js')(settings, users, accounts);
+var index = require('../libs/indexing.js')(settings, db);
 
 var mailer = new Mailer(settings.mailer, settings.baseUrl);
 
@@ -114,8 +112,8 @@ server.listen(settings.port, settings.hostname);
 // initialize the websocket server on top of the webserver
 websocket.createServer({server: server}, function(stream) {
 
-  var userRPC = require('../rpc/user.js')(settings);
-  var publicRPC = require('../rpc/public.js')(settings);
+  var userRPC = require('../rpc/user.js')(settings, users, accounts, db, index);
+  var publicRPC = require('../rpc/public.js')(settings, users, accounts, db, index);
 
   // initialize the rpc server on top of the websocket stream
   var rpcServer = rpc(auth({

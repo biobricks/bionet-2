@@ -1,7 +1,7 @@
 
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
-module.exports = function(settings) { 
+module.exports = function(settings, users, accounts, db, index) { 
   return {
 
     getPeerInfo: function(curUser, cb) {
@@ -38,7 +38,7 @@ module.exports = function(settings) {
       accounts.create(users, user, password, mailer, function(err) {
         if(err) return cb(err);
 
-        ensureUserData(users, user, cb)
+        db.ensureUserData(users, user, accounts, cb)
       });
     }, 
 
@@ -60,8 +60,8 @@ module.exports = function(settings) {
     },
 
     blast: rpc.syncReadStream(function(curUser, query) {
-      if(!blastDB) throw new Error("BLAST queries not supported by this node");
-      return blastDB.query(query);
+      if(!index.blast) throw new Error("BLAST queries not supported by this node");
+      return index.blast.query(query);
     }),
 
     // TODO switch to using a stream as output rather than a callback
@@ -76,9 +76,9 @@ module.exports = function(settings) {
         cb(peerInfo, result);
       }
 
-      if(blastDB) {
+      if(index.blast) {
         streams.push({          
-          stream: blastDB.query(query)
+          stream: index.blast.query(query)
         });
       }
 
