@@ -114,8 +114,8 @@ server.listen(settings.port, settings.hostname);
 // initialize the websocket server on top of the webserver
 websocket.createServer({server: server}, function(stream) {
 
-  var userRPC = require('./rpc/user.js')(settings);
-  var publicRPC = require('./rpc/public.js')(settings);
+  var userRPC = require('../rpc/user.js')(settings);
+  var publicRPC = require('../rpc/public.js')(settings);
 
   // initialize the rpc server on top of the websocket stream
   var rpcServer = rpc(auth({

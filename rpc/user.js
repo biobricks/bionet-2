@@ -1,4 +1,5 @@
 
+var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
 module.exports = function(settings) { 
   return {

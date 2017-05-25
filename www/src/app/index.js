@@ -200,7 +200,7 @@ class App extends EventEmitter {
     }
 
     addObserver(name, observer) {
-        //console.log('addObserver:', name)
+        console.log('addObserver:', name)
         this.stream[name].addObserver(observer);
     }
 
@@ -211,7 +211,7 @@ class App extends EventEmitter {
 
     addStream(name, stream) {
         if (stream === undefined) stream = new NanoStream();
-        //console.log('addStream:',name)
+        console.log('addStream:',name)
         this.stream[name] = stream;
         return stream;
     }

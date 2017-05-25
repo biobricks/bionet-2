@@ -1,5 +1,5 @@
 
-
+var websocket = require('websocket-stream');
 var rpc = require('rpc-multistream'); // RPC and multiple streams over one stream
 var auth = require('rpc-multiauth'); // authentication
 
