@@ -23,13 +23,13 @@ route('/', function () {
 })
 
 
-route('/logout', function () {
+route('/logout', function() {
     console.log("logout route...");
-    app.logout(function (err) {
-        if (err) {
-            app.ui.toast("Error logout route: " + err) // TODO handle better
+    app.rpc.logout(function(err) {
+        if(err) {
+          app.ui.toast("Error logout route: " + err) // TODO handle better
+          return;
         }
-        app.setLoginState(false)
         route('/');
     });
 })

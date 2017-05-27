@@ -1,7 +1,7 @@
 
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
-module.exports = function(settings, users, accounts, db, index) { 
+module.exports = function(settings, users, accounts, db, index, mailer) { 
   return {
 
     getPeerInfo: function(curUser, cb) {
@@ -36,7 +36,10 @@ module.exports = function(settings, users, accounts, db, index) {
       var user = {email: email};
 
       accounts.create(users, user, password, mailer, function(err) {
-        if(err) return cb(err);
+        if(err) {
+          console.log("ACCOUNT CREATE ERROR:", err);
+          return cb(err);
+        }
 
         db.ensureUserData(users, user, accounts, cb)
       });

@@ -7,7 +7,7 @@ var reconnectDelay = 2;
 var reconnectAttempts = 0;
 var reconnectAttemptsMax = 10;
 
-function reconnect() {
+function reconnect(cb) {
   if (reconnectAttempts > reconnectAttemptsMax) {
     console.log("Disconnected from server. Gave up trying to reconnect after " + reconnectAttemptsMax + " attempts.", {
       level: 'error',
@@ -23,7 +23,9 @@ function reconnect() {
     });
   }
   console.log("reconnecting in", delay, "seconds");
-  setTimeout(connect, delay * 1000);
+  setTimeout(function() {
+    connect(cb);
+  }, delay * 1000);
   reconnectAttempts++;
 }
 
@@ -67,6 +69,9 @@ function connector(cb) {
     auth.authenticate(remote, {
       setCookie: true
     }, function (err, userData) {
+
+      setLoginState(userData);
+
       if(err) {
         cb(null, remote);
       } else {
@@ -81,7 +86,7 @@ function connect(cb) {
   console.log("attempting to connect");
   connector(function (err, remote, user) {
     if(err) {
-      reconnect();
+//      reconnect(cb);
       return;
     }
     if(reconnectAttempts) {
@@ -94,10 +99,22 @@ function connect(cb) {
   })
 }
 
+function setLoginState(userData) {
+  if(userData) {
+    app.setLoginState(userData.user);
+    // TODO we should not be setting globals from in here
+    console.log("SETTING LOGIN STATE:", userData.user)
+  } else {
+    app.setLoginState();
+    console.log("UN-SETTING LOGIN STATE")
+    // TODO we should not be setting globals from in here
+  }
+}
+
 function login(email, password, cb) {
   if(!app.remote) return cb(new Error("Not connected"))
 
-  console.log("login initiated");
+  console.log("login initiated:", email, password);
 
   auth.login(app.remote, {
     email: email,
@@ -105,10 +122,9 @@ function login(email, password, cb) {
   }, {
     setCookie: true
   }, function (err, token, userData) {
-    if (err) return cb(err);
+    if(err) return cb(err);
 
-    // TODO we should not be setting globals from in here
-    app.user = userData.user;
+    setLoginState(userData);
 
     console.log("login successful! token: " + token + " userData: " + JSON.stringify(userData));
 
@@ -122,10 +138,11 @@ function logout(cb) {
 
   if(!app.remote) return cb(new Error("Not connected"))
 
-  auth.logout(app.remote, function () {
+  auth.logout(app.remote, function() {
 
     // TODO we should not be setting globals from in here
     app.user = undefined;
+    setLoginState()
 
     console.log("Logged out.");
     cb();

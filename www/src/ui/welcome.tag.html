@@ -28,6 +28,7 @@
         <input type="submit" style="display:none" />
         <search-input label="search biomaterials" ref="searchbio" name="searchbio" value={searchbioInit}/>
     </form>
+
     <form if={!app.user} onsubmit={signupAction} class="col center">
         <div class="center">OR</div>
         <input type="submit" style="display:none" />
@@ -176,11 +177,10 @@
 
                 app.ui.toast("Signup successful!")
 
-                app.login(app.state.signup.email, this.refs.enterpassword1.value, function(err, user) {
+                app.rpc.login(app.state.signup.email, this.refs.enterpassword1.value, function(err, user) {
                     if (err) return app.ui.toast("Login failed: " + err) // TODO better error handling
 
                     app.state.signup = {} // reset signup state
-                    app.setLoginState(true)
                     
                     riot.mount('div#home-page-content', 'mpassword-form')
                 })

@@ -17,6 +17,7 @@ window.$.xtend = require('xtend'); // extend that does not modify arguments
 // TODO why can't we just do: var app = window.app = require('./app'); ?
 import app from './app'
 window.app = app // our one global variable (other than jquery)
+app.rpc = rpc;
 app.initialize() // must be called before UI elements are required
 
 // ----- code below this point will call `app.` methods
@@ -28,27 +29,28 @@ var ui = require('./ui')
 require('./ui/uitags.js')
 require('./plugins/bionet')
 require('./plugins/bionet-scanner')
+app.startPlugins();
 
+// wait for everything to fully load
 $(document).ready(function () {
 
   console.log("document ready")
 
+  // connect to the server and attempt to log in
   rpc.connect(function(err, remote, user) {
     if(err) {
       console.error("Connection attempt failed. Will continue trying.");
       return;
     }
 
-    if(!user) {
-      console.log("Not logged in");
-      app.setLoginState(false);
+    app.remote = remote;
+
+    if(user) {
+      console.log("Logged in as: ", user);
     } else {
-      console.log("Logged in as: ", userData.user.email);
-      app.setLoginState(true);
+      console.log("Not logged in");
+
     }
 
-    app.remote = remote;
-    app.user = user;
-    app.startPlugins();
   });
 });

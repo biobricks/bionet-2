@@ -112,15 +112,15 @@ server.listen(settings.port, settings.hostname);
 // initialize the websocket server on top of the webserver
 websocket.createServer({server: server}, function(stream) {
 
-  var userRPC = require('../rpc/user.js')(settings, users, accounts, db, index);
-  var publicRPC = require('../rpc/public.js')(settings, users, accounts, db, index);
+  var userRPC = require('../rpc/user.js')(settings, users, accounts, db, index, mailer);
+  var publicRPC = require('../rpc/public.js')(settings, users, accounts, db, index, mailer);
 
   // initialize the rpc server on top of the websocket stream
   var rpcServer = rpc(auth({
 
     userDataAsFirstArgument: true, 
     secret: settings.loginToken.secret,
-    login: require('../libs/login.js')(users)
+    login: require('../libs/login.js')(db, users, accounts)
 
   }, publicRPC, {
 

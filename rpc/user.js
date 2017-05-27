@@ -2,7 +2,7 @@
 var async = require('async');
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
-module.exports = function(settings, db, index) { 
+module.exports = function(settings, users, accounts, db, index, mailer) { 
   return {
     secret: function(curUser, cb) {
       cb(null, "Sneeple are real!");

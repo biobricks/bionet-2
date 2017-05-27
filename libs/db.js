@@ -3,6 +3,7 @@ var level = require('level'); // leveldb database
 var sublevel = require('subleveldown'); // leveldb multiplexing
 var IDGenerator = require('../libs/id_generator.js'); // atomically unique IDs
 var labDeviceServer = require('../libs/lab_device_server.js');
+var uuid = require('uuid').v4;
 
 module.exports = function(settings, users, acccounts) {
 
@@ -27,6 +28,7 @@ module.exports = function(settings, users, acccounts) {
         process.nextTick(function() {
           cb(null, user, false);
         });
+        return;
       }
 
       saveMaterialInDB({
@@ -48,6 +50,7 @@ module.exports = function(settings, users, acccounts) {
         process.nextTick(function() {
           cb(null, user, false);
         });
+        return;
       }
 
       saveMaterialInDB({
@@ -76,6 +79,7 @@ module.exports = function(settings, users, acccounts) {
 
         accounts.update(users, user, function(err) {
           if(err) return cb(err);
+
           cb(null, user);
         });
       });
