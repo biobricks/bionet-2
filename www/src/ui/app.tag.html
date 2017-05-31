@@ -1,19 +1,9 @@
 <app>
-    <appbar/>
-    <div id="content-container" class="content-height {theme.style.color.background} {theme.style.color.text}">
-        <div class="content-height">
-            <div id="content" class="content-height {theme.style.color.background+' '+theme.style.color.text}" />
-        </div>
+    <div>
+      <appbar/>
+      <div id="content" class="{theme.style.color.background} {theme.style.color.text}"></div>
+      <bottom-notify/>
     </div>
-    <div style="height:48px"></div>
-    <!--  <footer-tag background={theme.style.color.highlightBackground} /> -->
-    <style>
-        .content-height {
-            height: -moz-calc(100% - 100px);
-            height: -webkit-calc(100% - 100px);
-            height: calc(100% - 100px);
-        }
-    </style>
     <script>
         const tag = this
         this.theme = app.getTheme()
@@ -35,11 +25,11 @@
             })
         })
         this.on('mount', function() {
-            $('#content-container').css('display', 'none')
-            $('#content-container').fadeIn(300)
+            $('#content').css('display', 'none')
+            $('#content').fadeIn(300)
         })
         this.on('before-unmount', function() {
-            $('#content-container').fadeOut(300)
+            $('#content').fadeOut(300)
         })
         this.on('unmount', function() {
             app.removeObserver(app.$.theme, observer)

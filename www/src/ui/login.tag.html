@@ -61,7 +61,6 @@
         this.username = ''
 
         const showLogin = function(login) {
-
             if (login) {
                 $('#username').css('display', 'block')
                 $('#logout-button').css('display', 'block')
@@ -87,7 +86,7 @@
             observer = app.addObserver(app.$.loginState, function(loggedIn) {
                 tag.loggedIn = loggedIn
                 showLogin(loggedIn)
-                    //tag.update()
+                tag.update()
             }.bind(this))
 
         })

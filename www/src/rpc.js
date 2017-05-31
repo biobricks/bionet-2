@@ -22,6 +22,9 @@ function reconnect(cb) {
       time: (delay - 1) * 1000
     });
   }
+  setTimeout(function() {
+    setConnectState(false, "Will attempt to reconnect in " + (delay - 1) + " seconds...");
+  }, 1000);
   console.log("reconnecting in", delay, "seconds");
   setTimeout(function() {
     connect(cb);
@@ -35,8 +38,8 @@ function connector(cb) {
   var failed = false;
 
   function failOnce(err) {
-    console.log('main.js failOnce error:', (typeof err === 'object') ? err.message + ' ' + err.stack : err);
-    if (!failed) {
+    if(!failed) {
+      console.log('main.js failOnce error:', (typeof err === 'object') ? err.message + ' ' + err.stack : err);
       cb(err);
       failed = true;
     }
@@ -51,7 +54,12 @@ function connector(cb) {
   console.log('connecting to websocket', websocketUrl)
 
   var stream = websocket(websocketUrl);
-  stream.on('error', failOnce);
+  stream.on('error', function(err) {
+    failOnce(new Error("connection closed"));
+  });
+  stream.on('close', function() {
+    failOnce(new Error("connection closed"));
+  });
 
   // You can turn on debugging like this:
   //   var rpcClient = rpc(null, {debug: true});
@@ -61,7 +69,10 @@ function connector(cb) {
 
   rpcClient.pipe(stream).pipe(rpcClient);
 
-  rpcClient.on('error', failOnce);
+  rpcClient.on('error', function(err) {
+    console.log("RPCCLIENT error:", err)
+    failOnce(err);
+  });
 
   rpcClient.on('methods', function (remote) {
 
@@ -86,9 +97,12 @@ function connect(cb) {
   console.log("attempting to connect");
   connector(function (err, remote, user) {
     if(err) {
-//      reconnect(cb);
+      setConnectState(false, "Failed to connect");
+      reconnect(cb);
       return;
     }
+    setConnectState(true);
+
     if(reconnectAttempts) {
       console.log("Reconnected!");
     }
@@ -97,6 +111,10 @@ function connect(cb) {
 
     cb(null, remote, user);
   })
+}
+
+function setConnectState(isConnected, msg) {
+  app.dispatch(app.$.connectState, {connected: isConnected, msg: msg})
 }
 
 function setLoginState(userData) {

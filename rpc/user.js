@@ -1,5 +1,7 @@
 
+var uuid = require('uuid').v4;
 var async = require('async');
+var through = require('through2');
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
 module.exports = function(settings, users, accounts, db, index, mailer) { 
@@ -18,7 +20,7 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
     getWorkbench: function(curUser, cb) {
       if(!curUser.user.workbenchID) return cb(new Error("User workbench missing"));
 
-      physicalDB.get(curUser.user.workbenchID, cb);
+      db.physical.get(curUser.user.workbenchID, cb);
     },
 
     workbenchTree: function(curUser, cb) {
@@ -386,12 +388,12 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
         cb(new Error("getLocationPath only works for physicals"));
       }
       
-      var db = db.physical;
+      var curdb = db.physical;
       var results = [];
 
       // TODO this should be done with the level-tree-index API
       var getParentLocation = function (id) {
-        db.get(id, {
+        curdb.get(id, {
           valueEncoding: 'json'
         }, function (err, p1) {
           if (err) {
@@ -409,17 +411,16 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
     },
     
     get: function(curUser, id, cb) {
-      console.log("getting:", id);
       var first = id[0];
-      var db;
+      var curdb;
       if(first === 'p') {
-        db = physicalDB;
+        curdb = db.physical;
       } else if(first === 'v') {
-        db = virtualDB;
+        curdb = db.virtual;
       } else {
         return cb(new Error("Unknown material class"));
       }
-      db.get(id, {valueEncoding: 'json'}, function(err, p) {
+      curdb.get(id, {valueEncoding: 'json'}, function(err, p) {
         if(err) return cb(err);
         cb(null, p);
       });

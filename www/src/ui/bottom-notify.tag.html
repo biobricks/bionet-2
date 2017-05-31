@@ -1,0 +1,30 @@
+<bottom-notify>
+  <div id="bottom-notify" class="modal bottom-sheet">
+    <div class="modal-content">
+      <h3>Disconnected</h3>
+      <p>Attempting to reconnect. Please stand by.</p>
+    </div>
+  </div>
+  <script>
+    var tag = this;
+    app.observe(app.$.connectState, function(state) {
+      if(!state.connected) {
+//        $('#bottom-notify').modal('open')
+        $('#bottom-notify h3').html("Disconnected");
+        $('#bottom-notify p').html(state.msg);
+      } else {
+        $('#bottom-notify h3').html("Reconnected!");
+        $('#bottom-notify p').html(' ');
+        setTimeout(function() {
+          $('#bottom-notify').modal('close')
+        }, 1000);
+      }
+      
+    })
+
+    this.on('mount', function() {
+      $('#bottom-notify').modal('');
+    });
+
+  </script>
+</bottom-notify>

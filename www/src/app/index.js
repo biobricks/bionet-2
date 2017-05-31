@@ -5,13 +5,7 @@ import NanoStream from './NanoStream';
 import NanoRoute from './NanoRoute';
 const EventEmitter = require('events');
 import search from './search'
-var appSettings = require('../../../settings.js');
-
-const riot = require('riot');
-window.riot = riot
-
-import route from 'riot-route'
-window.route = route;
+var appSettings = require('../../../settings.js')();
 
 var pluginsInitialized = false
 
@@ -20,7 +14,9 @@ class App extends EventEmitter {
   constructor() {
     super()
     
-    window.BIONET = this
+    // TODO globals should _only_ be assigned from main.js
+    // and why does this var have two names? it should be called app, not BIONET
+    window.BIONET = this 
     
     this.state = {}
 
@@ -44,7 +40,8 @@ class App extends EventEmitter {
       appBarConfig: 'appBarConfig',
       breadcrumbs: 'breadcrumbs',
       theme: 'theme',
-      settings: 'settings'
+      settings: 'settings',
+      connectState: 'connectState'
     }
 
     this.ui = require('../ui/methods');
@@ -72,6 +69,9 @@ class App extends EventEmitter {
     // theme data streams
     this.addStream(this.$.appBarConfig)
     this.addStream(this.$.breadcrumbs)
+
+    // connection state
+    this.addStream(this.$.connectState)
 
     // initialize theme data stream
     const theme = this.addStream(this.$.theme)
@@ -148,17 +148,21 @@ class App extends EventEmitter {
       settings.init(settingsObj)
 
       // TODO: messaging - plugins
+      // TODO Shouldn't we have to wait for a callback here?
+      // otherwise we might end up trying to use a plugin before it has loaded
       thisModule.dispatch(thisModule.$.plugin, 'start')
 
-      thisModule.startRouter()
-
-      var interval = setInterval(function () {
-        app.remote.foo('foo message', function (err) {
-          console.log('foo message response')
-        })
-      }, 30 * 1000)
-
     })
+  }
+
+  start() {
+    this.startRouter()
+    
+    var interval = setInterval(function () {
+      app.remote.foo('foo message', function (err) {
+        console.log('foo message response')
+      })
+    }, 30 * 1000)
   }
 
   // start router - after plugins have been started
@@ -202,6 +206,7 @@ class App extends EventEmitter {
   addObserver(name, observer) {
     console.log('addObserver:', name)
     this.stream[name].addObserver(observer);
+    return observer;
   }
 
   removeObserver(name, observer) {
@@ -302,7 +307,7 @@ class App extends EventEmitter {
 
   // theme methods
   getTheme() {
-    return this.getModel(this.$.theme)
+    return this.getModel(this.$.theme);
   }
   setTheme(theme) {
     app.dispatch(app.$.theme, theme)
@@ -325,6 +330,7 @@ class App extends EventEmitter {
     return null
   }
   getAttributesForType(type) {
+
     const dataTypes = appSettings.dataTypes
     const attributes = []
     for (var i = 0; i < dataTypes.length; i++) {

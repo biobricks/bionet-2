@@ -1,6 +1,9 @@
 
+var fs = require('fs');
+var path = require('path');
 var level = require('level'); // leveldb database
 var sublevel = require('subleveldown'); // leveldb multiplexing
+var through = require('through2');
 var IDGenerator = require('../libs/id_generator.js'); // atomically unique IDs
 var labDeviceServer = require('../libs/lab_device_server.js');
 var uuid = require('uuid').v4;

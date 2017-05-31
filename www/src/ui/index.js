@@ -107,30 +107,8 @@ stdThemePlugin.start = function () {
         }
     })
 
+  app.start();
 
-    /*
-      todo: add standard components for:
-      card
-      image card
-      tabs
-      tree view
-      dropdown
-      chips
-      modal dialog
-      snackbar
-      badge
-
-      completed:
-      *toast
-      *navbar
-      *sidenav
-      *content container
-      *section
-      *form elements
-      *buttons
-      *light/dark color schemes
-
-    */
 }
 stdThemePlugin.remove = function () {
     // todo: unmount tags, etc.

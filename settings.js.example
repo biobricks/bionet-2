@@ -214,6 +214,7 @@ var settings = {
 };
 
 module.exports = function(argv) {
+  argv = argv || {};
 
   settings.labDevice.labelImageFilePath = path.resolve(path.join(settings.userFilePath, settings.labDevice.labelImageFilePath));
    

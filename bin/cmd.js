@@ -112,8 +112,11 @@ server.listen(settings.port, settings.hostname);
 // initialize the websocket server on top of the webserver
 websocket.createServer({server: server}, function(stream) {
 
-  var userRPC = require('../rpc/user.js')(settings, users, accounts, db, index, mailer);
-  var publicRPC = require('../rpc/public.js')(settings, users, accounts, db, index, mailer);
+  var rpcMethods = require('../rpc/public.js')(settings, users, accounts, db, index, mailer);
+
+  // these functions only available to users in the 'user' group
+  rpcMethods.user = require('../rpc/user.js')(settings, users, accounts, db, index, mailer);
+
 
   // initialize the rpc server on top of the websocket stream
   var rpcServer = rpc(auth({
@@ -122,12 +125,7 @@ websocket.createServer({server: server}, function(stream) {
     secret: settings.loginToken.secret,
     login: require('../libs/login.js')(db, users, accounts)
 
-  }, publicRPC, {
-
-    // only users in the group 'user' can access this namespace
-    user: userRPC 
-
-  }, 'group'), {
+  }, rpcMethods, 'group'), {
 
     // the opts for rpc-multistream
 
