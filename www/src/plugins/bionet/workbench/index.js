@@ -4,7 +4,7 @@ const MiniSignal = require('mini-signals')
 var workbench = {
     init: function () {
         const thisModule = this
-        
+
         BIONET.signal.getWorkbenchTreeResult = new MiniSignal()
 
         const getWorkbenchTree = function (root) {
@@ -57,9 +57,10 @@ var workbench = {
                         var parentId = data.parent_id
                             //var title = a[a.length - 1]
                         var title = data.name
+                        var coordinates = (data.parent_x !== undefined) ? ' (' + data.parent_x + ',' + data.parent_y + ')' : ''
                         var node = {
                             key: data.id,
-                            title: title,
+                            title: title+coordinates,
                             dbData: data,
                             notes: data.notes,
                             barcode: data.barcode,
@@ -93,14 +94,31 @@ var workbench = {
                 BIONET.signal.getWorkbenchTreeResult.dispatch(treeNodes)
             })
         }
-        
+
         const requestWorkbench = function () {
             app.remote.getWorkbench(function (err, userWorkbench) {
+                if (err) {
+                    console.log('get workbench err:', err)
+                    return
+                }
                 getWorkbenchTree(userWorkbench)
             })
         }
         BIONET.signal.requestWorkbench = new MiniSignal()
         BIONET.signal.requestWorkbench.add(requestWorkbench)
+
+        const getFavorites = function () {
+            app.remote.favLocationsTree(function (err, userFavorites) {
+                if (err) {
+                    console.log('get favorites err:', err)
+                    return
+                }
+                BIONET.signal.getFavoritesResult.dispatch(userFavorites)
+            })
+        }
+        BIONET.signal.getFavoritesResult = new MiniSignal()
+        BIONET.signal.getFavorites = new MiniSignal()
+        BIONET.signal.getFavorites.add(getFavorites)
 
         const saveInWorkbench = function (item) {
             console.log('saveInWorkbench, item:', JSON.stringify(item))
@@ -116,7 +134,7 @@ var workbench = {
 
         const generatePhysicals = function (seriesName, instances) {
             const workbenchId = app.user.workbenchID
-            const instancesList=[]
+            const instancesList = []
             for (var instance = 0; instance < instances; instance++) {
                 // todo: generate hash value for new physical instance to avoid naming collisions
                 const name = seriesName + '_' + instance
@@ -126,7 +144,7 @@ var workbench = {
                     parent_id: workbenchId
                 }
                 instancesList.push(dbData)
-                //saveInWorkbench(dbData)
+                    //saveInWorkbench(dbData)
             }
             saveInWorkbench(instancesList)
         }.bind(this)

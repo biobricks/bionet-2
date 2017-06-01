@@ -181,8 +181,9 @@ StorageGrid.prototype.highlightMouseover = function (name, x, y, container) {
     this.mouseoverSprite.visible = true
 }
 
-StorageGrid.prototype.highlightId = function (id, data, x, y, container, multiple) {
-    const graphics = this.highlight(x, y, container, multiple, 0x00ffff)
+StorageGrid.prototype.highlightId = function (id, data, x, y, container, cellColor, multiple) {
+    const cColor = (cellColor !== undefined) ? cellColor : 0x00ffff
+    const graphics = this.highlight(x, y, container, multiple, cellColor)
     graphics.interactive = true
     graphics.mouseover = function () {
         console.log('cell highlight mouseover ', data.name, x, y)

@@ -126,6 +126,19 @@ var bionetSetup = {
         BIONET.signal.createStorageItem = new MiniSignal()
         BIONET.signal.createStorageItem.add(createStorageItem)
 
+        const addFavorite = function(m) {
+            app.remote.saveFavLocation(m, null, null, function (err) {
+                if (err) {
+                    console.log('addFavorite error: %s', err)
+                    return;
+                }
+                app.ui.toast(m.name+' added to favorites');
+                console.log('addFavorite id:', m.id)
+            })
+        }
+        BIONET.signal.addFavorite = new MiniSignal()
+        BIONET.signal.addFavorite.add(addFavorite)
+        
         const getPhysical = function (id) {
             app.remote.get(id, function (err, data) {
                 if (err) {
@@ -133,8 +146,8 @@ var bionetSetup = {
                     return
                 }
                 BIONET.signal.getPhysicalResult.dispatch(data)
-                const bionetStorageLocation = app.getStream('bionetStorageLocation')
-                bionetStorageLocation.dispatch('configure', data.id)
+                //const bionetStorageLocation = app.getStream('bionetStorageLocation')
+                //bionetStorageLocation.dispatch('configure', data.id)
             })
         }
         BIONET.signal.getPhysicalResult = new MiniSignal()

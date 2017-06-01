@@ -16,11 +16,14 @@
                 </table>
             </div>
             <div id="physical-storage" class="col s8">
-                <!--
                 <div if={showStorage} class="row">
                     <div id="pixijsdiv" class="pixijs">
-                        <bionet-storage-location width={pixiwidth}/>
+                        <bionet-storage-item width={pixiwidth}/>
                     </div>
+                </div>
+                <!--
+                <div id="box" class="edit-physical">
+                    <box-contents />
                 </div>
                 -->
                 <div class="row">
@@ -28,6 +31,15 @@
                     </div>
                 </div>
             </div>
+            <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:110px; left:10px; text-align:left" onclick={addNode} data-activates="addmenu2"><i class="material-icons">queue</i></a>
+
+            <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" style="position:absolute; top:180px; left:10px; text-align:left" onclick={saveWorkbench}><i class="material-icons">save</i></a>
+
+            <a class="btn-floating btn-large waves-effect waves-light red dropdown-button" data-constrainwidth="false" style="position:absolute; top:250px; left:10px; text-align:left" onclick={deleteNode}><i class="material-icons">delete</i></a>
+
+            <ul id="addmenu2" class="dropdown-content" style="position:absolute; top:110px; left:80px; width:200px !important; text-align:left;z-index:1000">
+                <li each={item in virtuals} class="add-type"><span onclick={createNode}>{item.name}</span></li>
+            </ul>
         </div>
     </div>
 
@@ -128,9 +140,47 @@
                 });
                 tag.pixiwidth = $('#physical-storage').width()
                 tag.update()
+
+                BIONET.signal.getFavorites.dispatch()
             })
         }
         const getWorkbenchTreeResultBinding = BIONET.signal.getWorkbenchTreeResult.add(getWorkbenchTreeResult)
+
+        const getFavoritesResult = function(favorites) {
+
+            const ftree = $("#ftree").fancytree("getTree")
+            const rootNode = ftree.getRootNode()
+            var favoritesNode = rootNode.findFirst('favorites')
+            if (favoritesNode !== null) return
+
+            const childNodes = []
+            for (var i = 0; i < favorites.length; i++) {
+                const data = favorites[i].material
+                var parentId = data.parent_id
+                var title = data.name
+                var node = {
+                    key: data.id,
+                    title: title,
+                    dbData: data,
+                    notes: data.notes,
+                    barcode: data.barcode,
+                    parentId: parentId,
+                    children: []
+                }
+                childNodes.push(node)
+            }
+            if (favoritesNode === null) {
+                const favoritesData = {
+                    key: 'favorites',
+                    title: 'favorites',
+                    children: childNodes
+                }
+                rootNode.addChildren(favoritesData, 0)
+            } else {
+                favoritesNode.addChildren(childNodes, 0)
+            }
+        }
+        const getFavoritesResultBinding = BIONET.signal.getFavoritesResult.add(getFavoritesResult)
 
         this.selected = null
         this.selectedType = null
@@ -335,7 +385,38 @@
                 },
             }
 
+            var boxObj = {}
+
+            const getTempCellAssignments = function(boxId) {
+                const ftree = $("#ftree").fancytree("getTree")
+                const tempAssignment = []
+                ftree.visit(function(node) {
+                    var searchData = node.data.dbData
+                    if (searchData && searchData.wbparent_id === boxId) {
+                        tempAssignment.push(searchData)
+                    }
+                })
+                return tempAssignment
+            }
+
+            // highlight temp cell assignments
+            const highlightTempCellAssignments = function(boxId) {
+                const cells = getTempCellAssignments(boxId)
+                BIONET.signal.highlightCellArray.dispatch(boxId, cells)
+            }
+
             $("#ftree").fancytree(ftSettings);
+            const ftree = $("#ftree").fancytree("getTree")
+            const origRenderTitle = ftree.nodeRenderTitle
+            ftree.nodeRenderTitle = function(ctx, title) {
+                origRenderTitle(ctx, title)
+                return
+                var node = ctx.node
+                this._super(ctx, title);
+                $("span.fancytree-icon", node.span).append($("<span style='font-color:#ff0000'/>").text(title + " 1"));
+            }
+
+
             $("#ftree").on('click dblclick keydown', function(e) {
                 if (e.type === 'keydown') {
                     if (e.which !== undefined && e.which !== 13) return
@@ -344,20 +425,55 @@
                 const elementType = active.prop('nodeName');
                 console.log('elementType:', elementType)
 
+                const ftree = $("#ftree").fancytree("getTree")
                 var node = $("#ftree").fancytree("getActiveNode");
                 if (node) {
-                    if (node.data.dbData.type === 'workbench') {
+                    const dbData = node.data.dbData
+                    if (dbData.type === 'workbench') {
                         tag.showStorage = false
                         riot.mount('div#workbench-form', 'create-quilt')
                         tag.update()
                         return
                     }
 
-                    const dbData = node.data.dbData
+                    if (dbData.type.indexOf('box') >= 0) {
+                        boxObj = dbData
+                        const boxId = dbData.id
+                        BIONET.signal.getBoxContents.dispatch(boxId)
+                        const bionetStorageLocation = app.getStream('bionetStorageLocation')
+                        bionetStorageLocation.dispatch('configure', {
+                                id: boxId,
+                                tempAssignments: getTempCellAssignments(boxId)
+                            })
+                            //highlightTempCellAssignments(boxId)
+
+                    } else {
+                        var parentObj = boxObj
+                        if (dbData.wbparent_id === undefined) {
+                            //dbData.wbparent_id = boxObj.id
+                        } else {
+                            const parentId = dbData.wbparent_id
+                            ftree.visit(function(node) {
+                                var searchData = node.data.dbData
+                                if (searchData && searchData.id === parentId) {
+                                    parentObj = searchData
+                                }
+                            })
+                        }
+                        const boxId = parentObj.id
+                        const bionetStorageLocation = app.getStream('bionetStorageLocation')
+                        bionetStorageLocation.dispatch('configureParent', {
+                                child: dbData,
+                                parent: parentObj,
+                                tempAssignments: getTempCellAssignments(boxId)
+                            })
+                            //highlightTempCellAssignments(boxId)
+                    }
+
+
                     console.log('select physical:', JSON.stringify(dbData))
 
                     tag.showStorage = true
-                    tag.update()
 
                     riot.mount('div#workbench-form', 'create-physical', {
                         topMargin: '0px'
@@ -373,9 +489,26 @@
                         'label': node.title,
                         'url': '/inventory'
                     }]);
+
                     tag.update()
                 }
             })
+
+            const physicalSaved = function(physicalData) {
+                const ftree = $("#ftree").fancytree("getTree")
+                ftree.visit(function(node) {
+                    var searchData = node.data.dbData
+                    if (searchData && physicalData.id === searchData.id) {
+                        node.data.dbData = physicalData
+                        if (physicalData.parent_x !== undefined) {
+                            node.setTitle(physicalData.name + ' (' + physicalData.parent_x + ',' + physicalData.parent_y + ')')
+                            highlightTempCellAssignments(physicalData.wbparent_id)
+                        }
+                    }
+                })
+            }
+            const physicalSavedBinding = BIONET.signal.physicalSaved.add(physicalSaved)
+
             const physicalUpdated = function(physicalData) {
                 // todo: only update single node in tree
                 BIONET.signal.requestWorkbench.dispatch()
@@ -387,7 +520,81 @@
                 getWorkbenchTreeResultBinding.detach()
                 createStorageItemResultBinding.detach()
                 physicalUpdatedBinding.detach()
+                getFavoritesResultBinding.detach()
+                physicalSavedBinding.detach()
             })
+
+            this.virtuals = []
+            this.locations = []
+            const appSettings = app.getAppSettings()
+            this.dataTypes = appSettings.dataTypes
+            for (var i = 0; i < this.dataTypes.length; i++) {
+                const type = this.dataTypes[i]
+                if (type.virtual === true) {
+                    type.url = '/create-virtual/' + encodeURI(type.name)
+                    this.virtuals.push(type)
+                } else {
+                    type.url = '/create-physical/' + encodeURI(type.name)
+                    this.locations.push(type)
+                }
+            }
+            tag.deleteNode = function() {
+                const ftree = $("#ftree").fancytree("getTree")
+                const deleteNodes = []
+                const delChildren = function(node) {
+                    if (!node.children) return
+                    for (var i = 0; i < node.children.length; i++) {
+                        const childNode = node.children[i]
+                        delChildren(childNode)
+                        deleteNodes.push(childNode)
+                    }
+                }
+                ftree.visit(function(node) {
+                    if (node.isSelected()) {
+                        delChildren(node)
+                        deleteNodes.push(node)
+                    }
+                })
+                for (var i = 0; i < deleteNodes.length; i++) {
+                    const node = deleteNodes[i]
+                    const id = node.data.dbData.id
+                    console.log('removing %s %s', node.title, id)
+                    BIONET.signal.delPhysical.dispatch(id)
+                    node.remove()
+                }
+            }
+
+            tag.saveWorkbench = function(e) {
+                const ftree = $("#ftree").fancytree("getTree")
+                const saveList = []
+                ftree.visit(function(node) {
+                    var dbData = node.data.dbData
+                    if (dbData && dbData.wbparent_id !== undefined) {
+                        dbData.parent_id = dbData.wbparent_id
+                        delete dbData.wbparent_id
+                        saveList.push(dbData)
+                        console.log('workbench: saving physical ', JSON.stringify(dbData))
+                            // TODO: messaging async api call
+                        app.route('partDataAccessor', 'storePhysical', undefined, dbData)
+                    }
+                })
+                app.ui.toast('Workbench items have been moved to local inventory');
+            }
+
+            tag.createNode = function(e) {
+                const active = $(e.target)
+                const type = active.text()
+                riot.mount('div#workbench-form', 'create-virtual-form', {
+                    type: type,
+                    query: {}
+                })
+                $('#createNodeForm').hide()
+            }
+
+            tag.addNode = function(e) {
+                BIONET.signal.generatePhysicals.dispatch(tag.refs.selectVirtual.value, tag.refs.instances.value)
+            }
+
 
         })
         tag.on('update', function() {

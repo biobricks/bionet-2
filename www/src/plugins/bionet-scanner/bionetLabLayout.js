@@ -12,8 +12,8 @@ const bionetLabLayout = {
         console.log('labStorage load function')
         const loader = PIXI.loader
         loader.baseUrl = this.assets
-        
-        loader.add('threedicon','ic_3d_rotation_black_24px.svg')
+
+        loader.add('threedicon', 'ic_3d_rotation_black_24px.svg')
 
         if (this.types !== undefined) {
             const types = this.types
@@ -66,6 +66,14 @@ const bionetLabLayout = {
             xc: 5,
             yc: 4
         }
+        types['5 x 4 freezer rack'] = {
+            xc: 4,
+            yc: 3
+        }
+        types['4 x 3 freezer rack'] = {
+            xc: 4,
+            yc: 3
+        }
         types['8 x 12 freezer box'] = {
             xc: 12,
             yc: 8
@@ -73,6 +81,10 @@ const bionetLabLayout = {
         types['9 x 9 freezer box'] = {
             xc: 9,
             yc: 9
+        }
+        types['10 x 10 freezer box'] = {
+            xc: 10,
+            yc: 10
         }
         types['freezer box'] = {
             xc: 1,
@@ -92,6 +104,7 @@ const bionetLabLayout = {
             this.title = config.title
         }
         const locationPath = this.config.locationPath
+        const appSettings = BIONET.getAppSettings()
 
         const locations = []
         for (var i = locationPath.length - 1; i >= 0; i--) {
@@ -120,57 +133,7 @@ const bionetLabLayout = {
 
             switch (type) {
                 case 'lab':
-                    location.subunit = [
-                        {
-                            name: 'BACKUP -80C',
-                            x: 1230,
-                            y: 318,
-                            width: 36,
-                            height: 36
-                    },
-                        {
-                            name: 'MAIN -80C',
-                            x: 1235,
-                            y: 407,
-                            width: 36,
-                            height: 36
-                    },
-                        {
-                            name: 'LEFT -20C',
-                            x: 1352,
-                            y: 315,
-                            width: 36,
-                            height: 36
-                    },
-                        {
-                            name: 'RIGHT -20C',
-                            x: 1354,
-                            y: 374,
-                            width: 36,
-                            height: 36
-                    },
-                        {
-                            name: 'LEFT -4C',
-                            x: 1430,
-                            y: 754,
-                            width: 36,
-                            height: 36
-                    },
-                        {
-                            name: 'RIGHT -4C',
-                            x: 1500,
-                            y: 752,
-                            width: 36,
-                            height: 36
-                    },
-                        {
-                            name: 'SHORT TERM -20C',
-                            x: 627,
-                            y: 804,
-                            width: 36,
-                            height: 36
-                    }
-                ]
+                    location.subunit = JSON.parse(JSON.stringify(appSettings.labLayout))
                     break;
                 case 'physical':
                     location.emoji_cloud = [
@@ -221,14 +184,11 @@ const bionetLabLayout = {
         const containerOutlineColor = 0x000000
         const containerFillColor = 0x000000
 
-        const celldx = Math.max(1600 / locations.length, 250)
+        const celldx = Math.max(1600 / locations.length, 350)
         const celldy = (150 / 190) * celldx
 
-        //const celldx = 190
-        //const celldy = 150
-
         const marginx = 30
-        const marginy = 30
+        const marginy = (locations.length > 2) ? 30 : 50
         var lx = marginx;
         var ly = marginy;
 
@@ -242,10 +202,17 @@ const bionetLabLayout = {
         }
 
         // todo: calculate scale value
+        /*
+        const centerStage = {
+            x: marginx,
+            y: marginy,
+            scale: 2.5
+        }
+        */
         const centerStage = {
             x: marginx,
             y: celldy + marginy * 3,
-            scale: 2
+            scale: 2.5
         }
 
         const centerSprite = function (w, h, obj) {
@@ -306,9 +273,10 @@ const bionetLabLayout = {
         const anchorPoint = new PIXI.Point(0.5, 1)
 
         if (thisModule.title !== undefined) {
+            const titleTextSize = (locations.length > 2) ? '22px' : '44px'
             var titleTextProps = {
                 fontFamily: 'Roboto',
-                fontSize: '22px',
+                fontSize: titleTextSize,
                 fill: '#000000',
             };
             const titleSprite = new PIXI.Text(this.title, titleTextProps)
@@ -337,12 +305,23 @@ const bionetLabLayout = {
         const toggleStorageItem = function (toggleState, toggleIndex) {
             const pixiController = app.getStream('bionetStorageLocation')
             pixiController.dispatch('resize', {})
+                /*
+                 */
             if (activeStorageItem >= 0) {
                 const activeStorageLocation = storageLocations[activeStorageItem]
                 if (activeStorageLocation) {
                     activeStorageLocation.mz.toggle()
                 }
             }
+            /*
+            for (var i=0; i<storageLocations.length; i++) {
+                const storageLocation = storageLocations[i]
+                if (storageLocation) {
+                    storageLocation.mz.toggle()
+                }
+            }
+            */
+
             activeStorageItem = toggleIndex
         }
 
@@ -388,7 +367,7 @@ const bionetLabLayout = {
             fontSize: '64px',
             fill: textColor
         };
-        
+
         const moveIconY = celldy + marginy * 3.5
         const moveLeftButton = new PIXI.Text(moveLeftButtonText, iconFontProps)
         moveLeftButton.x = 25
@@ -410,12 +389,12 @@ const bionetLabLayout = {
             BIONET.signal.activate3D.dispatch(BIONET.state.toggle3d)
         }
         const threedbutton = new PIXI.Sprite(this.resources.threedicon.texture)
-        //const threedbutton = new PIXI.Text(activate3dButtonText, iconFontProps)
+            //const threedbutton = new PIXI.Text(activate3dButtonText, iconFontProps)
         threedbutton.x = 800
         threedbutton.y = moveIconY
-        //threedbutton.anchor = new PIXI.Point(0, -0.5)
+            //threedbutton.anchor = new PIXI.Point(0, -0.5)
         threedbutton.width = threedbutton.height = 48
-        //threedbutton.scale.x = threedbutton.scale.y = 0.75
+            //threedbutton.scale.x = threedbutton.scale.y = 0.75
         sceneRoot.addChild(threedbutton)
         makeInteractive(threedbutton, toggle3d)
             //EmojiOneColor-SVGinOT.ttf
@@ -475,10 +454,17 @@ const bionetLabLayout = {
 
             var bounds = storageContainer.getBounds()
             const centerContainer = {
-                x: (1600 - bounds.width * centerStage.scale) / 2,
-                y: centerStage.y,
-                scale: centerStage.scale
-            }
+                    x: (1600 - bounds.width * centerStage.scale) / 2,
+                    y: centerStage.y,
+                    scale: centerStage.scale
+                }
+                /*
+                const centerContainer = {
+                    x: storageContainer.x,
+                    y: centerStage.y,
+                    scale: 2.5
+                }
+                */
             var mz = new moveAndZoomXform(storageContainer, bionetStorageContainer.titleSprite, centerContainer, toggleStorageItem, i);
 
             if (storageItem.emoji_cloud) {
@@ -521,21 +507,23 @@ const bionetLabLayout = {
             var loc = storageLocations[i]
             if (loc.id === id) {
                 if (loc.grid !== undefined && loc.grid.highlightId !== undefined) {
-                    loc.grid.highlightId(id, data, x, y, loc.bionetStorage.gridSprite, true)
+                    loc.grid.highlightId(id, data, x, y, loc.bionetStorage.gridSprite, 0xff0000, true)
                 }
             }
         }
     },
 
-    highlightCellArray: function (id, cells) {
+    highlightCellArray: function (id, cells, cellColor) {
         const storageLocations = this.storageLocations
+        if (storageLocations === undefined) return
+        const cColor = (cellColor !== undefined) ? cellColor : 0x00ffff
         for (var i = 0; i < storageLocations.length; i++) {
             var loc = storageLocations[i]
             if (loc.id === id) {
                 if (loc.grid !== undefined && loc.grid.highlightId !== undefined) {
                     for (var j = 0; j < cells.length; j++) {
                         const partData = cells[j]
-                        loc.grid.highlightId(partData.parent_id, partData, partData.parent_x, partData.parent_y, loc.bionetStorage.gridSprite, true)
+                        loc.grid.highlightId(partData.parent_id, partData, partData.parent_x, partData.parent_y, loc.bionetStorage.gridSprite, cColor, true)
                     }
                 }
                 break;

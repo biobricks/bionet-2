@@ -69,9 +69,10 @@ bionetStorageContainer.prototype.createScene = function (storageSprite) {
     }
 
     if (config.title !== undefined) {
+        const fontSize = (config.width>400) ? '32px' : '16px'
         var titleTextProps = {
             fontFamily: 'Roboto',
-            fontSize: '16px',
+            fontSize: fontSize,
             fill: '#000000',
             align: 'center',
             backgroundColor: '#00000000'

@@ -13,7 +13,7 @@
 
     <div class="input-field col s12">
         <div class="query-container">
-            <input type="text" ref={refName} name={opts.ref || opts.name || 'q'} id="autocomplete_q" placeholder={opts.placeholder} autocomplete="off" autofocus onblur={hideMatches} value={data}/>
+            <input type="text" ref={refName} name={opts.ref || opts.name || 'q'} id="autocomplete_q" placeholder={opts.placeholder} autocomplete="off"  onblur={hideMatches} value={data}/>
             <label for={opts.name || 'q'} class="active">Name</label>
         </div>
         <ul id="matchlist_q" class="matchlist">

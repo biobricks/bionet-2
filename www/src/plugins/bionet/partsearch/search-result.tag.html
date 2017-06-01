@@ -82,6 +82,10 @@
                     })
 
                     BIONET.signal.getPhysical.dispatch(item.id)
+                    
+                    const bionetStorageLocation = app.getStream('bionetStorageLocation')
+                    bionetStorageLocation.dispatch('configure', item.id)
+                    
                     tag.itemType = 'p'
                 } else if (item.id.indexOf('v-') >= 0) {
                     riot.mount('#edititem', 'part-specification')

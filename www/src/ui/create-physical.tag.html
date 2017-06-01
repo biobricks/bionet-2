@@ -133,8 +133,8 @@
                 cb: function(err, formData, imageData) {
                     this.labelFormData = formData;
                     this.labelImageData = imageData;
-                    $(this.refs.printModal).closeModal();
-                    $(this.refs.createLabelButton).html('edit label');
+                    $('#printModal').closeModal();
+                    $('#createLabelButton').html('edit label');
                 }
             }
             tags = riot.mount('#printModal', 'modal-content', labelOpts)
@@ -430,6 +430,7 @@
 
                 }.bind(this))
             }.bind(this))
+            
         }.bind(this));
 
     </script>

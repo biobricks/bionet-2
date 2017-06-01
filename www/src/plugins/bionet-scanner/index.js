@@ -12,6 +12,7 @@ const babylon = require('./3d/babylon.tag.html')
 const bionetScanPlugin = app.addPlugin('bionetScan2')
 require('./scanner.tag.html')
 require('./bionetStorageLocation.tag.html')
+require('./bionetStorageItem.tag.html')
 
 bionetScanPlugin.start = function () {
     console.log('starting bionet_scanner plugin')
@@ -30,6 +31,8 @@ bionetScanPlugin.start = function () {
     BIONET.signal.highlightStorageCell = new MiniSignal()
     BIONET.signal.storageLocationViewReady = new MiniSignal()
     BIONET.signal.activate3D = new MiniSignal()
+    BIONET.signal.physicalSaved = new MiniSignal()
+    BIONET.signal.highlightCellArray = new MiniSignal()
     
     const thisModule = this
     startScan.observe((msg) => {

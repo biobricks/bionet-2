@@ -1,5 +1,4 @@
 <inventory-treeview>
-  
     <div class="inventory-height">
         <div class="row">
             <div id="treeview" class="inventory-tree col s4">
@@ -23,7 +22,7 @@
                         <babylon-3d></babylon-3d>
                     </div>
                 </div>
-                <div class="row">
+                <div id="physical-props-view" class="row physical-view">
                     <div id="box" class="edit-physical">
                         <box-contents />
                     </div>
@@ -34,12 +33,17 @@
             </div>
         </div>
         <!-- add or delete buttons -->
-        <div id="addicon" class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:110px; left:10px; width:55px; height:55px;" data-activates="addmenu"><i class="material-icons">add</i></div>
+        <div id="addicon" class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:110px; left:10px; width:55px; height:55px;" data-activates="addmenu"><i class="material-icons">add</i></div>
+
         <ul id="addmenu" class="dropdown-content" style="position:absolute; top:110px; left:10px; width:200px !important; text-align:left;z-index:1000">
             <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.name}</span></li>
             <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.name}</span></li>
         </ul>
-        <div id="deleteicon" style="position:absolute; top:180px; left:10px; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></div>
+
+        <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" style="position:absolute; top:180px; left:10px; text-align:left" onclick={addToFavorites}><i class="material-icons">star</i></a>
+
+        <div id="deleteicon" style="position:absolute; top:250px; left:10px; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></div>
+
     </div>
 
     <style>
@@ -59,8 +63,13 @@
         .inventory-tree {
             float: left;
             margin-left: 65px;
-            overflow: auto;
+            overflow-y: scroll;
+            overflow-x: hidden;
             display: block;
+        }
+        
+        .physical-view {
+            overflow-y: scroll;
         }
         
         .edit-physical {
@@ -78,6 +87,9 @@
             outline: 1px solid #70C0E7;
         }
         
+        .inventory-height {
+            margin-top: 100px;
+        }
 
     </style>
     <script>
@@ -186,6 +198,15 @@
             }
         }
 
+        this.addToFavorites = function() {
+            const ftree = $("#ftree").fancytree("getTree")
+            ftree.visit(function(node) {
+                if (node.isSelected()) {
+                    BIONET.signal.addFavorite.dispatch(node.data.dbData)
+                }
+            })
+        }
+
         const requestStorageResult = function(storageData) {
             //console.log('initializing storage:', JSON.stringify(storageData))
             const ftree = $("#ftree").fancytree("getTree");
@@ -202,13 +223,19 @@
                     node.setFocus();
                     const dbData = node.data.dbData
                     console.log('ftree reload, active node:', JSON.stringify(dbData, null, 2))
+
                     BIONET.signal.getPhysical.dispatch(dbData.id)
+
+                    const bionetStorageLocation = app.getStream('bionetStorageLocation')
+                    bionetStorageLocation.dispatch('configure', dbData.id)
+
                     if (dbData.type.indexOf('box') >= 0) {
                         BIONET.signal.getBoxContents.dispatch(dbData.id)
                     } else {
                         node.setExpanded();
                     }
                     $('#physical-view').scrollTop(0)
+                    $('html').scrollTop(0)
 
                 } else {
                     const children = ftree.getRootNode().children
@@ -227,7 +254,10 @@
             // initialize breadcrumbs
             $('.inventory-height').css({
                 height: $(window).innerHeight() - $('#appbar').height()
-            });
+            })
+            $('html').css({
+                overflow: 'hidden'
+            })
             tag.pixiwidth = $('#physical-view').width()
 
             const treeViewIconX = $('#treeview').width() - 60
@@ -305,22 +335,23 @@
                 keydown: function(event, data) {},
                 click: function(event, data) {
                     const node = data.node;
-                    console.log('data target:', data.targetType)
-                        // todo: move add to cart to box view tag
-                        /*
-                         */
+                    // todo: move add to cart to box view tag
+                    /*
+                     */
                     const dbData = node.data.dbData
                     const type = dbData.type
-                    if (data.targetType === 'title' && type === 'physical' || type.indexOf('box') >= 0) {
-                        //console.log('adding item to cart:', JSON.stringify(dbData))
-                        // TODO: messaging async api call
-                        /*
-                        cart.route('addToCart', undefined, {
-                            id: dbData.id,
-                            name: dbData.name
-                        })
-                        */
-                    }
+                    console.log('click:', JSON.stringify(dbData))
+
+                    //if (data.targetType === 'title' && type === 'physical' || type.indexOf('box') >= 0) {
+                    //console.log('adding item to cart:', JSON.stringify(dbData))
+                    // TODO: messaging async api call
+                    /*
+                    cart.route('addToCart', undefined, {
+                        id: dbData.id,
+                        name: dbData.name
+                    })
+                    */
+                    //}
                 },
                 dnd5: {
                     // autoExpandMS: 400,
@@ -420,6 +451,9 @@
                 $('.edit-physical').css({
                     height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-layout').height() - 45
                 });
+                $('#physical-props-view').css({
+                    height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 45
+                });
                 if (e.type === 'keydown') {
                     if (e.which !== undefined && e.which !== 13) return
                 }
@@ -444,6 +478,10 @@
                     tag.update()
 
                     BIONET.signal.getPhysical.dispatch(dbData.id)
+
+                    const bionetStorageLocation = app.getStream('bionetStorageLocation')
+                    bionetStorageLocation.dispatch('configure', dbData.id)
+
                     if (e.type === 'keydown') node.setExpanded()
 
                     app.setBreadcrumbs([{
@@ -465,11 +503,14 @@
                 BIONET.signal.requestStorage.dispatch()
             }
             const physicalUpdatedBinding = BIONET.signal.physicalUpdated.add(physicalUpdated)
-            
+
             this.on('unmount', function() {
                 physicalUpdatedBinding.detach()
                 createStorageItemResultBinding.detach()
                 requestStorageResultBinding.detach()
+                $('html').css({
+                    overflow: 'auto'
+                })
             })
             BIONET.signal.requestStorage.dispatch()
         })

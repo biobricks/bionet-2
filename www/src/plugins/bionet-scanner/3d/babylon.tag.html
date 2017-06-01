@@ -60,11 +60,13 @@
         const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
 
         this.on('unmount', function() {
+            console.log('babylog.tag.html unmount')
             pauseRenderLoop()
             activate3DBinding.detach()
         })
 
         this.on('mount', function() {
+            console.log('babylog.tag.html mount')
 
             const canvas = document.getElementById('render-canvas');
             $(canvas).css({
@@ -313,11 +315,11 @@
                 return boxObj
             }
 
-            const createRack = function(id, x, y, index) {
+            const createRack = function(id, x, y, z, index) {
                 const width = (freezerWidth) / 4 - 0.2
                 const height = 0.8
                 const depth = 2
-                const z = -0.05
+                //const z = -0.05
                 const color = new BABYLON.Color3(0, 1, 1)
                 const elementProps = {
                     name: id,
@@ -332,22 +334,27 @@
                 }
                 createElement(elementProps)
                 const bx = x - 0.1
+                    //const zd = z
+                    //const zd = z + depth / -2
                 const zd = z + depth / -2
                 const rack = {
-                    name: id,
-                    type: 'freezer rack',
-                    x: index + 1,
-                    color: color,
-                    children: []
-                }
-                for (var row = 0; row < 4; row++) {
-                    var by = y + (row * height / 4) - (height / 2)
-                    for (var col = 0; col < 5; col++) {
+                        name: id,
+                        type: 'freezer rack',
+                        x: index + 1,
+                        color: color,
+                        children: []
+                    }
+                    //todo retrieve freezer rack specs for rows, columns
+                nrow = 3
+                ncol = 4
+                for (var row = 0; row < nrow; row++) {
+                    var by = y + (row * height / nrow) - (height / 2)
+                    for (var col = 0; col < ncol; col++) {
                         var boxId = id + ".box" + row + "," + col
-                        var bz = zd + col * depth / 5
-                        var highlight = (Math.random() > 0.99) ? true : false
+                        var bz = zd + col * depth / ncol
+                            //var highlight = (Math.random() > 0.99) ? true : false
                             //if (highlight === true) {
-                        var boxObj = createBox(boxId, bx, by, bz, false, 5 - col, 4 - row)
+                        var boxObj = createBox(boxId, bx, by, bz, false, col + 1, nrow - row)
                         rack.children.push(boxObj)
                             //}
                     }
@@ -355,7 +362,7 @@
                 return rack
             }
 
-            const createShelf = function(id, x, y, index) {
+            const createShelf = function(id, x, y, z, index) {
                 const width = freezerWidth
                 const height = 0.1
                 const depth = 2.1
@@ -367,7 +374,7 @@
                     depth: depth,
                     x: x,
                     y: y + height / 2,
-                    z: 0,
+                    z: z,
                     color: color
                 }
                 createElement(elementProps)
@@ -381,13 +388,13 @@
                 }
                 for (var rack = 0; rack < 4; rack++) {
                     var rackId = id + ".rack" + rack
-                    var rackObj = createRack(rackId, x + (rack * freezerWidth / 4) - freezerWidth / 2, y + height, rack)
+                    var rackObj = createRack(rackId, x + (rack * freezerWidth / 4) - freezerWidth / 2, y + height, z, rack)
                     shelf.children.push(rackObj)
                 }
                 return shelf
             }
 
-            const createFreezer = function(id, x, y, index) {
+            const createFreezer = function(id, x, y, z, index) {
                 //createElement("freezer1", 4, 5, 2, 0, 2.5, 0, scene)
 
                 /*
@@ -411,12 +418,15 @@
                 const freezer = {
                     name: id,
                     type: '-80 freezer',
-                    x: index,
+                    x: x,
+                    y: y,
+                    z: z,
                     children: []
                 }
                 for (var shelf = 0; shelf < 5; shelf++) {
                     var shelfId = id + ".shelf" + shelf
-                    var shelfObj = createShelf(shelfId, x, shelf + y, 5 - shelf)
+                    //var shelfObj = createShelf(shelfId, x, shelf + y, 5 - shelf)
+                    var shelfObj = createShelf(shelfId, x, shelf + y, z, 5 - shelf)
                     freezer.children.push(shelfObj)
                 }
                 return freezer
@@ -452,9 +462,18 @@
                     type: 'lab',
                     children: []
                 }
-                for (var x = 0; x < 4; x++) {
-                    var freezerId = "freezer" + x
-                    var freezerObj = createFreezer(freezerId, x * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, x)
+                const appSettings = BIONET.getAppSettings()
+                const labLayout = appSettings.labLayout
+
+                for (var i = 0; i < labLayout.length; i++) {
+                    var freezerId = "freezer" + i
+                    const freezer = labLayout[i]
+                        //const x = freezer.x
+                        //const z = freezer.y
+                    const x = freezer.y/40 -5
+                    const z = freezer.x/40
+                        //var freezerObj = createFreezer(freezerId, x * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, x)
+                    var freezerObj = createFreezer(freezerId, x * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, z, i)
                     lab.children.push(freezerObj)
                 }
 
