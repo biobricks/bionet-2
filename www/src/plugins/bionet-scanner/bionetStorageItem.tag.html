@@ -1,0 +1,242 @@
+<bionet-storage-item>
+    <div id="bionet-storage-item-canvas"></div>
+    <script>
+        const PIXI = require('pixi.js')
+        const MiniSignal = require('mini-signals')
+        const bionetLabLayout = require('./bionetLabLayout')
+        const BionetStorageContainer = require('./bionetStorageContainer')
+        const pixijsutils = require('./pixijsutils')
+
+        const tag = this
+        const PIXI_WIDTH = 500
+        const PIXI_HEIGHT = 300
+
+        const pixiController = app.getStream('bionetStorageLocation')
+        tag.pixiController = pixiController
+
+        this.on('unmount', function() {
+            pixijsutils.initStage(tag.width, tag.height)
+        })
+
+        this.on('mount', function() {
+            console.log('bionetStorageItem tag mount')
+
+            const pixiEvents = new MiniSignal()
+            tag.pixiEvents = pixiEvents
+
+            tag.width = opts.width || PIXI_WIDTH
+            tag.height = opts.height || PIXI_HEIGHT
+
+            tag.locationPath = undefined
+            const canvas = document.getElementById('bionet-storage-item-canvas')
+            pixijsutils.initStage(tag.width, tag.height)
+            pixijsutils.attachRenderer(canvas)
+            bionetLabLayout.clear()
+
+            const renderScene = function(locationPath) {
+                const bionetLabLayoutScene = new PIXI.Container()
+                bionetLabLayout.createScene(bionetLabLayoutScene)
+
+                /*                
+                                containerConfig = {
+                                    xc: storageItem.xc,
+                                    yc: storageItem.yc,
+                                    width: width,
+                                    height: height,
+                                    x: (childLoc) ? childLoc.x : undefined,
+                                    y: (childLoc) ? childLoc.y : undefined,
+                                    childId: (childLoc) ? childLoc.id : undefined,
+                                    title: storageItem.name
+                                }
+
+                            var bionetStorageContainer = new BionetStorageContainer(containerConfig)
+                            bionetStorageContainer.createScene(storageSprite)
+                */
+                //const locationPath = tag.locationPath
+                if (locationPath) {
+                    for (var i = 0; i < locationPath.length; i++) {
+                        BIONET.signal.getContainerContents.dispatch(locationPath[i].id)
+                    }
+                    bionetLabLayout.connectCells()
+                }
+                BIONET.signal.storageLocationViewReady.dispatch()
+
+                pixijsutils.scaleToFit(bionetLabLayoutScene)
+                pixijsutils.appendToStage(bionetLabLayoutScene)
+                    //pixijsutils.renderStage()
+            }
+
+            bionetLabLayout.initializeTypes()
+            const loader = PIXI.loader
+            loader.reset()
+            bionetLabLayout.loadResources()
+            loader.load((loader, resources) => {
+                bionetLabLayout.setResources(resources)
+                if (!tag.resources) {
+                    renderScene(tag.locationPath)
+                    pixijsutils.renderStage()
+                    tag.resources = resources
+                }
+            });
+
+
+            const config = {}
+
+            const highlightStorageCell = function(id, data, x, y) {
+                bionetLabLayout.highlightCell(id, data, x, y)
+                pixijsutils.renderStage()
+            }
+            const highlightStorageCellBinding = BIONET.signal.highlightStorageCell.add(highlightStorageCell)
+
+            const highlightOccupiedCells = function(id, physicals) {
+                if (physicals === undefined || physicals.length === 0) return
+                const cells = []
+                for (var i = 0; i < physicals.length; i++) {
+                    const cellData = physicals[i].value
+                    if (cellData.parent_id === id) cells.push(cellData)
+                }
+                bionetLabLayout.highlightCellArray(id, cells)
+                pixijsutils.renderStage()
+            }
+            const getContainerContentsResultBinding = BIONET.signal.getContainerContentsResult.add(highlightOccupiedCells)
+
+            const highlightCellArray = function(id, cells) {
+                bionetLabLayout.highlightCellArray(id, cells, 0x00ff00)
+                pixijsutils.renderStage()
+            }
+            const highlightCellArrayBinding = BIONET.signal.highlightCellArray.add(highlightCellArray)
+
+            var parentContainer = null
+
+            // handler functions for pixi client events
+            function onPixiEvent(cmd, msgdata) {
+                if (cmd === undefined) return;
+                const pixiMsgHandler = {
+                    selectCell: function(msg) {
+                        bionetLabLayout.connectCells()
+                        pixijsutils.renderStage()
+
+                        //update container with new coordinates
+                        const locationPath = tag.locationPath
+                        const id = msg.id
+                        var container = {}
+                        for (var i = 0; i < locationPath.length; i++) {
+                            container = locationPath[i]
+                            if (container.id === id) {
+                                break;
+                            }
+                        }
+                        if (container.id !== id) return
+                        const cell = msg.cell
+                        if (parentContainer !== null) container.wbparent_id = parentContainer.id
+                        container.parent_x = cell.x
+                        container.parent_y = cell.y
+                        const doPrint = false
+                        const labelImage = null
+                        const toast = app.getThemeMethod().toast
+                        console.log('selectCell %s %s', JSON.stringify(cell), JSON.stringify(container, null, 2))
+                        app.remote.savePhysical(container, labelImage, doPrint, function(err, id) {
+                            if (err) {
+                                toast('ERROR saving ' + container.name + ' ' + err)
+                                if (cb) cb(err)
+                                return;
+                            }
+                            //toast(container.name + ' saved at ' + container.parent_x + ' ' + container.parent_y)
+                            console.log(container.name + ' saved at ' + container.parent_x + ' ' + container.parent_y)
+                            BIONET.signal.getBoxContents.dispatch(container.parent_id)
+                            BIONET.signal.physicalSaved.dispatch(container)
+                        })
+                    },
+                    configureParent: function(msg) {
+                        console.log('bionet storage location configure')
+
+                        const container = msg.child
+                        const parent = msg.parent
+                        const tempAssignments = msg.tempAssignments
+                        const newLocationPath = [container, parent]
+                        tag.container = container
+                        parentContainer = parent
+                        tag.locationPath = newLocationPath
+
+                        pixijsutils.initStage(tag.width, tag.height)
+
+                        // add lab storage to stage and render
+                        const config = {
+                            locationPath: newLocationPath,
+                            title: container.name
+                        }
+                        bionetLabLayout.initializeModel(config)
+
+                        // render if resources loaded otherwise defer
+
+                        if (tag.resources) {
+                            renderScene(newLocationPath)
+                            bionetLabLayout.highlightCellArray(parent.id, tempAssignments, 0x00ff00)
+                            pixijsutils.renderStage()
+                        }
+                    },
+                    configure: function(msg) {
+                        //todo: this may be invoked before resources have loaded
+                        const id = msg.id
+                        const tempAssignments = msg.tempAssignments
+                        console.log('bionetStorageLocation tag configure function, id=', id)
+                        app.remote.getLocationPath(id, function(err, locationPath) {
+                            if (err) {
+                                console.log('getLocationPath error:', err)
+                                return
+                            }
+                            console.log('bionet storage location getLocationPath result:', JSON.stringify(locationPath))
+
+                            //const newLocationPath = [locationPath[0], locationPath[1]]
+                            const newLocationPath = locationPath
+
+                            const container = locationPath[0]
+                            const parent = locationPath[1]
+                            tag.container = container
+                            tag.locationPath = newLocationPath
+
+                            pixijsutils.initStage(tag.width, tag.height)
+
+                            // add lab storage to stage and render
+                            const config = {
+                                locationPath: newLocationPath,
+                                title: container.name
+                            }
+                            bionetLabLayout.initializeModel(config)
+
+                            // render if resources loaded otherwise defer
+
+                            if (tag.resources) {
+                                renderScene(newLocationPath)
+                                bionetLabLayout.highlightCellArray(id, tempAssignments, 0x00ff00)
+                                pixijsutils.renderStage()
+                            }
+                        })
+                    },
+                    resize: function(msg) {
+                        pixijsutils.resizeStage(tag.width, 600)
+                    },
+                    render: function(msg) {
+                        bionetLabLayout.connectCells()
+                    }
+                }
+                pixiMsgHandler[cmd](msgdata);
+            }
+            // setup listener for pixi events
+            var eventBinding = pixiController.add(onPixiEvent)
+
+            this.on('unmount', function() {
+                highlightStorageCellBinding.detach()
+                getContainerContentsResultBinding.detach()
+                highlightCellArrayBinding.detach()
+            })
+            tag.update()
+        })
+
+        this.on('updated', function() {
+            tag.width = opts.width || PIXI_WIDTH
+            tag.height = opts.height || PIXI_HEIGHT
+        })
+
+    </script>
+</bionet-storage-item>
