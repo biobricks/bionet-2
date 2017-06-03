@@ -15,7 +15,10 @@ import cart from './cart'
 
 const bionetPlugin = app.addPlugin('bionet')
 
-bionetPlugin.start = function () {
+bionetPlugin.start = function (cb) {
+
+  // TODO check if any of these init functions do anything async
+  // and if so, make them take a callback and use async.eachSeries to init
 
     //-------------------------------------------------------------------------
     // initialize bionet
@@ -57,6 +60,7 @@ bionetPlugin.start = function () {
     // initialize bionet cart
     cart.init();
 
+  cb()
 }
 
 bionetPlugin.remove = function () {

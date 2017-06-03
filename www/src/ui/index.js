@@ -4,7 +4,7 @@ import {
 from './methods'
 
 const stdThemePlugin = app.addPlugin('stdTheme')
-stdThemePlugin.start = function () {
+stdThemePlugin.start = function (cb) {
 
     const settings = app.getSettings()
     console.log('std theme init, settings:', JSON.stringify(settings))
@@ -107,8 +107,7 @@ stdThemePlugin.start = function () {
         }
     })
 
-  app.start();
-
+  cb();
 }
 stdThemePlugin.remove = function () {
     // todo: unmount tags, etc.

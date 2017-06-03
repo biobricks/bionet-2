@@ -35,6 +35,7 @@
     "accountdown": "^4.1.0",
     "accountdown-basic": "^1.1.0",
     "async": "^2.0.0-rc.6",
+    "async-es": "^2.4.1",
     "browserify": "^13.0.1",
     "browserify-shim": "^3.8.12",
     "buffer-equal-constant-time": "^1.0.1",

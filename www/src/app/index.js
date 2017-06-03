@@ -1,4 +1,5 @@
 
+var async = require('async');
 import Plugin from './plugin';
 import Persist from './persist'
 import NanoStream from './NanoStream';
@@ -121,7 +122,7 @@ class App extends EventEmitter {
   }
 
   // load settings and startup plugins 
-  startPlugins() {
+  startPlugins(cb) {
     if (pluginsInitialized) return
     pluginsInitialized = true
     console.log('starting plugins...')
@@ -150,19 +151,24 @@ class App extends EventEmitter {
       // TODO: messaging - plugins
       // TODO Shouldn't we have to wait for a callback here?
       // otherwise we might end up trying to use a plugin before it has loaded
-      thisModule.dispatch(thisModule.$.plugin, 'start')
+//      thisModule.dispatch(thisModule.$.plugin, 'start')
 
+      async.eachSeries(thisModule.plugin, function(plugin, cb) {
+        console.log("############ starting", plugin.name);
+        plugin.start(cb)
+      }, cb);
     })
   }
 
   start() {
     this.startRouter()
-    
+    /*
     var interval = setInterval(function () {
       app.remote.foo('foo message', function (err) {
         console.log('foo message response')
       })
     }, 30 * 1000)
+    */
   }
 
   // start router - after plugins have been started

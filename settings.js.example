@@ -210,7 +210,9 @@ var settings = {
 
    // DHT channel name used to discovering other nodes 
    // comment this out to disable discovery
-   dhtChannel: 'bionet-nodes'
+   dhtChannel: 'bionet-nodes',
+
+   labLayout: {}
 };
 
 module.exports = function(argv) {

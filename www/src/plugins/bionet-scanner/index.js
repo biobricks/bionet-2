@@ -14,7 +14,7 @@ require('./scanner.tag.html')
 require('./bionetStorageLocation.tag.html')
 require('./bionetStorageItem.tag.html')
 
-bionetScanPlugin.start = function () {
+bionetScanPlugin.start = function (cb) {
     console.log('starting bionet_scanner plugin')
     pixijsutils.initRenderer()
 
@@ -64,6 +64,8 @@ bionetScanPlugin.start = function () {
         })
         riot.mount('div#content', 'scanner')
     })
+
+  cb();
 }
 
 bionetScanPlugin.remove = function () {

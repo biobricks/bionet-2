@@ -42,12 +42,17 @@ var ui = require('./ui')
 require('./ui/uitags.js')
 require('./plugins/bionet')
 require('./plugins/bionet-scanner')
-app.startPlugins();
+
 
 // wait for everything to fully load
 $(document).ready(function () {
-
   console.log("document ready")
+
+app.startPlugins(function(err) {
+  if(err) return console.error("Failed to initialize plugins:", err);
+
+
+
 
   // connect to the server and attempt to log in
   rpc.connect(function(err, remote, user) {
@@ -55,9 +60,9 @@ $(document).ready(function () {
       console.error("Connection attempt failed. Will continue trying.");
       return;
     }
-
+//    app.startRouter();
     app.remote = remote;
-
+    app.startRouter();
     // TODO
     // app.start() should be called here
     // but is currently called from ui/index.js 
@@ -73,4 +78,5 @@ $(document).ready(function () {
     }
 
   });
+});
 });

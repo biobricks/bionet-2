@@ -121,10 +121,8 @@ function setLoginState(userData) {
   if(userData) {
     app.setLoginState(userData.user);
     // TODO we should not be setting globals from in here
-    console.log("SETTING LOGIN STATE:", userData.user)
   } else {
     app.setLoginState();
-    console.log("UN-SETTING LOGIN STATE")
     // TODO we should not be setting globals from in here
   }
 }
