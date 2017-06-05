@@ -1,6 +1,6 @@
 <babylon-3d>
     <div id="babylon-container">
-        <canvas class="render-canvas" id="render-canvas"></canvas>
+        <canvas id="render-canvas"></canvas>
     </div>
     <style>
         #babylon-container {
@@ -11,18 +11,17 @@
             padding: 0;
         }
         
-        .render-canvas {
+        #render-canvas {
             width: 100%;
             height: 100%;
-            bottom: 0px;
-            right: 0px;
+            touch-action: none;
         }
 
     </style>
     <script>
         const tag = this
         const pixiController = app.getStream('bionetStorageLocation')
-        tag.engine = null
+        tag.engine = {}
         var scene = {}
 
         const bionetLabLayout = require('../bionetLabLayout')
@@ -43,35 +42,16 @@
 
         tag.active = false
         const activate3d = function(activeState) {
-            if (tag.engine !== null) {
-                if (activeState) {
-                    const canvas = document.getElementById('render-canvas');
-                    $(canvas).css({
-                        bottom: window.innerHeight - 60
-                    })
-                    const scale = 720.0 / window.innerHeight
-                        //tag.engine.setHardwareScalingLevel(scale,scale)
-                    runRenderLoop()
-                } else pauseRenderLoop()
-            }
+            if (activeState) runRenderLoop()
+            else pauseRenderLoop()
             tag.active = activeState
             tag.update()
         }
-        const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
-
-        this.on('unmount', function() {
-            console.log('babylog.tag.html unmount')
-            pauseRenderLoop()
-            activate3DBinding.detach()
-        })
+        BIONET.signal.activate3D.add(activate3d)
 
         this.on('mount', function() {
-            console.log('babylog.tag.html mount')
 
             const canvas = document.getElementById('render-canvas');
-            $(canvas).css({
-                bottom: window.innerHeight
-            })
             tag.engine = new BABYLON.Engine(canvas, true);
             const engine = tag.engine
             var lab = {}
@@ -162,10 +142,9 @@
                         }
                     }
                 }
-                if (tag.engine !== null) {
-                    if (BIONET.state.toggle3d) runRenderLoop()
-                    else pauseRenderLoop()
-                }
+
+                if (BIONET.state.toggle3d) runRenderLoop()
+                else pauseRenderLoop()
 
                 //$('#render-canvas').hide()
             }
@@ -315,11 +294,11 @@
                 return boxObj
             }
 
-            const createRack = function(id, x, y, z, index) {
+            const createRack = function(id, x, y, index) {
                 const width = (freezerWidth) / 4 - 0.2
                 const height = 0.8
                 const depth = 2
-                //const z = -0.05
+                const z = -0.05
                 const color = new BABYLON.Color3(0, 1, 1)
                 const elementProps = {
                     name: id,
@@ -334,27 +313,22 @@
                 }
                 createElement(elementProps)
                 const bx = x - 0.1
-                    //const zd = z
-                    //const zd = z + depth / -2
                 const zd = z + depth / -2
                 const rack = {
-                        name: id,
-                        type: 'freezer rack',
-                        x: index + 1,
-                        color: color,
-                        children: []
-                    }
-                    //todo retrieve freezer rack specs for rows, columns
-                nrow = 3
-                ncol = 4
-                for (var row = 0; row < nrow; row++) {
-                    var by = y + (row * height / nrow) - (height / 2)
-                    for (var col = 0; col < ncol; col++) {
+                    name: id,
+                    type: 'freezer rack',
+                    x: index + 1,
+                    color: color,
+                    children: []
+                }
+                for (var row = 0; row < 4; row++) {
+                    var by = y + (row * height / 4) - (height / 2)
+                    for (var col = 0; col < 5; col++) {
                         var boxId = id + ".box" + row + "," + col
-                        var bz = zd + col * depth / ncol
-                            //var highlight = (Math.random() > 0.99) ? true : false
+                        var bz = zd + col * depth / 5
+                        var highlight = (Math.random() > 0.99) ? true : false
                             //if (highlight === true) {
-                        var boxObj = createBox(boxId, bx, by, bz, false, col + 1, nrow - row)
+                        var boxObj = createBox(boxId, bx, by, bz, false, 5 - col, 4 - row)
                         rack.children.push(boxObj)
                             //}
                     }
@@ -362,7 +336,7 @@
                 return rack
             }
 
-            const createShelf = function(id, x, y, z, index) {
+            const createShelf = function(id, x, y, index) {
                 const width = freezerWidth
                 const height = 0.1
                 const depth = 2.1
@@ -374,7 +348,7 @@
                     depth: depth,
                     x: x,
                     y: y + height / 2,
-                    z: z,
+                    z: 0,
                     color: color
                 }
                 createElement(elementProps)
@@ -388,13 +362,13 @@
                 }
                 for (var rack = 0; rack < 4; rack++) {
                     var rackId = id + ".rack" + rack
-                    var rackObj = createRack(rackId, x + (rack * freezerWidth / 4) - freezerWidth / 2, y + height, z, rack)
+                    var rackObj = createRack(rackId, x + (rack * freezerWidth / 4) - freezerWidth / 2, y + height, rack)
                     shelf.children.push(rackObj)
                 }
                 return shelf
             }
 
-            const createFreezer = function(id, x, y, z, index) {
+            const createFreezer = function(id, x, y, index) {
                 //createElement("freezer1", 4, 5, 2, 0, 2.5, 0, scene)
 
                 /*
@@ -418,15 +392,12 @@
                 const freezer = {
                     name: id,
                     type: '-80 freezer',
-                    x: x,
-                    y: y,
-                    z: z,
+                    x: index,
                     children: []
                 }
                 for (var shelf = 0; shelf < 5; shelf++) {
                     var shelfId = id + ".shelf" + shelf
-                    //var shelfObj = createShelf(shelfId, x, shelf + y, 5 - shelf)
-                    var shelfObj = createShelf(shelfId, x, shelf + y, z, 5 - shelf)
+                    var shelfObj = createShelf(shelfId, x, shelf + y, 5 - shelf)
                     freezer.children.push(shelfObj)
                 }
                 return freezer
@@ -462,18 +433,9 @@
                     type: 'lab',
                     children: []
                 }
-                const appSettings = BIONET.getAppSettings()
-                const labLayout = appSettings.labLayout
-
-                for (var i = 0; i < labLayout.length; i++) {
-                    var freezerId = "freezer" + i
-                    const freezer = labLayout[i]
-                        //const x = freezer.x
-                        //const z = freezer.y
-                    const x = freezer.y/40 -5
-                    const z = freezer.x/40
-                        //var freezerObj = createFreezer(freezerId, x * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, x)
-                    var freezerObj = createFreezer(freezerId, x * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, z, i)
+                for (var x = 0; x < 4; x++) {
+                    var freezerId = "freezer" + x
+                    var freezerObj = createFreezer(freezerId, x * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, x)
                     lab.children.push(freezerObj)
                 }
 
@@ -595,7 +557,7 @@
                         })
                     }
                 }
-                if (pixiMsgHandler[cmd] !== undefined) pixiMsgHandler[cmd](msgdata);
+                pixiMsgHandler[cmd](msgdata);
             }
             var eventBinding = pixiController.add(onPixiEvent);
             scene = createScene();
