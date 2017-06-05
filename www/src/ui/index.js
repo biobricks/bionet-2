@@ -26,6 +26,9 @@ stdThemePlugin.start = function (cb) {
         label: 'workbench',
         action: '/create'
   }, {
+        label: 'scan',
+        action: '/scan'
+  }, {
         icon: 'shopping_cart',
         action: '/cart'
     }];
@@ -107,7 +110,7 @@ stdThemePlugin.start = function (cb) {
         }
     })
 
-  cb();
+    cb();
 }
 stdThemePlugin.remove = function () {
     // todo: unmount tags, etc.

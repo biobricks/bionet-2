@@ -1,5 +1,6 @@
 const PIXI = require('pixi.js')
 const pixijsutils = require('./pixijsutils')
+const async = require('async')
 
 const StorageGrid = function (xcells, ycells, width, height, xalpha, yalpha) {
     this.xcells = xcells
@@ -24,7 +25,7 @@ StorageGrid.prototype.drawGrid = function (container) {
     const dx = this.dx
     const dy = this.dy
     const ticLength = 4
-    const lineThickness = 2
+    const lineThickness = 3
     const t2 = lineThickness / 2
     const anchorPoint = new PIXI.Point(0.5, 0.5)
 
@@ -196,7 +197,7 @@ StorageGrid.prototype.highlightId = function (id, data, x, y, container, cellCol
     }.bind(this)
     graphics.mouseout = function () {
         console.log('cell highlight mouseout ', name, x, y)
-            //this.mouseoverSprite.visible = false
+        this.mouseoverSprite.visible = false
         pixijsutils.renderStage()
     }.bind(this)
 }

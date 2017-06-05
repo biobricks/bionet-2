@@ -220,7 +220,7 @@ module.exports = function(settings, users, acccounts) {
       return;
     }
     
-    if(!m.parent_id) {
+    if(!m.parent_id&&m.type!=='lab') {
       return cb(new Error("No container specified"));
     }
 

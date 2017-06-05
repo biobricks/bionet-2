@@ -136,6 +136,8 @@ const bionetLabLayout = {
                     location.subunit = JSON.parse(JSON.stringify(appSettings.labLayout))
                     break;
                 case 'physical':
+                    location.emoji_cloud = []
+                    /*
                     location.emoji_cloud = [
                         {
                             x: 100,
@@ -153,6 +155,7 @@ const bionetLabLayout = {
                             emoji: ':ledger:'
                         }
                     ]
+                    */
                     break;
             }
             locations.push(location)
@@ -532,6 +535,7 @@ const bionetLabLayout = {
     },
 
     connectCells: function () {
+        if (this.storageLocations===undefined) return
         const storageLocations = this.storageLocations
         const sceneRoot = this.sceneRoot
         if (this.connectCellsGraphics) {
