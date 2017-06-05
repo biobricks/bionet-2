@@ -133,17 +133,19 @@
                 cb: function(err, formData, imageData) {
                     this.labelFormData = formData;
                     this.labelImageData = imageData;
-                    $('#printModal').closeModal();
+                    $('#printModal').modal('close');
                     $('#createLabelButton').html('edit label');
                 }
             }
             tags = riot.mount('#printModal', 'modal-content', labelOpts)
 
-            $(this.refs.printModal).openModal({
+            $(this.refs.printModal).modal({
                 complete: function() {
                     tags[0].unmount(true)
                 }
             })
+            $(this.refs.printModal).modal('open');
+
         }.bind(this)
 
         this.scanItem = function() {

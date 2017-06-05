@@ -29,7 +29,7 @@
                 cb: function(err, formData, imageData) {
                     this.labelFormData = formData;
                     this.labelImageData = imageData;
-                    $(this.printModal).closeModal();
+                    $(this.printModal).modal('close');
                     $(this.createLabelButton).html('edit label');
                 }
             }
@@ -51,7 +51,7 @@
                     if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
                     $(this.curBarcode).html('  ' + id + '  ');
                     $(this.scanButton).html('rescan');
-                    $(this.scanModal).closeModal();
+                    $(this.scanModal).modal('close');
                     tags[0].unmount(true)
                 }
             }
@@ -91,6 +91,8 @@
             this.formData = this.opts
             this.imgPath = '/static/labels/' + path.basename(formData.labelImagePath)
             this.update()
+            $(this.printModal).modal()
+
         }.bind(this));
 
     </script>
