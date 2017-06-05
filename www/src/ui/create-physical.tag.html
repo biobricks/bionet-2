@@ -229,8 +229,6 @@
 
             this.showPhysical = true
             this.update()
-                //todo: figure out why scroll to bottom occurs when refreshing inventory view
-                //$('#content-container').scrollTop(0)
             document.body.scrollTop = document.documentElement.scrollTop = 0;
         }.bind(this)
 
@@ -292,10 +290,8 @@
                     this.printNameDefault = this.refs.name.value.trim() || virtual.name
                     $(this.refs.createPhysicalHeader).html("New " + virtual.name)
                     this.update();
-                    // TODO
 
                 }.bind(this));
-                //$('#createPhysicalForm').scrollTop(0)
                 return;
             }
 

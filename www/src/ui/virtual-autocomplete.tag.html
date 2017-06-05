@@ -47,7 +47,6 @@
 
         this.on('mount', function() {
 
-            // todo: was opts.id but apparently riot uses opts.id for something else
             riot.mount('#autocomplete-container', 'autocomplete', {
                 searchCallback: function(query, cb) {
                     app.remote.physicalAutocomplete(query, function(err, result) {

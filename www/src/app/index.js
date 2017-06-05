@@ -17,6 +17,7 @@ class App extends EventEmitter {
     
     // TODO globals should _only_ be assigned from main.js
     // and why does this var have two names? it should be called app, not BIONET
+    // It was named BIONET because many js packages such as PIXI use this namespacing convention for global variables to avoid possible collisions when more generic global names are used.
     window.BIONET = this 
     
     this.state = {}
