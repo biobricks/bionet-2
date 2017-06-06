@@ -9,6 +9,7 @@
                 <bionet-container width="200" />
             </div>
 
+
             <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
             <!--
             <form-text-input label="Type" ref="type" name="type" value={formData.type}/>
@@ -16,11 +17,13 @@
             <form-text-input3 label="Parent Y" ref="locationid" name="parent_y" value={formData.parent_y}/>
             -->
 
+            <input type="hidden" ref="barcode" name="barcode" value={formData.barcode} />
+
             <div each={field in fields}>
                 <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
             </div>
 
-            <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">{formData.label ? 'edit' : 'create'} label</a>
+            <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">{formData.barcode ? 'rescan' : 'scan'}</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">{formData.label ? 'edit' : 'create'} label</a>
 
             <div style="margin-top:30px" />
             <form-text-input3 label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
@@ -165,9 +168,9 @@
                 subTag: "scan", // the tag to mount
                 cb: function(err, id) {
                     if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
-                    $(tag.refs.curBarcode).val(id);
-                    $(tag.refs.scanButton).html('rescan');
                     $(tag.refs.scanModal).modal('close');
+                    tag.formData.barcode = id;
+                    tag.update();
                     console.log('scan item cb, tags:', tags)
                     tags[0].unmount(true)
                 }
