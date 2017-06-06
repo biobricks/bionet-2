@@ -18,7 +18,9 @@
         <div id="edit-physical" class="edititem col s8">
             <div if={results.length>0} onclick={emptyCart} class="right-align" style="margin-right:20px; color:teal; cursor: pointer; cursor: hand; ">empty cart</div>
             <bionet-storage-location width="{pixiwidth}" />
+            <!--
             <babylon-3d></babylon-3d>
+            -->
             <create-physical show="false" top-margin="0px" />
         </div>
     </div>
@@ -65,10 +67,9 @@
 
             cart.addRoute('cartResult', function(data) {
                     //console.log('cart tag, result:', JSON.stringify(data))
-                    const path = (data.path.indexOf('_workbench-') >= 0) ? 'workbench' : '';
                     const item = {
                         primary_text: data.physical.name,
-                        secondary_text: path,
+                        secondary_text: '',
                         id: data.physical.id,
                         iconClick: deleteCartItem,
                         starred: true,

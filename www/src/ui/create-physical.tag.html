@@ -201,6 +201,9 @@
                         if (err) return app.ui.toast("Lookup failed. Item does not exist in database.");
 
         // TODO this doesn't get saved
+                        if (err) return app.ui.toast("Container not found");
+                        tag.formData.parent_id = id
+                        tag.update()
                         $(tag.curContainerBarcode).val(m.id);
                         $(tag.containerScanButton).html('rescan container');
                     })

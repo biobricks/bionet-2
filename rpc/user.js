@@ -1,3 +1,4 @@
+var Readable = require('stream').Readable;
 
 var uuid = require('uuid').v4;
 var async = require('async');
@@ -176,16 +177,11 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
             if(err.notFound) return next();
             return cb(err);
           }
-          db.physical.path(o.id, function(err, path) {
-            
-            if(err) return cb(err);
             cartStream.push({
               physical: o,
-              path: path
+              path: {}
             })
             next();
-            
-          });
         });
       }));
 
