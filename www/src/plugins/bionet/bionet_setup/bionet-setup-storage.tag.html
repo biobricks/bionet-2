@@ -421,7 +421,7 @@
                             const movedNode = data.otherNode.data.dbData
                             movedNode.parent_id = parentId
                                 // TODO: messaging async api call
-                            app.route('partDataAccessor', 'storePhysical', undefined, movedNode)
+                            app.route('partDataAccessor', 'storePhysical', undefined, {material: movedNode})
                             console.log('drag other node other:%s node:%s', movedNode.name, node.data.dbData.name)
 
                         } else if (data.otherNodeData) {
