@@ -180,7 +180,7 @@ module.exports = function(settings, users, acccounts) {
 
 
   function savePhysical(curUser, m, imageData, doPrint, cb, isUnique) {
-
+    console.log("savePhysical", m, imageData, doPrint);
     if(!m.id && !isUnique) { // if no id then this is a new physical
 
       // check for name uniqueness
@@ -229,7 +229,7 @@ module.exports = function(settings, users, acccounts) {
 
       var imageBuffer = new Buffer(mtch[1], 'base64');
       // TODO size check
-      var imagePath = path.join(settings.printing.labelImageFilePath, m.id+'.png')
+      var imagePath = path.join(settings.labDevice.labelImageFilePath, m.id+'.png')
       fs.writeFile(imagePath, imageBuffer, function(err) {
         if(err) return cb(err);
 
@@ -241,7 +241,7 @@ module.exports = function(settings, users, acccounts) {
           if(err) return cb(err);
           if(!doPrint) return cb(null, id);
 
-          var relativePath = path.relative(settings.labelImageFilePath, imagePath);
+          var relativePath = path.relative(settings.labDevice.labelImageFilePath, imagePath);
           labDeviceServer.printLabel(relativePath);
           console.log("relative path:", relativePath);
           cb(null, id);
