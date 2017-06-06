@@ -200,6 +200,7 @@
                     app.remote.getBy('barcode', id, function(err, m) {
                         if (err) return app.ui.toast("Lookup failed. Item does not exist in database.");
 
+        // TODO this doesn't get saved
                         $(tag.curContainerBarcode).val(m.id);
                         $(tag.containerScanButton).html('rescan container');
                     })

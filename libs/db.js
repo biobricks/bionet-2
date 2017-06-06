@@ -306,6 +306,7 @@ module.exports = function(settings, users, acccounts) {
     userCart: userCartDB,
     unixEpochTime: unixEpochTime,
     ensureUserData: ensureUserData,
+    getBy: getBy,
 
     init: init
 

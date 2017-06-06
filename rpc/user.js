@@ -489,7 +489,7 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
 
     // TODO use indexes for this!
     getBy: function(curUser, field, value, cb) {
-      return getBy(field, value, cb);
+      return db.getBy(field, value, cb);
     },
 
     // TODO doesn't work
