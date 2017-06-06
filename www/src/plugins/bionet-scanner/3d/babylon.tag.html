@@ -49,6 +49,136 @@
         }
         BIONET.signal.activate3D.add(activate3d)
 
+        const StorageSpec = function(type, materialSpec, dimensions, defaultVisibility) {
+            this.type = (type !== undefined) ? type : 'notype'
+
+            const materials = {
+                default: {
+                    color: new BABYLON.Color3(0, 1, 1),
+                    alpha: 0.25
+                },
+                highlighted: {
+                    color: new BABYLON.Color3(1, 0, 0),
+                    alpha: 0.25
+                },
+                selected: {
+                    color: new BABYLON.Color3(0, 1, 1),
+                    alpha: 0.75
+                }
+            }
+
+            if (materialSpec !== undefined) {
+                if (materialSpec.default !== undefined) materials.default = materialSpec.default
+                if (materialSpec.highlighted !== undefined) materials.highlighted = materialSpec.highlighted
+                if (materialSpec.selected !== undefined) materials.selected = materialSpec.selected
+            }
+
+            this.materials = materials
+
+            const defaultDimensions = {
+                width: 1,
+                height: 1,
+                depth: 1
+            }
+            this.dimensions = (dimensions !== undefined) ? dimensions : defaultDimensions
+            this.scalingFactor = 3
+
+            this.defaultVisibility = (defaultVisibility !== undefined) ? defaultVisibility : true
+        }
+
+        StorageSpec.prototype.createMaterial = function(scene, name, color, alpha) {
+            const material = new BABYLON.StandardMaterial(name, scene);
+            material.alpha = alpha;
+            material.diffuseColor = color;
+            material.ambientColor = color;
+            material.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+            return material
+        }
+
+        StorageSpec.prototype.initMaterials = function(scene) {
+            const materials = this.materials
+            materials.default.m = this.createMaterial(scene, this.type + 'DefaultMaterial', materials.default.color, materials.default.alpha)
+            materials.highlighted.m = this.createMaterial(scene, this.type + 'HighlightedMaterial', materials.highlighted.color, materials.highlighted.alpha)
+            materials.selected.m = this.createMaterial(scene, this.type + 'SelectedMaterial', materials.selected.color, materials.selected.alpha)
+            this.materials = materials
+        }
+
+        StorageSpec.prototype.createElement = function(scene, name, x, y, z, visible) {
+            const width = this.dimensions.width
+            const height = this.dimensions.height
+            const depth = this.dimensions.depth
+
+            var element = BABYLON.MeshBuilder.CreateBox(name, {
+                height: height,
+                width: width,
+                depth: depth,
+            }, scene);
+            element.position.x = x
+            element.position.y = y
+            element.position.z = z
+            element.visibility = (visible !== undefined) ? visible : true
+            element.material = this.materials.default.m;
+        }
+
+        StorageSpec.prototype.defaultMaterial = function(scene, name) {
+            const element = scene.getMeshByName(name);
+            if (element === undefined) return
+            element.material = this.materials.default.m;
+            element.visibility = this.defaultVisibility
+        }
+
+        StorageSpec.prototype.highlight = function(scene, name) {
+            const element = scene.getMeshByName(name);
+            if (element === undefined) return
+            element.material = this.materials.highlighted.m;
+            element.visibility = true
+        }
+
+        StorageSpec.prototype.select = function(scene, name) {
+            const element = scene.getMeshByName(name);
+            if (element === undefined) return
+            element.material = this.materials.selected.m;
+            element.visibility = true
+        }
+        const scalingFactor = 3
+
+        const boxSpec = new StorageSpec('box', {
+            highlighted: {
+                color: new BABYLON.Color3(1, 0, 0),
+                alpha: 1
+            }
+        }, {
+            width: (scalingFactor / 4) - 0.3,
+            height: 0.7 / 4,
+            depth: 1.8 / 5
+        }, false)
+
+        const rackSpec = new StorageSpec('rack', {
+            highlighted: {
+                color: new BABYLON.Color3(1, 0, 0),
+                alpha: 0.5
+            }
+        }, {
+            width: (scalingFactor) / 4 - 0.2,
+            height: 0.8,
+            depth: 2
+        })
+
+        const shelfSpec = new StorageSpec('shelf', {
+            default: {
+                color: new BABYLON.Color3(0, 1, 1),
+                alpha: 1
+            },
+            highlighted: {
+                color: new BABYLON.Color3(1, 1, 0),
+                alpha: 1
+            }
+        }, {
+            width: scalingFactor,
+            height: 0.1,
+            depth: 2.1
+        })
+
         this.on('mount', function() {
 
             const canvas = document.getElementById('render-canvas');
@@ -74,32 +204,27 @@
                     const locationSpec = locationPath[i]
                     var x = Number(locationSpec.parent_x)
                     var y = Number(locationSpec.parent_y)
-                    var hcolor = new BABYLON.Color3(1, 0, 0)
-                    var halpha = 0.5
-                    var ucolor = new BABYLON.Color3(0, 1, 1)
-                    var ualpha = 0.25
                     var type = locationSpec.type
+                    if (type === undefined) continue
+                    var stype = ''
                     if (type.indexOf('box') >= 0) {
-                        halpha = 1.0
+                        stype = 'box'
                         id += ".box" + x + "," + y
                     } else if (type.indexOf('rack') >= 0) {
-                        hcolor = new BABYLON.Color3(0, 1, 1)
+                        stype = 'rack'
                         x = x - 1
                         id += ".rack" + x
                     } else if (type.indexOf('shelf') >= 0) {
-                        halpha = 1.0
-                        ualpha = 1.0
-                        hcolor = new BABYLON.Color3(1, 1, 0)
-                        ucolor = new BABYLON.Color3(0, 0.75, 0.75)
+                        stype = 'shelf'
                         id += ".shelf" + y
                     } else if (type.indexOf('freezer') >= 0) {
+                        stype = 'freezer'
                         id += locationSpec.name
                     }
-                    highlightElement(id, true, hcolor, halpha)
+                    highlightElementType(id, stype)
                     highlightPathObj.push({
                         name: id,
-                        color: ucolor,
-                        alpha: ualpha
+                        type: stype
                     })
                 }
                 console.log('setupLocationPath id:', id)
@@ -114,92 +239,34 @@
 
             }
 
-            const highlightElement = function(name, highlight, color, origAlpha) {
-                const obj = scene.getMeshByName(name);
-                if (obj === null || obj === undefined) return
-                console.log('highlighting object: %s %s %s %s', obj.name, highlight, color, origAlpha)
-                var highlightColor = (color !== undefined) ? color : new BABYLON.Color3(0, 1, 1)
-                var alpha = 0.25
-                if (origAlpha === undefined || origAlpha === null) {
-                    alpha = (highlight === true) ? 0.5 : 0.25
-                } else {
-                    alpha = origAlpha
-                }
-                console.log('highlighting object, alpha=', alpha)
+            const typeSpecs = {
+                box: boxSpec,
+                rack: rackSpec,
+                shelf: shelfSpec
+            }
 
-                var visible = true
-                if (highlight === true) {
-                    highlightColor = (color !== undefined) ? color : new BABYLON.Color3(1, 0, 0)
-                } else {
-                    if (name.indexOf('box') >= 0) visible = false
-                }
-                var highlightMaterial = new BABYLON.StandardMaterial("highlightTexture", scene);
-                highlightMaterial.alpha = alpha;
-                highlightMaterial.diffuseColor = highlightColor;
-                highlightMaterial.ambientColor = highlightColor;
-                highlightMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-                obj.material = highlightMaterial;
-
-                obj.visibility = visible
+            const highlightElementType = function(id, type) {
+                const typeSpec = typeSpecs[type]
+                if (typeSpec === undefined) return
+                typeSpec.highlight(scene, id)
             }
 
             const unhighlightPath = function() {
                 for (var i = 0; i < highlightPathObj.length; i++) {
                     var element = highlightPathObj[i]
-                    highlightElement(element.name, false, element.color, element.alpha)
+                    const typeSpec = typeSpecs[element.type]
+                    if (typeSpec === undefined) continue
+                    typeSpec.defaultMaterial(scene, element.name)
                 }
             }
 
-            const createElement = function(props) {
-                const name = props.name
-                const width = props.width
-                const height = props.height
-                const depth = props.depth
-                const x = props.x
-                const y = props.y
-                const z = props.z
-                const boxColor = (props.color) ? props.color : new BABYLON.Color3(0, 0.25, 1)
-                const alpha = (props.alpha) ? props.alpha : 1
-
-                var box = BABYLON.MeshBuilder.CreateBox(name, {
-                    height: height,
-                    width: width,
-                    depth: depth,
-                }, scene);
-                box.position.x = x
-                box.position.y = y
-                box.position.z = z
-                if (props.visible !== undefined) box.visibility = props.visible
-
-                var materialBox1 = new BABYLON.StandardMaterial("texture1", scene);
-                materialBox1.alpha = alpha;
-                materialBox1.diffuseColor = boxColor;
-                materialBox1.ambientColor = boxColor;
-                materialBox1.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-                box.material = materialBox1;
-
-            }
             const freezerWidth = 3
 
-            const createBox = function(id, x, y, z, highlight, xindex, yindex) {
-                const width = (freezerWidth / 4) - 0.3
-                const height = 0.7 / 4
-                const depth = 1.8 / 5
-                const color = (highlight === true) ? new BABYLON.Color3(1, 0, 0) : new BABYLON.Color3(0, 1, 1)
-                const alpha = (highlight === true) ? 1 : 0.25
-                const elementProps = {
-                    name: id,
-                    width: width,
-                    height: height,
-                    depth: depth,
-                    x: x + ((freezerWidth / 4) - 0.2) / 2 + 0.1,
-                    y: y + 0.8 / 2 + 0.1,
-                    z: z + depth / 2,
-                    color: color,
-                    alpha: 1,
-                    visible: false
-                }
-                createElement(elementProps)
+            const createBox = function(id, xp, yp, zp, highlight, xindex, yindex) {
+                const x = xp + ((freezerWidth / 4) - 0.2) / 2 + 0.1
+                const y = yp + 0.8 / 2 + 0.1
+                const z = zp + boxSpec.dimensions.depth / 2
+                boxSpec.createElement(scene, id, x, y, z, false)
                 const boxObj = {
                     name: id,
                     children: [],
@@ -211,78 +278,64 @@
                 return boxObj
             }
 
-            const createRack = function(id, x, y, index) {
-                const width = (freezerWidth) / 4 - 0.2
-                const height = 0.8
-                const depth = 2
+            // todo: add zp
+            const createRack = function(id, xp, yp, index) {
+
+                const width = rackSpec.dimensions.width
+                const height = rackSpec.dimensions.height
+                const depth = rackSpec.dimensions.depth
+                const x = xp + rackSpec.dimensions.width / 2 + 0.1
+                const y = yp + height / 2
                 const z = -0.05
-                const color = new BABYLON.Color3(0, 1, 1)
-                const elementProps = {
-                    name: id,
-                    width: width,
-                    height: height,
-                    depth: depth,
-                    x: x + width / 2 + 0.1,
-                    y: y + height / 2,
-                    z: z,
-                    color: color,
-                    alpha: 0.25
-                }
-                createElement(elementProps)
-                const bx = x - 0.1
+                rackSpec.createElement(scene, id, x, y, z)
+
+                const bx = xp - 0.1
                 const zd = z + depth / -2
                 const rack = {
                     name: id,
                     type: 'freezer rack',
                     x: index + 1,
-                    color: color,
+                    color: {},
                     children: []
                 }
+
                 for (var row = 0; row < 4; row++) {
-                    var by = y + (row * height / 4) - (height / 2)
+                    var by = yp + (row * height / 4) - (height / 2)
                     for (var col = 0; col < 5; col++) {
                         const xindex = 5 - col
                         const yindex = 4 - row
                         var boxId = id + ".box" + xindex + "," + yindex
                         var bz = zd + col * depth / 5
                         var highlight = (Math.random() > 0.99) ? true : false
-                            //if (highlight === true) {
                         var boxObj = createBox(boxId, bx, by, bz, false, xindex, yindex)
                         rack.children.push(boxObj)
-                            //}
                     }
                 }
                 return rack
             }
 
-            const createShelf = function(id, x, y, index) {
-                const width = freezerWidth
-                const height = 0.1
-                const depth = 2.1
-                const color = new BABYLON.Color3(0, 0.75, 0.75)
-                const elementProps = {
-                    name: id,
-                    width: width,
-                    height: height,
-                    depth: depth,
-                    x: x,
-                    y: y + height / 2,
-                    z: 0,
-                    color: color,
-                    alpha:1.0
-                }
-                createElement(elementProps)
+            // todo: add zp
+            const createShelf = function(id, xp, yp, index) {
+
+                const width = shelfSpec.dimensions.width
+                const height = shelfSpec.dimensions.height
+                const depth = shelfSpec.dimensions.depth
+                const x = xp
+                const y = yp + height / 2
+                const z = 0
+                shelfSpec.createElement(scene, id, x, y, z)
+
                 const shelf = {
                     name: id,
                     type: 'shelf',
                     x: index,
-                    color: color,
+                    color: {},
                     alpha: 1,
                     children: []
                 }
                 for (var rack = 0; rack < 4; rack++) {
                     var rackId = id + ".rack" + rack
-                    var rackObj = createRack(rackId, x + (rack * freezerWidth / 4) - freezerWidth / 2, y + height, rack)
+                    var rackObj = createRack(rackId, xp + (rack * freezerWidth / 4) - freezerWidth / 2, yp + height, rack)
                     shelf.children.push(rackObj)
                 }
                 return shelf
@@ -325,11 +378,15 @@
                 const y = 0
                 const labObj = inventoryModel[0]
                 lab = {
-                        name: labObj.dbData.name,
-                        type: 'lab',
-                        children: []
-                    }
-                
+                    name: labObj.dbData.name,
+                    type: 'lab',
+                    children: []
+                }
+
+                boxSpec.initMaterials(scene)
+                rackSpec.initMaterials(scene)
+                shelfSpec.initMaterials(scene)
+
                 // find all physical freezer objects in inventoryModel
                 for (var freezer = 0; freezer < labObj.children.length; freezer++) {
                     const freezerData = labObj.children[freezer].dbData
