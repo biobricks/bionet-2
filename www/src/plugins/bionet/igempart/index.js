@@ -68,30 +68,30 @@ var igempart = {
             })
         })
 
+        // TODO why is this necessary? it seems to simply strip all but four properties but why is that important?
         partDataAccessor.reduceRoute('toPhysicalItem', (m, partData) => {
-            return {
-                name: partData.name,
-                virtual_id: partData.virtual_id,
-                cassetteid: partData.cassetteid,
-                locationid: partData.locationid
-            }
+            return {material: {
+                name: partData.material.name,
+                virtual_id: partData.material.virtual_id,
+                cassetteid: partData.material.cassetteid,
+                locationid: partData.material.locationid
+            }}
         })
 
+      // TODO why is this a route? should simply be a function call
         partDataAccessor.addRoute('storePhysical', (physicalData) => {
             console.log('partDataAccessor physicalData:', JSON.stringify(physicalData))
             const toast = app.getThemeMethod().toast
-            const doPrint = false
-            const labelImage = null
-            app.remote.savePhysical(physicalData, labelImage, doPrint, function (err, id) {
+            app.remote.savePhysical(physicalData.material, physicalData.labelImage, physicalData.doPrint, function (err, id) {
                 if (err) {
-                    toast('ERROR saving ' + physicalData.name + ' ' + err)
+                    toast('ERROR saving ' + physicalData.material.name + ' ' + err)
                     if (cb) cb(err)
                     return;
                 }
-                toast(physicalData.name + ' saved')
+                toast(physicalData.material.name + ' saved')
                 // TODO: messaging - async api
-                app.dispatch('bioPhysicalQuery', physicalData.virtual_id)
-                BIONET.signal.physicalUpdated.dispatch(physicalData)
+                app.dispatch('bioPhysicalQuery', physicalData.material.virtual_id)
+                BIONET.signal.physicalUpdated.dispatch(physicalData.material)
             })
         })
 

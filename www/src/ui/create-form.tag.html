@@ -575,7 +575,7 @@
                         saveList.push(dbData)
                         console.log('workbench: saving physical ', JSON.stringify(dbData))
                             // TODO: messaging async api call
-                        app.route('partDataAccessor', 'storePhysical', undefined, dbData)
+                        app.route('partDataAccessor', 'storePhysical', undefined, {material: dbData})
                     }
                 })
                 app.ui.toast('Workbench items have been moved to local inventory');

@@ -9,6 +9,7 @@
                 <bionet-container width="200" />
             </div>
 
+
             <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
             <!--
             <form-text-input label="Type" ref="type" name="type" value={formData.type}/>
@@ -16,11 +17,13 @@
             <form-text-input3 label="Parent Y" ref="locationid" name="parent_y" value={formData.parent_y}/>
             -->
 
+            <input type="hidden" ref="barcode" name="barcode" value={formData.barcode} />
+
             <div each={field in fields}>
                 <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
             </div>
 
-            <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">scan</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">create label</a>
+            <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">{formData.barcode ? 'rescan' : 'scan'}</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">{formData.label ? 'edit' : 'create'} label</a>
 
             <div style="margin-top:30px" />
             <form-text-input3 label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
@@ -85,8 +88,13 @@
         var savePhysical = function(p, labelImage) {
             var doPrint = labelImage ? true : false
             console.log('savePhysical, p=', JSON.stringify(p))
-                // TODO: messaging async api call
-            app.route('partDataAccessor', 'storePhysical', undefined, p)
+            // TODO: messaging async api call
+            // TODO why is this a route? should simply be a function call
+            app.route('partDataAccessor', 'storePhysical', undefined, {
+                material: p,
+                labelImage: labelImage,
+                doPrint: doPrint
+            })
         }
 
         /*
@@ -108,45 +116,48 @@
                             app.ui.toast("Warning: Invalid container");
                         } else {
                             formData.parent_id = m.id;
-                            this.update();
+                            tag.update();
                         }
-                        savePhysical(formData, this.labelImageData);
-                    }.bind(this))
+                        savePhysical(formData, tag.labelImageData);
+                    })
                     return;
                 }
             }
 
-            savePhysical(formData, this.labelImageData);
-        }.bind(this)
+            savePhysical(formData, tag.labelImageData);
+        }
 
         this.createLabel = function() {
             var tags = []
             var defaultLabelOpts = {
-                title: this.printNameDefault,
+                title: tag.refs.name.value,
                 bsl: 1
             }
+        console.log("------", tag.labelFormData);
             var labelOpts = {
                 title: "Create label",
                 subtitle: undefined,
                 subTag: "print", // the tag to mount
-                label: this.labelFormData || defaultLabelOpts,
+                label: tag.labelFormData || ((tag.formData && tag.formData.label) ? tag.formData.label : defaultLabelOpts),
                 cb: function(err, formData, imageData) {
-                    this.labelFormData = formData;
-                    this.labelImageData = imageData;
+                    console.log("######## CB", formData);
+                    tag.labelFormData = formData;
+                    tag.labelImageData = imageData;
                     $('#printModal').modal('close');
                     $('#createLabelButton').html('edit label');
                 }
             }
+        console.log('++++++', labelOpts.label);
             tags = riot.mount('#printModal', 'modal-content', labelOpts)
 
-            $(this.refs.printModal).modal({
+            $(tag.refs.printModal).modal({
                 complete: function() {
                     tags[0].unmount(true)
                 }
             })
-            $(this.refs.printModal).modal('open');
+            $(tag.refs.printModal).modal('open');
 
-        }.bind(this)
+        }
 
         this.scanItem = function() {
             console.log('scanItem')
@@ -157,21 +168,23 @@
                 subTag: "scan", // the tag to mount
                 cb: function(err, id) {
                     if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
-                    $(this.refs.curBarcode).val(id);
-                    $(this.refs.scanButton).html('rescan');
-                    $(this.refs.scanModal).closeModal();
+                    $(tag.refs.scanModal).modal('close');
+                    tag.formData.barcode = id;
+                    tag.update();
                     console.log('scan item cb, tags:', tags)
                     tags[0].unmount(true)
                 }
             }
             tags = riot.mount('#scanModal', 'modal-content', scanOpts)
 
-            $(this.refs.scanModal).openModal({
+            $(tag.refs.scanModal).modal({
                 complete: function() {
                     tags[0].unmount(true)
                 }
             })
-        }.bind(this)
+            $(tag.refs.scanModal).modal('open');
+            
+        }
 
         this.scanContainer = function() {
             console.log('scan container function')
@@ -187,22 +200,23 @@
                     app.remote.getBy('barcode', id, function(err, m) {
                         if (err) return app.ui.toast("Lookup failed. Item does not exist in database.");
 
-                        $(this.curContainerBarcode).val(m.id);
-                        $(this.containerScanButton).html('rescan container');
+                        $(tag.curContainerBarcode).val(m.id);
+                        $(tag.containerScanButton).html('rescan container');
                     })
 
-                    $(this.scanModal).closeModal();
+                    $(tag.scanModal).modal('close');
                     tags[0].unmount(true)
                 }
             }
             tags = riot.mount('#scanModal', 'modal-content', scanOpts)
 
-            $('#scanModal').openModal({
+            $('#scanModal').modal({
                 complete: function() {
                     tags[0].unmount(true)
                 }
             })
-        }.bind(this)
+            $('#scanModal').modal('open');
+        }
 
         function query(type, q, cb) {
 
@@ -212,73 +226,76 @@
             });
         }
         this.hideMatches = function(e) {
-            this.matches = null
-            this.selected = null
-            this.update()
-        }.bind(this)
+            tag.matches = null
+            tag.selected = null
+            tag.update()
+        }
 
         this.clickSelect = function(e) {
-            this.selectCurrent();
-        }.bind(this)
+            tag.selectCurrent();
+        }
 
         this.selected = null
         this.selectedType = null
 
         const getPhysicalResult = function(data) {
             console.log('getPhysicalResult', JSON.stringify(data))
-            this.formData = data
-            this.type = data.type
-
-            this.showPhysical = true
-            this.update()
+            tag.formData = data
+            tag.type = data.type
+            
+            tag.showPhysical = true
+            tag.update()
             document.body.scrollTop = document.documentElement.scrollTop = 0;
-        }.bind(this)
+        }
 
         this.on('mount', function() {
+
             console.log("create physical tag mount, opts:%s", JSON.stringify(opts))
 
             const getPhysicalResultBinding = BIONET.signal.getPhysicalResult.add(getPhysicalResult)
-            this.on('unmount', function() {
+            tag.on('unmount', function() {
                 getPhysicalResultBinding.detach()
             })
 
-            if (!this.formData) {
-                this.formData = {};
+            if (!tag.formData) {
+                tag.formData = {};
             }
 
             if (opts.query && opts.query.name && opts.query.name.trim()) {
-                this.formData.name = decodeURIComponent(opts.query.name);
-                //this.type = this.formData.name
+                tag.formData.name = decodeURIComponent(opts.query.name);
+                //tag.type = tag.formData.name
             }
 
-            this.update();
+            tag.update();
 
             // if we are editing
+        /*
             if (opts.physicalID) {
                 app.remote.get(opts.physicalID, function(err, data) {
                         if (err) {
                             app.error(err)
                             return
                         }
-                        this.formData = data
+                        tag.formData = data
                         tag.type = data.type
 
-                        this.printNameDefault = data.name;
-                        $(this.refs.createPhysicalHeader).html("Edit " + data.name)
-                        this.update()
+                        tag.printNameDefault = data.name;
+                        $(tag.refs.createPhysicalHeader).html("Edit " + data.name)
+                        tag.update()
 
 
-                    }.bind(this))
+                    })
                     //$('#createPhysicalForm').scrollTop(0)
                 return;
             }
-
+        */
             $('#selectVirtual').hide()
 
             if (opts.isVirtual) {
                 tag.isMaterial = true
             }
 
+/*
             if (opts.virtualID) {
                 // create new physical instance of this material
                 app.remote.get(opts.virtualID, function(err, virtual) {
@@ -286,18 +303,21 @@
                         app.ui.toast(err); // TODO handle better
                         return;
                     }
-                    this.formData.virtual_id = virtual.id;
-                    this.type = virtual.type
-                    this.formData.name = virtual.name;
-                    this.printNameDefault = this.refs.name.value.trim() || virtual.name
-                    $(this.refs.createPhysicalHeader).html("New " + virtual.name)
-                    this.update();
+                    tag.formData.virtual_id = virtual.id;
+                    tag.type = virtual.type
+                    tag.formData.name = virtual.name;
+                    tag.printNameDefault = tag.refs.name.value.trim() || virtual.name
+                    $(tag.refs.createPhysicalHeader).html("New " + virtual.name)
+                    tag.update();
 
-                }.bind(this));
+                });
                 return;
             }
+*/
 
+/*
             if (opts.type) {
+
                 app.remote.getType(opts.type, function(err, type) {
                     if (err) {
                         if (err.notFound) {
@@ -314,12 +334,13 @@
                         route('/create/' + encodeURIComponent(opts.type));
                         return;
                     }
-                    this.printNameDefault = this.refs.name.value.trim() || type.name
-                    $(this.refs.createPhysicalHeader).html("New " + type.name)
 
-                }.bind(this));
+                    tag.printNameDefault = tag.refs.name.value.trim() || type.name
+                    $(tag.refs.createPhysicalHeader).html("New " + type.name)
+
+                });
             }
-
+*/
             this.updateMatchListPosition = function() {
                 const matchlist = $('#matchlist')
                 try {
@@ -334,27 +355,27 @@
                 pos.width = $('#q').innerWidth();
                 $('#matchList').css(pos)
                 */
-            }.bind(this)
+            }
 
             $(window).resize(function() {
-                this.updateMatchListPosition();
-            }.bind(this))
+                tag.updateMatchListPosition();
+            })
 
             this.setSelectedType = function(type) {
                 if (!type) {
-                    this.selectedType = null
+                    tag.selectedType = null
                     $('#selectedTypeContainer').css('display', 'none')
                 } else {
-                    this.selectedType = type
+                    tag.selectedType = type
                     $('#selectedTypeLabel').text(type.name)
                     $('#selectedTypeContainer').css('display', 'block')
                 }
-                this.updateMatchListPosition()
-            }.bind(this)
+                tag.updateMatchListPosition()
+            }
 
             this.selectCurrent = function() {
-                var sel = this.matches[this.selected]
-                this.refs.q.value = sel.name
+                var sel = tag.matches[tag.selected]
+                tag.refs.q.value = sel.name
                 tag.formData.parent_name = sel.name
                 app.remote.getBy('name', formData.parent_name, function(err, m) {
                     if (err) return app.ui.toast("Error:" + err);
@@ -364,48 +385,48 @@
                         tag.formData.parent_id = m.id;
                         tag.update();
                     }
-                }.bind(this))
-                this.hideMatches()
-            }.bind(this)
+                })
+                tag.hideMatches()
+            }
 
             $('#q').keydown(function(e) {
 
                 if (e.keyCode === 38) { // up arrow
                     e.preventDefault()
-                    if (this.selected !== null && this.selected > 0) this.selected--
-                        this.update();
+                    if (tag.selected !== null && tag.selected > 0) tag.selected--
+                        tag.update();
                 } else if (e.keyCode === 40) { // down arrow
                     e.preventDefault()
-                    if (this.selected === null) this.selected = 0
-                    else if (this.selected < this.matches.length - 1) this.selected++
-                        this.update();
+                    if (tag.selected === null) tag.selected = 0
+                    else if (tag.selected < tag.matches.length - 1) tag.selected++
+                        tag.update();
                 } else if (e.keyCode === 27) { // escape
-                    this.hideMatches()
+                    tag.hideMatches()
                 } else if (e.keyCode === 9 || e.keyCode === 13) { // tab or enter
-                    if (this.selected === null) return // normal operation if nothing selected
+                    if (tag.selected === null) return // normal operation if nothing selected
                     e.preventDefault();
-                    this.selectCurrent()
+                    tag.selectCurrent()
                 } else {
-                    hadQueryBeforeKeydown = !!this.refs.q.value.replace(/\s+/g, '')
+                    hadQueryBeforeKeydown = !!tag.refs.q.value.replace(/\s+/g, '')
                 }
 
-            }.bind(this));
+            });
 
             $('#q').on('input', function(e) {
 
-                this.matches = [];
+                tag.matches = [];
 
-                var q = this.refs.q.value.trim();
+                var q = tag.refs.q.value.trim();
 
-                query(this.selectedType, q, function(err, results) {
+                query(tag.selectedType, q, function(err, results) {
                     if (err) return app.ui.toast(err); // TODO better error handling
 
                     if (!q) {
-                        this.matches = null;
+                        tag.matches = null;
                     } else {
                         var i;
                         for (i = 0; i < results.types.length; i++) {
-                            this.matches.push({
+                            tag.matches.push({
                                 pre: "type",
                                 name: results.types[i].name,
                                 extraClass: 'type',
@@ -413,23 +434,23 @@
                             });
                         }
                         for (i = 0; i < results.virtuals.length; i++) {
-                            this.matches.push({
+                            tag.matches.push({
                                 pre: "virtual",
                                 name: results.virtuals[i].name
                             });
                         }
                     }
-                    if (this.matches && this.matches.length) {
-                        this.selected = 0;
+                    if (tag.matches && tag.matches.length) {
+                        tag.selected = 0;
                     } else {
-                        this.selected = null
+                        tag.selected = null
                     }
-                    this.update()
+                    tag.update()
 
-                }.bind(this))
-            }.bind(this))
+                })
+            })
             
-        }.bind(this));
+        });
 
     </script>
 </create-physical>

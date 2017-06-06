@@ -1,7 +1,8 @@
 <print>
-    <div class="print">
+    <div class="print modal-content">
         <canvas id="labelPreview" class="labelPreview tab" width="560" height="174"></canvas>
         <form id="createLabelForm" ref="createLabelForm" name="createLabelForm" class="col s12" onsubmit={submitForm}>
+            <input type="hidden" name="humanID" value={labelFormData.humanID || '?'} />
             <form-text-input label="Title" name="title" value={labelFormData.title} />
             <form-textarea-input label="Additional text" name="text" value={labelFormData.text} />
             <form-text-input label="Storage temperature" name="temperature" value={labelFormData.temperature} />
@@ -20,10 +21,14 @@
         var labelMaker;
 
         var modalCallback;
+        var tag = this;
 
         // get a unique human-readable ID for the label if it doesn't have one
         function finalizeLabel(cb) {
-            if (this.humanID) {
+            var humanID = tag.refs.createLabelForm.humanID.value;
+            if(humanID === '?') humanID = '';
+
+            if (humanID) {
                 process.nextTick(function() {
                     cb(null, humanID);
                 })
@@ -38,32 +43,32 @@
                     app.ui.toast("Error creating physical: " + err); // TODO handle error
                     return cb(err);
                 }
-                this.humanID = humanID
-                updateLabel(this, function() {
+                tag.refs.createLabelForm.humanID.value = humanID
+                updateLabel(function() {
                     cb(null, humanID);
                 });
-            }.bind(this))
+            })
         }
 
-        function updateLabel(self, cb) {
+        function updateLabel(cb) {
             cb = cb || function() {}
 
             var pre = ""
-            pre += "ID: " + (self.humanID || '?') + "\n";
-            pre += $(self.refs.createLabelForm.title).val() + "\n";
+            pre += "ID: " + (tag.refs.createLabelForm.humanID.value || '?') + "\n";
+            pre += ($(tag.refs.createLabelForm.title).val() || tag.labelFormData.title) + "\n";
 
-            var txt = $(self.refs.createLabelForm.text).val()
-            var temperature = $(self.refs.createLabelForm.temperature).val()
+            var txt = $(tag.refs.createLabelForm.text).val() || tag.labelFormData.text || ''
+            var temperature = $(tag.refs.createLabelForm.temperature).val() || tag.labelFormData.temperature || ''
 
             var o = {
                 temperature: temperature,
-                bsl: self.labelFormData.bsl || 0
+                bsl: tag.labelFormData.bsl || 0
             };
 
             if (o.bsl > 1) {
                 o.biohazard = true;
             }
-            labelMaker.drawLabel('labelPreview', settings.baseUrl + "/p/" + self.humanID, pre + txt, o, cb);
+            labelMaker.drawLabel('labelPreview', settings.baseUrl + "/p/" + tag.refs.createLabelForm.humanID.value, pre + txt, o, cb);
         }
 
         this.submitForm = function(e) {
@@ -72,17 +77,19 @@
             finalizeLabel(function(err, humanID) {
                 if (err) return;
                 var labelFormData = $.formToObject('createLabelForm');
-                labelFormData.humanID = this.humanID
-                labelFormData.bsl = this.labelFormData.bsl
+                labelFormData.humanID = humanID
+                labelFormData.bsl = tag.labelFormData.bsl
                 var imageData = labelMaker.getDataURL();
                 modalCallback(null, labelFormData, imageData);
             });
-        }.bind(this);
+        };
 
         this.labelFormData = this.opts.label || {}
+
         this.on('mount', function() {
 
-            modalCallback = this.opts.cb
+
+            modalCallback = tag.opts.cb
 
             labelMaker = new LabelMaker({
                 symbolPath: settings.symbolPath,
@@ -91,27 +98,29 @@
                 }
             });
 
-            // if this isn't in a settimeout it doesn't work :/
+            // TODO if this isn't in a settimeout it doesn't work :/ why?
             setTimeout(function() {
-                $(this.refs.createLabelForm.text).focus()
-            }.bind(this), 1)
+                $(tag.refs.createLabelForm.text).focus()
+            }, 1)
 
-            $(this.refs.createLabelForm.title).on('input', function(e) {
-                updateLabel(this)
-            }.bind(this))
+            $(tag.refs.createLabelForm.title).on('input', function(e) {
+                updateLabel()
+            })
 
-            $(this.refs.createLabelForm.text).on('input', function(e) {
-                updateLabel(this)
-            }.bind(this))
+            $(tag.refs.createLabelForm.text).on('input', function(e) {
+                updateLabel()
+            })
 
-            $(this.refs.createLabelForm.temperature).on('input', function(e) {
-                updateLabel(this)
-            }.bind(this))
+            $(tag.refs.createLabelForm.temperature).on('input', function(e) {
+                updateLabel()
+            })
 
             waitForFontLoad(['FiraSans-Regular', 'FiraSans-Bold', 'FiraSans-Bold'], function() {
-                updateLabel(this)
-            }.bind(this));
-        }.bind(this));
+                updateLabel()
+            });
+         
+            
+        });
 
     </script>
 </print>

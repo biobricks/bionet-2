@@ -364,7 +364,7 @@
             partData.cassetteid = tag.refs.cassette.value
             console.log('part-instance tag submit:', JSON.stringify(partData))
             // TODO: messaging async api call
-            app.route('partDataAccessor', 'storePhysical', 'toPhysicalItem', partData)
+            app.route('partDataAccessor', 'storePhysical', 'toPhysicalItem', {material: partData})
         }
 
         app.addRouteDestination('searchResult', 'updateList', function(itemList) {
