@@ -146,7 +146,7 @@
                     },
                     configure: function(msg) {
                         //todo: this may be invoked before resources have loaded
-                        const id = msg
+                        const id = msgdata
                         console.log('bionetStorageLocation tag configure function, id=', id)
                         app.remote.getLocationPath(id, function(err, locationPath) {
                             if (err) {
@@ -183,7 +183,7 @@
                         bionetLabLayout.connectCells()
                     }
                 }
-                pixiMsgHandler[cmd](msgdata);
+                if (pixiMsgHandler[cmd] !== undefined) pixiMsgHandler[cmd](msgdata);
             }
             // setup listener for pixi events
             var eventBinding = pixiController.add(onPixiEvent)

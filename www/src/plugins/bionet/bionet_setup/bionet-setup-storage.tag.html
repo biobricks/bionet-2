@@ -210,6 +210,8 @@
         const requestStorageResult = function(storageData) {
             //console.log('initializing storage:', JSON.stringify(storageData))
             const ftree = $("#ftree").fancytree("getTree");
+            const bionetStorageLocation = app.getStream('bionetStorageLocation')
+            bionetStorageLocation.dispatch('setupModel', storageData)
             ftree.reload(storageData).then(function() {
                 $('.inventory-tree').css({
                     height: $(window).innerHeight() - $('#appbar').height() - 15
@@ -226,7 +228,6 @@
 
                     BIONET.signal.getPhysical.dispatch(dbData.id)
 
-                    const bionetStorageLocation = app.getStream('bionetStorageLocation')
                     bionetStorageLocation.dispatch('configure', dbData.id)
 
                     if (dbData.type.indexOf('box') >= 0) {

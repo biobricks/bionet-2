@@ -220,7 +220,7 @@
                         bionetLabLayout.connectCells()
                     }
                 }
-                pixiMsgHandler[cmd](msgdata);
+                if (pixiMsgHandler[cmd] !== undefined) pixiMsgHandler[cmd](msgdata);
             }
             // setup listener for pixi events
             var eventBinding = pixiController.add(onPixiEvent)
