@@ -65,10 +65,9 @@
 
             cart.addRoute('cartResult', function(data) {
                     //console.log('cart tag, result:', JSON.stringify(data))
-                    const path = (data.path.indexOf('_workbench-') >= 0) ? 'workbench' : '';
                     const item = {
                         primary_text: data.physical.name,
-                        secondary_text: path,
+                        secondary_text: '',
                         id: data.physical.id,
                         iconClick: deleteCartItem,
                         starred: true,
