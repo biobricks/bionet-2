@@ -13,12 +13,9 @@ body {
     padding: 0;
     margin: 0;
 }
-
-
 #content {
-  margin-top: 100px;
+    margin-top: 100px;
 }
-
 nav ul a,
 nav .brand-logo {
     color: #444;
@@ -113,6 +110,39 @@ footer.page-footer {
         font-size: 1.6vw;
     }
 }
+.fancytree-title {
+    font-family: 'Roboto';
+}
+
+ul.fancytree-container {
+    font-family: 'Roboto';
+    font-size: 10pt;
+    white-space: nowrap;
+}
+.fancytree-title {
+    margin-top: 0;
+    padding-left: 32px;
+}
+@media (max-width:600px) {
+    .fancytree-title {
+        font-size: 8px;
+    }
+}
+@media (min-width:601px) {
+    .fancytree-title {
+        font-size: 10px;
+    }
+}
+@media (min-width:900px) {
+    .fancytree-title {
+        font-size: 12px;
+    }
+}
+@media (min-width:1200px) {
+    .fancytree-title {
+        font-size: 16px;
+    }
+}
 .collection .collection-item.avatar2 {
     padding-left: 72px;
     position: relative;
@@ -169,6 +199,7 @@ NotoColorEmoji
 src: url('../fonts/emojione/EmojiOneColor-SVGinOT.ttf');
     src: url('../fonts/emojione/NotoColorEmoji.ttf');
 */
+
 @font-face {
     font-family: 'Noto Color Emoji';
     src: url('../fonts/emojione/EmojiOneColor-SVGinOT.ttf');
