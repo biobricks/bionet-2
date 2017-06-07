@@ -27,7 +27,7 @@ var argv = minimist(process.argv.slice(2), {
     }
 });
 
-var settings = require(argv.settings);
+var settings = require(argv.settings)(argv);
 
 function usage(err) {
   var f;
@@ -94,6 +94,7 @@ if(cmd === 'help') {
 
 var db = multilevel.client();
 var con = net.connect(settings.dbPort);
+
 con.on('error', function(err) {
   if(argv.online) {
     console.error("Error: bionet app appears to be offline");

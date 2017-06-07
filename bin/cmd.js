@@ -8,7 +8,6 @@ var router = require('routes')(); // server side router
 var websocket = require('websocket-stream');
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 var auth = require('rpc-multiauth'); // auth
-var multilevel = require('multileveldown'); // share one leveldb between processes
 var accountdown = require('accountdown'); // user/login management
 var uuid = require('uuid').v4;
 var through = require('through2');
