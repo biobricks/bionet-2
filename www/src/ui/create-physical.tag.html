@@ -23,12 +23,12 @@
                 <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
             </div>
 
-            <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">{formData.barcode ? 'rescan' : 'scan'}</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">{formData.label ? 'edit' : 'create'} label</a>
+            <a id="scanButton" ref="scanButton" class="waves-effect waves-light btn" onclick={scanItem} style="margin-right:10px">{formData.barcode ? 'rescan tube' : 'scan tube'}</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect waves-light btn" onclick={createLabel} style="margin-left:10px">{formData.label ? 'edit' : 'create'} label</a>
 
             <div style="margin-top:30px" />
-            <form-text-input3 label="Container ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
+            <form-text-input3 label="Parent ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
 
-            <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan container</a>
+            <a id="containerScanButton" class="waves-effect waves-light btn" onclick={scanContainer} style="margin-right:10px">scan parent container</a>
             <div id="autocomplete-container">
                 <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name" />
             </div>
@@ -166,10 +166,13 @@
                 title: "Scan",
                 subtitle: "Scan the item's barcode",
                 subTag: "scan", // the tag to mount
-                cb: function(err, id) {
-                    if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
+                cb: function(err, m, barcode) {
                     $(tag.refs.scanModal).modal('close');
-                    tag.formData.barcode = id;
+                    if(err) return app.ui.toast("Scan failed: " + err); // TODO handle error
+                    if(!barcode) return app.ui.toast("You cannot associate an existing QR code label with a new object")
+                    app.ui.toast("Scanned barcode: " + barcode);
+
+                    tag.formData.barcode = barcode;
                     tag.update();
                     console.log('scan item cb, tags:', tags)
                     tags[0].unmount(true)
@@ -190,26 +193,23 @@
             console.log('scan container function')
             var tags = []
             var scanOpts = {
-                title: "Scan location",
+                title: "Scan parent",
                 subtitle: "Scan the barcode of e.g. the box or freezer where you put this item",
                 subTag: "scan",
-                cb: function(err, id) {
-                    if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
-
+                cb: function(err, m, barcode) {
                     $('#scanModal').modal('close');
+                    if(err) return app.ui.toast("Scan failed: " + err);
+                    if(barcode) return app.ui.toast("Cryotubes cannot contain other containers");
+        
+                    if(m.id === tag.formData.id) {
+                      return app.ui.toast("Error: An item cannot contain itself.");
+                    }
+                    app.ui.toast("Assigned parent: " + m.name);
 
-                    app.remote.getBy('barcode', id, function(err, m) {
-                        if(err || !m) return app.ui.toast("Lookup failed. Item does not exist in database.");
-
-                        if(m.id === tag.formData.id) {
-                          return app.ui.toast("Error: An item cannot contain itself."); 
-                        }
-
-                        tag.formData.parent_id = m.id
-                        tag.update()
-                        $(tag.curContainerBarcode).val(m.id);
-                        $(tag.containerScanButton).html('rescan container');
-                    })
+                    tag.formData.parent_id = m.id
+                    tag.update()
+                    $(tag.curContainerBarcode).val(m.id);
+                    $(tag.containerScanButton).html('rescan parent container');
 
                     tags[0].unmount(true)
                 }
