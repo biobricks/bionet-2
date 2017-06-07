@@ -171,13 +171,12 @@ function main() {
       subCmd = 'list';
     }
 
-    db.on('open', function() {
-      var userDB = sublevel(db, 'accountdown', { valueEncoding: 'json' });
+      var userDB = sublevel(db, 'u', { valueEncoding: 'json' });
 
       var users = accountdown(userDB, {
         login: { basic: require('accountdown-basic') }
       });
-      
+
       count = 0;
       if(subCmd.match(/^l/)) {
         var s = users.list();
@@ -187,13 +186,13 @@ function main() {
           count++;
         }, function() {
           console.log("Listed", count, "users");
+          process.exit(0);
         }));
 
       } else {
         usage("Invalid user command");
       }
 
-    });
 
   } else {
     usage("Invalid command");
