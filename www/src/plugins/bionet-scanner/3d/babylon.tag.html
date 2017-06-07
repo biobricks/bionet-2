@@ -22,7 +22,7 @@
         const tag = this
         const pixiController = app.getStream('bionetStorageLocation')
         tag.engine = {}
-        var scene = {}
+        var scene = null
 
         const bionetLabLayout = require('../bionetLabLayout')
         bionetLabLayout.initializeTypes()
@@ -30,6 +30,10 @@
 
         const runRenderLoop = function() {
             $('#render-canvas').show()
+            $('#babylon-container').css({
+                height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-layout').height() - 50
+            });
+
             tag.engine.runRenderLoop(function() {
                 //scene.activeCamera.alpha += .01;
                 scene.render();
@@ -42,12 +46,13 @@
 
         tag.active = false
         const activate3d = function(activeState) {
+            console.log('activate3d:', activeState)
             if (activeState) runRenderLoop()
             else pauseRenderLoop()
             tag.active = activeState
             tag.update()
         }
-        BIONET.signal.activate3D.add(activate3d)
+        const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
 
         const StorageSpec = function(type, materialSpec, dimensions, defaultVisibility) {
             this.type = (type !== undefined) ? type : 'notype'
@@ -179,6 +184,12 @@
             depth: 2.1
         })
 
+        this.on('unmount', function() {
+            scene = null
+            pauseRenderLoop()
+            activate3DBinding.detach()
+        })
+
         this.on('mount', function() {
 
             const canvas = document.getElementById('render-canvas');
@@ -188,6 +199,7 @@
             var highlightPathObj = []
 
             const moveCameraToElement = function(name) {
+                if (scene === null || scene === undefined) return
                 const targetObj = scene.getMeshByName(name);
                 if (!targetObj) return
                 var x = targetObj.position.x
@@ -199,6 +211,7 @@
             }
 
             const setupLocationPath = function(locationPath) {
+                if (scene === null || scene === undefined) return
                 var id = ''
                 unhighlightPath()
                 highlightPathObj = []
@@ -231,14 +244,11 @@
                 }
                 console.log('setupLocationPath id:', id)
                 moveCameraToElement(id)
-                if (BIONET.state.toggle3d) runRenderLoop()
-                else pauseRenderLoop()
+                    /*
+                    if (BIONET.state.toggle3d) runRenderLoop()
+                    else pauseRenderLoop()
+                    */
                 return
-
-
-                if (BIONET.state.toggle3d) runRenderLoop()
-                else pauseRenderLoop()
-
             }
 
             const typeSpecs = {
@@ -254,6 +264,7 @@
             }
 
             const unhighlightPath = function() {
+                if (scene === null || scene === undefined) return
                 for (var i = 0; i < highlightPathObj.length; i++) {
                     var element = highlightPathObj[i]
                     const typeSpec = typeSpecs[element.type]
@@ -360,6 +371,7 @@
 
             const createScene = function(inventoryModel) {
                 // create a basic BJS Scene object
+                //if (scene !== null) return
                 scene = new BABYLON.Scene(engine);
 
                 // create a FreeCamera, and set its position
@@ -395,9 +407,9 @@
                     var freezerId = freezerData.name
 
                     const freezerLayout = labLayout[freezerData.parent_x]
-                    if (freezerLayout===undefined) continue
-                    const x = (40-freezerLayout.y / 15)
-                    const z = (80-freezerLayout.x / 15)
+                    if (freezerLayout === undefined) continue
+                    const x = (40 - freezerLayout.y / 15)
+                    const z = (80 - freezerLayout.x / 15)
                         //var freezerObj = createFreezer(freezerId, freezer * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, z, freezer)
                     var freezerObj = createFreezer(freezerId, x, y, z, freezer)
                     lab.children.push(freezerObj)
@@ -512,6 +524,13 @@
             window.addEventListener('resize', function() {
                 engine.resize();
             });
+            
+            $('#render-canvas').click( function() {
+                $('html').scrollTop(0)
+            })
+            
+            $('#render-canvas').hide()
+
         })
 
     </script>

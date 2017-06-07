@@ -2,7 +2,7 @@
     <div class="inventory-height">
         <div class="row">
             <div id="treeview" class="inventory-tree col s4">
-                <table id="ftree" style="margin-top:15px; margin-left:65px; border:none !important;width:80%">
+                <table id="ftree" style="margin-top:15px; margin-left:65px; border:none !important; width:80%; height:95%">
                     <colgroup>
                         <col></col>
                         <col></col>
@@ -63,7 +63,7 @@
         .inventory-tree {
             float: left;
             margin-left: 65px;
-            overflow-y: auto;
+            overflow-y: scroll;
             overflow-x: hidden;
             display: block;
         }
@@ -71,6 +71,7 @@
         .physical-view {
             overflow-y: auto;
             overflow-x: hidden;
+            height: 100%;
         }
         
         .edit-physical {
@@ -214,8 +215,10 @@
             const bionetStorageLocation = app.getStream('bionetStorageLocation')
             bionetStorageLocation.dispatch('setupModel', storageData)
             ftree.reload(storageData).then(function() {
+                /*
+                 */
                 $('.inventory-tree').css({
-                    height: $(window).innerHeight() - $('#appbar').height() - 15
+                    height: $(window).innerHeight() - $('#appbar').height() - 25
                 });
                 //tag.pixiwidth = $('#ftree').width() - 40
 
@@ -422,7 +425,9 @@
                             const movedNode = data.otherNode.data.dbData
                             movedNode.parent_id = parentId
                                 // TODO: messaging async api call
-                            app.route('partDataAccessor', 'storePhysical', undefined, {material: movedNode})
+                            app.route('partDataAccessor', 'storePhysical', undefined, {
+                                material: movedNode
+                            })
                             console.log('drag other node other:%s node:%s', movedNode.name, node.data.dbData.name)
 
                         } else if (data.otherNodeData) {
@@ -451,10 +456,10 @@
 
             $("#ftree").on('click dblclick keydown', function(e) {
                 $('.edit-physical').css({
-                    height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-layout').height() - 45
+                    height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-layout').height() - 50
                 });
                 $('#physical-props-view').css({
-                    height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 45
+                    height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 50
                 });
                 if (e.type === 'keydown') {
                     if (e.which !== undefined && e.which !== 13) return
@@ -506,10 +511,20 @@
             }
             const physicalUpdatedBinding = BIONET.signal.physicalUpdated.add(physicalUpdated)
 
+            const activate3d = function(activeState) {
+                if (activeState) {
+                    $('physical-props-view').hide()
+                } else {
+                    $('physical-props-view').show()
+                }
+            }
+            const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
+
             this.on('unmount', function() {
                 physicalUpdatedBinding.detach()
                 createStorageItemResultBinding.detach()
                 requestStorageResultBinding.detach()
+                activate3DBinding.detach()
                 $('html').css({
                     overflow: 'auto'
                 })
