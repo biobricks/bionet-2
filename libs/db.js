@@ -242,6 +242,7 @@ module.exports = function(settings, users, acccounts) {
           if(!doPrint) return cb(null, id);
 
           var relativePath = path.relative(settings.labDevice.labelImageFilePath, imagePath);
+
           labDeviceServer.printLabel(relativePath);
           console.log("relative path:", relativePath);
           cb(null, id);
