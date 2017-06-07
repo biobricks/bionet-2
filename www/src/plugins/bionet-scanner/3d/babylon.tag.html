@@ -47,6 +47,7 @@
         }
 
         tag.active = false
+        const scalingFactor = 2
 
         const StorageSpec = function(type, materialSpec, dimensions, defaultVisibility) {
             this.type = (type !== undefined) ? type : 'notype'
@@ -80,7 +81,7 @@
                 depth: 1
             }
             this.dimensions = (dimensions !== undefined) ? dimensions : defaultDimensions
-            this.scalingFactor = 3
+            this.scalingFactor = scalingFactor
 
             this.defaultVisibility = (defaultVisibility !== undefined) ? defaultVisibility : true
         }
@@ -140,7 +141,6 @@
             element.material = this.materials.selected.m;
             element.visibility = true
         }
-        const scalingFactor = 3
 
         const boxSpec = new StorageSpec('box', {
             highlighted: {
@@ -148,7 +148,7 @@
                 alpha: 1
             }
         }, {
-            width: (scalingFactor / 4) - 0.3,
+            width: (scalingFactor / 4) - 0.1,
             height: 0.7 / 4,
             depth: 1.8 / 5
         }, false)
@@ -159,7 +159,7 @@
                 alpha: 0.5
             }
         }, {
-            width: (scalingFactor) / 4 - 0.2,
+            width: (scalingFactor) / 4 - 0.1,
             height: 0.8,
             depth: 2
         })
@@ -176,7 +176,7 @@
         }, {
             width: scalingFactor,
             height: 0.1,
-            depth: 2.1
+            depth: 1.8
         })
 
         const freezerSpec = new StorageSpec('freezer', {
@@ -284,11 +284,9 @@
                 }
             }
 
-            const freezerWidth = 3
-
             const createBox = function(id, xp, yp, zp, highlight, parent) {
                 const x = xp + (-0.2) / 2 + 0.1
-                    //const x = xp + ((freezerWidth / 4) - 0.2) / 2 + 0.1
+                    //const x = xp + ((scalingFactor / 4) - 0.2) / 2 + 0.1
                     //const y = yp + 0.8 / 2 + 0.1
                 const y = yp + 0.1
                 const z = zp + boxSpec.dimensions.depth / 2
@@ -371,8 +369,8 @@
                 }
                 for (var rack = 0; rack < 4; rack++) {
                     var rackId = id + ".rack" + rack
-                        //var rackObj = createRack(rackId, xp + (rack * freezerWidth / 4) - freezerWidth / 2, yp + height, z, rack)
-                    var rackObj = createRack(rackId, (rack * freezerWidth / 4) - freezerWidth / 2, height, 0, shelfElement)
+                        //var rackObj = createRack(rackId, xp + (rack * scalingFactor / 4) - scalingFactor / 2, yp + height, z, rack)
+                    var rackObj = createRack(rackId, (rack * scalingFactor / 4) - scalingFactor / 2, height, 0, shelfElement)
                     shelf.children.push(rackObj)
                 }
                 return shelf
@@ -450,7 +448,7 @@
                     if (freezerLayout === undefined) continue
                     const x = (40 - freezerLayout.y / 15)
                     const z = (80 - freezerLayout.x / 15)
-                        //var freezerObj = createFreezer(freezerId, freezer * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, z, freezer)
+                        //var freezerObj = createFreezer(freezerId, freezer * (scalingFactor + 0.5) - (1.5 * (scalingFactor + 0.5)), y, z, freezer)
                     var freezerObj = createFreezer(freezerId, x, y, z, index)
                     lab.children.push(freezerObj)
                 }
