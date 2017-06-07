@@ -122,21 +122,21 @@
 
         StorageSpec.prototype.defaultMaterial = function(scene, name) {
             const element = scene.getMeshByName(name);
-            if (element === undefined) return
+            if (element === undefined || element === null) return
             element.material = this.materials.default.m;
             element.visibility = this.defaultVisibility
         }
 
         StorageSpec.prototype.highlight = function(scene, name) {
             const element = scene.getMeshByName(name);
-            if (element === undefined) return
+            if (element === undefined || element === null) return
             element.material = this.materials.highlighted.m;
             element.visibility = true
         }
 
         StorageSpec.prototype.select = function(scene, name) {
             const element = scene.getMeshByName(name);
-            if (element === undefined) return
+            if (element === undefined || element === null) return
             element.material = this.materials.selected.m;
             element.visibility = true
         }
@@ -191,9 +191,11 @@
                 const targetObj = scene.getMeshByName(name);
                 if (!targetObj) return
                 var x = targetObj.position.x
-                var y = Math.max(targetObj.position.y - 1, 1)
+                var y = Math.max(targetObj.position.y - 1, 4)
+                    //var z = Math.max(targetObj.position.z + 2, -1)
+                var z = targetObj.position.z + 1
                 y = Math.min(y, 2)
-                moveCamera(null, x, y)
+                moveCamera(null, x, y, z)
             }
 
             const setupLocationPath = function(locationPath) {
@@ -278,15 +280,14 @@
                 return boxObj
             }
 
-            // todo: add zp
-            const createRack = function(id, xp, yp, index) {
+            const createRack = function(id, xp, yp, zp, index) {
 
                 const width = rackSpec.dimensions.width
                 const height = rackSpec.dimensions.height
                 const depth = rackSpec.dimensions.depth
                 const x = xp + rackSpec.dimensions.width / 2 + 0.1
                 const y = yp + height / 2
-                const z = -0.05
+                const z = zp + -0.05
                 rackSpec.createElement(scene, id, x, y, z)
 
                 const bx = xp - 0.1
@@ -314,15 +315,14 @@
                 return rack
             }
 
-            // todo: add zp
-            const createShelf = function(id, xp, yp, index) {
+            const createShelf = function(id, xp, yp, zp, index) {
 
                 const width = shelfSpec.dimensions.width
                 const height = shelfSpec.dimensions.height
                 const depth = shelfSpec.dimensions.depth
                 const x = xp
                 const y = yp + height / 2
-                const z = 0
+                const z = zp
                 shelfSpec.createElement(scene, id, x, y, z)
 
                 const shelf = {
@@ -335,13 +335,13 @@
                 }
                 for (var rack = 0; rack < 4; rack++) {
                     var rackId = id + ".rack" + rack
-                    var rackObj = createRack(rackId, xp + (rack * freezerWidth / 4) - freezerWidth / 2, yp + height, rack)
+                    var rackObj = createRack(rackId, xp + (rack * freezerWidth / 4) - freezerWidth / 2, yp + height, z, rack)
                     shelf.children.push(rackObj)
                 }
                 return shelf
             }
 
-            const createFreezer = function(id, x, y, index) {
+            const createFreezer = function(id, x, y, z, index) {
 
                 const freezer = {
                     name: id,
@@ -352,7 +352,7 @@
                 for (var shelf = 0; shelf < 5; shelf++) {
                     sid = 5 - shelf
                     var shelfId = id + ".shelf" + sid
-                    var shelfObj = createShelf(shelfId, x, shelf + y, sid)
+                    var shelfObj = createShelf(shelfId, x, shelf + y, z, sid)
                     freezer.children.push(shelfObj)
                 }
                 return freezer
@@ -364,7 +364,7 @@
 
                 // create a FreeCamera, and set its position
                 //var camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 4, -9), scene);
-                var camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", 0, 0, 0, new BABYLON.Vector3(0, 4, -9), scene);
+                var camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", Math.PI/2, Math.PI/2, 1, new BABYLON.Vector3(0, 5, -9), scene);
 
                 // target the camera to scene origin
                 camera.setTarget(new BABYLON.Vector3(0, 2, 0));
@@ -387,16 +387,24 @@
                 rackSpec.initMaterials(scene)
                 shelfSpec.initMaterials(scene)
 
+                const appSettings = BIONET.getAppSettings()
+                const labLayout = appSettings.labLayout
+
                 // find all physical freezer objects in inventoryModel
                 for (var freezer = 0; freezer < labObj.children.length; freezer++) {
                     const freezerData = labObj.children[freezer].dbData
                     var freezerId = freezerData.name
-                    var freezerObj = createFreezer(freezerId, freezer * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, freezer)
+
+                    const freezerLayout = labLayout[freezerData.parent_x]
+                    const x = freezerLayout.y / 15 - 40
+                    const z = freezerLayout.x / 15 - 90
+                        //var freezerObj = createFreezer(freezerId, freezer * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, z, freezer)
+                    var freezerObj = createFreezer(freezerId, x, y, z, freezer)
                     lab.children.push(freezerObj)
                 }
 
                 // create a built-in "ground" shape; its constructor takes 5 params: name, width, height, subdivisions and scene
-                var ground = BABYLON.Mesh.CreateGround('ground1', 4.5 * 4 + 2, 6, 2, scene);
+                var ground = BABYLON.Mesh.CreateGround('ground1', 80, 80, 2, scene);
                 var materialGround = new BABYLON.StandardMaterial("groundTexture", scene);
                 materialGround.alpha = 1;
                 materialGround.diffuseColor = new BABYLON.Color3(0.75, 0.75, 0.75);
@@ -409,7 +417,7 @@
                 return scene;
             }
 
-            const moveCamera = function(callback, dx, dy) {
+            const moveCamera = function(callback, dx, dy, dz) {
                 console.log('move camera ', dx, dy)
                 var translatex = new BABYLON.Animation("camTranslatex", "target.x", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
                 var keysx = [{
@@ -439,10 +447,11 @@
                     value: scene.activeCamera.target.z
                 }, {
                     frame: 100,
-                    value: 1.5
+                    value: dz
                 }];
                 translatez.setKeys(keysz);
                 scene.activeCamera.animations.push(translatez);
+
                 scene.beginAnimation(scene.activeCamera, 0, 100, false, 5.0, callback);
             }
 
