@@ -428,8 +428,9 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
       var s = db.bio.createReadStream({valueEncoding: 'json'});
       var found = false;
       var out = s.pipe(through.obj(function(data, enc, next) {
-        if(!data || !data.value || !data.value.label) return next()
-        if(data.value.label.humanID == humanID) {
+        if(!data || !data.value) return next()
+        console.log(data.value.label);
+        if(data.value.humanID == humanID) {
           found = true;
           cb(null, data.value);
         } else {

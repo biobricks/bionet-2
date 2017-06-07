@@ -62,17 +62,26 @@ route('/scan', function () {
 })
 
 
-route('/p/*', function (id) {
+route('/o/*', function (id) {
     app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false
     })
-    setTimeout(function () {
-        app.remote.getMaterialByHumanID(id, function (err, m) {
-            riot.mount('div#content', 'view-physical', m)
-        });
-    }, 500);
+
+    app.remote.getByHumanID(id, function (err, m) {
+      if(err || !m) {
+        app.ui.toast("Item not found in inventory");
+        return;
+      }
+      route('/inventory/'+m.id);
+    });
+
+//    setTimeout(function () {
+//        app.remote.getByHumanID(id, function (err, m) {
+//            riot.mount('div#content', 'view-physical', m)
+//        });
+//    }, 500);
 })
 
 // TODO remove again

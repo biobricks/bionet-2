@@ -103,10 +103,11 @@
     this.keyboardScan = function(e) {
       e.preventDefault();
       var code = this.refs.code.value;
+      this.refs.code.value = '';
       code = code.replace(/[^\d]+/g, '');
       if(code.length <= 0) {
         $('#keyboardInput').val('');
-        app.ui.toast("Invalid scan..."); // TODO better errer handling
+        app.ui.toast("Invalid scan..."); // TODO better error handling
         return;                       
       }
       scanSuccess(code);
@@ -138,7 +139,14 @@
       stopCameraStream();
       if(modalCallback) return modalCallback(err, code);
 
-      window.location.href = '/p/' + code;
+      app.remote.getBy('barcode', code, function (err, m) {
+        if(err || !m) {
+          app.ui.toast("Item not found in inventory");
+          return;
+        }
+
+        route('/inventory/'+m.id);
+      });
     }
 
     this.on('before-unmount', function() {

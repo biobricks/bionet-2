@@ -253,6 +253,8 @@
         const requestStorageResultBinding = BIONET.signal.requestStorageResult.add(requestStorageResult)
 
         this.on('mount', function() {
+                                    console.log("OOOOOOOOOPTS:", opts)
+
             // initialize breadcrumbs
             $('.inventory-height').css({
                 height: $(window).innerHeight() - $('#appbar').height()
@@ -515,6 +517,24 @@
                 })
             })
             BIONET.signal.requestStorage.dispatch()
+
+            if(opts.q) {
+              setTimeout(function() {
+                var ourTree = $("#ftree").fancytree("getTree");
+                var selNode = ourTree.findFirst(function(node) {
+                  if(!node.data || !node.data.dbData) return;
+                  var m = node.data.dbData;
+                  if(m.id === opts.q) return true;
+                });
+                if(!selNode) {
+                  app.ui.toast("Could not find item in local inventory");
+                  return;
+                }
+
+                ourTree.activateKey(selNode.key);
+              
+              }, 1000);
+            }
         })
 
 
