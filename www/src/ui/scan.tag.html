@@ -156,6 +156,10 @@
       stopCameraStream();
       if(modalCallback) return modalCallback(err, m, barcode);
 
+      if(!m) {
+        app.ui.toast("That tube is not associated with the bionet");
+        return;
+      }
       route('/inventory/'+m.id);
     }
 
