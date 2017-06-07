@@ -123,6 +123,7 @@
             element.position.z = z
             element.visibility = (visible !== undefined) ? visible : true
             element.material = this.materials.default.m;
+            return element
         }
 
         StorageSpec.prototype.defaultMaterial = function(scene, name) {
@@ -184,6 +185,21 @@
             depth: 2.1
         })
 
+        const freezerSpec = new StorageSpec('freezer', {
+            default: {
+                color: new BABYLON.Color3(0, 1, 1),
+                alpha: 0
+            },
+            highlighted: {
+                color: new BABYLON.Color3(1, 1, 0),
+                alpha: 0
+            }
+        }, {
+            width: scalingFactor,
+            height: 5,
+            depth: 2.1
+        })
+
         this.on('unmount', function() {
             scene = null
             pauseRenderLoop()
@@ -202,11 +218,17 @@
                 if (scene === null || scene === undefined) return
                 const targetObj = scene.getMeshByName(name);
                 if (!targetObj) return
-                var x = targetObj.position.x
-                var y = Math.max(targetObj.position.y - 1, 4)
-                    //var z = Math.max(targetObj.position.z + 2, -1)
-                var z = targetObj.position.z + 1
-                y = Math.min(y, 2)
+                const center = targetObj.getBoundingInfo().boundingBox.vectorsWorld[0]
+                    /*
+                    var x = targetObj.position.x
+                    var y = Math.max(targetObj.position.y - 1, 4)
+                        //var z = Math.max(targetObj.position.z + 2, -1)
+                    var z = targetObj.position.z + 1
+                    y = Math.min(y, 2)
+                    */
+                const x = center.x
+                const y = center.y
+                const z = center.z
                 moveCamera(null, x, y, z)
             }
 
@@ -275,23 +297,27 @@
 
             const freezerWidth = 3
 
-            const createBox = function(id, xp, yp, zp, highlight, xindex, yindex) {
-                const x = xp + ((freezerWidth / 4) - 0.2) / 2 + 0.1
-                const y = yp + 0.8 / 2 + 0.1
+            const createBox = function(id, xp, yp, zp, highlight, parent) {
+                const x = xp + ( - 0.2) / 2 + 0.1
+                //const x = xp + ((freezerWidth / 4) - 0.2) / 2 + 0.1
+                    //const y = yp + 0.8 / 2 + 0.1
+                const y = yp + 0.1
                 const z = zp + boxSpec.dimensions.depth / 2
-                boxSpec.createElement(scene, id, x, y, z, false)
+                const boxElement = boxSpec.createElement(scene, id, x, y, z, false)
+                boxElement.parent = parent
+
                 const boxObj = {
                     name: id,
                     children: [],
-                    x: xindex,
-                    y: yindex,
+                    x: 0,
+                    y: 0,
                     alpha: 1,
                     type: '8 x 12 freezer box'
                 }
                 return boxObj
             }
 
-            const createRack = function(id, xp, yp, zp, index) {
+            const createRack = function(id, xp, yp, zp, parent) {
 
                 const width = rackSpec.dimensions.width
                 const height = rackSpec.dimensions.height
@@ -299,34 +325,38 @@
                 const x = xp + rackSpec.dimensions.width / 2 + 0.1
                 const y = yp + height / 2
                 const z = zp + -0.05
-                rackSpec.createElement(scene, id, x, y, z)
+                const rackElement = rackSpec.createElement(scene, id, x, y, z)
+                rackElement.parent = parent
 
-                const bx = xp - 0.1
-                const zd = z + depth / -2
+                //const bx = xp - 0.1
+                //const bx = rackSpec.dimensions.width / 2 + 0.1
+                const bx = 0
+                const zd = z + depth / -2 - 0.05
                 const rack = {
                     name: id,
                     type: 'freezer rack',
-                    x: index + 1,
+                    x: 1,
                     color: {},
                     children: []
                 }
 
                 for (var row = 0; row < 4; row++) {
-                    var by = yp + (row * height / 4) - (height / 2)
+                    var by = (row * height / 4) - (height / 2)
                     for (var col = 0; col < 5; col++) {
                         const xindex = 5 - col
                         const yindex = 4 - row
                         var boxId = id + ".box" + xindex + "," + yindex
-                        var bz = zd + col * depth / 5
+                        var bz = col * depth / 5 + depth / -2
                         var highlight = (Math.random() > 0.99) ? true : false
-                        var boxObj = createBox(boxId, bx, by, bz, false, xindex, yindex)
+                            //var boxObj = createBox(boxId, bx, by, bz, false, xindex, yindex)
+                        var boxObj = createBox(boxId, bx, by, bz, false, rackElement)
                         rack.children.push(boxObj)
                     }
                 }
                 return rack
             }
 
-            const createShelf = function(id, xp, yp, zp, index) {
+            const createShelf = function(id, xp, yp, zp, parent) {
 
                 const width = shelfSpec.dimensions.width
                 const height = shelfSpec.dimensions.height
@@ -334,19 +364,26 @@
                 const x = xp
                 const y = yp + height / 2
                 const z = zp
-                shelfSpec.createElement(scene, id, x, y, z)
+                    /*
+                    const x = xp
+                    const y = yp + height / 2
+                    const z = zp
+                    */
+                shelfElement = shelfSpec.createElement(scene, id, x, y, z)
+                shelfElement.parent = parent
 
                 const shelf = {
                     name: id,
                     type: 'shelf',
-                    x: index,
+                    x: 0,
                     color: {},
                     alpha: 1,
                     children: []
                 }
                 for (var rack = 0; rack < 4; rack++) {
                     var rackId = id + ".rack" + rack
-                    var rackObj = createRack(rackId, xp + (rack * freezerWidth / 4) - freezerWidth / 2, yp + height, z, rack)
+                        //var rackObj = createRack(rackId, xp + (rack * freezerWidth / 4) - freezerWidth / 2, yp + height, z, rack)
+                    var rackObj = createRack(rackId, (rack * freezerWidth / 4) - freezerWidth / 2, height, 0, shelfElement)
                     shelf.children.push(rackObj)
                 }
                 return shelf
@@ -360,10 +397,19 @@
                     x: index,
                     children: []
                 }
+                const freezerElement = freezerSpec.createElement(scene, id, x, y, z)
+                if (index==2 || index==3) {
+                    freezerElement.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
+                }
+                if (index==4 || index==5 || index==6) {
+                    freezerElement.rotate(BABYLON.Axis.Y, Math.PI/2, BABYLON.Space.LOCAL);
+                }
+                
                 for (var shelf = 0; shelf < 5; shelf++) {
                     sid = 5 - shelf
                     var shelfId = id + ".shelf" + sid
-                    var shelfObj = createShelf(shelfId, x, shelf + y, z, sid)
+                        //var shelfObj = createShelf(shelfId, x, shelf + y, z, freezerElement)
+                    var shelfObj = createShelf(shelfId, 0, shelf, 0, freezerElement)
                     freezer.children.push(shelfObj)
                 }
                 return freezer
@@ -372,6 +418,9 @@
             const createScene = function(inventoryModel) {
                 // create a basic BJS Scene object
                 //if (scene !== null) return
+                const labObj = inventoryModel[0]
+                if (labObj===undefined) return
+                
                 scene = new BABYLON.Scene(engine);
 
                 // create a FreeCamera, and set its position
@@ -387,7 +436,7 @@
                 var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), scene);
 
                 const y = 0
-                const labObj = inventoryModel[0]
+                
                 lab = {
                     name: labObj.dbData.name,
                     type: 'lab',
@@ -397,6 +446,7 @@
                 boxSpec.initMaterials(scene)
                 rackSpec.initMaterials(scene)
                 shelfSpec.initMaterials(scene)
+                freezerSpec.initMaterials(scene)
 
                 const appSettings = BIONET.getAppSettings()
                 const labLayout = appSettings.labLayout
@@ -405,13 +455,14 @@
                 for (var freezer = 0; freezer < labObj.children.length; freezer++) {
                     const freezerData = labObj.children[freezer].dbData
                     var freezerId = freezerData.name
+                    const index = freezerData.parent_x
 
-                    const freezerLayout = labLayout[freezerData.parent_x]
+                    const freezerLayout = labLayout[index]
                     if (freezerLayout === undefined) continue
                     const x = (40 - freezerLayout.y / 15)
                     const z = (80 - freezerLayout.x / 15)
                         //var freezerObj = createFreezer(freezerId, freezer * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, z, freezer)
-                    var freezerObj = createFreezer(freezerId, x, y, z, freezer)
+                    var freezerObj = createFreezer(freezerId, x, y, z, index)
                     lab.children.push(freezerObj)
                 }
 
@@ -524,11 +575,11 @@
             window.addEventListener('resize', function() {
                 engine.resize();
             });
-            
-            $('#render-canvas').click( function() {
+
+            $('#render-canvas').click(function() {
                 $('html').scrollTop(0)
             })
-            
+
             $('#render-canvas').hide()
 
         })
