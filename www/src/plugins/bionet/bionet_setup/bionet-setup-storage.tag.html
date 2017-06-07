@@ -2,7 +2,13 @@
     <div class="inventory-height">
         <div class="row">
             <div id="treeview" class="inventory-tree col s4">
-                <table id="ftree" style="margin-top:15px; margin-left:65px; border:none !important; width:80%; height:95%">
+                <table id="ftree" style="margin-top:15px; margin-left:65px; border:none !important; width:80%; ">
+                    <thead>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </thead>
                     <colgroup>
                         <col></col>
                         <col></col>
@@ -128,7 +134,8 @@
             // initialize parent id
             var parentId
             if (!node) {
-                node = $("#ftree").fancytree("getRootNode");
+                // todo: set to lab node
+                node = $("#ftree").fancytree("getRootNode").children[0];
             } else {
                 parentId = node.data.dbData.id
             }
@@ -195,7 +202,7 @@
                 const node = deleteNodes[i]
                 const id = node.data.dbData.id
                 console.log('removing %s %s', node.title, id)
-                                
+
                 BIONET.signal.delPhysical.dispatch(id)
                 node.remove()
             }
@@ -214,10 +221,9 @@
             //console.log('initializing storage:', JSON.stringify(storageData))
             const ftree = $("#ftree").fancytree("getTree");
             const bionetStorageLocation = app.getStream('bionetStorageLocation')
-            bionetStorageLocation.dispatch('setupModel', storageData)
+            app.state.inventoryTree = storageData
+            
             ftree.reload(storageData).then(function() {
-                /*
-                 */
                 $('.inventory-tree').css({
                     height: $(window).innerHeight() - $('#appbar').height() - 25
                 });
@@ -257,29 +263,42 @@
         const requestStorageResultBinding = BIONET.signal.requestStorageResult.add(requestStorageResult)
 
         this.on('mount', function() {
-                                    console.log("OOOOOOOOOPTS:", opts)
+            console.log("OOOOOOOOOPTS:", opts)
 
-            // initialize breadcrumbs
-            $('.inventory-height').css({
-                height: $(window).innerHeight() - $('#appbar').height()
-            })
-            $('html').css({
-                overflow: 'hidden'
-            })
-            tag.pixiwidth = $('#physical-view').width()
-
-            const treeViewIconX = $('#treeview').width() - 60
+            const configureWindowSize = function() {
                 /*
-                $('#addicon').css({
-                    left: treeViewIconX
+                $('.edit-physical').css({
+                    height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-layout').height() - 50
                 });
-                $('#deleteicon').css({
-                    left: treeViewIconX
-                });
-                $('#addmenu').css({
-                    left: treeViewIconX
+                $('#physical-props-view').css({
+                    height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 50
                 });
                 */
+                $('.inventory-height').css({
+                    height: $(window).innerHeight() - $('#appbar').height()
+                })
+                $('html').css({
+                        overflow: 'auto'
+                    })
+                    //overflow: 'hidden'
+                tag.pixiwidth = $('#physical-view').width()
+
+            }
+            const treeViewIconX = $('#treeview').width() - 60
+            configureWindowSize()
+
+            // initialize breadcrumbs
+            /*
+            $('#addicon').css({
+                left: treeViewIconX
+            });
+            $('#deleteicon').css({
+                left: treeViewIconX
+            });
+            $('#addmenu').css({
+                left: treeViewIconX
+            });
+            */
 
 
             tag.materials = []
@@ -455,8 +474,7 @@
             }
 
             $("#ftree").fancytree(ftSettings);
-
-
+            
             $("#ftree").on('click dblclick keydown', function(e) {
                 $('.edit-physical').css({
                     height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-layout').height() - 50
@@ -464,6 +482,7 @@
                 $('#physical-props-view').css({
                     height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 50
                 });
+                //configureWindowSize()
                 if (e.type === 'keydown') {
                     if (e.which !== undefined && e.which !== 13) return
                 }
@@ -472,6 +491,8 @@
                 console.log('elementType:', elementType)
                     //if (!active.hasClass('fancytree-edit')) {
                 var node = $("#ftree").fancytree("getActiveNode");
+                /*
+                */
                 if (node) {
                     const dbData = node.data.dbData
                     const type = dbData.type
@@ -534,22 +555,22 @@
             })
             BIONET.signal.requestStorage.dispatch()
 
-            if(opts.q) {
-              setTimeout(function() {
-                var ourTree = $("#ftree").fancytree("getTree");
-                var selNode = ourTree.findFirst(function(node) {
-                  if(!node.data || !node.data.dbData) return;
-                  var m = node.data.dbData;
-                  if(m.id === opts.q) return true;
-                });
-                if(!selNode) {
-                  app.ui.toast("Could not find item in local inventory");
-                  return;
-                }
+            if (opts.q) {
+                setTimeout(function() {
+                    var ourTree = $("#ftree").fancytree("getTree");
+                    var selNode = ourTree.findFirst(function(node) {
+                        if (!node.data || !node.data.dbData) return;
+                        var m = node.data.dbData;
+                        if (m.id === opts.q) return true;
+                    });
+                    if (!selNode) {
+                        app.ui.toast("Could not find item in local inventory");
+                        return;
+                    }
 
-                ourTree.activateKey(selNode.key);
-              
-              }, 2000);
+                    ourTree.activateKey(selNode.key);
+
+                }, 2000);
             }
         })
 

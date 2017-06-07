@@ -45,14 +45,6 @@
         }
 
         tag.active = false
-        const activate3d = function(activeState) {
-            console.log('activate3d:', activeState)
-            if (activeState) runRenderLoop()
-            else pauseRenderLoop()
-            tag.active = activeState
-            tag.update()
-        }
-        const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
 
         const StorageSpec = function(type, materialSpec, dimensions, defaultVisibility) {
             this.type = (type !== undefined) ? type : 'notype'
@@ -200,11 +192,6 @@
             depth: 2.1
         })
 
-        this.on('unmount', function() {
-            scene = null
-            pauseRenderLoop()
-            activate3DBinding.detach()
-        })
 
         this.on('mount', function() {
 
@@ -298,8 +285,8 @@
             const freezerWidth = 3
 
             const createBox = function(id, xp, yp, zp, highlight, parent) {
-                const x = xp + ( - 0.2) / 2 + 0.1
-                //const x = xp + ((freezerWidth / 4) - 0.2) / 2 + 0.1
+                const x = xp + (-0.2) / 2 + 0.1
+                    //const x = xp + ((freezerWidth / 4) - 0.2) / 2 + 0.1
                     //const y = yp + 0.8 / 2 + 0.1
                 const y = yp + 0.1
                 const z = zp + boxSpec.dimensions.depth / 2
@@ -398,13 +385,13 @@
                     children: []
                 }
                 const freezerElement = freezerSpec.createElement(scene, id, x, y, z)
-                if (index==2 || index==3) {
+                if (index == 2 || index == 3) {
                     freezerElement.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
                 }
-                if (index==4 || index==5 || index==6) {
-                    freezerElement.rotate(BABYLON.Axis.Y, Math.PI/2, BABYLON.Space.LOCAL);
+                if (index == 4 || index == 5 || index == 6) {
+                    freezerElement.rotate(BABYLON.Axis.Y, Math.PI / 2, BABYLON.Space.LOCAL);
                 }
-                
+
                 for (var shelf = 0; shelf < 5; shelf++) {
                     sid = 5 - shelf
                     var shelfId = id + ".shelf" + sid
@@ -419,8 +406,8 @@
                 // create a basic BJS Scene object
                 //if (scene !== null) return
                 const labObj = inventoryModel[0]
-                if (labObj===undefined) return
-                
+                if (labObj === undefined) return
+
                 scene = new BABYLON.Scene(engine);
 
                 // create a FreeCamera, and set its position
@@ -436,7 +423,7 @@
                 var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), scene);
 
                 const y = 0
-                
+
                 lab = {
                     name: labObj.dbData.name,
                     type: 'lab',
@@ -479,6 +466,23 @@
                 scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
                 return scene;
             }
+
+            const activate3d = function(activeState) {
+                console.log('activate3d:', activeState)
+                if (activeState) {
+                    if (app.state.inventoryTree !== undefined) {
+                        createScene(app.state.inventoryTree)
+                        runRenderLoop()
+                    } else {}
+                } else {
+                    pauseRenderLoop()
+                }
+                //if (activeState) runRenderLoop()
+                //else pauseRenderLoop()
+                tag.active = activeState
+                tag.update()
+            }
+            const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
 
             const moveCamera = function(callback, dx, dy, dz) {
                 console.log('move camera ', dx, dy)
@@ -581,6 +585,11 @@
             })
 
             $('#render-canvas').hide()
+            this.on('unmount', function() {
+                scene = null
+                pauseRenderLoop()
+                activate3DBinding.detach()
+            })
 
         })
 
