@@ -194,6 +194,7 @@
                 const node = deleteNodes[i]
                 const id = node.data.dbData.id
                 console.log('removing %s %s', node.title, id)
+                                
                 BIONET.signal.delPhysical.dispatch(id)
                 node.remove()
             }

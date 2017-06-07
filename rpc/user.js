@@ -51,7 +51,7 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
           db.physical.get(child.value.material_id, function(err, m) {
             if(err) return cb(err);
             out.push({
-              favorite: child,
+              favorite: child.value,
               material: m
             });
             cb();

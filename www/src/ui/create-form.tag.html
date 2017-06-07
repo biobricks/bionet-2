@@ -162,6 +162,7 @@
                     key: data.id,
                     title: title,
                     dbData: data,
+                    dbRef: favorites[i].favorite,
                     notes: data.notes,
                     barcode: data.barcode,
                     parentId: parentId,
@@ -557,8 +558,8 @@
                 })
                 for (var i = 0; i < deleteNodes.length; i++) {
                     const node = deleteNodes[i]
-                    const id = node.data.dbData.id
-                    console.log('removing %s %s', node.title, id)
+                    const id = node.data.dbRef.id
+                    console.log('!! removing %s %s', node.name, id)
                     BIONET.signal.delPhysical.dispatch(id)
                     node.remove()
                 }
