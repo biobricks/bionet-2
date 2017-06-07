@@ -122,7 +122,6 @@ function main() {
     var dbs = db.createReadStream()
     var jstream = JSONStream.stringifyObject();
     dbs.pipe(through.obj(function(obj, enc, cb) {
-      console.log('--------------');
       // reformat key/value as array since stringifyObject expects that
       this.push([obj.key, obj.value])
       cb();
