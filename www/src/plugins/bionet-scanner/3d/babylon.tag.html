@@ -14,6 +14,8 @@
         #render-canvas {
             width: 100%;
             height: 100%;
+            margin: 0;
+            padding: 0;
             touch-action: none;
         }
 
@@ -31,7 +33,7 @@
         const runRenderLoop = function() {
             $('#render-canvas').show()
             $('#babylon-container').css({
-                height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-layout').height() - 50
+                height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-location-canvas').height() - 15
             });
 
             tag.engine.runRenderLoop(function() {

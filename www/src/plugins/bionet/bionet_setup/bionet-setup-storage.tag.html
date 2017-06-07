@@ -1,6 +1,6 @@
 <inventory-treeview>
     <div class="inventory-height">
-        <div class="row">
+        <div class="row" style="margin-bottom:0; padding-bottom:0">
             <div id="treeview" class="inventory-tree col s4">
                 <table id="ftree" style="margin-top:15px; margin-left:65px; border:none !important; width:80%; ">
                     <thead>
@@ -69,6 +69,8 @@
         .inventory-tree {
             float: left;
             margin-left: 65px;
+            margin-bottom:0px;
+            padding-bottom:0px;
             overflow-y: scroll;
             overflow-x: hidden;
             display: block;
@@ -537,9 +539,11 @@
 
             const activate3d = function(activeState) {
                 if (activeState) {
-                    $('physical-props-view').hide()
+                    $('#physical-props-view').hide()
+                    //$('#physical-storage').hide()
                 } else {
-                    $('physical-props-view').show()
+                    $('#physical-props-view').show()
+                    //$('#physical-storage').show()
                 }
             }
             const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
