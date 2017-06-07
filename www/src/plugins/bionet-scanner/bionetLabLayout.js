@@ -134,6 +134,10 @@ const bionetLabLayout = {
             switch (type) {
                 case 'lab':
                     location.subunit = JSON.parse(JSON.stringify(appSettings.labLayout))
+                    for (var j=0; j<location.subunit.length; j++) {
+                        const freezer = location.subunit[j]
+                        if (freezer.parent_x===undefined) freezer.parent_x=j
+                    }
                     break;
                 case 'physical':
                     location.emoji_cloud = []
