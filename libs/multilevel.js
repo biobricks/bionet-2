@@ -1,5 +1,6 @@
 
 var net = require('net');
+var multilevel = require('multileveldown'); // share one leveldb between processes
 
 module.exports = function(settings, db) {
 
@@ -17,6 +18,7 @@ module.exports = function(settings, db) {
     port: settings.dbPort || 13377
 
   }, function(err) {
+    if(err) return console.error("Failed to start multilevel:", err)
     console.log("multilevel listening");
   });
 

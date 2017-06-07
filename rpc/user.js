@@ -51,7 +51,7 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
           db.physical.get(child.value.material_id, function(err, m) {
             if(err) return cb(err);
             out.push({
-              favorite: child,
+              favorite: child.value,
               material: m
             });
             cb();
@@ -429,6 +429,7 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
       var found = false;
       var out = s.pipe(through.obj(function(data, enc, next) {
         if(!data || !data.value || !data.value.label) return next()
+
         if(data.value.label.humanID == humanID) {
           found = true;
           cb(null, data.value);

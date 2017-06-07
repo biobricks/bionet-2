@@ -31,11 +31,16 @@
     var path = require('path');
     var settings = require('../../../settings.js')();
 
-    var dmdecode = require("datamatrix-decode");
+//    var dmdecode = require("datamatrix-decode");
 //    var datamatrix = require('../../../../biomatrix-scratch');
+
+    // check if something is a v4 uuid
+    function isUUID(id) {
+      return !!(id.match(/[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/i))
+    }
     
     function getIDFromURL(url) {
-      var m = url.match(new RegExp('^'+settings.baseUrl+'/p/(\\d+)'));
+      var m = url.match(new RegExp('^'+settings.baseUrl+'/o/(\\d+)'));
       if(!m || (m.length < 2)) return null;
       return parseInt(m[1]);
     }
@@ -63,7 +68,19 @@
     }
 
     function scanSuccess(code) {
-       runCallback(null, code)
+      app.remote.getBy('barcode', code, function (err, m) {
+        if(err || !m) {
+           app.remote.getByHumanID(code, function (err, m) {
+             if(err || !m) {
+               runCallback(null, null, code)
+               return;
+              }              
+              runCallback(null, m)
+           })
+           return;
+        }
+        runCallback(null, m, code)
+      });
     }
 
     function scan(delay) {
@@ -71,7 +88,7 @@
       delay = delay || 500; // delay between frames in ms
 
       this.scanCtx.drawImage(this.refs.scanVideo, 0, 0);
-      console.log("scanning...")
+//      console.log("scanning...")
       decodeQrCode(this, function(data) {
         if(!data) {
           if(!enableDM) {
@@ -103,10 +120,11 @@
     this.keyboardScan = function(e) {
       e.preventDefault();
       var code = this.refs.code.value;
+      this.refs.code.value = '';
       code = code.replace(/[^\d]+/g, '');
       if(code.length <= 0) {
         $('#keyboardInput').val('');
-        app.ui.toast("Invalid scan..."); // TODO better errer handling
+        app.ui.toast("Invalid scan..."); // TODO better error handling
         return;                       
       }
       scanSuccess(code);
@@ -134,11 +152,11 @@
       }
     }
 
-    function runCallback(err, code) {
+    function runCallback(err, m, barcode) {
       stopCameraStream();
-      if(modalCallback) return modalCallback(err, code);
+      if(modalCallback) return modalCallback(err, m, barcode);
 
-      window.location.href = '/p/' + code;
+      route('/inventory/'+m.id);
     }
 
     this.on('before-unmount', function() {
