@@ -219,7 +219,7 @@
                     } else if (type.indexOf('shelf') >= 0) {
                         stype = 'shelf'
                         id += ".shelf" + y
-                    } else if (type.indexOf('freezer') >= 0) {
+                    } else if (type.indexOf('freezer') >= 0 || type.indexOf('fridge') >= 0) {
                         stype = 'freezer'
                         id += locationSpec.name
                     }
@@ -363,8 +363,7 @@
                 scene = new BABYLON.Scene(engine);
 
                 // create a FreeCamera, and set its position
-                //var camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 4, -9), scene);
-                var camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", Math.PI/2, Math.PI/2, 1, new BABYLON.Vector3(0, 5, -9), scene);
+                var camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", 0, 0 * Math.PI, 0 * Math.PI, new BABYLON.Vector3(0, 5, -8), scene);
 
                 // target the camera to scene origin
                 camera.setTarget(new BABYLON.Vector3(0, 2, 0));
@@ -396,8 +395,9 @@
                     var freezerId = freezerData.name
 
                     const freezerLayout = labLayout[freezerData.parent_x]
-                    const x = freezerLayout.y / 15 - 40
-                    const z = freezerLayout.x / 15 - 90
+                    if (freezerLayout===undefined) continue
+                    const x = (40-freezerLayout.y / 15)
+                    const z = (80-freezerLayout.x / 15)
                         //var freezerObj = createFreezer(freezerId, freezer * (freezerWidth + 0.5) - (1.5 * (freezerWidth + 0.5)), y, z, freezer)
                     var freezerObj = createFreezer(freezerId, x, y, z, freezer)
                     lab.children.push(freezerObj)
