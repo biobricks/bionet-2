@@ -243,7 +243,7 @@
 
                     bionetStorageLocation.dispatch('configure', dbData.id)
 
-                    if (dbData.type.indexOf('box') >= 0) {
+                    if (dbData.type.indexOf('box') >= 0 || dbData.type.indexOf('rack') >= 0) {
                         BIONET.signal.getBoxContents.dispatch(dbData.id)
                     } else {
                         node.setExpanded();
@@ -500,7 +500,7 @@
                     const type = dbData.type
                     if (type) {
                         tag.createType = 'storage'
-                        if (type.indexOf('box') >= 0) {
+                        if (type.indexOf('box') >= 0 || type.indexOf('rack') >= 0) {
                             BIONET.signal.getBoxContents.dispatch(dbData.id)
                         } else {
                             BIONET.signal.getBoxContentsResult.dispatch(dbData.id, [])
