@@ -82,6 +82,7 @@ var igempart = {
         partDataAccessor.addRoute('storePhysical', (physicalData) => {
             console.log('partDataAccessor physicalData:', JSON.stringify(physicalData))
             const toast = app.getThemeMethod().toast
+
             app.remote.savePhysical(physicalData.material, physicalData.labelImage, physicalData.doPrint, function (err, id) {
                 if (err) {
                     toast('ERROR saving ' + physicalData.material.name + ' ' + err)

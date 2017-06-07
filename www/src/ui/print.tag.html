@@ -8,7 +8,7 @@
             <form-text-input label="Storage temperature" name="temperature" value={labelFormData.temperature} />
 
             <div class="top-right-submit">
-                <a onclick={submitForm} class="waves-effect waves-light btn darken-1">save</a>
+                <a onclick={submitForm} class="waves-effect waves-light btn darken-1">done</a>
             </div>
 
             <input type="submit" style="visibility:hidden;height:0" />
@@ -68,6 +68,7 @@
             if (o.bsl > 1) {
                 o.biohazard = true;
             }
+
             labelMaker.drawLabel('labelPreview', settings.baseUrl + "/o/" + tag.refs.createLabelForm.humanID.value, pre + txt, o, cb);
         }
 

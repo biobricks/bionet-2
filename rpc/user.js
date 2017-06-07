@@ -49,7 +49,11 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
           if(!child.value.material_id) return cb();
 
           db.physical.get(child.value.material_id, function(err, m) {
-            if(err) return cb(err);
+            if(err) { // if the physical no longer exists, remove the favorite
+              return db.physical.del(child.value.material_id, function(err) {
+                cb();
+              })
+            }
             out.push({
               favorite: child.value,
               material: m
