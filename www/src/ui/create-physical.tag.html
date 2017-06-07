@@ -195,20 +195,22 @@
                 subTag: "scan",
                 cb: function(err, id) {
                     if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
-                    app.ui.toast("Looking up scanned item");
+
+                    $('#scanModal').modal('close');
 
                     app.remote.getBy('barcode', id, function(err, m) {
-                        if (err) return app.ui.toast("Lookup failed. Item does not exist in database.");
+                        if(err || !m) return app.ui.toast("Lookup failed. Item does not exist in database.");
 
-        // TODO this doesn't get saved
-                        if (err) return app.ui.toast("Container not found");
-                        tag.formData.parent_id = id
+                        if(m.id === tag.formData.id) {
+                          return app.ui.toast("Error: An item cannot contain itself."); 
+                        }
+
+                        tag.formData.parent_id = m.id
                         tag.update()
                         $(tag.curContainerBarcode).val(m.id);
                         $(tag.containerScanButton).html('rescan container');
                     })
 
-                    $(tag.scanModal).modal('close');
                     tags[0].unmount(true)
                 }
             }
