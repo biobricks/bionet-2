@@ -28,14 +28,21 @@ const pixijsUtils = {
     initStage: function (width, height) {
         this.stage.removeChildren()
         const w = Math.round(width)
-        //this.renderer.clear(this.pixiBackgroundColor)
+            //this.renderer.clear(this.pixiBackgroundColor)
         const h = Math.round(height)
         this.width = w
         this.height = h
+        
+        const graphics = new PIXI.Graphics()
+        graphics.beginFill(0xffffff)
+        graphics.drawRect(0, 0, w, h)
+        graphics.endFill();
+        this.stage.addChild(graphics)
+
         this.renderer.render(this.stage)
         this.renderer.resize(w, h)
     },
-    resizeStage: function(width,height) {
+    resizeStage: function (width, height) {
         const w = Math.round(width)
         const h = Math.round(height)
         this.width = w
@@ -54,11 +61,11 @@ const pixijsUtils = {
             divWidth: this.width,
             divHeight: this.height,
             scale: scale,
-            devicePixelRatio:window.devicePixelRatio,
-            windowWidth:window.innerWidth,
-            windowHeight:window.innerHeight,
+            devicePixelRatio: window.devicePixelRatio,
+            windowWidth: window.innerWidth,
+            windowHeight: window.innerHeight,
         }
-        console.log('***pixijs scaling*** \n %s',JSON.stringify(scaleObj,null,2))
+        console.log('***pixijs scaling*** \n %s', JSON.stringify(scaleObj, null, 2))
     },
     appendToStage: function (source) {
         this.stage.addChild(source)
@@ -103,7 +110,7 @@ const pixijsUtils = {
             thisModule.renderStage()
             if (!thisModule.frameCounter || --thisModule.frameCounter > 0) window.requestAnimationFrame(update)
         }
-        if (!thisModule.frameCounter || thisModule.frameCounter<=0) window.requestAnimationFrame(update)
+        if (!thisModule.frameCounter || thisModule.frameCounter <= 0) window.requestAnimationFrame(update)
         thisModule.frameCounter = (thisModule.frameCounter) ? thisModule.frameCounter + frames : frames
     }
 }
