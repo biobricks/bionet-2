@@ -113,17 +113,19 @@
                 if (cmd === undefined) return;
                 const pixiMsgHandler = {
                     selectCell: function(msg) {
-                        bionetLabLayout.connectCells()
-                        pixijsutils.renderStage()
-
-                        //update container with new coordinates
                         const locationPath = tag.locationPath
                         const id = msg.id
                         var container = {}
-                        for (var i = 0; i < locationPath.length; i++) {
-                            container = locationPath[i]
-                            if (container.id === id) {
-                                break;
+                        if (locationPath !== undefined) {
+                            bionetLabLayout.connectCells()
+                            pixijsutils.renderStage()
+
+                            //update container with new coordinates
+                            for (var i = 0; i < locationPath.length; i++) {
+                                container = locationPath[i]
+                                if (container.id === id) {
+                                    break;
+                                }
                             }
                         }
                         if (container.id !== id) return

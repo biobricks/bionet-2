@@ -29,23 +29,24 @@ const pixijsUtils = {
         this.stage.removeChildren()
         const w = Math.round(width)
         //this.renderer.clear(this.pixiBackgroundColor)
+        const h = Math.round(height)
         this.width = w
-        this.height = height
+        this.height = h
         this.renderer.render(this.stage)
-        this.renderer.resize(w, height)
+        this.renderer.resize(w, h)
     },
     resizeStage: function(width,height) {
-        this.width = w
-        this.height = height
         const w = Math.round(width)
-        this.renderer.resize(w, height)
+        const h = Math.round(height)
+        this.width = w
+        this.height = h
+        this.renderer.resize(w, h)
     },
     scaleToFit: function (source) {
         const bounds = source.getBounds()
-        var scale = Math.min(this.width / bounds.width, this.height / bounds.height)
-        // todo: need to include window width
-        //scale = Math.min(scale,0.7)
-        scale = Math.min(scale,1)
+        const scalex = this.width / bounds.width
+        const scaley = this.height / bounds.height
+        var scale = Math.min(scalex, scaley)
         source.scale.x = source.scale.y = scale
     },
     appendToStage: function (source) {

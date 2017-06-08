@@ -34,7 +34,7 @@
             
             const renderScene = function(locationPath) {
                 const bionetLabLayoutScene = new PIXI.Container()
-                bionetLabLayout.createScene(bionetLabLayoutScene)
+                bionetLabLayout.createScene(bionetLabLayoutScene, tag.width, tag.height)
                     //const locationPath = tag.locationPath
                 if (locationPath) {
                     for (var i = 0; i < locationPath.length; i++) {
@@ -87,11 +87,12 @@
                 if (cmd === undefined) return;
                 const pixiMsgHandler = {
                     selectCell: function(msg) {
+                        const locationPath = tag.locationPath
+                        if (locationPath===undefined) return
                         bionetLabLayout.connectCells()
                         pixijsutils.renderStage()
 
                         //update container with new coordinates
-                        const locationPath = tag.locationPath
                         const id = msg.id
                         var container = {}
                         for (var i = 0; i < locationPath.length; i++) {

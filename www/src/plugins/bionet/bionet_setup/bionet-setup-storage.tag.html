@@ -21,14 +21,20 @@
                     </tbody>
                 </table>
             </div>
-            <div id="physical-view" class="col s8">
-                <div class="row">
+            <!--
                     <div id="pixijsdiv" class="pixijs">
                         <bionet-storage-location width={pixiwidth}/>
                         <babylon-3d></babylon-3d>
                     </div>
+    -->
+            <div id="physical-view" class="col s8">
+                <div id="pixijsdiv" class="row pixijs">
+                    <bionet-storage-location width={pixiwidth} height={pixiheight}/>
                 </div>
-                <div id="physical-props-view" class="row physical-view">
+                <div id="threedview" class="row" class="threedview" style="margin:0;padding:0;">
+                    <babylon-3d></babylon-3d>
+                </div>
+                <div id="physical-props-view" class="row physical-view" style="margin:0;padding:0;">
                     <div id="box" class="edit-physical">
                         <box-contents />
                     </div>
@@ -50,6 +56,9 @@
 
         <div id="deleteicon" style="position:absolute; top:250px; left:10px; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></div>
 
+        <div id="threedicon" style="position:absolute; top:320px; left:10px; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
+
+
     </div>
 
     <style>
@@ -61,25 +70,41 @@
         
         .pixijs {
             margin-top: 15px;
+            margin-bottom: 0px;
             width: 100%;
+            height: 35%;
             float: left;
             z-index: 2000;
         }
         
-        .inventory-tree {
-            float: left;
-            margin-left: 65px;
-            margin-bottom:0px;
-            padding-bottom:0px;
-            overflow-y: scroll;
+        .threedview {
+            overflow-y: auto;
             overflow-x: hidden;
-            display: block;
+            margin-top: 0px;
+            padding-top: 0px;
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+            height: 65%;
         }
         
         .physical-view {
             overflow-y: auto;
             overflow-x: hidden;
-            height: 100%;
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding-top: 0px;
+            padding-bottom: 0px;
+            height: 75%;
+        }
+        
+        .inventory-tree {
+            float: left;
+            margin-left: 65px;
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            display: block;
         }
         
         .edit-physical {
@@ -224,7 +249,7 @@
             const ftree = $("#ftree").fancytree("getTree");
             const bionetStorageLocation = app.getStream('bionetStorageLocation')
             app.state.inventoryTree = storageData
-            
+
             ftree.reload(storageData).then(function() {
                 $('.inventory-tree').css({
                     height: $(window).innerHeight() - $('#appbar').height() - 25
@@ -266,6 +291,18 @@
 
         this.on('mount', function() {
             console.log("OOOOOOOOOPTS:", opts)
+
+            $('#physical-view').css({
+                height: $(window).innerHeight() - $('#appbar').height() - 14
+            });
+            tag.pixiwidth = $('#pixijsdiv').width()
+            tag.pixiheight = $('#pixijsdiv').height()
+
+            /*
+            $('#physical-props-view').css({
+                height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 14
+            });
+            */
 
             const configureWindowSize = function() {
                 /*
@@ -476,14 +513,16 @@
             }
 
             $("#ftree").fancytree(ftSettings);
-            
+
             $("#ftree").on('click dblclick keydown', function(e) {
+                /*
                 $('.edit-physical').css({
                     height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-layout').height() - 50
                 });
                 $('#physical-props-view').css({
                     height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 50
                 });
+                */
                 //configureWindowSize()
                 if (e.type === 'keydown') {
                     if (e.which !== undefined && e.which !== 13) return
@@ -494,7 +533,7 @@
                     //if (!active.hasClass('fancytree-edit')) {
                 var node = $("#ftree").fancytree("getActiveNode");
                 /*
-                */
+                 */
                 if (node) {
                     const dbData = node.data.dbData
                     const type = dbData.type
@@ -540,13 +579,18 @@
             const activate3d = function(activeState) {
                 if (activeState) {
                     $('#physical-props-view').hide()
-                    //$('#physical-storage').hide()
+                    $('#threedview').show()
                 } else {
                     $('#physical-props-view').show()
-                    //$('#physical-storage').show()
+                    $('#threedview').hide()
                 }
             }
             const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
+            var threedstatus = false
+            tag.activate3d = function() {
+                threedstatus = !threedstatus
+                BIONET.signal.activate3D.dispatch(threedstatus)
+            }
 
             this.on('unmount', function() {
                 physicalUpdatedBinding.detach()

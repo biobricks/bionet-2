@@ -7,6 +7,7 @@ const bionetLabLayout = {
     assets: '/static/assets/lab-storage/',
     storageSprite: null,
     resources: {},
+    sceneWidth: 1600,
 
     loadResources: function () {
         console.log('labStorage load function')
@@ -134,32 +135,32 @@ const bionetLabLayout = {
             switch (type) {
                 case 'lab':
                     location.subunit = JSON.parse(JSON.stringify(appSettings.labLayout))
-                    for (var j=0; j<location.subunit.length; j++) {
+                    for (var j = 0; j < location.subunit.length; j++) {
                         const freezer = location.subunit[j]
-                        if (freezer.parent_x===undefined) freezer.parent_x=j
+                        if (freezer.parent_x === undefined) freezer.parent_x = j
                     }
                     break;
                 case 'physical':
                     location.emoji_cloud = []
-                    /*
-                    location.emoji_cloud = [
-                        {
-                            x: 100,
-                            y: 60,
-                            emoji: ':warning:'
-                        },
-                        {
-                            x: 100,
-                            y: 100,
-                            emoji: ':smile:'
-                        },
-                        {
-                            x: 100,
-                            y: 150,
-                            emoji: ':ledger:'
-                        }
-                    ]
-                    */
+                        /*
+                        location.emoji_cloud = [
+                            {
+                                x: 100,
+                                y: 60,
+                                emoji: ':warning:'
+                            },
+                            {
+                                x: 100,
+                                y: 100,
+                                emoji: ':smile:'
+                            },
+                            {
+                                x: 100,
+                                y: 150,
+                                emoji: ':ledger:'
+                            }
+                        ]
+                        */
                     break;
             }
             locations.push(location)
@@ -168,10 +169,11 @@ const bionetLabLayout = {
         this.locations = locations
     },
 
-    createScene: function (stage) {
+    createScene: function (stage, divwidth, divheight) {
         if (this.locations === undefined) return
 
         console.log('labStorage initialize scene ')
+        const scale = stage.scale.x
 
         const thisModule = this;
         const sceneRoot = stage
@@ -191,8 +193,15 @@ const bionetLabLayout = {
         const containerOutlineColor = 0x000000
         const containerFillColor = 0x000000
 
-        const celldx = Math.max(1600 / locations.length, 350)
-        const celldy = (150 / 190) * celldx
+        var celldx = Math.max(divwidth / locations.length, 350)
+        //var celldx = width / locations.length
+        var celldy = (150 / 190) * celldx - 60
+
+        if (celldy * scale > divheight) {
+            celldy = divheight - 60
+            const sc = celldx / celldy
+            celldx = celldy * sc
+        }
 
         const marginx = 30
         const marginy = (locations.length > 2) ? 30 : 50
@@ -374,7 +383,7 @@ const bionetLabLayout = {
             fontSize: '64px',
             fill: textColor
         };
-
+        /*
         const moveIconY = celldy + marginy * 3.5
         const moveLeftButton = new PIXI.Text(moveLeftButtonText, iconFontProps)
         moveLeftButton.x = 25
@@ -405,7 +414,8 @@ const bionetLabLayout = {
         sceneRoot.addChild(threedbutton)
         makeInteractive(threedbutton, toggle3d)
             //EmojiOneColor-SVGinOT.ttf
-
+            */
+        
         for (var i = 0; i < locations.length; i++) {
             const storageItem = locations[i];
             console.log('labStorage.onLoadComplete: initializing storage location %s %s', storageItem.name, storageItem.type)
@@ -461,7 +471,7 @@ const bionetLabLayout = {
 
             var bounds = storageContainer.getBounds()
             const centerContainer = {
-                    x: (1600 - bounds.width * centerStage.scale) / 2,
+                    x: (this.sceneWidth - bounds.width * centerStage.scale) / 2,
                     y: centerStage.y,
                     scale: centerStage.scale
                 }
@@ -539,7 +549,7 @@ const bionetLabLayout = {
     },
 
     connectCells: function () {
-        if (this.storageLocations===undefined) return
+        if (this.storageLocations === undefined) return
         const storageLocations = this.storageLocations
         const sceneRoot = this.sceneRoot
         if (this.connectCellsGraphics) {
