@@ -488,10 +488,12 @@
                     } else {
                         var parentObj = boxObj
                         if (dbData.wbparent_id === undefined) {
+                            /*
                             bionetStorageLocation.dispatch('configure', {
                                 id: dbData.id,
                                 tempAssignments: []
                             })
+                            */
                         } else {
                             const parentId = dbData.wbparent_id
                             ftree.visit(function(node) {
@@ -500,13 +502,13 @@
                                     parentObj = searchData
                                 }
                             })
-                            const boxId = parentObj.id
-                            bionetStorageLocation.dispatch('configureParent', {
-                                child: dbData,
-                                parent: parentObj,
-                                tempAssignments: getTempCellAssignments(boxId)
-                            })
                         }
+                        const boxId = parentObj.id
+                        bionetStorageLocation.dispatch('configureParent', {
+                            child: dbData,
+                            parent: parentObj,
+                            tempAssignments: getTempCellAssignments(boxId)
+                        })
                     }
 
 
