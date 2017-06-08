@@ -132,24 +132,7 @@
         tag.formData = {}
         const cart = app.getStream('cart')
 
-        // setup secondary nav
-        app.setSecondaryNav([{
-            label: 'storage',
-            action: '/bionetsetup/storage'
-        }, {
-            label: 'schemas',
-            action: '/bionetsetup/schemas'
-        }, {
-            label: 'strains',
-            action: '/bionetsetup/strains'
-        }])
-
-        // configure app bar
-        app.appbarConfig({
-            enableTopNav: true,
-            enableBreadCrumbs: true,
-            enableSubbar: false
-        })
+        BIONET.signal.requestStorage.dispatch()
 
         this.addNode = function(e) {
 
@@ -246,7 +229,6 @@
             //console.log('initializing storage:', JSON.stringify(storageData))
             const ftree = $("#ftree").fancytree("getTree");
             const bionetStorageLocation = app.getStream('bionetStorageLocation')
-            app.state.inventoryTree = storageData
 
             ftree.reload(storageData).then(function() {
                 $('.inventory-tree').css({
@@ -289,6 +271,24 @@
 
         this.on('mount', function() {
             console.log("OOOOOOOOOPTS:", opts)
+                // setup secondary nav
+            app.setSecondaryNav([{
+                label: 'storage',
+                action: '/bionetsetup/storage'
+            }, {
+                label: 'schemas',
+                action: '/bionetsetup/schemas'
+            }, {
+                label: 'strains',
+                action: '/bionetsetup/strains'
+            }])
+
+            // configure app bar
+            app.appbarConfig({
+                enableTopNav: true,
+                enableBreadCrumbs: true,
+                enableSubbar: false
+            })
 
             $('#physical-view').css({
                 height: $(window).innerHeight() - $('#appbar').height() - 14

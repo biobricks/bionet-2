@@ -8,19 +8,7 @@
                 </list-item>
             </div>
         </div>
-        <!--
-        <div id="display-location" class="edititem col s7">
-            <div if={showscanner===true}>
-                <scanner/>
-            </div>
-        </div>
-        <div id="edit-physical" class="edititem col s8">
-            <div if={results.length>0} onclick={emptyCart} class="right-align" style="margin-right:20px; color:teal; cursor: pointer; cursor: hand; ">empty cart</div>
-            <bionet-storage-location width="{pixiwidth}" />
-            <babylon-3d></babylon-3d>
-            <create-physical show="false" top-margin="0px" />
-        </div>
-        -->
+
         <div id="physical-view" class="col s8">
             <div id="pixijsdiv" class="row pixijs">
                 <bionet-storage-location width={pixiwidth} height={pixiheight}/>
@@ -28,7 +16,7 @@
             <div id="threedview" class="row threedview" style="margin:0;padding:0;">
                 <babylon-3d></babylon-3d>
             </div>
-            <div id="physical-props-view" class="row physical-view"  style="width:100%;margin:0;padding:0;">
+            <div id="physical-props-view" class="row physical-view" style="width:100%;margin:0;padding:0;">
                 <div id="box" class="edit-physical">
                     <box-contents />
                 </div>
@@ -100,12 +88,13 @@
         tag.showscanner = false
         const cart = app.getStream('cart')
 
-        const breadcrumbs = [{
-            'label': 'cart',
-            'url': '/cart'
-        }]
+        BIONET.signal.requestStorage.dispatch()
 
         this.on('mount', function() {
+            const breadcrumbs = [{
+                'label': 'cart',
+                'url': '/cart'
+            }]
             $('#physical-view').css({
                 height: $(window).innerHeight() - $('#appbar').height() - 14
             });

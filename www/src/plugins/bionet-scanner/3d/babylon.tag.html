@@ -532,6 +532,7 @@
                     configure: function(msg) {
                         //todo: this may be invoked before resources have loaded
                         const id = msg
+                        tag.id = id
                         console.log('babylon-3d tag configure function, id=', id)
                         app.remote.getLocationPath(id, function(err, locationPath) {
                             if (err) {
@@ -577,8 +578,14 @@
                 if (activeState) {
                     if (app.state.inventoryTree !== undefined) {
                         createScene(app.state.inventoryTree)
-                        engine.resize();
+                        engine.resize()
                         runRenderLoop()
+                        if (tag.id!==undefined) {
+                            //setupLocationPath(tag.locationPath)
+                            const bionetStorageLocation = app.getStream('bionetStorageLocation')
+                            bionetStorageLocation.dispatch('configure', tag.id)
+                        }
+
                     } else {}
                 } else {
                     pauseRenderLoop()

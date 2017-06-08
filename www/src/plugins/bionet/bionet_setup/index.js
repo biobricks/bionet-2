@@ -81,6 +81,7 @@ var bionetSetup = {
                         }
                     })
                     //console.log('inventory step 2:', JSON.stringify(treeNodes,null,2))
+                app.state.inventoryTree = treeNodes
                 BIONET.signal.requestStorageResult.dispatch(treeNodes)
             });
         }
@@ -97,7 +98,7 @@ var bionetSetup = {
         BIONET.signal.getBoxContentsResult = new MiniSignal()
         BIONET.signal.getBoxContents = new MiniSignal()
         BIONET.signal.getBoxContents.add(getBoxContents)
-        
+
         const getContainerContents = function (id) {
             BIONET.remote.getChildren(id, function (err, children) {
                 if (err) return console.error(err);
@@ -126,19 +127,19 @@ var bionetSetup = {
         BIONET.signal.createStorageItem = new MiniSignal()
         BIONET.signal.createStorageItem.add(createStorageItem)
 
-        const addFavorite = function(m) {
+        const addFavorite = function (m) {
             app.remote.saveFavLocation(m, null, null, function (err) {
                 if (err) {
                     console.log('addFavorite error: %s', err)
                     return;
                 }
-                app.ui.toast(m.name+' added to favorites');
+                app.ui.toast(m.name + ' added to favorites');
                 console.log('addFavorite id:', m.id)
             })
         }
         BIONET.signal.addFavorite = new MiniSignal()
         BIONET.signal.addFavorite.add(addFavorite)
-        
+
         const getPhysical = function (id) {
             app.remote.get(id, function (err, data) {
                 if (err) {
@@ -146,8 +147,8 @@ var bionetSetup = {
                     return
                 }
                 BIONET.signal.getPhysicalResult.dispatch(data)
-                //const bionetStorageLocation = app.getStream('bionetStorageLocation')
-                //bionetStorageLocation.dispatch('configure', data.id)
+                    //const bionetStorageLocation = app.getStream('bionetStorageLocation')
+                    //bionetStorageLocation.dispatch('configure', data.id)
             })
         }
         BIONET.signal.getPhysicalResult = new MiniSignal()
