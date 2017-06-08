@@ -568,9 +568,9 @@
             });
 
             $('#render-canvas').click(function() {
-                $('html').scrollTop(0)
-            })
-            //$('#render-canvas').hide()
+                    $('html').scrollTop(0)
+                })
+                //$('#render-canvas').hide()
 
             const activate3d = function(activeState) {
                 console.log('activate3d:', activeState)
@@ -589,7 +589,7 @@
                 tag.update()
             }
             const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
-            
+
             this.on('unmount', function() {
                 scene = null
                 pauseRenderLoop()
