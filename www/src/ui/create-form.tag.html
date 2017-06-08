@@ -474,11 +474,11 @@
                     }
                     toggleLocationPath(true)
 
+                    const bionetStorageLocation = app.getStream('bionetStorageLocation')
                     if (dbData.type.indexOf('box') >= 0) {
                         boxObj = dbData
                         const boxId = dbData.id
                         BIONET.signal.getBoxContents.dispatch(boxId)
-                        const bionetStorageLocation = app.getStream('bionetStorageLocation')
                         bionetStorageLocation.dispatch('configure', {
                                 id: boxId,
                                 tempAssignments: getTempCellAssignments(boxId)
@@ -488,7 +488,10 @@
                     } else {
                         var parentObj = boxObj
                         if (dbData.wbparent_id === undefined) {
-                            //dbData.wbparent_id = boxObj.id
+                            bionetStorageLocation.dispatch('configure', {
+                                id: dbData.id,
+                                tempAssignments: []
+                            })
                         } else {
                             const parentId = dbData.wbparent_id
                             ftree.visit(function(node) {
@@ -497,15 +500,13 @@
                                     parentObj = searchData
                                 }
                             })
-                        }
-                        const boxId = parentObj.id
-                        const bionetStorageLocation = app.getStream('bionetStorageLocation')
-                        bionetStorageLocation.dispatch('configureParent', {
+                            const boxId = parentObj.id
+                            bionetStorageLocation.dispatch('configureParent', {
                                 child: dbData,
                                 parent: parentObj,
                                 tempAssignments: getTempCellAssignments(boxId)
                             })
-                            //highlightTempCellAssignments(boxId)
+                        }
                     }
 
 

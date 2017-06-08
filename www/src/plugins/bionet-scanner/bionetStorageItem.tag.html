@@ -172,11 +172,12 @@
                             console.log('bionet storage location getLocationPath result:', JSON.stringify(locationPath))
 
                             const newLocationPath = locationPath
-
                             const container = locationPath[0]
-                            const parent = locationPath[1]
-                            tag.container = container
-                            tag.locationPath = newLocationPath
+                            if (locationPath.length > 1) {
+                                const parent = locationPath[1]
+                                tag.container = container
+                                tag.locationPath = newLocationPath
+                            }
 
                             pixijsutils.initStage(tag.width, tag.height)
 
