@@ -31,10 +31,12 @@
         tag.types = bionetLabLayout.types
 
         const runRenderLoop = function() {
-            $('#render-canvas').show()
+            //$('#render-canvas').show()
+            /*
             $('#babylon-container').css({
                 height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-location-canvas').height() - 15
             });
+            */
 
             tag.engine.runRenderLoop(function() {
                 //scene.activeCamera.alpha += .01;
@@ -42,7 +44,7 @@
             });
         }
         const pauseRenderLoop = function() {
-            $('#render-canvas').hide()
+            //$('#render-canvas').hide()
             tag.engine.stopRenderLoop()
         }
 
@@ -405,6 +407,7 @@
             const createScene = function(inventoryModel) {
                 // create a basic BJS Scene object
                 //if (scene !== null) return
+                console.log('babylonjs create scene')
                 const labObj = inventoryModel[0]
                 if (labObj === undefined) return
 
@@ -467,22 +470,6 @@
                 return scene;
             }
 
-            const activate3d = function(activeState) {
-                console.log('activate3d:', activeState)
-                if (activeState) {
-                    if (app.state.inventoryTree !== undefined) {
-                        createScene(app.state.inventoryTree)
-                        runRenderLoop()
-                    } else {}
-                } else {
-                    pauseRenderLoop()
-                }
-                //if (activeState) runRenderLoop()
-                //else pauseRenderLoop()
-                tag.active = activeState
-                tag.update()
-            }
-            const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
 
             const moveCamera = function(callback, dx, dy, dz) {
                 console.log('move camera ', dx, dy)
@@ -583,8 +570,26 @@
             $('#render-canvas').click(function() {
                 $('html').scrollTop(0)
             })
+            //$('#render-canvas').hide()
 
-            $('#render-canvas').hide()
+            const activate3d = function(activeState) {
+                console.log('activate3d:', activeState)
+                if (activeState) {
+                    if (app.state.inventoryTree !== undefined) {
+                        createScene(app.state.inventoryTree)
+                        engine.resize();
+                        runRenderLoop()
+                    } else {}
+                } else {
+                    pauseRenderLoop()
+                }
+                //if (activeState) runRenderLoop()
+                //else pauseRenderLoop()
+                tag.active = activeState
+                tag.update()
+            }
+            const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
+            
             this.on('unmount', function() {
                 scene = null
                 pauseRenderLoop()

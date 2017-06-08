@@ -2,7 +2,7 @@
     <div class="searchheight row">
         <div id="searchresult" class="searchresult col s4">
             <div if={results.length===0}>Cart is empty.</div>
-            <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
+            <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}" style="margin-left:65px;">
                 <list-item class="searchItem" no-reorder each={item in results} item={item}>
                     <form-checkbox class={left-align} id={item.id}/>
                 </list-item>
@@ -14,16 +14,69 @@
                 <scanner/>
             </div>
         </div>
-        -->
         <div id="edit-physical" class="edititem col s8">
             <div if={results.length>0} onclick={emptyCart} class="right-align" style="margin-right:20px; color:teal; cursor: pointer; cursor: hand; ">empty cart</div>
             <bionet-storage-location width="{pixiwidth}" />
             <babylon-3d></babylon-3d>
             <create-physical show="false" top-margin="0px" />
         </div>
+        -->
+        <div id="physical-view" class="col s8">
+            <div id="pixijsdiv" class="row pixijs">
+                <bionet-storage-location width={pixiwidth} height={pixiheight}/>
+            </div>
+            <div id="threedview" class="row threedview" style="margin:0;padding:0;">
+                <babylon-3d></babylon-3d>
+            </div>
+            <div id="physical-props-view" class="row physical-view"  style="width:100%;margin:0;padding:0;">
+                <div id="box" class="edit-physical">
+                    <box-contents />
+                </div>
+                <div id="physical-storage" class="edit-physical">
+                    <create-physical show="false" top-margin="0px" />
+                </div>
+            </div>
+        </div>
+
+        <div id="threedicon" style="position:absolute; top:110px; left:10px; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
+
+
     </div>
 
     <style>
+        .pixijs {
+            margin-top: 15px;
+            margin-bottom: 0px;
+            width: 100%;
+            height: 35%;
+            float: left;
+            z-index: 2000;
+        }
+        
+        .threedview {
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-top: 0px;
+            padding-top: 0px;
+            margin-bottom: 0px;
+            padding-bottom: 0px;
+            width: 100%;
+            height: 65%;
+            float: left;
+        }
+        
+        .physical-view {
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding-top: 0px;
+            padding-bottom: 0px;
+            width: 100%;
+            height: 65%;
+            float: left;
+        }
+        
         .searchheight {
             margin-top: 115px;
             height: calc(100% - 100px)
@@ -53,9 +106,30 @@
         }]
 
         this.on('mount', function() {
-            tag.pixiwidth = $('#edit-physical').width()
+            $('#physical-view').css({
+                height: $(window).innerHeight() - $('#appbar').height() - 14
+            });
+            tag.pixiwidth = $('#pixijsdiv').width()
+            tag.pixiheight = $('#pixijsdiv').height()
+            tag.update()
 
             console.log('cart tag')
+
+            var threedstatus = false
+            tag.activate3d = function() {
+                threedstatus = !threedstatus
+                if (threedstatus) {
+                    $('#physical-props-view').hide()
+                    $('#threedview').show()
+                } else {
+                    $('#physical-props-view').show()
+                    $('#threedview').hide()
+                }
+                BIONET.signal.activate3D.dispatch(threedstatus)
+            }
+            $('#physical-props-view').show()
+            $('#threedview').hide()
+
             const deleteCartItem = function(e, item) {
                 console.log('iconClick', item.id)
                 tag.results = []

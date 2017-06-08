@@ -25,15 +25,15 @@
                 <div id="pixijsdiv" class="row pixijs">
                     <bionet-storage-location width={pixiwidth} height={pixiheight}/>
                 </div>
-                <div id="threedview" class="row" class="threedview" style="margin:0;padding:0;">
+                <div id="threedview" class="row threedview" style="margin:0;padding:0;">
                     <babylon-3d></babylon-3d>
                 </div>
-                <div id="physical-props-view" class="row physical-view" style="margin:0;padding:0;">
-                    <div id="box" class="edit-physical">
+                <div id="physical-props-view" class="row physical-view" style="width:100%;margin:0;padding:0;">
+                    <div id="box" class="edit-physical" style="width:100%">
                         <box-contents />
                     </div>
-                    <div id="physical-storage" class="edit-physical">
-                        <create-physical show="false" top-margin="0px" />
+                    <div id="physical-storage" class="edit-physical" style="width:100%">
+                        <create-physical show="false" top-margin="0px" style="width:100%" />
                     </div>
                 </div>
             </div>
@@ -78,7 +78,10 @@
             padding-top: 0px;
             margin-bottom: 0px;
             padding-bottom: 0px;
+            width: 100%;
             height: 65%;
+            float: left;
+            display: block;
         }
         
         .physical-view {
@@ -88,7 +91,10 @@
             margin-bottom: 0px;
             padding-top: 0px;
             padding-bottom: 0px;
-            height: 75%;
+            width: 100%;
+            height: 65%;
+            float: left;
+            display: block;
         }
         
         .inventory-tree {
@@ -569,9 +575,24 @@
                 BIONET.signal.requestStorage.dispatch()
             }
             const physicalUpdatedBinding = BIONET.signal.physicalUpdated.add(physicalUpdated)
-
-            const activate3d = function(activeState) {
-                if (activeState) {
+                /*
+                const activate3d = function(activeState) {
+                    if (activeState) {
+                        $('#physical-props-view').hide()
+                        $('#threedview').show()
+                    } else {
+                        $('#physical-props-view').show()
+                        $('#threedview').hide()
+                    }
+                }
+                const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
+                */
+            var threedstatus = false
+            tag.activate3d = function() {
+                threedstatus = !threedstatus
+                console.log('inventory view activate3d ', threedstatus)
+                BIONET.signal.activate3D.dispatch(threedstatus)
+                if (threedstatus) {
                     $('#physical-props-view').hide()
                     $('#threedview').show()
                 } else {
@@ -579,18 +600,13 @@
                     $('#threedview').hide()
                 }
             }
-            const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
-            var threedstatus = false
-            tag.activate3d = function() {
-                threedstatus = !threedstatus
-                BIONET.signal.activate3D.dispatch(threedstatus)
-            }
+            $('#physical-props-view').show()
+            $('#threedview').hide()
 
             this.on('unmount', function() {
                 physicalUpdatedBinding.detach()
                 createStorageItemResultBinding.detach()
                 requestStorageResultBinding.detach()
-                activate3DBinding.detach()
                 $('html').css({
                     overflow: 'auto'
                 })
