@@ -49,7 +49,7 @@
         }
 
         tag.active = false
-        const scalingFactor = 2
+        const scalingFactor = 2.5
 
         const StorageSpec = function(type, materialSpec, dimensions, defaultVisibility) {
             this.type = (type !== undefined) ? type : 'notype'
@@ -414,7 +414,7 @@
                 scene = new BABYLON.Scene(engine);
 
                 // create a FreeCamera, and set its position
-                var camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", 0, 0 * Math.PI, 0 * Math.PI, new BABYLON.Vector3(0, 5, -8), scene);
+                var camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", 0.4 * Math.PI, 0 * Math.PI, 0, new BABYLON.Vector3(0, 5, -8), scene);
 
                 // target the camera to scene origin
                 camera.setTarget(new BABYLON.Vector3(0, 2, 0));

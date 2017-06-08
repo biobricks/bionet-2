@@ -48,6 +48,17 @@ const pixijsUtils = {
         const scaley = this.height / bounds.height
         var scale = Math.min(scalex, scaley)
         source.scale.x = source.scale.y = scale
+        const scaleObj = {
+            stageWidth: bounds.width,
+            stageHeight: bounds.height,
+            divWidth: this.width,
+            divHeight: this.height,
+            scale: scale,
+            devicePixelRatio:window.devicePixelRatio,
+            windowWidth:window.innerWidth,
+            windowHeight:window.innerHeight,
+        }
+        console.log('***pixijs scaling*** \n %s',JSON.stringify(scaleObj,null,2))
     },
     appendToStage: function (source) {
         this.stage.addChild(source)

@@ -7,7 +7,7 @@ const bionetLabLayout = {
     assets: '/static/assets/lab-storage/',
     storageSprite: null,
     resources: {},
-    sceneWidth: 1600,
+    sceneWidth: {},
 
     loadResources: function () {
         console.log('labStorage load function')
@@ -101,6 +101,7 @@ const bionetLabLayout = {
 
     initializeModel: function (config) {
         this.config = config
+        this.sceneWidth={}
         if (config.title !== undefined) {
             this.title = config.title
         }
@@ -173,6 +174,7 @@ const bionetLabLayout = {
         if (this.locations === undefined) return
 
         console.log('labStorage initialize scene ')
+        this.sceneWidth = divwidth
         const scale = stage.scale.x
 
         const thisModule = this;
