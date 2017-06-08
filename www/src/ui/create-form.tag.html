@@ -15,22 +15,17 @@
                     </tbody>
                 </table>
             </div>
-            <div id="physical-storage" class="col s8">
-                <div if={showStorage} class="row">
-                    <div id="pixijsdiv" class="pixijs">
-                        <bionet-storage-item width={pixiwidth}/>
-                    </div>
+
+            <div id="physical-view" class="col s8">
+                <div id="pixijsdiv" class="row pixijs">
+                    <bionet-storage-item width={pixiwidth} height={pixiheight}/>
                 </div>
-                <!--
-                <div id="box" class="edit-physical">
-                    <box-contents />
-                </div>
-                -->
-                <div class="row">
+                <div id="physical-props-view" class="row physical-view" style="margin:0;padding:0;">
                     <div id="workbench-form" class="edit-physical">
                     </div>
                 </div>
             </div>
+
             <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:110px; left:10px; text-align:left" onclick={addNode} data-activates="addmenu2"><i class="material-icons">queue</i></a>
 
             <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" style="position:absolute; top:180px; left:10px; text-align:left" onclick={saveWorkbench}><i class="material-icons">save</i></a>
@@ -44,6 +39,28 @@
     </div>
 
     <style>
+        .pixijs {
+            margin-top: 15px;
+            margin-bottom: 0px;
+            width: 100%;
+            height: 35%;
+            float: left;
+            z-index: 2000;
+        }
+        
+        .physical-view {
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding-top: 0px;
+            padding-bottom: 0px;
+            width: 100%;
+            height: 75%;
+            float: left;
+            display: block;
+        }
+        
         .matchlist {
             background-color: rgba(255, 255, 255, 1);
             z-index: 1000;
@@ -138,7 +155,6 @@
                 $('#ftree').css({
                     width: $('#treeview').width() - 75
                 });
-                tag.pixiwidth = $('#physical-storage').width()
                 tag.update()
 
                 BIONET.signal.getFavorites.dispatch()
@@ -187,14 +203,34 @@
         this.selectedType = null
         this.matches = []
 
+        const toggleLocationPath = function(enable) {
+            if (enable) {
+                $('#pixijsdiv').show()
+                $('#physical-props-view').css({
+                    height: '65%'
+                });
+
+            } else {
+                $('#pixijsdiv').hide()
+                $('#physical-props-view').css({
+                    height: '100%'
+                });
+            }
+        }
+
         this.on('mount', function() {
+
+            $('#physical-view').css({
+                height: $(window).innerHeight() - $('#appbar').height() - 14
+            });
+            tag.pixiwidth = $('#pixijsdiv').width()
+            tag.pixiheight = $('#pixijsdiv').height()
+            toggleLocationPath(false)
+            tag.update()
 
             $('.inventory-height').css({
                 height: $(window).innerHeight() - $('#appbar').height()
             });
-
-            //$('#name').focus()
-            tag.pixiwidth = $('#physical-storage').width()
 
             // set default create form to create quilt
             riot.mount('div#workbench-form', 'create-quilt')
@@ -431,11 +467,12 @@
                 if (node) {
                     const dbData = node.data.dbData
                     if (dbData.type === 'workbench') {
-                        tag.showStorage = false
+                        toggleLocationPath(false)
                         riot.mount('div#workbench-form', 'create-quilt')
                         tag.update()
                         return
                     }
+                    toggleLocationPath(true)
 
                     if (dbData.type.indexOf('box') >= 0) {
                         boxObj = dbData
@@ -473,8 +510,6 @@
 
 
                     console.log('select physical:', JSON.stringify(dbData))
-
-                    tag.showStorage = true
 
                     riot.mount('div#workbench-form', 'create-physical', {
                         topMargin: '0px'
@@ -576,7 +611,9 @@
                         saveList.push(dbData)
                         console.log('workbench: saving physical ', JSON.stringify(dbData))
                             // TODO: messaging async api call
-                        app.route('partDataAccessor', 'storePhysical', undefined, {material: dbData})
+                        app.route('partDataAccessor', 'storePhysical', undefined, {
+                            material: dbData
+                        })
                     }
                 })
                 app.ui.toast('Workbench items have been moved to local inventory');
@@ -595,12 +632,11 @@
             tag.addNode = function(e) {
                 BIONET.signal.generatePhysicals.dispatch(tag.refs.selectVirtual.value, tag.refs.instances.value)
             }
+            tag.update()
 
 
         })
-        tag.on('update', function() {
-            tag.pixiwidth = $('#physical-storage').width()
-        })
+        tag.on('update', function() {})
 
     </script>
 </create-form>

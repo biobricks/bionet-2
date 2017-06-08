@@ -440,15 +440,17 @@ const bionetLabLayout = {
             } else {
                 var width, height
                 if (storageItem.xc === storageItem.yc) {
-                    height = celldy - marginy * 2
+                    height = celldx - marginy * 2
                     width = height
+                        width = celldx *0.66
+                        height = celldx *0.66
                 } else {
                     if (storageItem.xc > storageItem.yc) {
                         width = celldx
-                        height = width * 0.66
+                        height = celldx * 0.66
                     } else {
-                        height = celldy
-                        width = height * 0.66
+                        width = celldx *0.5
+                        height = celldx *0.66
                     }
                 }
                 const childLoc = locations[i + 1]

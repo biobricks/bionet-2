@@ -35,24 +35,8 @@
 
             const renderScene = function(locationPath) {
                 const bionetLabLayoutScene = new PIXI.Container()
-                bionetLabLayout.createScene(bionetLabLayoutScene)
+                bionetLabLayout.createScene(bionetLabLayoutScene, tag.width, tag.height)
 
-                /*                
-                                containerConfig = {
-                                    xc: storageItem.xc,
-                                    yc: storageItem.yc,
-                                    width: width,
-                                    height: height,
-                                    x: (childLoc) ? childLoc.x : undefined,
-                                    y: (childLoc) ? childLoc.y : undefined,
-                                    childId: (childLoc) ? childLoc.id : undefined,
-                                    title: storageItem.name
-                                }
-
-                            var bionetStorageContainer = new BionetStorageContainer(containerConfig)
-                            bionetStorageContainer.createScene(storageSprite)
-                */
-                //const locationPath = tag.locationPath
                 if (locationPath) {
                     for (var i = 0; i < locationPath.length; i++) {
                         BIONET.signal.getContainerContents.dispatch(locationPath[i].id)
@@ -63,7 +47,6 @@
 
                 pixijsutils.scaleToFit(bionetLabLayoutScene)
                 pixijsutils.appendToStage(bionetLabLayoutScene)
-                    //pixijsutils.renderStage()
             }
 
             bionetLabLayout.initializeTypes()
@@ -167,9 +150,8 @@
                             locationPath: newLocationPath,
                             title: container.name
                         }
-                        bionetLabLayout.initializeModel(config)
 
-                        // render if resources loaded otherwise defer
+                        bionetLabLayout.initializeModel(config, tag.height, tag.width)
 
                         if (tag.resources) {
                             renderScene(newLocationPath)
@@ -189,7 +171,6 @@
                             }
                             console.log('bionet storage location getLocationPath result:', JSON.stringify(locationPath))
 
-                            //const newLocationPath = [locationPath[0], locationPath[1]]
                             const newLocationPath = locationPath
 
                             const container = locationPath[0]
@@ -204,7 +185,7 @@
                                 locationPath: newLocationPath,
                                 title: container.name
                             }
-                            bionetLabLayout.initializeModel(config)
+                            bionetLabLayout.initializeModel(config, tag.height, tag.width)
 
                             // render if resources loaded otherwise defer
 
