@@ -219,10 +219,12 @@ module.exports = function(settings, users, acccounts) {
 
       return;
     }
-    
+      
+    /* skipping test for container altogether
     if(!m.parent_id&&m.type!=='lab') {
       return cb(new Error("No container specified"));
     }
+    */
 
     var mtch;
     if(imageData && (mtch = imageData.match(/^data:image\/png;base64,(.*)/))) {
