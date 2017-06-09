@@ -35,7 +35,8 @@
 
             const renderScene = function(locationPath) {
                 const bionetLabLayoutScene = new PIXI.Container()
-                bionetLabLayout.createScene(bionetLabLayoutScene, tag.width, tag.height)
+                //bionetLabLayout.createScene(bionetLabLayoutScene, tag.width, tag.height)
+                bionetLabLayout.createScene(bionetLabLayoutScene, pixijsutils.PIXI_WIDTH, pixijsutils.PIXI_HEIGHT)
 
                 if (locationPath) {
                     for (var i = 0; i < locationPath.length; i++) {

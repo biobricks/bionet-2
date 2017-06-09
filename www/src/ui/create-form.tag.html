@@ -486,29 +486,29 @@
                             //highlightTempCellAssignments(boxId)
 
                     } else {
-                        var parentObj = boxObj
-                        if (dbData.wbparent_id === undefined) {
-                            /*
+                        if (dbData.type.indexOf('physical') < 0) {
                             bionetStorageLocation.dispatch('configure', {
                                 id: dbData.id,
                                 tempAssignments: []
                             })
-                            */
                         } else {
-                            const parentId = dbData.wbparent_id
-                            ftree.visit(function(node) {
-                                var searchData = node.data.dbData
-                                if (searchData && searchData.id === parentId) {
-                                    parentObj = searchData
-                                }
+                            var parentObj = boxObj
+                            if (dbData.wbparent_id !== undefined) {
+                                const parentId = dbData.wbparent_id
+                                ftree.visit(function(node) {
+                                    var searchData = node.data.dbData
+                                    if (searchData && searchData.id === parentId) {
+                                        parentObj = searchData
+                                    }
+                                })
+                            }
+                            const boxId = parentObj.id
+                            bionetStorageLocation.dispatch('configureParent', {
+                                child: dbData,
+                                parent: parentObj,
+                                tempAssignments: getTempCellAssignments(boxId)
                             })
                         }
-                        const boxId = parentObj.id
-                        bionetStorageLocation.dispatch('configureParent', {
-                            child: dbData,
-                            parent: parentObj,
-                            tempAssignments: getTempCellAssignments(boxId)
-                        })
                     }
 
 

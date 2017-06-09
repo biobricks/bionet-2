@@ -44,10 +44,12 @@
     <h5 id="createVirtualHeader" ref="createVirtualHeader">Edit {formData.type}</h5>
     <form id="editPartForm" name="editPartForm" class="col s12">
         <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+        <!--
         <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
         <form-textarea-input label="Biosafety level" ref="bsl" name="bsl" value={formData.bsl}/>
         <form-switch label="Biohazardous?" ref="biohazard" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
         <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
+        -->
         <div each={field in fields}>
             <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value={formData[field.name]} />
         </div>
@@ -116,6 +118,7 @@
             partDataAccessor.addRoute('getVirtualResult', (virtualData) => {
                 console.log('part-specification, getVirtualResult:', JSON.stringify(virtualData))
                 tag.formData = JSON.parse(JSON.stringify(virtualData));
+                this.fields = app.getAttributesForType(tag.formData.type)
                 if (tag.formData.created) {
                     d.setTime(tag.formData.created.time * 1000)
                     tag.createdDate = d.toDateString()

@@ -101,7 +101,7 @@ const bionetLabLayout = {
 
     initializeModel: function (config) {
         this.config = config
-        this.sceneWidth={}
+        this.sceneWidth=1600
         if (config.title !== undefined) {
             this.title = config.title
         }
@@ -195,18 +195,20 @@ const bionetLabLayout = {
         const containerOutlineColor = 0x000000
         const containerFillColor = 0x000000
 
-        var celldx = Math.max(divwidth / locations.length, 350)
-        //var celldx = width / locations.length
+        //var celldx = Math.max(divwidth / locations.length, 250)
+        var celldx = 250
         var celldy = (150 / 190) * celldx - 60
-
+        /*
         if (celldy * scale > divheight) {
             celldy = divheight - 60
             const sc = celldx / celldy
             celldx = celldy * sc
         }
+        */
 
         const marginx = 30
-        const marginy = (locations.length > 2) ? 30 : 50
+        const marginy = 20
+        //const marginy = (locations.length > 2) ? 30 : 50
         var lx = marginx;
         var ly = marginy;
 
@@ -291,7 +293,8 @@ const bionetLabLayout = {
         const anchorPoint = new PIXI.Point(0.5, 1)
 
         if (thisModule.title !== undefined) {
-            const titleTextSize = (locations.length > 2) ? '22px' : '44px'
+            const titleTextSize = '20px'
+            //const titleTextSize = (locations.length > 2) ? '22px' : '44px'
             var titleTextProps = {
                 fontFamily: 'Roboto',
                 fontSize: titleTextSize,

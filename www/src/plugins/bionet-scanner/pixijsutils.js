@@ -2,9 +2,14 @@ const PIXI = require('pixi.js')
 const tween = require('pixi-tween')
 const MiniSignal = require('mini-signals');
 const pixijsUtils = {
+    PIXI_WIDTH:945,
+    PIXI_HEIGHT:230,
+    //PIXI_WIDTH:1465,
+    //PIXI_HEIGHT:834,
     initRenderer: function () {
         this.pixiBackgroundColor = 0xffffff
-        const renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, {
+        //xconst renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, {
+        const renderer = PIXI.autoDetectRenderer(this.PIXI_WIDTH, this.PIXI_HEIGHT, {
             backgroundColor: this.pixiBackgroundColor,
             resolution: window.devicePixelRatio,
             transparent: false,
@@ -28,7 +33,6 @@ const pixijsUtils = {
     initStage: function (width, height) {
         this.stage.removeChildren()
         const w = Math.round(width)
-            //this.renderer.clear(this.pixiBackgroundColor)
         const h = Math.round(height)
         this.width = w
         this.height = h
@@ -40,7 +44,7 @@ const pixijsUtils = {
         this.stage.addChild(graphics)
 
         this.renderer.render(this.stage)
-        this.renderer.resize(w, h)
+        //xthis.renderer.resize(w, h)
     },
     resizeStage: function (width, height) {
         const w = Math.round(width)
@@ -51,6 +55,12 @@ const pixijsUtils = {
     },
     scaleToFit: function (source) {
         const bounds = source.getBounds()
+        /*
+        const bounds = {
+            width:this.PIXI_WIDTH,
+            height:this.PIXI_HEIGHT
+        }
+        */
         const scalex = this.width / bounds.width
         const scaley = this.height / bounds.height
         var scale = Math.min(scalex, scaley)

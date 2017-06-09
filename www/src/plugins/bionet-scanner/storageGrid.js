@@ -147,6 +147,7 @@ Object.defineProperty(StorageGrid, "p2", {
 
 StorageGrid.prototype.highlightMouseover = function (name, x, y, container) {
     var annotation = this.mouseoverSprite
+    const scalef=1
     annotation.removeChildren()
     annotation.x = x
     annotation.y = y
@@ -158,12 +159,12 @@ StorageGrid.prototype.highlightMouseover = function (name, x, y, container) {
     const textColor = '#000000'
     const textProps = {
         fontFamily: 'Ariel',
-        fontSize: '64px',
+        fontSize: '128px',
         fill: textColor,
         fontWeight: 1600
     }
     const label = new PIXI.Text(name, textProps);
-    label.scale.x = label.scale.y = 3
+    label.scale.x = label.scale.y = scalef
     annotation.addChild(label)
     label.updateTransform()
     label.calculateBounds()
