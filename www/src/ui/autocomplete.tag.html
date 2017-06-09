@@ -88,7 +88,7 @@
             this.hideMatches = function(e) {
                 this.matches = null
                 this.selected = null
-                $('#matchlist_q').css("display:none")
+                $('#matchlist_q').hide()
                 this.update()
             }.bind(this)
 
@@ -134,7 +134,7 @@
             }.bind(this));
 
             this.showMatches = function() {
-                $('#matchlist_q').css("display:block")
+                $('#matchlist_q').show()
             }
 
             $(this.refs[tag.refName]).on('input', function(e) {
@@ -160,6 +160,7 @@
         this.on('updated', function() {
             if (this.matches && this.matches.length) {
                 $('#matchlist_q').css('border', '')
+                this.showMatches()
             } else {
                 $('#matchlist_q').css('border', 'none')
             }
