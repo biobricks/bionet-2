@@ -193,9 +193,11 @@
                     children: childNodes
                 }
                 rootNode.addChildren(favoritesData, 0)
+                favoritesNode = rootNode.findFirst('favorites')
             } else {
                 favoritesNode.addChildren(childNodes, 0)
             }
+            favoritesNode.setExpanded()
         }
         const getFavoritesResultBinding = BIONET.signal.getFavoritesResult.add(getFavoritesResult)
 
