@@ -206,9 +206,7 @@
             })
             for (var i = 0; i < deleteNodes.length; i++) {
                 const node = deleteNodes[i]
-                const id = node.data.dbData.id
-                console.log('removing %s %s', node.title, id)
-
+                const id = (node.data.dbRef !== undefined) ? node.data.dbRef : node.data.dbData.id
                 BIONET.signal.delPhysical.dispatch(id)
                 node.remove()
             }
@@ -221,6 +219,7 @@
                     BIONET.signal.addFavorite.dispatch(node.data.dbData)
                 }
             })
+            BIONET.signal.getFavorites.dispatch()
         }
 
         const requestStorageResult = function(storageData) {
@@ -262,10 +261,49 @@
                         node.setFocus();
                     }
                 }
+                BIONET.signal.getFavorites.dispatch()
                 tag.update()
             })
         }
         const requestStorageResultBinding = BIONET.signal.requestStorageResult.add(requestStorageResult)
+        const getFavoritesResult = function(favorites) {
+            const ftree = $("#ftree").fancytree("getTree")
+            const rootNode = ftree.getRootNode()
+            var favoritesNode = rootNode.findFirst('favorites')
+            if (favoritesNode !== null) favoritesNode.remove()
+            favoritesNode = null
+
+            const childNodes = []
+            for (var i = 0; i < favorites.length; i++) {
+                const data = favorites[i].material
+                var parentId = data.parent_id
+                var title = data.name
+                var node = {
+                    key: data.id,
+                    title: title,
+                    dbData: data,
+                    dbRef: favorites[i].favorite,
+                    notes: data.notes,
+                    barcode: data.barcode,
+                    parentId: parentId,
+                    children: []
+                }
+                childNodes.push(node)
+            }
+            if (favoritesNode === null) {
+                const favoritesData = {
+                    key: 'favorites',
+                    title: 'favorites',
+                    children: childNodes
+                }
+                rootNode.addChildren(favoritesData, 0)
+                favoritesNode = rootNode.findFirst('favorites')
+            } else {
+                favoritesNode.addChildren(childNodes, 0)
+            }
+            favoritesNode.setExpanded()
+        }
+        const getFavoritesResultBinding = BIONET.signal.getFavoritesResult.add(getFavoritesResult)
 
         this.on('mount', function() {
             console.log("OOOOOOOOOPTS:", opts)
@@ -371,22 +409,24 @@
                 renderColumns: function(event, data) {
                     const node = data.node
                     const dbData = node.data.dbData
-                    if (!dbData.type || dbData.type === 'physical' || dbData.type === 'box') {
+                        /*
+                        if (!dbData.type || dbData.type === 'physical' || dbData.type === 'box') {
+                            const $tdList = $(node.tr).find(">td");
+                            //$tdList.eq(1).html('<i class="material-icons right-align" style="cursor: pointer; cursor: hand; ">shopping_cart</i>');
+                        }
+                        */
+                        /*
+                        console.log('tdlist:')
+                        const node = data.node
                         const $tdList = $(node.tr).find(">td");
-                        //$tdList.eq(1).html('<i class="material-icons right-align" style="cursor: pointer; cursor: hand; ">shopping_cart</i>');
-                    }
-                    /*
-                    console.log('tdlist:')
-                    const node = data.node
-                    const $tdList = $(node.tr).find(">td");
-                    const dbData = node.data.dbData
-                    const type = (dbData.type) ? dbData.type : ''
-                    const barcode = (dbData.barcode) ? dbData.barcode : ' '
-                    $tdList.eq(1).html('<span class="fancytree-edit">' + dbData.Description + '</span>');
-                    $tdList.eq(2).html('<span class="fancytree-edit">' + type + '</span>');
-                    $tdList.eq(3).html('<span class="fancytree-edit">' + barcode + '</span>');
-                    //$tdList.eq(3).html('<span>' + node.getIndexHier() + '</span>');
-                    */
+                        const dbData = node.data.dbData
+                        const type = (dbData.type) ? dbData.type : ''
+                        const barcode = (dbData.barcode) ? dbData.barcode : ' '
+                        $tdList.eq(1).html('<span class="fancytree-edit">' + dbData.Description + '</span>');
+                        $tdList.eq(2).html('<span class="fancytree-edit">' + type + '</span>');
+                        $tdList.eq(3).html('<span class="fancytree-edit">' + barcode + '</span>');
+                        //$tdList.eq(3).html('<span>' + node.getIndexHier() + '</span>');
+                        */
                 },
                 beforeSelect: function(event, data) {},
                 modifyChild: function(event, data) {
@@ -603,6 +643,7 @@
                 physicalUpdatedBinding.detach()
                 createStorageItemResultBinding.detach()
                 requestStorageResultBinding.detach()
+                getFavoritesResultBinding.detach()
                 $('html').css({
                     overflow: 'auto'
                 })
