@@ -179,4 +179,7 @@ websocket.createServer({server: server}, function(stream) {
 db.init();
 
 // initialize peer to peer connectivity
-var p2p = require('../libs/p2p.js')(settings);
+var p2p;
+if(!argv.nop2p) {
+  p2p = require('../libs/p2p.js')(settings);
+}

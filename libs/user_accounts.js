@@ -1,5 +1,6 @@
 
 var emailValidator = require('email-validator');
+
 var uuid = require('uuid').v4;
 var through = require('through2');
 

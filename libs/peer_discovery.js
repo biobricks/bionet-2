@@ -1,7 +1,7 @@
 
 var DC = require('discovery-channel')
 var xtend = require('xtend');
-;
+
 
 function discover(opts, cb) {
   if(!(this instanceof discover)) return new discover(opts, cb);

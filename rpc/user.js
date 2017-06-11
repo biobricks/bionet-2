@@ -544,6 +544,76 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
         console.log("SENDING:", ret);
         cb(null, ret);
       });
+    },
+
+    // TODO switch to using a stream as output rather than a callback
+    peerSearch: function(curUser, query, cb) {
+
+      function onError(err) {
+        // do we really care about remote errors? probably not
+      }
+
+      function onResult(peerInfo, result) {
+        cb(peerInfo, result);
+      }
+
+      // for each connected peer
+      peerConnector.peerDo(function(peer, next) {
+
+        // run a streaming blast query
+        var s = peer.remote.search(query)
+
+        s.on('error', onError);
+
+        s.on('data', function(data) {
+          cb(null, peer.info, data);
+        });
+
+        // TODO time out the search after a while
+
+        next();
+
+      }, function(err) {
+        if(err) return cb(err);
+      });
+    }
+
+    // TODO switch to using a stream as output rather than a callback
+    peerBlast: function(curUser, query, cb) {
+      var streams = [];
+
+      function onError(err) {
+        // do we really care about remote errors? probably not
+      }
+
+      function onResult(peerInfo, result) {
+        cb(peerInfo, result);
+      }
+
+      if(index.blast) {
+        streams.push({
+          stream: index.blast.query(query)
+        });
+      }
+
+      // for each connected peer
+      peerConnector.peerDo(function(peer, next) {
+
+        // run a streaming blast query
+        var s = peer.remote.blast(query)
+
+        s.on('error', onError);
+
+        s.on('data', function(data) {
+          cb(null, peer.info, data);
+        });
+        streams.push(s);
+
+        next();
+
+      }, function(err) {
+        if(err) return cb(err);
+      });
     }
 
   };

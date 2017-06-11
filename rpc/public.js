@@ -1,4 +1,7 @@
 
+// TODO should re-use mailer from cmd.js
+var mailer = new Mailer(settings.mailer, settings.baseUrl);
+
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
 module.exports = function(settings, users, accounts, db, index, mailer) { 
@@ -42,7 +45,7 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
         }
 
         db.ensureUserData(users, user, accounts, cb)
-      });
+     });
     }, 
 
 
@@ -67,43 +70,24 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
       return index.blast.query(query);
     }),
 
-    // TODO switch to using a stream as output rather than a callback
-    peerBlast: function(curUser, query, cb) {
-      var streams = [];
+    search: rpc.syncReadStream(function(curUser, q, cb) {
+      var s = db.bio.createReadStream({valueEncoding: 'json'});
 
-      function onError(err) {
-        // do we really care about remote errors? probably not
-      }
+      return s.pipe(through.obj(function(data, enc, next) {
+        if(!data.value.isPublic) return next();
+        if((data.value.name && data.value.name.toLowerCase().match(q.toLowerCase())) || (data.value.description && data.value.description.toLowerCase().match(q.toLowerCase()))) {
+          // skip stuff beginning with underscore
+          if(data.value.name && data.value.name[0] === '_') {
+            return;
+          }
 
-      function onResult(peerInfo, result) {
-        cb(peerInfo, result);
-      }
-
-      if(index.blast) {
-        streams.push({          
-          stream: index.blast.query(query)
-        });
-      }
-
-      // for each connected peer
-      peerConnector.peerDo(function(peer, next) {
-
-        // run a streaming blast query
-        var s = peer.remote.blast(query)
-
-        s.on('error', onError);
-
-        s.on('data', function(data) {
-          cb(null, peer.info, data);
-        });
-        streams.push(s);
-
+          ret.push(data.value);
+        }
+        
         next();
+      }));
 
-      }, function(err) {
-        if(err) return cb(err);
-      });
-    }
+    })
 
   }
 }
