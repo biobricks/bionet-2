@@ -1,6 +1,4 @@
 
-// TODO should re-use mailer from cmd.js
-var mailer = new Mailer(settings.mailer, settings.baseUrl);
 
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 

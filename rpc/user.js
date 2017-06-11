@@ -576,7 +576,7 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
       }, function(err) {
         if(err) return cb(err);
       });
-    }
+    },
 
     // TODO switch to using a stream as output rather than a callback
     peerBlast: function(curUser, query, cb) {
