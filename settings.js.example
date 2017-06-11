@@ -212,6 +212,23 @@ var settings = {
    // comment this out to disable discovery
    dhtChannel: 'bionet-nodes',
 
+  // Email where requests for biomaterials are sent
+  requestFulFillerEmail: "someone@example.org",
+
+  // Latitude and longtitude of the node's lab
+  physicalPosition: [2.2, 2.2], 
+
+  // Where requested biomaterials should be sent
+  physicalAddress: [
+    "Name of Lab",
+    "ATT: Name of Lab Manager",
+    "Address line 1",
+    "Address line 2",
+    "State or region",
+    "Zip or postal code",
+    "Country"
+  ],
+
    labLayout: {}
 };
 
