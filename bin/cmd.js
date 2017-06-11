@@ -10,7 +10,6 @@ var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 var auth = require('rpc-multiauth'); // auth
 var accountdown = require('accountdown'); // user/login management
 var uuid = require('uuid').v4;
-var through = require('through2');
 var accounts = require('../libs/user_accounts.js');
 var Mailer = require('../libs/mailer.js');
 
@@ -40,6 +39,13 @@ var db = require('../libs/db.js')(settings, users, accounts);
 var index = require('../libs/indexing.js')(settings, db);
 
 var mailer = new Mailer(settings.mailer, settings.baseUrl);
+
+// initialize peer to peer connectivity
+var p2p;
+if(!argv.nop2p) {
+  p2p = require('../libs/p2p.js')(settings);
+}
+
 
 // server up static files like css and images that are the same for all users
 var ecstatic = require('ecstatic')({
@@ -114,7 +120,7 @@ websocket.createServer({server: server}, function(stream) {
   var rpcMethods = require('../rpc/public.js')(settings, users, accounts, db, index, mailer);
 
   // these functions only available to users in the 'user' group
-  rpcMethods.user = require('../rpc/user.js')(settings, users, accounts, db, index, mailer);
+  rpcMethods.user = require('../rpc/user.js')(settings, users, accounts, db, index, mailer, p2p);
 
 
   // initialize the rpc server on top of the websocket stream
@@ -178,8 +184,3 @@ websocket.createServer({server: server}, function(stream) {
 // initialize the db (if it 
 db.init();
 
-// initialize peer to peer connectivity
-var p2p;
-if(!argv.nop2p) {
-  p2p = require('../libs/p2p.js')(settings);
-}

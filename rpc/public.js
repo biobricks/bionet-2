@@ -1,5 +1,5 @@
 
-
+var through = require('through2');
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
 module.exports = function(settings, users, accounts, db, index, mailer) { 
@@ -46,6 +46,26 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
      });
     }, 
 
+    searchAvailable: rpc.syncReadStream(function(curUser, q, cb) {
+      var s = db.physical.createReadStream({valueEncoding: 'json'});
+
+      return s.pipe(through.obj(function(data, enc, next) {
+//        if(!data.value.isPublic) return next();
+//        if(!data.value.isAvailable) return next();
+
+        if((data.value.name && data.value.name.toLowerCase().match(q.toLowerCase())) || (data.value.description && data.value.description.toLowerCase().match(q.toLowerCase()))) {
+          // skip stuff beginning with underscore
+          if(data.value.name && data.value.name[0] === '_') {
+            return;
+          }
+
+          this.push(data.value);
+        }
+        
+        next();
+        
+      }));
+    }),
 
     verifyUser: function(curUser, code, cb) {
       accounts.verify(users, code, cb);
@@ -66,26 +86,6 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
     blast: rpc.syncReadStream(function(curUser, query) {
       if(!index.blast) throw new Error("BLAST queries not supported by this node");
       return index.blast.query(query);
-    }),
-
-    search: rpc.syncReadStream(function(curUser, q, cb) {
-      var s = db.bio.createReadStream({valueEncoding: 'json'});
-
-      return s.pipe(through.obj(function(data, enc, next) {
-        if(!data.value.isPublic) return next();
-        if((data.value.name && data.value.name.toLowerCase().match(q.toLowerCase())) || (data.value.description && data.value.description.toLowerCase().match(q.toLowerCase()))) {
-          // skip stuff beginning with underscore
-          if(data.value.name && data.value.name[0] === '_') {
-            return;
-          }
-
-          ret.push(data.value);
-        }
-        
-        next();
-      }));
-
     })
-
   }
 }

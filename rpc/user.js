@@ -5,7 +5,8 @@ var async = require('async');
 var through = require('through2');
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
-module.exports = function(settings, users, accounts, db, index, mailer) { 
+module.exports = function(settings, users, accounts, db, index, mailer, p2p) { 
+
   return {
     secret: function(curUser, cb) {
       cb(null, "Sneeple are real!");
@@ -546,27 +547,33 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
       });
     },
 
+    // get a list of connected peers
+    getPeers: function(curUser, cb) {
+      if(!p2p) return cb(new Error("p2p not supported by this node"));
+
+      process.nextTick(function() {
+        cb(null, p2p.connector.peers);
+      });
+    },
+
     // TODO switch to using a stream as output rather than a callback
     peerSearch: function(curUser, query, cb) {
+      if(!p2p) return cb(new Error("p2p not supported by this node"));
 
       function onError(err) {
         // do we really care about remote errors? probably not
       }
 
-      function onResult(peerInfo, result) {
-        cb(peerInfo, result);
-      }
-
       // for each connected peer
-      peerConnector.peerDo(function(peer, next) {
+      p2p.connector.peerDo(function(peer, next) {
 
         // run a streaming blast query
-        var s = peer.remote.search(query)
+        var s = peer.remote.searchAvailable(query);
 
         s.on('error', onError);
 
         s.on('data', function(data) {
-          cb(null, peer.info, data);
+          cb(null, peer.id, data);
         });
 
         // TODO time out the search after a while
