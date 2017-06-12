@@ -1,0 +1,35 @@
+<show-global-result>
+  <div class="col s12">
+    <table cellspacing="0" cellpadding="0" border="0">
+      <tr>
+        <td>Material name</td><td>{opts.result.name}</td>
+      </tr>
+      <tr>
+        <td>Lab name</td><td>{opts.peer.name}</td>
+      </tr>
+      <tr>
+        <td>Distance</td><td>{Math.round(opts.peer.distance)} km</td>
+      </tr>
+      <tr>
+        <td>ID</td><td>{opts.result.id}</td>
+      </tr>
+    </table>
+    <p>This material is available under the OpenMTA and has been listed by the parent lab as requestable.</p>
+    <p id="request-btn-container"><button click={requestMaterial}>Request material</button></p>
+  </div>
+
+  <script>
+    var tag = this;
+    this.on('mount', function() {
+
+    });
+
+    this.requestMaterial = function(e) {
+      app.remote.requestMaterial(opts.peer.id, opts.result.id, function(err) {
+        if(err) return app.ui.toast("Request failed: " + err);
+
+        $('#request-btn-container').html("Your request, along with your contact info, has been sent to the lab manager at " + opts.peer.name);
+      });
+    };
+  </script>
+</show-global-result>

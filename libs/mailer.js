@@ -78,6 +78,8 @@ module.exports = function(opts, base_url) {
 
     txt += "\n\n";
 
+    console.log("PPPPPPPPPPP", opts);
+
     this.send({
       to: opts.requestFulfillerEmail,
       subject: "Material request",

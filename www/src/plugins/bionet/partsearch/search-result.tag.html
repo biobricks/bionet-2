@@ -180,7 +180,7 @@
   </p>
   <ul class="global-search-results">
     
-    <li class="searchItem" each={opts.results}>
+    <li class="searchItem" each={opts.results} onclick={showResult}>
       <a href="#">{result.name}</a><span class="result-distance">{peer.name}</span><span class="result-distance">{Math.round(peer.distance)} km</span>
     </li>
   </ul>
@@ -189,6 +189,14 @@
     this.on('mount', function() {
 //      tag.update();
     });
+
+    this.showResult = function(e) {
+      e.stopPropagation();
+
+      riot.mount('div#searchresults', 'show-global-result', e.item)
+      
+      return false;
+    };
   </script>
 
 </global-results>

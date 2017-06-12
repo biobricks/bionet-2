@@ -10,6 +10,7 @@ var partsearch = {
         //-------------------------------------------------------------------------
         // search
         require('./search-result.tag.html')
+        require('./show-global-result.tag.html')
 
         // TODO are these still used?
         app.addStream('bioClassQuery')
