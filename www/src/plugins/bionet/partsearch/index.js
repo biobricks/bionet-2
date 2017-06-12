@@ -54,7 +54,7 @@ var partsearch = {
 
         //---------------------------------------------------------------------
         // search route
-        const globalSearch = function (terms) {
+        const localSearch = function (terms) {
             app.appbarConfig({
                 enableTopNav: true,
                 enableBreadCrumbs: true,
@@ -74,11 +74,8 @@ var partsearch = {
                 return
             }
 
-            console.log("SEARCHING FOR:", q.terms);
-
             app.remote.search(q.terms, function (err, results) {
 
-                console.log("CALLED BACK");
                 if (err) return console.error(err); // TODO handle error better
 
                 q.results = [];
@@ -104,12 +101,78 @@ var partsearch = {
 
             });
         }
+
         app.addRoute('/search', function () {
-            globalSearch()
+            localSearch()
         })
         app.addRoute('/search/*', function (terms) {
-            globalSearch(terms)
+            localSearch(terms)
         })
+
+        app.addRoute('/gsearch', function (terms) {
+            globalSearch();
+        })
+
+        app.addRoute('/gsearch/*', function (terms) {
+            globalSearch(terms);
+        })
+
+        // search route
+        const globalSearch = function (terms) {
+            app.appbarConfig({
+                enableTopNav: true,
+                enableBreadCrumbs: true,
+                enableSubbar: false
+            })
+            
+            // todo: handle pagination
+            const q = route.query()
+            if (q.page !== undefined) {
+                console.log('search result page: ' + q.page)
+            }
+
+            q.terms = (terms !== undefined) ? decodeURIComponent(terms) : ''
+            if (q.terms.length<=0) {
+                q.results=[]
+                riot.mount('div#content', 'search-result', q)
+                return
+            }
+
+            console.log("SEARCHING FOR:", q.terms);
+
+            q.results = [];
+            q.global = true;
+
+            riot.mount('div#content', 'search-result', q)
+
+            var results = [];
+
+            app.remote.peerSearch(q.terms, function (err, peerInfo, result) {
+                if (err) return console.error(err); // TODO handle error better
+
+              results.push({
+                peer: peerInfo,
+                result: result
+              });
+
+              console.log("GOT RESULT!", results);
+
+              riot.mount('div#searchresults', 'global-results', {results: results})
+
+/*
+                    if (!result || !result.name) continue;
+                    const isVirtual = result.id.charAt(0) === 'v'
+
+                    q.results.push({
+                        primary_text: result.name,
+                        secondary_text: '',
+                        isPhysical: (result.id.indexOf('p-')>=0) ? true : false,
+                        id: result.id
+                    });
+                }
+*/
+            });
+        }
     },
     remove: function () {
 

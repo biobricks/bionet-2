@@ -8,11 +8,17 @@
                         <input id="search" ref="search" type="text" value={opts.terms} autofocus/>
                         <label id="search-label" class="active" for="search">Search biomaterials</label>
                     </div>
+                    <p class="local-global-radios">
+                      <input class="with-gap" ref="localglobalcheck" name="localglobalcheck" type="radio" id="localsearch" value="local" checked="{!opts.global}" />
+                      <label for="localsearch">Local</label>
+                      <input class="with-gap" ref="localglobalcheck" name="localglobalcheck" type="radio" id="globalsearch" value="global" checked="{opts.global}" />
+                      <label for="globalsearch">Global</label>
+                    </p>
                     <input type="submit" style="display:none" />
                 </form>
             </div>
             <div class="row">
-                <div class="searchresult"  style="width:100%">
+                <div id="searchresults" class="searchresult"  style="width:100%">
                     <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
                         <list-item class="searchItem" no-reorder each={item in results} item={item}>
                             <i if={item.isPhysical} class="tiny material-icons" style="float: right">group_work</i>
@@ -42,6 +48,8 @@
             float: left;
         }
 
+
+
     </style>
 
     <script>
@@ -58,14 +66,20 @@
 
         this.searchClick = function(e) {
             e.preventDefault()
+
             const terms = tag.refs.search.value
-            console.log('search-result tag, query:', terms)
-            route('search/' + encodeURIComponent(terms))
+
+            var globalOrLocal = $('#search-form')[0].localglobalcheck.value;
+            if(globalOrLocal === 'global') {
+              route('gsearch/' + encodeURIComponent(terms))
+            } else {
+              route('search/' + encodeURIComponent(terms))
+            }
             return false
         }
 
         const breadcrumbs = [{
-            'label': 'global search',
+            'label': 'search',
             'url': '/search'
         }]
 
@@ -100,7 +114,7 @@
                 tag.update()
 
                 app.setBreadcrumbs([{
-                    'label': 'global search',
+                    'label': 'search',
                     'url': '/search'
                 }, {
                     'label': opts.terms,
@@ -159,3 +173,23 @@
 
     </script>
 </search-result>
+
+<global-results>
+  <p>
+    {results}
+  </p>
+  <ul>
+    
+    <li class="searchItem" each={opts.results}>
+      {result.name}
+    </li>
+  </ul>
+  <script>
+    var tag = this;
+    this.on('mount', function() {
+      console.log("pppp", this.opts.results);
+      tag.update();
+    });
+  </script>
+
+</global-results>

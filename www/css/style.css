@@ -233,3 +233,9 @@ src: url('../fonts/emojione/EmojiOneColor-SVGinOT.ttf');
     font-weight: normal;
     font-style: normal;
 }
+
+
+.local-global-radios label {
+    margin-left: 35px;
+    padding-left: 35px;
+}

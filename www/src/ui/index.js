@@ -17,7 +17,7 @@ stdThemePlugin.start = function (cb) {
   }, {
     */
     const loggedInNav = [{
-        label: 'global search',
+        label: 'search',
         action: '/search'
   }, {
         label: 'local inventory',
