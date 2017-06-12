@@ -7,7 +7,11 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
 
     getPeerInfo: function(curUser, cb) {
       cb(null, {
-        id: settings.baseUrl
+        id: settings.baseUrl,
+        hostname: settings.hostname,
+        port: settings.port,
+        name: settings.lab,
+        position: settings.physicalPosition
       });
     },
 

@@ -158,19 +158,6 @@ var partsearch = {
               console.log("GOT RESULT!", results);
 
               riot.mount('div#searchresults', 'global-results', {results: results})
-
-/*
-                    if (!result || !result.name) continue;
-                    const isVirtual = result.id.charAt(0) === 'v'
-
-                    q.results.push({
-                        primary_text: result.name,
-                        secondary_text: '',
-                        isPhysical: (result.id.indexOf('p-')>=0) ? true : false,
-                        id: result.id
-                    });
-                }
-*/
             });
         }
     },

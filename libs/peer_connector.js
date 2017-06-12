@@ -3,8 +3,11 @@ var websocket = require('websocket-stream');
 var async = require('async');
 var backoff = require('backoff');
 var rpc = require('rpc-multistream');
+var auth = require('rpc-multiauth');
+var distance = require('jeyo-distans');
+var xtend = require('xtend');
 
-function PeerConnector(peerID, hostname, port, opts) {
+function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
 
   this.hostname = hostname;
   this.port = port;
@@ -16,6 +19,10 @@ function PeerConnector(peerID, hostname, port, opts) {
 
   this.peers = {}; // connected peers
   this.urls = {}; // same as this.peers but indexed by peer.url
+
+  this.rpcMethods = xtend(rpcMethods, {
+      peerIdentifier: function(){}, // used to identify us as a peer
+  });
 
   this._connectFail = function(peer) {
     peer.connected = false;
@@ -61,20 +68,23 @@ function PeerConnector(peerID, hostname, port, opts) {
 
     var stream = websocket(peer.url);
 
-    var rpcClient = rpc({
-      getPeerInfo: function(cb) {
-        cb(null, {
-          id: self.id,
-          hostname: self.hostname,
-          port: self.port
-        });
-      },
+    var rpcMethods = xtend(self.rpcMethods, {
+
       // the other side can ask this side to stop reconnecting
       permanentlyDisconnect: function() {
         peer.stopTrying = true;
         peer.stream.socket.close();
       }
-    }, {
+    });
+
+    // null auth
+    var rpcMethodsAuth = auth({
+      userDataAsFirstArgument: true, 
+      secret: 'unused',
+      login: function(loginData, cb) {cb(new Error("login is impossible"))}
+    }, rpcMethods, 'group');
+
+    var rpcClient = rpc(rpcMethodsAuth, {
       objectMode: true,
       heartbeat: 5000,
       debug: false
@@ -100,7 +110,17 @@ function PeerConnector(peerID, hostname, port, opts) {
           console.error('[peer getPeerInfo error]', err);
           return peer.stream.socket.close();
         }
+        console.log("GOT", info);
         peer.id = info.id;
+        peer.name = info.name;
+        peer.position = info.position;
+
+        if(peer.position && self.opts.position) {
+          peer.distance = distance(self.opts.position, peer.position);
+        } else {
+          peer.distance = Infinity;
+        }
+
         self.peers[peer.id] = peer;
         self.urls[peer.url] = peer;
       });
@@ -172,8 +192,8 @@ function PeerConnector(peerID, hostname, port, opts) {
     // reached backoff timeout
     bo.on('ready', function(number, delay) {
       console.log("RETRYING");
-      self._connectToPeer(peer);
-    });
+      this._connectToPeer(peer);
+    }.bind(this));
 
     peer.backoff = bo;
 
@@ -186,7 +206,7 @@ function PeerConnector(peerID, hostname, port, opts) {
 
     // TODO check options and reject if e.g. hostname or port missing
 
-    console.log("INCOMING:", peerInfo.id);
+    console.log("INCOMING:", peerInfo);
 
     if(peer) {
       if(peer.connected && !peer.incoming) {
@@ -206,8 +226,18 @@ function PeerConnector(peerID, hostname, port, opts) {
       stream: stream,
       incoming: true, // peer connected to us (rather than us connecting to peer)
       connected: true,
-      wasConnected: true
+      wasConnected: true,
+      name: peerInfo.name,
+      position: peerInfo.position
     };
+
+    if(peer.position && self.opts.position) {
+      peer.distance = distance(self.opts.position, peer.position);
+    } else {
+      peer.distance = Infinity;
+    }
+
+    console.log("DISTAAAANCE:", peer.distance);
 
     console.log("==================== INCOMING established:", peer.url);
 

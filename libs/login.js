@@ -11,7 +11,7 @@ module.exports = function(db, users, accounts) {
     
     users.verify('basic', creds, function(err, ok, id) {
       if(err) return cb(err)
-      if(!ok) return cb("Invalid username or password");
+      if(!ok) return cb(new Error("Invalid username or password"));
       
       users.get(id, function(err, user) {
         if(err) return cb(err);

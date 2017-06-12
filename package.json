@@ -51,6 +51,7 @@
     "form_to_object": "^1.0.8",
     "getusermedia": "^2.0.0",
     "index-level": "^0.0.2",
+    "jeyo-distans": "^0.2.0",
     "jquery": "^3.2.1",
     "jquery-ui": "^1.12.1",
     "jsonwebtoken": "^5.7.0",

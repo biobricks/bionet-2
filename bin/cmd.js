@@ -7,7 +7,7 @@ var util = require('util');
 var router = require('routes')(); // server side router
 var websocket = require('websocket-stream');
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
-var auth = require('rpc-multiauth'); // auth
+var auth = require('rpc-multiauth'); // authentication
 var accountdown = require('accountdown'); // user/login management
 var uuid = require('uuid').v4;
 var accounts = require('../libs/user_accounts.js');
@@ -39,12 +39,6 @@ var db = require('../libs/db.js')(settings, users, accounts);
 var index = require('../libs/indexing.js')(settings, db);
 
 var mailer = new Mailer(settings.mailer, settings.baseUrl);
-
-// initialize peer to peer connectivity
-var p2p;
-if(!argv.nop2p) {
-  p2p = require('../libs/p2p.js')(settings);
-}
 
 
 // server up static files like css and images that are the same for all users
@@ -119,24 +113,20 @@ websocket.createServer({server: server}, function(stream) {
 
   var rpcMethods = require('../rpc/public.js')(settings, users, accounts, db, index, mailer);
 
+
   // these functions only available to users in the 'user' group
   rpcMethods.user = require('../rpc/user.js')(settings, users, accounts, db, index, mailer, p2p);
 
-
-  // initialize the rpc server on top of the websocket stream
-  var rpcServer = rpc(auth({
-
+  var rpcMethodsAuth = auth({
     userDataAsFirstArgument: true, 
     secret: settings.loginToken.secret,
     login: require('../libs/login.js')(db, users, accounts)
+  }, rpcMethods, 'group');
 
-  }, rpcMethods, 'group'), {
-
-    // the opts for rpc-multistream
-
+  // initialize the rpc server on top of the websocket stream
+  var rpcServer = rpc(rpcMethodsAuth, {
     objectMode: true, // default to object mode streams
     debug: false
-
   });
 
 
@@ -148,9 +138,9 @@ websocket.createServer({server: server}, function(stream) {
   // when we receive a methods list from the other endpoint
   rpcServer.on('methods', function(remote) {
 
-    // if the remote node exports an rpc function called 'getPeerInfo'
-    // then we assume it's a peer
-    if(remote.getPeerInfo) {
+    // if the remote node exports an rpc function called 'peerIdentifier'
+    // then we assume it's a peer and not a web client
+    if(remote.peerIdentifier) {
 
       if(!p2p) {
         // we don't support p2p so ask the peer to permanently disconnect
@@ -184,3 +174,11 @@ websocket.createServer({server: server}, function(stream) {
 // initialize the db (if it 
 db.init();
 
+
+var rpcMethods = require('../rpc/public.js')(settings, users, accounts, db, index, mailer);
+
+// initialize peer to peer connectivity
+var p2p;
+if(!argv.nop2p) {
+  p2p = require('../libs/p2p.js')(rpcMethods, settings);
+}

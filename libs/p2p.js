@@ -1,13 +1,16 @@
 var PeerConnector = require('../libs/peer_connector');
 var PeerDiscover = require('../libs/peer_discovery');
 
-module.exports = function(settings) {
+module.exports = function(rpcMethods, settings) {
 
   if(!settings.dhtChannel) {
     return;
   }
 
-  var peerConnector = new PeerConnector(settings.baseUrl, settings.hostname, settings.port, {ssl: settings.ssl});
+  var peerConnector = new PeerConnector(settings.baseUrl, settings.hostname, settings.port, rpcMethods, {
+    ssl: settings.ssl,
+    position: settings.physicalPosition
+  });
 
   var peerDiscover = new PeerDiscover({
     channel: settings.dhtChannel,
