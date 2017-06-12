@@ -1,6 +1,6 @@
 <search-result>
     <div class="searchheight row">
-        <div class="col s4">
+        <div class="col s6">
             <div class="row">
                 <form id="search-form">
                     <div class="input-field col" style="width:100%">
@@ -178,17 +178,16 @@
   <p>
     {results}
   </p>
-  <ul>
+  <ul class="global-search-results">
     
     <li class="searchItem" each={opts.results}>
-      {result.name}
+      <a href="#">{result.name}</a><span class="result-distance">{peer.name}</span><span class="result-distance">{Math.round(peer.distance)} km</span>
     </li>
   </ul>
   <script>
     var tag = this;
     this.on('mount', function() {
-      console.log("pppp", this.opts.results);
-      tag.update();
+//      tag.update();
     });
   </script>
 

@@ -155,8 +155,6 @@ var partsearch = {
                 result: result
               });
 
-              console.log("GOT RESULT!", results);
-
               riot.mount('div#searchresults', 'global-results', {results: results})
             });
         }

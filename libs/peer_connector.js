@@ -237,8 +237,6 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
       peer.distance = Infinity;
     }
 
-    console.log("DISTAAAANCE:", peer.distance);
-
     console.log("==================== INCOMING established:", peer.url);
 
     stream.socket.on('close', function(code, reason) {

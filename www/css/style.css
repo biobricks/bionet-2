@@ -239,3 +239,36 @@ src: url('../fonts/emojione/EmojiOneColor-SVGinOT.ttf');
     margin-left: 35px;
     padding-left: 35px;
 }
+
+.global-search-results {
+  padding-left: 20px;
+
+}
+
+.global-search-results li {
+    height: 25px;
+    cursor: pointer;
+}
+
+.global-search-results li:hover {
+    background-color: #DDDDFF;
+}
+
+.global-search-results a {
+    width: 250px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.global-search-results .result-lab {
+    width: 100px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.global-search-results .result-distance {
+    width: 100px;
+    display: inline-block;
+    vertical-align: middle;
+}

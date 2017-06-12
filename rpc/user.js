@@ -573,7 +573,12 @@ module.exports = function(settings, users, accounts, db, index, mailer, p2p) {
         s.on('error', onError);
 
         s.on('data', function(data) {
-          cb(null, peer.id, data);
+          cb(null, {
+            id: peer.id,
+            name: peer.name,
+            position: peer.position,
+            distance: peer.distance
+          }, data);
         });
 
         // TODO time out the search after a while
