@@ -621,6 +621,14 @@ module.exports = function(settings, users, accounts, db, index, mailer, p2p) {
       }, function(err) {
         if(err) return cb(err);
       });
+    },
+
+    requestMaterial: function(curUser, peerID, id, cb) {
+      if(!p2p) return cb(new Error("Node does not support p2p"));
+      var peer = p2p.connector.peers[peerID];
+      if(!peer || !peer.remote) return cb(new Error("No such peer: "+peerID));
+
+      peer.remote.requestMaterialRemote(id, curUser.user.email, settings.physicalAddress, cb);
     }
 
   };

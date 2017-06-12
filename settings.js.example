@@ -42,7 +42,8 @@ var settings = {
     port: 25, // only needed for type: "smtp"
     tls: false,
     from_address: "noreply@example.org",
-    subjectPrefix: "[bionet.myhost.org]" // system email subjects are prefixed with this
+    subjectPrefix: "[bionet.myhost.org]", // system email subjects are prefixed with this
+    requestFulfillerEmail: "someone@example.org" // Email where requests for biomaterials are sent
   },
 
   // ----------
@@ -211,9 +212,6 @@ var settings = {
    // DHT channel name used to discovering other nodes 
    // comment this out to disable discovery
    dhtChannel: 'bionet-nodes',
-
-  // Email where requests for biomaterials are sent
-  requestFulFillerEmail: "someone@example.org",
 
   // Latitude and longtitude of the node's lab
   physicalPosition: [2.2, 2.2], 

@@ -86,6 +86,17 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
     blast: rpc.syncReadStream(function(curUser, query) {
       if(!index.blast) throw new Error("BLAST queries not supported by this node");
       return index.blast.query(query);
-    })
+    }),
+
+    // TODO should have some kind of validation / security / rate limiting
+    requestMaterialRemote: function(curUser, id, requesterEmail, physicalAddress, cb) {
+
+      db.physical.get(id, function(err, m) {
+        if(err) return cb(err);
+
+        mailer.sendMaterialRequest(m, requesterEmail, physicalAddress, cb);
+      });
+    }
+
   }
 }
