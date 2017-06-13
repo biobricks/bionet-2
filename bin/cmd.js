@@ -153,7 +153,7 @@ websocket.createServer({server: server}, function(stream) {
       remote.getPeerInfo(function(err, info) {
         if(err) return stream.socket.close();
 
-        p2p.connector.registerIncoming(info, stream, rpcServer, function(err) {
+        p2p.connector.registerIncoming(remote, info, stream, rpcServer, function(err) {
           if(err && err._permaFail) {
 
             console.log("Failing permanently for:", info.id, err.message);

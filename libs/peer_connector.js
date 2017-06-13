@@ -200,7 +200,7 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
     this._connectToPeer(peer);
   };
 
-  this.registerIncoming = function(peerInfo, stream, rpc, cb) {
+  this.registerIncoming = function(remote, peerInfo, stream, rpc, cb) {
     var self = this;
     var peer = this.peers[peerInfo.id];
 
@@ -220,6 +220,7 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
     }
 
     peer = {
+      remote: remote,
       id: peerInfo.id,
       url: this._toUrl(peerInfo.hostname, peerInfo.port),
       rpc: rpc,
