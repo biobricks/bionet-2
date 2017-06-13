@@ -256,6 +256,11 @@ You can restore from a backup by first deleting the old database (obviously be c
 * Add font inlining
 * Switch to gulp?
 
+# Gotchas and known issues
+
+## Peer disovery
+
+Right now DHT-based peer discovery won't work if your bionet node is _not_ hosted at the root URL of your hostname. E.g. if your `settings.baseUrl` is `https://mynode.org` then you're fine, but if it's `https://mynode.org/bionet` then it won't work.
 
 # Notes
 

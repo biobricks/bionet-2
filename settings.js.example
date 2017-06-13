@@ -244,5 +244,16 @@ module.exports = function(argv) {
     settings.mailer.type = 'console';
   }
 
+  var m = settings.baseUrl.match(/ttp:.*:(\d+)/);
+  if(m) {
+    settings.externalPort = parseInt(m[1]);
+  } else {
+    if(settings.baseUrl.match(/^https/)) {
+      settings.externalPort = 443;
+    } else {
+      settings.externalPort = 80;
+    }
+  }
+
   return settings;
 };
