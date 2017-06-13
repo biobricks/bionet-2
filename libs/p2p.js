@@ -7,13 +7,13 @@ module.exports = function(rpcMethods, settings) {
     return;
   }
 
-  var peerConnector = new PeerConnector(settings.baseUrl, settings.hostname, settings.externalPort, rpcMethods, {
+  var peerConnector = new PeerConnector(settings.baseUrl, settings.hostname, settings.port, rpcMethods, {
     position: settings.physicalPosition
   });
 
   var peerDiscover = new PeerDiscover({
     channel: settings.dhtChannel,
-    port: settings.externalPort
+    port: settings.port
   }, function(err, peer, type) {
     if(err) {
       // TODO
