@@ -8,7 +8,6 @@ module.exports = function(rpcMethods, settings) {
   }
 
   var peerConnector = new PeerConnector(settings.baseUrl, settings.hostname, settings.externalPort, rpcMethods, {
-    ssl: settings.ssl,
     position: settings.physicalPosition
   });
 

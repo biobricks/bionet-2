@@ -49,7 +49,7 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
 
   this._toUrl = function(hostname, port) {
     var prefix;
-    if(this.opts.ssl) {
+    if(this.port === 443) {
       prefix = 'wss://';
     } else {
       prefix = 'ws://';
