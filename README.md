@@ -23,7 +23,7 @@ git clone https://github.com/biobricks/bionet
 # install nvm
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash
 # install node
-nvm install stable
+nvm install --lts
 
 # install node packages
 cd bionet/
