@@ -1,21 +1,29 @@
-This is a work in progress. Don't expect anything to work.
+This is a work in progress. Don't expect everything to work.
+
+# Setting up a user
+
+If you're setting the bionet up to be used in production you will want to run it as its own user. E.g:
+
+```
+adduser bionet
+```
+
+Then do everything below as the bionet user.
 
 # Downloading
 
 ```
 sudo aptitude install git # if you don't already have git installed
-git clone git@gitlab.com:biobricks/bionet.git
+git clone https://github.com/biobricks/bionet
 ```
 
 # Installing pre-requisites
-
-TODO instructions for install latest stable node using nvm (and for root as well)
 
 ```
 # install nvm
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash
 # install node
-nvm install v4.4.2
+nvm install stable
 
 # install node packages
 cd bionet/
@@ -30,23 +38,35 @@ Follow (this guide)[https://www.elastic.co/guide/en/elasticsearch/reference/curr
 
 ## BLAST+
 
+The current version does not yet support BLAST through the web UI so for most folk this is not yet relevant.
+
 BLAST+ is required if you want to be able to run BLAST queries on DNA, RNA or Amino Acid sequences. As with ElasticSearch only exact matching is possible if BLAST is not installed.
 
-For debian/ubuntu based systems:
+You will have to compile the latest version, since the version bundled with most distros is not new enough to work with the bionet.
+
+First install build essentials:
+
+      ```
+sudo apt install build-essential
+```
+
+Download the latest version [from the NCBI ftp server](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/). It's probably [ncbi-blast-2.6.0+-x64-linux.tar.gz](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/).
+
+Extract, compile and install:
 
 ```
-sudo apt install ncbi-blast+
+cd ncbi-blast-2.6.0+-src/c++
+./configure
+make
+sudo make install
+cd ..
 ```
-
-or you can find the latest version (on the NCBI ftp server)[ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/].
 
 # Configuring
 
 ```
+cd bionet/
 cp settings.js.example settings.js 
-
-# TODO currently non-existant
-#cp www/settings.js.example www/settings.js
 ```
 
 Then edit each of the settings.js files to suit your needs.
@@ -60,6 +80,14 @@ cd ../
 ```
 
 and copy the ssh public key for each labdevice client to the `labdevice/client_keys/ directory` to authorize the client.
+
+# Email
+
+You will want to have a local SMTP server so the bionet can send outgoing emails. Install postfix and accept default options for everything but the system mail name. Ensure that the system mail name is the full domain name used by users to access the website, e.g. `my.domain.org`.
+
+```
+sudo apt install postfix
+```
 
 # Building
 
@@ -80,28 +108,6 @@ npm run watchify
 ```
 npm start
 ```
-
-# CSS and less
-
-The bionet uses [less](http://lesscss.org/) but you can of course also use plain CSS. To add less or css just add .less or .css files into:
-
-```
-www/css/
-```
-
-All of these files will be bundled into `static/bundle.css`.
-
-Note that the content of each .less files will be wrapped in a css class based on the filename of the .less file. The files basename without the file extension will be used but all strings of characters that are not in the set A-z or 0-9 or - or _ will be transformed to a signgle - (dash) character e.g:
-
-```
-# The contents of the file:
-foo\ bar..baz.less
-
-# Will be wrapped in the class
-.foo-bar-baz
-```
-
-Plain CSS files will not be wrapped like this (because nested rules aren't supported by CSS) and if you want to avoid this wrapping for .less files, then end the filename in `.global.less` 
 
 # Production 
 
