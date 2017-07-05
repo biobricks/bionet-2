@@ -32,6 +32,8 @@
 
             <a class="btn-floating btn-large waves-effect waves-light red dropdown-button" data-constrainwidth="false" style="position:absolute; top:250px; left:10px; text-align:left" onclick={deleteNode}><i class="material-icons">delete</i></a>
 
+            <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:absolute; top:320px; left:10px; text-align:left" onclick={upload}><i class="material-icons">open_in_browser</i></a>
+
             <ul id="addmenu2" class="dropdown-content" style="position:absolute; top:110px; left:80px; width:200px !important; text-align:left;z-index:1000">
                 <li each={item in virtuals} class="add-type"><span onclick={createNode}>{item.name}</span></li>
             </ul>
@@ -118,7 +120,6 @@
                 cb(null, results)
             });
         }
-
 
         const createStorageItemResult = function(storageItem) {
             console.log('createStorageItemResult', JSON.stringify(storageItem))
@@ -605,6 +606,7 @@
                 }
             }
 
+
             tag.saveWorkbench = function(e) {
                 const ftree = $("#ftree").fancytree("getTree")
                 const saveList = []
@@ -639,9 +641,67 @@
             }
             tag.update()
 
+            tag.upload = function(e) {
+                riot.mount('div#workbench-form', 'part-attachment')
+                $('#createNodeForm').hide()
+                tag.update()
+            }
+
 
         })
         tag.on('update', function() {})
 
     </script>
 </create-form>
+
+<part-attachment>
+    <!--
+    <form-textarea-input label="Attachments" name="attachment" value={formData.attachments}/>
+    -->
+    <div id="dropZone" style="width: 100%; height: 200px; border-style: dashed; border-width:7px; border-color:#b0b0b0;">
+        <div class="valign-wrapper" style="width:100%; height:100%">
+            <h5 class="valign center-align" style="color:#404040; width:100%">Drag and drop files to upload...</h5>
+        </div>
+    </div>
+    <script>
+        const tag = this
+        this.formData = {
+            attachments: ''
+        }
+        this.on('mount', function() {
+            console.log('part attachments mounted')
+
+            tag.formData = app.state.editPart
+            tag.update()
+            console.log("part-attachments tag:", JSON.stringify(tag.formData))
+            var dropZone = document.getElementById('dropZone');
+            if (dropZone === null || dropZone === undefined) {
+                console.log('null dropzone')
+                return
+            }
+            // Optional.   Show the copy icon when dragging over.  Seems to only work for chrome.
+            dropZone.addEventListener('dragover', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+            });
+
+            // Get file data on drop
+            dropZone.addEventListener('drop', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                var files = e.dataTransfer.files; // Array of all files
+                for (var i = 0, file; file = files[i]; i++) {
+                    if (file.type.match(/csv/)) {
+                        var reader = new FileReader();
+                        reader.onload = function(e2) { // finished reading file data.
+                            BIONET.signal.generatePhysicalsFromUpload.dispatch(e2.target.result)
+                        }
+                        reader.readAsText(file); // start reading the file data.
+                    }
+                }
+            });
+        })
+
+    </script>
+</part-attachment>

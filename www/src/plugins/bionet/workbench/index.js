@@ -60,7 +60,7 @@ var workbench = {
                         var coordinates = (data.parent_x !== undefined) ? ' (' + data.parent_x + ',' + data.parent_y + ')' : ''
                         var node = {
                             key: data.id,
-                            title: title+coordinates,
+                            title: title + coordinates,
                             dbData: data,
                             notes: data.notes,
                             barcode: data.barcode,
@@ -150,6 +150,96 @@ var workbench = {
         }.bind(this)
         BIONET.signal.generatePhysicals = new MiniSignal()
         BIONET.signal.generatePhysicals.add(generatePhysicals)
+
+        const generatePhysicalsFromUpload = function (csvData) {
+            const workbenchId = app.user.workbenchID
+            console.log('generatePhysicalsFromUpload:', csvData)
+            const instancesList = []
+            const lines = csvData.match(/[^\r\n]+/g);
+
+            const createVirtual = function (virtualObj, physicalInstances) {
+                    if (!physicalInstances || isNaN(physicalInstances)) return
+                    app.remote.saveVirtual(virtualObj, function (err, id) {
+                        if (err) return app.ui.toast("Error: " + err) // TODO handle error
+                        generatePhysicals(virtualObj.name, physicalInstances)
+                    });
+                }
+                // line:["Name","Created By","Created","Description","Sequence","Physical Instances"]
+
+            const headerLine = lines[0].match(/[^,]+/g)
+            const nameIdx = headerLine.indexOf('Name')
+            const typeIdx = headerLine.indexOf('Type')
+            const usernameIdx = headerLine.indexOf('Created By')
+            const createdDateIdx = headerLine.indexOf('Created')
+            const descriptionIdx = headerLine.indexOf('Description')
+            const sequenceIdx = headerLine.indexOf('Sequence')
+            const instancesIdx = headerLine.indexOf('Physical Instances')
+            const genomeIdx = headerLine.indexOf('Genome')
+            if (nameIdx < 0 || typeIdx < 0 || instancesIdx < 0) {
+                app.toast('invalid format specified, missing name, type or instances')
+                return
+            }
+
+            for (var i = 1; i < lines.length; i++) {
+                var line = lines[i].match(/[^,]+/g)
+                console.log('line:%s', JSON.stringify(line))
+                var instances = line[instancesIdx]
+                if (!instances || isNaN(instances)) continue
+                var seriesName = line[nameIdx]
+                var userName = line[usernameIdx]
+                var virtualType = line[typeIdx]
+                    //const timeCreated = line[createdDateIdx]
+                var timeCreated = new Date().toDateString()
+                var creator = {
+                    user: userName,
+                    time: timeCreated
+                }
+                var updated = {
+                    user: userName,
+                    time: timeCreated
+                }
+                var description = line[descriptionIdx]
+                var sequence = line[sequenceIdx]
+                var genome = line[genomeIdx]
+                var virtualObj = {
+                    name: seriesName,
+                    type: virtualType,
+                    creator: creator,
+                    "creator.user": userName,
+                    "creator.time": timeCreated,
+                    Description: description,
+                    Sequence: sequence,
+                    Genome: genome
+                }
+                createVirtual(virtualObj, instances)
+
+                /*
+
+                line:["Name","Created By","Created","Description","Sequence","Physical Instances"]
+
+                getPhysicalResult {"name":"myNewVector01_0","type":"physical","parent_id":"p-40f35523-9884-4361-8eae-e97466e7b25d","id":"p-9820ba76-5ff0-4270-bbc3-07079a796b76","created":{"user":"tsakach@gmail.com","time":1499278758},"updated":{"user":"tsakach@gmail.com","time":1499278758}}
+
+{"type":"vector","name":"myNewVector02","creator":{"user":"tsakach@gmail.com","time":"Wed Jul 05 2017"},"Description":"v02","Sequence":"abba","creator.user":"tsakach@gmail.com","creator.time":"Wed Jul 05 2017","Genotype":"abcd"}"
+                */
+                /*
+                
+                for (var instance = 0; instance < instances; instance++) {
+                    const name = seriesName + '_' + instance
+                    const dbData = {
+                        name: name,
+                        type: 'physical',
+                        parent_id: workbenchId,
+                        description: description,
+                        sequence: sequence
+                    }
+                    instancesList.push(dbData)
+                }
+                */
+            }
+            saveInWorkbench(instancesList)
+        }.bind(this)
+        BIONET.signal.generatePhysicalsFromUpload = new MiniSignal()
+        BIONET.signal.generatePhysicalsFromUpload.add(generatePhysicalsFromUpload)
 
         require('./workbench.tag.html')
 

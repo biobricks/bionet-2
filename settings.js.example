@@ -164,6 +164,7 @@ var settings = {
       name: "organism",
       virtual: true,
       fields: {
+        Description: 'text',
         Genotype: 'text',
         Sequence: 'text'
       }
