@@ -79,7 +79,7 @@ ssh-keygen -t rsa -f hostkey -N ""
 cd ../
 ```
 
-and copy the ssh public key for each labdevice client to the `labdevice/client_keys/ directory` to authorize the client.
+and copy the ssh public key for each labdevice client to the `labdevice/client_keys/` directory to authorize the client.
 
 # Email
 
