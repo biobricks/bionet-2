@@ -46,7 +46,7 @@ You will have to compile the latest version, since the version bundled with most
 
 First install build essentials:
 
-      ```
+```
 sudo apt install build-essential
 ```
 
