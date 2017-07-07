@@ -8,3 +8,4 @@ db/**
 www/js/bionet.js
 print_client_keys/**
 print_host_keys/**
+nightwatch.js.conf

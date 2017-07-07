@@ -255,6 +255,49 @@ You can restore from a backup by first deleting the old database (obviously be c
 ./bin/db.js import ./myfile.json
 ```
 
+# Unit testing
+
+## Backend
+
+The backend currently has no unit tests but many of the individual modules that make up the backend have a set of unit tests written using [tape](https://github.com/substack/tape). The plan is to have unit tests for the entire RPC system and public API. 
+
+## Frontend
+
+We're using [nightwatch](https://nightwatchjs.org) for end-to-end testing. 
+
+You need Java 8 installed (unclear if Oracle Java is required or not) and latest stable Crhome or Chromium. To install via PPAs on Ubuntu:
+
+```
+# Oracle Java 8
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt update
+sudo apt install oracle-java8-installer
+sudo apt install oracle-java8-set-default
+```
+
+```
+# Chromium latest stable:
+sudo add-apt-repository ppa:chromium-daily/stable 
+sudo apt-get update
+sudo apt-get install chromium-browser
+```
+
+Then you need to download Selenium and the Chrome Selenium plugin:
+
+```
+cd selenium/
+./fetch.sh
+cd ..
+```
+
+Now you should be able to run the frontend unit tests using:
+
+```
+npm run ftest
+```
+
+The frontend tests are located in the `frontend_tests/` directory.
+
 # ToDo
 
 ## Build system

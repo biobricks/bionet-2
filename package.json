@@ -10,7 +10,8 @@
     "build": "cross-env NODE_ENV=production browserify -t babelify --presets es2015-riot -e www/src/main.js -m -o www/js/bionet.js",
     "lint": "eslint --ext .js www/src test/unit",
     "test": "karma start karma.conf.js",
-    "start": "./bin/cmd.js"
+    "start": "./bin/cmd.js",
+    "ftest": "./node_modules/.bin/nightwatch"
   },
   "browserify": {
     "transform": [
@@ -112,6 +113,7 @@
     "level-js": "^2.2.4",
     "lodash": "^4.16.4",
     "mini-signals": "^1.1.1",
+    "nightwatch": "^0.9.16",
     "npm-run-all": "^1.6.0",
     "phantomjs-prebuilt": "2.1.9",
     "pixi-tween": "^0.2.0",
