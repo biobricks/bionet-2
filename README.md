@@ -290,6 +290,12 @@ cd selenium/
 cd ..
 ```
 
+Copy our default nightwatch config file to get started:
+
+```
+cp nightwatch.conf.js.example nightwatch.conf.js
+```
+
 Now you should be able to run the frontend unit tests using:
 
 ```
