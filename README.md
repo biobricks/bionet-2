@@ -34,7 +34,7 @@ npm install
 
 ElasticSearch is required if you want human language search (fuzzy matching). If ElasticSearch is not present on your system then only search results exactly matching your query will work (though case and whitespace is ignored).
 
-Follow (this guide)[https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-repositories.html] to install from the official repository so you'll get security updates.
+Follow [this guide](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-repositories.html) to install from the official repository so you'll get security updates.
 
 ## BLAST+
 
@@ -50,7 +50,7 @@ First install build essentials:
 sudo apt install build-essential
 ```
 
-Download the latest version [from the NCBI ftp server](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/). It's probably [ncbi-blast-2.6.0+-x64-linux.tar.gz](ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/).
+Download the latest version from the NCBI ftp server ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ .  It's probably ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.6.0+-x64-linux.tar.gz .
 
 Extract, compile and install:
 
