@@ -38,6 +38,7 @@
                 <li each={item in virtuals} class="add-type"><span onclick={createNode}>{item.name}</span></li>
             </ul>
         </div>
+        <delete-modal deleteaction={deleteAction}></delete-modal>
     </div>
 
     <style>
@@ -230,6 +231,8 @@
             tag.pixiheight = $('#pixijsdiv').height()
             toggleLocationPath(false)
             tag.update()
+
+            $('.modal').modal();
 
             $('.inventory-height').css({
                 height: $(window).innerHeight() - $('#appbar').height()
@@ -581,37 +584,37 @@
                 }
             }
             tag.deleteNode = function() {
-                const ftree = $("#ftree").fancytree("getTree")
-                const deleteNodes = []
-
-                //const deleteNode = data.childNode
-
-                const delChildren = function(node) {
-                    if (!node.children) return
-                    for (var i = 0; i < node.children.length; i++) {
-                        const childNode = node.children[i]
-                        delChildren(childNode)
-                        deleteNodes.push(childNode)
+                tag.deleteAction = function() {
+                    const ftree = $("#ftree").fancytree("getTree")
+                    const deleteNodes = []
+                    const delChildren = function(node) {
+                        if (!node.children) return
+                        for (var i = 0; i < node.children.length; i++) {
+                            const childNode = node.children[i]
+                            delChildren(childNode)
+                            deleteNodes.push(childNode)
+                        }
+                    }
+                    ftree.visit(function(node) {
+                        if (node.isSelected()) {
+                            delChildren(node)
+                            deleteNodes.push(node)
+                        }
+                    })
+                    for (var i = 0; i < deleteNodes.length; i++) {
+                        const node = deleteNodes[i]
+                        var id = null
+                        if (node.data.dbRef) {
+                            id = node.data.dbRef.id
+                        } else {
+                            id = node.data.dbData.id
+                        }
+                        console.log('!! removing %s %s', node.name, id)
+                        if (id) BIONET.signal.delPhysical.dispatch(id)
+                        node.remove()
                     }
                 }
-                ftree.visit(function(node) {
-                    if (node.isSelected()) {
-                        delChildren(node)
-                        deleteNodes.push(node)
-                    }
-                })
-                for (var i = 0; i < deleteNodes.length; i++) {
-                    const node = deleteNodes[i]
-                    var id = null
-                    if (node.data.dbRef) {
-                        id = node.data.dbRef.id
-                    } else {
-                        id = node.data.dbData.id
-                    }
-                    console.log('!! removing %s %s', node.name, id)
-                    if (id) BIONET.signal.delPhysical.dispatch(id)
-                    node.remove()
-                }
+                $('#deleteModal').modal('open');
             }
 
 
@@ -669,15 +672,15 @@
     <br/>
 
     <div class="file-field input-field">
-      <div class="btn">
-        <span>Import CSV</span>
-        <input id="upload-file" type="file">
-      </div>
-      <div class="file-path-wrapper">
-        <input class="file-path validate" type="text">
-      </div>
-    </div>    
-     <br/>
+        <div class="btn">
+            <span>Import CSV</span>
+            <input id="upload-file" type="file">
+        </div>
+        <div class="file-path-wrapper">
+            <input class="file-path validate" type="text">
+        </div>
+    </div>
+    <br/>
 
     <div id="dropZone" style="width: 100%; height: 200px; border-style: dashed; border-width:7px; border-color:#b0b0b0;">
         <div class="valign-wrapper" style="width:100%; height:100%">
@@ -741,3 +744,23 @@
 
     </script>
 </part-attachment>
+
+<delete-modal>
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <p>Do you really want to delete?</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action waves-effect waves-green btn-flat" onclick={deleteAction}>Delete</a>
+            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+        </div>
+    </div>
+    <script>
+        const deleteAction = function() {
+            $('#deleteModal').modal('close');
+            opts.deleteaction()
+        }
+        this.deleteAction = deleteAction
+
+    </script>
+</delete-modal>

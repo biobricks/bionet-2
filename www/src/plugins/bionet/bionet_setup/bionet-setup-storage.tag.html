@@ -52,6 +52,8 @@
 
         <div id="threedicon" style="position:absolute; top:320px; left:10px; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
 
+        <delete-modal deleteaction={deleteAction}></delete-modal>
+
 
     </div>
 
@@ -188,28 +190,31 @@
         const createStorageItemResultBinding = BIONET.signal.createStorageItemResult.add(createStorageItemResult)
 
         this.deleteNode = function() {
-            const ftree = $("#ftree").fancytree("getTree")
-            const deleteNodes = []
-            const delChildren = function(node) {
-                if (!node.children) return
-                for (var i = 0; i < node.children.length; i++) {
-                    const childNode = node.children[i]
-                    delChildren(childNode)
-                    deleteNodes.push(childNode)
+            tag.deleteAction = function() {
+                const ftree = $("#ftree").fancytree("getTree")
+                const deleteNodes = []
+                const delChildren = function(node) {
+                    if (!node.children) return
+                    for (var i = 0; i < node.children.length; i++) {
+                        const childNode = node.children[i]
+                        delChildren(childNode)
+                        deleteNodes.push(childNode)
+                    }
+                }
+                ftree.visit(function(node) {
+                    if (node.isSelected()) {
+                        delChildren(node)
+                        deleteNodes.push(node)
+                    }
+                })
+                for (var i = 0; i < deleteNodes.length; i++) {
+                    const node = deleteNodes[i]
+                    const id = (node.data.dbRef !== undefined) ? node.data.dbRef : node.data.dbData.id
+                    BIONET.signal.delPhysical.dispatch(id)
+                    node.remove()
                 }
             }
-            ftree.visit(function(node) {
-                if (node.isSelected()) {
-                    delChildren(node)
-                    deleteNodes.push(node)
-                }
-            })
-            for (var i = 0; i < deleteNodes.length; i++) {
-                const node = deleteNodes[i]
-                const id = (node.data.dbRef !== undefined) ? node.data.dbRef : node.data.dbData.id
-                BIONET.signal.delPhysical.dispatch(id)
-                node.remove()
-            }
+            $('#deleteModal').modal('open');
         }
 
         this.addToFavorites = function() {
@@ -331,6 +336,8 @@
             });
             tag.pixiwidth = $('#pixijsdiv').width()
             tag.pixiheight = $('#pixijsdiv').height()
+            
+            $('.modal').modal();
 
             /*
             $('#physical-props-view').css({
