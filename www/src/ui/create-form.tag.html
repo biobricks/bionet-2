@@ -380,7 +380,7 @@
                 beforeSelect: function(event, data) {},
                 modifyChild: function(event, data) {
                     if (data.operation === 'remove') {
-                        const deleteNode = data.childNode
+                        //const deleteNode = data.childNode
                     }
                 },
                 keydown: function(event, data) {},
@@ -583,6 +583,9 @@
             tag.deleteNode = function() {
                 const ftree = $("#ftree").fancytree("getTree")
                 const deleteNodes = []
+                
+                //const deleteNode = data.childNode
+                
                 const delChildren = function(node) {
                     if (!node.children) return
                     for (var i = 0; i < node.children.length; i++) {
@@ -599,9 +602,14 @@
                 })
                 for (var i = 0; i < deleteNodes.length; i++) {
                     const node = deleteNodes[i]
-                    const id = node.data.dbRef.id
+                    var id = null
+                    if (node.data.dbRef) {
+                        id = node.data.dbRef.id
+                    } else {
+                        id = node.data.dbData.id
+                    }
                     console.log('!! removing %s %s', node.name, id)
-                    BIONET.signal.delPhysical.dispatch(id)
+                    if (id) BIONET.signal.delPhysical.dispatch(id)
                     node.remove()
                 }
             }
