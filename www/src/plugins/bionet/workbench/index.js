@@ -1,5 +1,8 @@
 const riot = require('riot')
 import bionetapi from '../bionetapi'
+
+const genbankToJson = require('bio-parsers/parsers/genbankToJson');
+
 const MiniSignal = require('mini-signals')
 var workbench = {
     init: function () {
@@ -238,8 +241,55 @@ var workbench = {
             }
             saveInWorkbench(instancesList)
         }.bind(this)
+
+
         BIONET.signal.generatePhysicalsFromUpload = new MiniSignal()
         BIONET.signal.generatePhysicalsFromUpload.add(generatePhysicalsFromUpload)
+
+        const createVirtual = function (virtualObj, physicalInstances) {
+          if (!physicalInstances) return
+          app.remote.saveVirtual(virtualObj, function (err, id) {
+            if (err) return app.ui.toast("Error: " + err) // TODO handle error
+            
+            generatePhysicals(virtualObj.name, physicalInstances)
+          });
+        }
+
+        const generatePhysicalFromGenbankUpload = function(filename, gbData) {
+
+          genbankToJson(gbData, function(results) {
+           
+            if(!results || !results.length) {
+              return app.ui.toast("Error reading file: " + filename);
+            }
+            
+            var i, data;
+            for(i=0; i < results.length; i++) {
+              if(!results[i].success) {
+                console.error("Error:", results.messages);
+                return app.ui.toast("Error reading file: " + filename);
+              }
+              data = results[i].parsedSequence;
+
+              if(!data || !data.name) {
+                return app.ui.toast("Error reading file: " + filename);
+              }
+
+              var virtualObj = {
+                name: data.name,
+                type: 'plasmid',
+                Description: data.description,
+                Sequence: data.sequence,
+                filename: filename
+              }
+              createVirtual(virtualObj, 1);
+            }
+          }, {isProtein: false})
+
+        }.bind(this);
+
+        BIONET.signal.generatePhysicalFromGenbankUpload = new MiniSignal()
+        BIONET.signal.generatePhysicalFromGenbankUpload.add(generatePhysicalFromGenbankUpload)
 
         require('./workbench.tag.html')
 

@@ -688,6 +688,7 @@
         </div>
     </div>
     <script>
+        var async = require('async');
         const tag = this
         this.formData = {
             attachments: ''
@@ -730,15 +731,27 @@
                 e.stopPropagation();
                 e.preventDefault();
                 var files = e.dataTransfer.files; // Array of all files
-                for (var i = 0, file; file = files[i]; i++) {
-                    if (file.type.match(/csv/)) {
+                async.eachSeries(files, function(file, next) {
+
+                    if (file.type.match(/csv/i)) {
                         var reader = new FileReader();
                         reader.onload = function(e2) { // finished reading file data.
                             BIONET.signal.generatePhysicalsFromUpload.dispatch(e2.target.result)
+                            next();
                         }
                         reader.readAsText(file); // start reading the file data.
+
+                    // match genbank extension
+                    } else if(file.name.match(/\.gbk?$|\.genbank$/i)) {
+                        
+                        var reader = new FileReader();
+                        reader.onload = function(e2) { // finished reading file data.
+                            BIONET.signal.generatePhysicalFromGenbankUpload.dispatch(file.name, e2.target.result)
+                            next();
+                        }
+                        reader.readAsText(file); // start reading the file data.        
                     }
-                }
+                });
             });
         })
 
