@@ -122,12 +122,13 @@
                         })
                     },
                     configureParent: function(msg) {
+
                         console.log('bionet storage location configure')
 
                         const newLocationPath = [msg.child, msg.parent]
 
                         const container = newLocationPath[0]
-                        const parent = newLocationPath[1]
+                        const parent = msg.parent
                         tag.container = container
                         tag.locationPath = newLocationPath
 

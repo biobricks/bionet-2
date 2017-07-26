@@ -100,6 +100,7 @@ var bionetSetup = {
         BIONET.signal.getBoxContents.add(getBoxContents)
 
         const getContainerContents = function (id) {
+          if(!id) return;
             BIONET.remote.getChildren(id, function (err, children) {
                 if (err) return console.error(err);
                 BIONET.signal.getContainerContentsResult.dispatch(id, children)

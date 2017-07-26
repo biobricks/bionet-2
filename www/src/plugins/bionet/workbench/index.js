@@ -275,9 +275,17 @@ var workbench = {
                 return app.ui.toast("Error reading file: " + filename);
               }
 
+              console.log("DATA", data);
+
+              // if no description, generate description from features
+              if(!data.description || !data.description.trim()) {
+                data.description = (data.features) ? data.features.map(function(feat) { return feat.name; }).join(', ') : '';
+                
+              }
+
               var virtualObj = {
                 name: data.name,
-                type: 'plasmid',
+                type: 'vector',
                 Description: data.description,
                 Sequence: data.sequence,
                 filename: filename

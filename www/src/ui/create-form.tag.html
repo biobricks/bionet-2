@@ -428,7 +428,7 @@
                 },
             }
 
-            var boxObj = {}
+            var boxObj = {};
 
             const getTempCellAssignments = function(boxId) {
                 const ftree = $("#ftree").fancytree("getTree")
@@ -498,6 +498,7 @@
                                 tempAssignments: []
                             })
                         } else {
+
                             var parentObj = boxObj
                             if (dbData.wbparent_id !== undefined) {
                                 const parentId = dbData.wbparent_id
@@ -509,6 +510,7 @@
                                 })
                             }
                             const boxId = parentObj.id
+
                             bionetStorageLocation.dispatch('configureParent', {
                                 child: dbData,
                                 parent: parentObj,
