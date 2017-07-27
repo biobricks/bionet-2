@@ -1,0 +1,88 @@
+[
+    {
+        "id": "freezer",
+        "attributes": {
+            "visibility": true,
+            "subVisibility": false,
+            "position": [0, 0.0, 0],
+            "nameFormat": "C",
+            "threedmodel": {
+                "defaultMaterial": "freezerDefaultMaterial",
+                "highlightMaterial": "highlightPlaneMaterial",
+                "frontMaterial": "freezerFrontMaterial",
+                "gridAxis": "xz",
+                "cameraRadius": 7,
+                "cameraAlphaDegrees": 270,
+                "cameraBetaDegrees": 90
+            }
+        }
+    },
+
+    {
+        "id": "shelf",
+        "attributes": {
+            "shortcode": "S",
+            "position": [0, 0.4, 0],
+            "visibility": false,
+            "subVisibility": false,
+            "nameFormat": "R yp",
+            "threedmodel": {
+                "defaultMaterial": "shelfDefaultMaterial",
+                "highlightMaterial": "highlightPlaneMaterial",
+                "topMaterial": "shelfTopMaterial",
+                "highlightPlane": "topPlane",
+                "gridAxis": "xz",
+                "cameraRadius": 5,
+                "cameraAlphaDegrees": 0,
+                "cameraBetaDegrees": 90
+
+            }
+        }
+    },
+
+    {
+        "id": "rack",
+        "attributes": {
+            "shortcode": "R",
+            "position": [0, 0, 0],
+            "visibility": true,
+            "subVisibility": false,
+            "noChildrenGeneration": false,
+            "nameFormat": "p R x",
+            "threedmodel": {
+                "defaultMaterial": "rackDefaultMaterial",
+                "highlightMaterial": "highlightPlaneMaterial",
+                "gridAxis": "yz",
+                "cameraRadius": 1.5,
+                "cameraAlphaDegrees": 270,
+                "cameraBetaDegrees": 90,
+                "translateVector": [0, 0, -1.4]
+            }
+        }
+    },
+    {
+        "id": "rack2_4x5_4in_box",
+        "child": "4in_box_fiberboard_9x9"
+    },
+    {
+        "id": "endylab_workbench_shelving_unit",
+        "child": "endylab_workbench_shelf"
+    },
+    {
+        "id": "box",
+        "attributes": {
+            "visibility": false,
+            "subVisibility": false,
+            "noChildrenGeneration": true,
+            "nameFormat": "p R[z,y]",
+            "threedmodel": {
+                "defaultMaterial": "boxDefaultMaterial",
+                "highlightMaterial": "boxHighlightMaterial",
+                "gridAxis": "xz",
+                "cameraRadius": 1,
+                "cameraAlphaDegrees": 270,
+                "cameraBetaDegrees": 0
+            }
+        }
+    }
+]

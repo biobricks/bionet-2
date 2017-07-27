@@ -21,433 +21,61 @@
 
     </style>
     <script>
+        const MiniSignal = require('mini-signals')
         const tag = this
         const pixiController = app.getStream('bionetStorageLocation')
-        tag.engine = {}
-        var scene = null
+            //tag.engine = {}
+            //var scene = null
 
-        const bionetLabLayout = require('../bionetLabLayout')
-        bionetLabLayout.initializeTypes()
-        tag.types = bionetLabLayout.types
-
-        const runRenderLoop = function() {
-            //$('#render-canvas').show()
-            /*
-            $('#babylon-container').css({
-                height: $(window).innerHeight() - $('#appbar').height() - $('#bionet-storage-location-canvas').height() - 15
-            });
-            */
-
-            tag.engine.runRenderLoop(function() {
-                //scene.activeCamera.alpha += .01;
-                scene.render();
-            });
-        }
-        const pauseRenderLoop = function() {
-            //$('#render-canvas').hide()
-            tag.engine.stopRenderLoop()
-        }
-
-        tag.active = false
-        const scalingFactor = 2.5
-
-        const StorageSpec = function(type, materialSpec, dimensions, defaultVisibility) {
-            this.type = (type !== undefined) ? type : 'notype'
-
-            const materials = {
-                default: {
-                    color: new BABYLON.Color3(0, 1, 1),
-                    alpha: 0.25
-                },
-                highlighted: {
-                    color: new BABYLON.Color3(1, 0, 0),
-                    alpha: 0.25
-                },
-                selected: {
-                    color: new BABYLON.Color3(0, 1, 1),
-                    alpha: 0.75
-                }
+        const typeFromDBType = function(type) {
+            var stype = null
+            if (type.indexOf('physical') >= 0) {
+                stype = 'tube'
             }
-
-            if (materialSpec !== undefined) {
-                if (materialSpec.default !== undefined) materials.default = materialSpec.default
-                if (materialSpec.highlighted !== undefined) materials.highlighted = materialSpec.highlighted
-                if (materialSpec.selected !== undefined) materials.selected = materialSpec.selected
+            if (type.indexOf('box') >= 0) {
+                stype = 'box'
+            } else if (type.indexOf('rack') >= 0) {
+                stype = 'rack'
+            } else if (type.indexOf('shelf') >= 0) {
+                stype = 'shelf'
+            } else if (type.indexOf('freezer') >= 0 || type.indexOf('fridge') >= 0) {
+                stype = 'freezer'
             }
+            return stype
+        }
 
-            this.materials = materials
-
-            const defaultDimensions = {
-                width: 1,
-                height: 1,
-                depth: 1
+        const initLocationPath = function(locationPathAr) {
+            if (!locationPathAr) return
+            const locationPath = []
+            for (var i = locationPathAr.length - 1; i >= 0; i--) {
+                var locationSpec = locationPathAr[i]
+                var stype = typeFromDBType(locationSpec.type)
+                if (!stype) continue
+                var x = Number(locationSpec.parent_x)
+                var y = Number(locationSpec.parent_y)
+                locationPath.push({
+                    dbid: locationSpec.id,
+                    name: locationSpec.name,
+                    type: stype,
+                    x: x,
+                    y: y
+                })
             }
-            this.dimensions = (dimensions !== undefined) ? dimensions : defaultDimensions
-            this.scalingFactor = scalingFactor
-
-            this.defaultVisibility = (defaultVisibility !== undefined) ? defaultVisibility : true
+            return locationPath
         }
-
-        StorageSpec.prototype.createMaterial = function(scene, name, color, alpha) {
-            const material = new BABYLON.StandardMaterial(name, scene);
-            material.alpha = alpha;
-            material.diffuseColor = color;
-            material.ambientColor = color;
-            material.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-            return material
-        }
-
-        StorageSpec.prototype.initMaterials = function(scene) {
-            const materials = this.materials
-            materials.default.m = this.createMaterial(scene, this.type + 'DefaultMaterial', materials.default.color, materials.default.alpha)
-            materials.highlighted.m = this.createMaterial(scene, this.type + 'HighlightedMaterial', materials.highlighted.color, materials.highlighted.alpha)
-            materials.selected.m = this.createMaterial(scene, this.type + 'SelectedMaterial', materials.selected.color, materials.selected.alpha)
-            this.materials = materials
-        }
-
-        StorageSpec.prototype.createElement = function(scene, name, x, y, z, visible) {
-            const width = this.dimensions.width
-            const height = this.dimensions.height
-            const depth = this.dimensions.depth
-
-            var element = BABYLON.MeshBuilder.CreateBox(name, {
-                height: height,
-                width: width,
-                depth: depth,
-            }, scene);
-            element.position.x = x
-            element.position.y = y
-            element.position.z = z
-            element.visibility = (visible !== undefined) ? visible : true
-            element.material = this.materials.default.m;
-            return element
-        }
-
-        StorageSpec.prototype.defaultMaterial = function(scene, name) {
-            const element = scene.getMeshByName(name);
-            if (element === undefined || element === null) return
-            element.material = this.materials.default.m;
-            element.visibility = this.defaultVisibility
-        }
-
-        StorageSpec.prototype.highlight = function(scene, name) {
-            const element = scene.getMeshByName(name);
-            if (element === undefined || element === null) return
-            element.material = this.materials.highlighted.m;
-            element.visibility = true
-        }
-
-        StorageSpec.prototype.select = function(scene, name) {
-            const element = scene.getMeshByName(name);
-            if (element === undefined || element === null) return
-            element.material = this.materials.selected.m;
-            element.visibility = true
-        }
-
-        const boxSpec = new StorageSpec('box', {
-            highlighted: {
-                color: new BABYLON.Color3(1, 0, 0),
-                alpha: 1
-            }
-        }, {
-            width: (scalingFactor / 4) - 0.1,
-            height: 0.7 / 4,
-            depth: 1.8 / 5
-        }, false)
-
-        const rackSpec = new StorageSpec('rack', {
-            highlighted: {
-                color: new BABYLON.Color3(1, 0, 0),
-                alpha: 0.25
-            }
-        }, {
-            width: (scalingFactor) / 4 - 0.1,
-            height: 0.8,
-            depth: 2
-        })
-
-        const shelfSpec = new StorageSpec('shelf', {
-            default: {
-                color: new BABYLON.Color3(0, 1, 1),
-                alpha: 1
-            },
-            highlighted: {
-                color: new BABYLON.Color3(1, 1, 0),
-                alpha: 1
-            }
-        }, {
-            width: scalingFactor,
-            height: 0.1,
-            depth: 1.8
-        })
-
-        const freezerSpec = new StorageSpec('freezer', {
-            default: {
-                color: new BABYLON.Color3(0, 1, 1),
-                alpha: 0
-            },
-            highlighted: {
-                color: new BABYLON.Color3(1, 1, 0),
-                alpha: 0
-            }
-        }, {
-            width: scalingFactor,
-            height: 5,
-            depth: 2.1
-        })
-
 
         this.on('mount', function() {
 
             const canvas = document.getElementById('render-canvas');
-            tag.engine = new BABYLON.Engine(canvas, true);
-            const engine = tag.engine
-            var lab = {}
-            var highlightPathObj = []
-
-            const moveCameraToElement = function(name) {
-                if (scene === null || scene === undefined) return
-                const targetObj = scene.getMeshByName(name);
-                if (!targetObj) return
-                const center = targetObj.getBoundingInfo().boundingBox.vectorsWorld[0]
-                var scale,rotation,translation
-                const worldMatrix = targetObj.getWorldMatrix();
-                //worldMatrix.decompose(scale,rotation,translation)
-                var q =  BABYLON.Quaternion.FromRotationMatrix(worldMatrix)
-                const x = center.x
-                const y = Math.max(center.y, 2)
-                const z = center.z
-                //const alpha = Math.random()*3
-                //const alpha = q.y * q.w + Math.PI /2
-                var alpha = q.y * q.w * Math.PI + Math.PI / 2 + Math.PI /8
-                if (targetObj.id.indexOf('Backup -80')>=0 || targetObj.id.indexOf('Main -80')>=0) alpha+=Math.PI
-                moveCamera(null, x, y, z, alpha)
-                //BABYLON.Angle.FromDegrees(45).radians()
-            }
-
-            const setupLocationPath = function(locationPath) {
-                if (scene === null || scene === undefined) return
-                var id = ''
-                unhighlightPath()
-                highlightPathObj = []
-                for (var i = locationPath.length - 1; i >= 0; i--) {
-                    const locationSpec = locationPath[i]
-                    var x = Number(locationSpec.parent_x)
-                    var y = Number(locationSpec.parent_y)
-                    var type = locationSpec.type
-                    if (type === undefined) continue
-                    var stype = ''
-                    if (type.indexOf('box') >= 0) {
-                        stype = 'box'
-                        id += ".box" + x + "," + y
-                    } else if (type.indexOf('rack') >= 0) {
-                        stype = 'rack'
-                        x = x - 1
-                        id += ".rack" + x
-                    } else if (type.indexOf('shelf') >= 0) {
-                        stype = 'shelf'
-                        id += ".shelf" + y
-                    } else if (type.indexOf('freezer') >= 0 || type.indexOf('fridge') >= 0) {
-                        stype = 'freezer'
-                        id += locationSpec.name
-                    }
-                    highlightElementType(id, stype)
-                    highlightPathObj.push({
-                        name: id,
-                        type: stype
-                    })
-                }
-                console.log('setupLocationPath id:', id)
-                moveCameraToElement(id)
-                    /*
-                    if (BIONET.state.toggle3d) runRenderLoop()
-                    else pauseRenderLoop()
-                    */
-                return
-            }
-
-            const typeSpecs = {
-                box: boxSpec,
-                rack: rackSpec,
-                shelf: shelfSpec
-            }
-
-            const highlightElementType = function(id, type) {
-                const typeSpec = typeSpecs[type]
-                if (typeSpec === undefined) return
-                typeSpec.highlight(scene, id)
-            }
-
-            const unhighlightPath = function() {
-                if (scene === null || scene === undefined) return
-                for (var i = 0; i < highlightPathObj.length; i++) {
-                    var element = highlightPathObj[i]
-                    const typeSpec = typeSpecs[element.type]
-                    if (typeSpec === undefined) continue
-                    typeSpec.defaultMaterial(scene, element.name)
-                }
-            }
-
-            const createBox = function(id, xp, yp, zp, highlight, parent) {
-                const x = xp + (-0.2) / 2 + 0.1
-                    //const x = xp + ((scalingFactor / 4) - 0.2) / 2 + 0.1
-                    //const y = yp + 0.8 / 2 + 0.1
-                const y = yp + 0.1
-                const z = zp + boxSpec.dimensions.depth / 2
-                const boxElement = boxSpec.createElement(scene, id, x, y, z, false)
-                boxElement.parent = parent
-
-                const boxObj = {
-                    name: id,
-                    children: [],
-                    x: 0,
-                    y: 0,
-                    alpha: 1,
-                    type: '8 x 12 freezer box'
-                }
-                return boxObj
-            }
-
-            const createRack = function(id, xp, yp, zp, parent) {
-
-                const width = rackSpec.dimensions.width
-                const height = rackSpec.dimensions.height
-                const depth = rackSpec.dimensions.depth
-                const x = xp + rackSpec.dimensions.width / 2 + 0.1
-                const y = yp + height / 2
-                const z = zp + -0.05
-                const rackElement = rackSpec.createElement(scene, id, x, y, z)
-                rackElement.parent = parent
-
-                //const bx = xp - 0.1
-                //const bx = rackSpec.dimensions.width / 2 + 0.1
-                const bx = 0
-                const zd = z + depth / -2 - 0.05
-                const rack = {
-                    name: id,
-                    type: 'freezer rack',
-                    x: 1,
-                    color: {},
-                    children: []
-                }
-
-                for (var row = 0; row < 4; row++) {
-                    var by = (row * height / 4) - (height / 2)
-                    for (var col = 0; col < 5; col++) {
-                        const xindex = 5 - col
-                        const yindex = 4 - row
-                        var boxId = id + ".box" + xindex + "," + yindex
-                        var bz = col * depth / 5 + depth / -2
-                        var highlight = (Math.random() > 0.99) ? true : false
-                            //var boxObj = createBox(boxId, bx, by, bz, false, xindex, yindex)
-                        var boxObj = createBox(boxId, bx, by, bz, false, rackElement)
-                        rack.children.push(boxObj)
-                    }
-                }
-                return rack
-            }
-
-            const createShelf = function(id, xp, yp, zp, parent) {
-
-                const width = shelfSpec.dimensions.width
-                const height = shelfSpec.dimensions.height
-                const depth = shelfSpec.dimensions.depth
-                const x = xp
-                const y = yp + height / 2
-                const z = zp
-                    /*
-                    const x = xp
-                    const y = yp + height / 2
-                    const z = zp
-                    */
-                shelfElement = shelfSpec.createElement(scene, id, x, y, z)
-                shelfElement.parent = parent
-
-                const shelf = {
-                    name: id,
-                    type: 'shelf',
-                    x: 0,
-                    color: {},
-                    alpha: 1,
-                    children: []
-                }
-                for (var rack = 0; rack < 4; rack++) {
-                    var rackId = id + ".rack" + rack
-                        //var rackObj = createRack(rackId, xp + (rack * scalingFactor / 4) - scalingFactor / 2, yp + height, z, rack)
-                    var rackObj = createRack(rackId, (rack * scalingFactor / 4) - scalingFactor / 2, height, 0, shelfElement)
-                    shelf.children.push(rackObj)
-                }
-                return shelf
-            }
-
-            const createFreezer = function(id, x, y, z, index) {
-
-                const freezer = {
-                    name: id,
-                    type: '-80 freezer',
-                    x: index,
-                    children: []
-                }
-                const freezerElement = freezerSpec.createElement(scene, id, x, y, z)
-                if (index == 2 || index == 3) {
-                    const alpha = BABYLON.Angle.FromDegrees(180).radians()
-                    //freezerElement.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
-                    freezerElement.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
-                }
-                if (index == 4 || index == 5 || index == 6) {
-                    const alpha = BABYLON.Angle.FromDegrees(90).radians()
-                    //freezerElement.rotate(BABYLON.Axis.Y, Math.PI / 2, BABYLON.Space.LOCAL);
-                    freezerElement.rotate(BABYLON.Axis.Y, Math.PI / 2, BABYLON.Space.WORLD);
-                }
-
-                for (var shelf = 0; shelf < 5; shelf++) {
-                    sid = 5 - shelf
-                    var shelfId = id + ".shelf" + sid
-                        //var shelfObj = createShelf(shelfId, x, shelf + y, z, freezerElement)
-                    var shelfObj = createShelf(shelfId, 0, shelf, 0, freezerElement)
-                    freezer.children.push(shelfObj)
-                }
-                return freezer
-            }
+            BIONET_3DLAB.initialize(canvas)
 
             const createScene = function(inventoryModel) {
-                // create a basic BJS Scene object
-                //if (scene !== null) return
-                console.log('babylonjs create scene')
-                const labObj = inventoryModel[0]
-                if (labObj === undefined) return
-
-                scene = new BABYLON.Scene(engine);
-
-                // create a FreeCamera, and set its position
-                var camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", 0.4 * Math.PI, 0 * Math.PI, 0, new BABYLON.Vector3(0, 2, -6), scene);
-
-                // target the camera to scene origin
-                camera.setTarget(new BABYLON.Vector3(0, 2, 0));
-
-                // attach the camera to the canvas
-                camera.attachControl(canvas, false);
-
-                // create a basic light, aiming 0,1,0 - meaning, to the sky
-                var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), scene);
-
-                const y = 0
-
-                lab = {
-                    name: labObj.dbData.name,
-                    type: 'lab',
-                    children: []
-                }
-
-                boxSpec.initMaterials(scene)
-                rackSpec.initMaterials(scene)
-                shelfSpec.initMaterials(scene)
-                freezerSpec.initMaterials(scene)
 
                 const appSettings = BIONET.getAppSettings()
                 const labLayout = appSettings.labLayout
 
                 // find all physical freezer objects in inventoryModel
+                /*
                 for (var freezer = 0; freezer < labObj.children.length; freezer++) {
                     const freezerData = labObj.children[freezer].dbData
                     var freezerId = freezerData.name
@@ -457,73 +85,10 @@
                     if (freezerLayout === undefined) continue
                     const x = (40 - freezerLayout.y / 15)
                     const z = (80 - freezerLayout.x / 15)
-                        //var freezerObj = createFreezer(freezerId, freezer * (scalingFactor + 0.5) - (1.5 * (scalingFactor + 0.5)), y, z, freezer)
                     var freezerObj = createFreezer(freezerId, x, y, z, index)
                     lab.children.push(freezerObj)
                 }
-
-                // create a built-in "ground" shape; its constructor takes 5 params: name, width, height, subdivisions and scene
-                var ground = BABYLON.Mesh.CreateGround('ground1', 80, 80, 2, scene);
-                var materialGround = new BABYLON.StandardMaterial("groundTexture", scene);
-                materialGround.alpha = 1;
-                materialGround.diffuseColor = new BABYLON.Color3(0.75, 0.75, 0.75);
-                materialGround.ambientColor = new BABYLON.Color3(0.75, 0.75, 0.75);
-                materialGround.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-                ground.material = materialGround;
-
-                var VJC = new BABYLON.VirtualJoysticksCamera("VJC", BABYLON.Vector3.Zero(), scene);
-                scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
-                return scene;
-            }
-
-
-            const moveCamera = function(callback, dx, dy, dz, alpha) {
-                console.log('move camera ', dx, dy)
-                var translatex = new BABYLON.Animation("camTranslatex", "target.x", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-                var keysx = [{
-                    frame: 0,
-                    value: scene.activeCamera.target.x
-                }, {
-                    frame: 100,
-                    value: dx
-                }];
-                translatex.setKeys(keysx);
-                scene.activeCamera.animations.push(translatex);
-
-                var translatey = new BABYLON.Animation("camTranslatey", "target.y", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-                var keysy = [{
-                    frame: 0,
-                    value: scene.activeCamera.target.y
-                }, {
-                    frame: 100,
-                    value: dy
-                }];
-                translatey.setKeys(keysy);
-                scene.activeCamera.animations.push(translatey);
-
-                var translatez = new BABYLON.Animation("camTranslatez", "target.z", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-                var keysz = [{
-                    frame: 0,
-                    value: scene.activeCamera.target.z
-                }, {
-                    frame: 100,
-                    value: dz
-                }];
-                translatez.setKeys(keysz);
-                scene.activeCamera.animations.push(translatez);
-                
-                var rotatey = new BABYLON.Animation("camrotatey", "alpha", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-                var keysalpha = [{
-                    frame: 0,
-                    value: scene.activeCamera.alpha
-                }, {
-                    frame: 100,
-                    value: alpha
-                }];
-                rotatey.setKeys(keysalpha);
-                scene.activeCamera.animations.push(rotatey);
-
-                scene.beginAnimation(scene.activeCamera, 0, 100, false, 5.0, callback);
+                */
             }
 
             function onPixiEvent(cmd, msgdata) {
@@ -539,86 +104,119 @@
                                 const cell = msg.cell
                                 locationSpec.parent_x = cell.x
                                 locationSpec.parent_y = cell.y
-                                unhighlightPath()
-                                setupLocationPath(locationPath)
+                                    //unhighlightPath()
+                                    //setupLocationPath(locationPath)
                                 break
                             }
 
                         }
                     },
                     configure: function(msg) {
-                        //todo: this may be invoked before resources have loaded
                         const id = msg
                         tag.id = id
                         console.log('babylon-3d tag configure function, id=', id)
-                        app.remote.getLocationPath(id, function(err, locationPath) {
+                        app.remote.getLocationPath(id, function(err, locationPathAr) {
                             if (err) {
                                 console.log('getLocationPath error:', err)
                                 return
                             }
-                            console.log('babylon-3d getLocationPath result:', JSON.stringify(locationPath))
-
-                            const container = locationPath[0]
-                            const parent = locationPath[1]
-                            tag.container = container
+                            const locationPath = initLocationPath(locationPathAr)
                             tag.locationPath = locationPath
-
-                            // add lab storage to stage and render
-                            const config = {
-                                locationPath: locationPath,
-                                title: container.name
-                            }
-                            const meshName = ''
-                            unhighlightPath()
-                            setupLocationPath(locationPath)
+                            console.log('babylon-3d getLocationPath result:', JSON.stringify(locationPath, null, 2))
+                            BIONET_3DLAB.signal.selectLocationPath.dispatch(locationPath, false)
                         })
                     },
                     setupModel: function(msg) {
-                        scene = createScene(msg);
+                        //scene = createScene(msg);
                     }
                 }
                 if (pixiMsgHandler[cmd] !== undefined) pixiMsgHandler[cmd](msgdata);
             }
             var eventBinding = pixiController.add(onPixiEvent);
 
-            window.addEventListener('resize', function() {
-                engine.resize();
-            });
-
-            $('#render-canvas').click(function() {
-                    $('html').scrollTop(0)
-                })
-                //$('#render-canvas').hide()
+            BIONET.signal.select3D = new MiniSignal()
+            const select3D = function() {
+                if (tag.locationPath) {
+                    BIONET_3DLAB.signal.selectLocationPath.dispatch(tag.locationPath, true)
+                }
+            }
+            const select3DBinding = BIONET.signal.select3D.add(select3D)
 
             const activate3d = function(activeState) {
-                console.log('activate3d:', activeState)
-                if (activeState) {
-                    if (app.state.inventoryTree !== undefined) {
-                        createScene(app.state.inventoryTree)
-                        engine.resize()
-                        runRenderLoop()
-                        if (tag.id!==undefined) {
-                            //setupLocationPath(tag.locationPath)
-                            const bionetStorageLocation = app.getStream('bionetStorageLocation')
-                            bionetStorageLocation.dispatch('configure', tag.id)
-                        }
-
-                    } else {}
-                } else {
-                    pauseRenderLoop()
-                }
-                //if (activeState) runRenderLoop()
-                //else pauseRenderLoop()
-                tag.active = activeState
-                tag.update()
+                BIONET_3DLAB.signal.activate3D.dispatch(activeState)
             }
             const activate3DBinding = BIONET.signal.activate3D.add(activate3d)
 
-            this.on('unmount', function() {
-                scene = null
-                pauseRenderLoop()
-                activate3DBinding.detach()
-            })
+            const highlightOccupiedCells = function(id, physicals) {
+                if (id !== tag.id) return
+                
+                app.remote.getLocationPath(id, function(err, locationPathAr) {
+                    if (err) {
+                        console.log('getLocationPath error:', err)
+                        return
+                    }
+                    const locationPath = initLocationPath(locationPathAr)
+                    console.log('highlightOccupiedCells %s', id)
+                    const sceneLocationPath = locationPath
+                        //if (!sceneLocationPath) return
+                        /*
+                        if (physicals === undefined || physicals.length === 0 || !sceneLocationPath) return
+                        var selectedLocation = null
+                        var selectedCell = null
+                        for (var i = 0; i < sceneLocationPath.length; i++) {
+                            if (id == sceneLocationPath[i].dbid) {
+                                selectedLocation = sceneLocationPath[i]
+                                if ((i + 1) < sceneLocationPath.length) {
+                                    selectedCell = sceneLocationPath[i + 1].dbid
+                                }
+                                break
+                            }
+                        }
+                        if (!selectedLocation) return
+                        */
+                    var selectedCell = id
+                    const selectedCellArray = []
+                    for (i = 0; i < physicals.length; i++) {
+                        const element = physicals[i].value
+                        if (element.parent_id === id && element.id !== selectedCell) {
+                            const stype = typeFromDBType(element.type)
+                            if (!stype) continue
+                            var x = Number(element.parent_x)
+                            var y = Number(element.parent_y)
+
+                            if (stype === 'tube') {
+                                selectedCellArray.push({
+                                    dbid: element.id,
+                                    name: element.name,
+                                    type: stype,
+                                    x: x,
+                                    y: y
+                                })
+                            } else {
+                                //var typeId = pathIdForElement(stype, x, y, element.name)
+                                //const id = selectedLocation.id
+                                selectedCellArray.push({
+                                    dbid: element.id,
+                                    name: element.name,
+                                    type: stype,
+                                    x: x,
+                                    y: y
+                                })
+                            }
+                        }
+                    }
+                    console.log('highlightOccupiedCells result %s', JSON.stringify(selectedCellArray, null, 2))
+                    BIONET_3DLAB.signal.selectCellArray.dispatch(sceneLocationPath, selectedCellArray, false)
+                        //selectedLocation.cellArray = selectedCellArray
+                        //highlightCellArray(selectedCellArray, true)
+                })
+            }
+            const getContainerContentsResultBinding = BIONET.signal.getContainerContentsResult.add(highlightOccupiedCells)
+
+            this.on('unmount', function() {})
+            window.addEventListener('resize', function() {
+                //engine.resize();
+            });
 
         })
 

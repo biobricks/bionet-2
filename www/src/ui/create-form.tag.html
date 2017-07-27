@@ -116,10 +116,11 @@
         }])
 
         function query(type, q, cb) {
-            app.remote.createAutocomplete(type, q, function(err, results) {
-                if (err) return cb(err)
-                cb(null, results)
-            });
+            app.remote.physicalAutocomplete(query, function(err, results) {
+                cb(err, {
+                    virtuals: results
+                });
+            })
         }
 
         const createStorageItemResult = function(storageItem) {
@@ -668,28 +669,43 @@
 </create-form>
 
 <part-attachment>
-    <!--
-    <form-textarea-input label="Attachments" name="attachment" value={formData.attachments}/>
-    -->
+
+    <br/>
+    <form id="importForm">
+        <div id="autocomplete-container">
+            <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name" />
+        </div>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+
+        <div class="file-field input-field">
+            <div class="btn">
+                <span>Import</span>
+                <input id="upload-file" type="file">
+            </div>
+            <div class="file-path-wrapper">
+                <input class="file-path validate" type="text">
+            </div>
+        </div>
+        <br/>
+    </form>
     <br/>
 
-    <div class="file-field input-field">
-        <div class="btn">
-            <span>Import CSV</span>
-            <input id="upload-file" type="file">
-        </div>
-        <div class="file-path-wrapper">
-            <input class="file-path validate" type="text">
-        </div>
-    </div>
-    <br/>
 
     <div id="dropZone" style="width: 100%; height: 200px; border-style: dashed; border-width:7px; border-color:#b0b0b0;">
         <div class="valign-wrapper" style="width:100%; height:100%">
             <h5 class="valign center-align" style="color:#404040; width:100%">Drag and drop files to upload...</h5>
         </div>
     </div>
+
     <script>
+        this.isMaterial = false
+        this.showPhysical = true
+        if (opts.show === undefined || opts.show === true) this.showPhysical = true
+        else this.showPhysical = false
+
         var async = require('async');
         const tag = this
         this.formData = {
@@ -697,23 +713,58 @@
         }
         this.on('mount', function() {
             console.log('part attachments mounted')
-
-            tag.formData = app.state.editPart
+            tag.autoCompleteData = null
+            this.updateAutocomplete = function(query, cb) {
+                app.remote.physicalAutocomplete(query, function(err, results) {
+                    tag.autoCompleteData = results
+                    cb(err, {
+                        virtuals: results
+                    });
+                })
+            };
             tag.update()
             console.log("part-attachments tag:", JSON.stringify(tag.formData))
 
-            var uploadFileElement = document.getElementById('upload-file');
-            uploadFileElement.addEventListener('change', function(e) {
-                const fileName = uploadFileElement.value
-                if (this.files && this.files[0]) {
+            tag.readFile = function(file, next, parent_id) {
+
+                if (file.type.match(/csv/i)) {
                     var reader = new FileReader();
                     reader.onload = function(e2) { // finished reading file data.
-                        BIONET.signal.generatePhysicalsFromUpload.dispatch(e2.target.result)
+                        BIONET.signal.generatePhysicalsFromUpload.dispatch(e2.target.result, parent_id)
+                        next();
                     }
-                    console.log('uploadFile: ', e, this.files[0])
-                    reader.readAsText(this.files[0]); // start reading the file data.
-                }
+                    reader.readAsText(file); // start reading the file data.
 
+                    // match genbank extension
+                } else if (file.name.match(/\.gbk?$|\.genbank$/i)) {
+
+                    var reader = new FileReader();
+                    reader.onload = function(e2) { // finished reading file data.
+                        BIONET.signal.generatePhysicalFromGenbankUpload.dispatch(file.name, e2.target.result, parent_id)
+                        next();
+                    }
+                    reader.readAsText(file); // start reading the file data.        
+                }
+            }
+
+            tag.getSelectedContainerId = function() {
+                var formData = $.formToObject('importForm') || {};
+                const name = formData.selectContainer
+                for (var i = 0; i < tag.autoCompleteData.length; i++) {
+                    if (name === tag.autoCompleteData[i].name) return tag.autoCompleteData[i].id
+                }
+                return null
+            }
+
+            var uploadFileElement = document.getElementById('upload-file');
+            uploadFileElement.addEventListener('change', function(e) {
+                const parent_id = tag.getSelectedContainerId()
+                const fileName = uploadFileElement.value
+                if (this.files && this.files.length > 0) {
+                    async.eachSeries(this.files, function(file, next) {
+                        tag.readFile(file, next, parent_id)
+                    })
+                }
             })
 
             var dropZone = document.getElementById('dropZone');
@@ -732,27 +783,10 @@
             dropZone.addEventListener('drop', function(e) {
                 e.stopPropagation();
                 e.preventDefault();
+                const parent_id = tag.getSelectedContainerId()
                 var files = e.dataTransfer.files; // Array of all files
                 async.eachSeries(files, function(file, next) {
-
-                    if (file.type.match(/csv/i)) {
-                        var reader = new FileReader();
-                        reader.onload = function(e2) { // finished reading file data.
-                            BIONET.signal.generatePhysicalsFromUpload.dispatch(e2.target.result)
-                            next();
-                        }
-                        reader.readAsText(file); // start reading the file data.
-
-                    // match genbank extension
-                    } else if(file.name.match(/\.gbk?$|\.genbank$/i)) {
-                        
-                        var reader = new FileReader();
-                        reader.onload = function(e2) { // finished reading file data.
-                            BIONET.signal.generatePhysicalFromGenbankUpload.dispatch(file.name, e2.target.result)
-                            next();
-                        }
-                        reader.readAsText(file); // start reading the file data.        
-                    }
+                    tag.readFile(file, next, parent_id)
                 });
             });
         })
