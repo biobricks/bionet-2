@@ -272,39 +272,42 @@ var workbench = {
         }
 
         const generatePhysicalFromGenbankUpload = function (filename, gbData, container_id) {
+          genbankToJson(gbData, function(results) {
+           
+            if(!results || !results.length) {
+              return app.ui.toast("Error reading file: " + filename);
+            }
+            
+            var i, data;
+            for(i=0; i < results.length; i++) {
+              if(!results[i].success) {
+                console.error("Error:", results.messages);
+                return app.ui.toast("Error reading file: " + filename);
+              }
+              data = results[i].parsedSequence;
 
-            genbankToJson(gbData, function (results) {
+              if(!data || !data.name) {
+                return app.ui.toast("Error reading file: " + filename);
+              }
 
-                if (!results || !results.length) {
-                    return app.ui.toast("Error reading file: " + filename);
-                }
+              console.log("DATA", data);
 
-                var i, data;
-                for (i = 0; i < results.length; i++) {
-                    if (!results[i].success) {
-                        console.error("Error:", results.messages);
-                        return app.ui.toast("Error reading file: " + filename);
-                    }
-                    data = results[i].parsedSequence;
+              // if no description, generate description from features
+              if(!data.description || !data.description.trim()) {
+                data.description = (data.features) ? data.features.map(function(feat) { return feat.name; }).join(', ') : '';
+                
+              }
 
-                    if (!data || !data.name) {
-                        return app.ui.toast("Error reading file: " + filename);
-                    }
-
-                    var virtualObj = {
-                        name: data.name,
-                        type: 'plasmid',
-                        Description: data.description,
-                        Sequence: data.sequence,
-                        filename: filename
-                    }
-                    createVirtual(virtualObj, 1, container_id);
-                }
-            }, {
-                isProtein: false
-            })
-
-        }.bind(this);
+              var virtualObj = {
+                name: data.name,
+                type: 'vector',
+                Description: data.description,
+                Sequence: data.sequence,
+                filename: filename
+              }
+              createVirtual(virtualObj, 1, container_id);
+            }
+          }, {isProtein: false})
 
         BIONET.signal.generatePhysicalFromGenbankUpload = new MiniSignal()
         BIONET.signal.generatePhysicalFromGenbankUpload.add(generatePhysicalFromGenbankUpload)
