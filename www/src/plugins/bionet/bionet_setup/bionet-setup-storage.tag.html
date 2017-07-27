@@ -52,6 +52,8 @@
 
         <div id="threedicon" style="position:absolute; top:320px; left:10px; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
 
+        <div id="threedicon" style="position:absolute; top:390px; left:10px; width:55px; height:55px;" onclick={select3d} class="btn-floating btn-large waves-effect waves-light blue"><span>-></span></div>
+
         <delete-modal deleteaction={deleteAction}></delete-modal>
 
 
@@ -215,6 +217,9 @@
                 }
             }
             $('#deleteModal').modal('open');
+        }
+        this.select3d = function() {
+            BIONET.signal.select3D.dispatch()
         }
 
         this.addToFavorites = function() {
