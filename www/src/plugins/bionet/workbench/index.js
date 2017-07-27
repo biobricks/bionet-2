@@ -135,8 +135,19 @@ var workbench = {
             })
         }
 
-        const generatePhysicals = function (seriesName, instances) {
-            const workbenchId = app.user.workbenchID
+        const saveToInventory = function (physical, label, doPrint) {
+            app.remote.savePhysical(physical, label, doPrint, function (err, id) {
+                if (err) {
+                    //toast('ERROR saving ' + physicalData.material.name + ' ' + err)
+                    console.log(err)
+                    if (cb) cb(err)
+                    return;
+                }
+            })
+        }
+
+        const generatePhysicals = function (seriesName, instances, container_id) {
+            const parent_id = container_id || app.user.workbenchID
             const instancesList = []
             for (var instance = 0; instance < instances; instance++) {
                 // todo: generate hash value for new physical instance to avoid naming collisions
@@ -144,27 +155,33 @@ var workbench = {
                 const dbData = {
                     name: name,
                     type: 'physical',
-                    parent_id: workbenchId
+                    parent_id: parent_id
                 }
                 instancesList.push(dbData)
                     //saveInWorkbench(dbData)
             }
-            saveInWorkbench(instancesList)
+            if (container_id) {
+                for (var i = 0; i < instancesList.length; i++) {
+                    saveToInventory(instancesList[i])
+                }
+                app.ui.toast(instancesList.length+' items stored in inventory');
+            } else {
+                saveInWorkbench(instancesList)
+            }
         }.bind(this)
         BIONET.signal.generatePhysicals = new MiniSignal()
         BIONET.signal.generatePhysicals.add(generatePhysicals)
 
-        const generatePhysicalsFromUpload = function (csvData) {
-            const workbenchId = app.user.workbenchID
+        const generatePhysicalsFromUpload = function (csvData, container_id) {
             console.log('generatePhysicalsFromUpload:', csvData)
             const instancesList = []
             const lines = csvData.match(/[^\r\n]+/g);
 
-            const createVirtual = function (virtualObj, physicalInstances) {
+            const createVirtual = function (virtualObj, physicalInstances, container_id) {
                     if (!physicalInstances || isNaN(physicalInstances)) return
                     app.remote.saveVirtual(virtualObj, function (err, id) {
                         if (err) return app.ui.toast("Error: " + err) // TODO handle error
-                        generatePhysicals(virtualObj.name, physicalInstances)
+                        generatePhysicals(virtualObj.name, physicalInstances, container_id)
                     });
                 }
                 // line:["Name","Created By","Created","Description","Sequence","Physical Instances"]
@@ -214,7 +231,7 @@ var workbench = {
                     Sequence: sequence,
                     Genome: genome
                 }
-                createVirtual(virtualObj, instances)
+                createVirtual(virtualObj, instances, container_id)
 
                 /*
 
@@ -246,45 +263,46 @@ var workbench = {
         BIONET.signal.generatePhysicalsFromUpload = new MiniSignal()
         BIONET.signal.generatePhysicalsFromUpload.add(generatePhysicalsFromUpload)
 
-        const createVirtual = function (virtualObj, physicalInstances) {
-          if (!physicalInstances) return
-          app.remote.saveVirtual(virtualObj, function (err, id) {
-            if (err) return app.ui.toast("Error: " + err) // TODO handle error
-            
-            generatePhysicals(virtualObj.name, physicalInstances)
-          });
+        const createVirtual = function (virtualObj, physicalInstances, container_id) {
+            if (!physicalInstances) return
+            app.remote.saveVirtual(virtualObj, function (err, id) {
+                if (err) return app.ui.toast("Error: " + err) // TODO handle error
+                generatePhysicals(virtualObj.name, physicalInstances, container_id)
+            });
         }
 
-        const generatePhysicalFromGenbankUpload = function(filename, gbData) {
+        const generatePhysicalFromGenbankUpload = function (filename, gbData, container_id) {
 
-          genbankToJson(gbData, function(results) {
-           
-            if(!results || !results.length) {
-              return app.ui.toast("Error reading file: " + filename);
-            }
-            
-            var i, data;
-            for(i=0; i < results.length; i++) {
-              if(!results[i].success) {
-                console.error("Error:", results.messages);
-                return app.ui.toast("Error reading file: " + filename);
-              }
-              data = results[i].parsedSequence;
+            genbankToJson(gbData, function (results) {
 
-              if(!data || !data.name) {
-                return app.ui.toast("Error reading file: " + filename);
-              }
+                if (!results || !results.length) {
+                    return app.ui.toast("Error reading file: " + filename);
+                }
 
-              var virtualObj = {
-                name: data.name,
-                type: 'plasmid',
-                Description: data.description,
-                Sequence: data.sequence,
-                filename: filename
-              }
-              createVirtual(virtualObj, 1);
-            }
-          }, {isProtein: false})
+                var i, data;
+                for (i = 0; i < results.length; i++) {
+                    if (!results[i].success) {
+                        console.error("Error:", results.messages);
+                        return app.ui.toast("Error reading file: " + filename);
+                    }
+                    data = results[i].parsedSequence;
+
+                    if (!data || !data.name) {
+                        return app.ui.toast("Error reading file: " + filename);
+                    }
+
+                    var virtualObj = {
+                        name: data.name,
+                        type: 'plasmid',
+                        Description: data.description,
+                        Sequence: data.sequence,
+                        filename: filename
+                    }
+                    createVirtual(virtualObj, 1, container_id);
+                }
+            }, {
+                isProtein: false
+            })
 
         }.bind(this);
 
