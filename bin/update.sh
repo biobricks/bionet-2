@@ -1,6 +1,9 @@
 #!/bin/bash
 
-script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+bionet_path="$( readlink -m $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/..)"
+
+
+cd $bionet_path
 
 usage() {
   if [ -z "$1" ]; then
@@ -47,9 +50,16 @@ if [ $? -ne "0" ]; then
 fi
 
 echo "Running migrations"
-${script_path}/../bin/migrate.js
+./bin/migrate.js
 if [ $? -ne "0" ]; then
   echo "bin/migrate.js failed" > /dev/stderr
+  exit 1
+fi
+
+echo "Building front-end"
+npm run build
+if [ $? -ne "0" ]; then
+  echo "front-end build failed" > /dev/stderr
   exit 1
 fi
 
