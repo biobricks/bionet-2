@@ -34,6 +34,7 @@
             bionetLabLayout.clear()
 
             const renderScene = function(locationPath) {
+
                 const bionetLabLayoutScene = new PIXI.Container()
                 //bionetLabLayout.createScene(bionetLabLayoutScene, tag.width, tag.height)
                 bionetLabLayout.createScene(bionetLabLayoutScene, pixijsutils.PIXI_WIDTH, pixijsutils.PIXI_HEIGHT)
@@ -138,6 +139,7 @@
 
                         const container = msg.child
                         const parent = msg.parent
+
                         const tempAssignments = msg.tempAssignments
                         const newLocationPath = [container, parent]
                         tag.container = container
