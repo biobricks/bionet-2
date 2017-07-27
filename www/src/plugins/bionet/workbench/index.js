@@ -308,6 +308,7 @@ var workbench = {
               createVirtual(virtualObj, 1, container_id);
             }
           }, {isProtein: false})
+        }
 
         BIONET.signal.generatePhysicalFromGenbankUpload = new MiniSignal()
         BIONET.signal.generatePhysicalFromGenbankUpload.add(generatePhysicalFromGenbankUpload)
