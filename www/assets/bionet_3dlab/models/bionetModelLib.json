@@ -1,0 +1,2858 @@
+[
+  {
+    "id": "freezer",
+    "attributes": {
+      "description": "Freezer",
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "upright_freezer",
+    "parent": "freezer",
+    "child": "freezer_shelf",
+    "attributes": {
+      "description": "Upright freezer",
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "chest_freezer",
+    "parent": "freezer",
+    "child": "chest_freezer_rack",
+    "attributes": {
+      "description": "Chest freezer",
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "shelf",
+    "attributes": {
+      "description": "Shelf",
+      "rootId": "shelf"
+    }
+  },
+  {
+    "id": "freezer_shelf",
+    "parent": "shelf",
+    "child": "upright_freezer_rack",
+    "attributes": {
+      "description": "Freezer shelf",
+      "rootId": "shelf"
+    }
+  },
+  {
+    "id": "rack",
+    "attributes": {
+      "description": "Rack",
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "upright_freezer_rack",
+    "parent": "rack",
+    "attributes": {
+      "description": "Upright freezer rack",
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "chest_freezer_rack",
+    "parent": "rack",
+    "attributes": {
+      "description": "Chest freezer rack",
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "upright_freezer_rack_2in_box",
+    "parent": "upright_freezer_rack",
+    "child": "2in_box",
+    "attributes": {
+      "description": "Upright freezer rack 2 inch box",
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "upright_freezer_rack_3in_box",
+    "parent": "upright_freezer_rack",
+    "child": "3in_box",
+    "attributes": {
+      "description": "Upright freezer rack 3 inch box",
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "upright_freezer_rack_4in_box",
+    "parent": "upright_freezer_rack",
+    "child": "4in_box",
+    "attributes": {
+      "description": "Upright freezer rack 4 inch box",
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "chest_freezer_rack_2in_box",
+    "parent": "chest_freezer_rack",
+    "child": "2in_box",
+    "attributes": {
+      "description": "Chest freezer rack 2 inch box",
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "chest_freezer_rack_3in_box",
+    "parent": "chest_freezer_rack",
+    "child": "3in_box",
+    "attributes": {
+      "description": "Chest freezer rack 3 inch box",
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "chest_freezer_rack_4in_box",
+    "parent": "chest_freezer_rack",
+    "child": "4in_box",
+    "attributes": {
+      "description": "Chest freezer rack 4 inch box",
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "box",
+    "attributes": {
+      "description": "Box",
+      "rootId": "box"
+    }
+  },
+  {
+    "id": "tube",
+    "attributes": {
+      "description": "Tube",
+      "rootId": "tube"
+    }
+  },
+  {
+    "id": "2in_box",
+    "parent": "box",
+    "attributes": {
+      "description": "2 inch box",
+      "dimensions": {
+        "exterior": {
+          "height": 50,
+          "depth": 102,
+          "width": 102
+        }
+      },
+      "rootId": "box"
+    }
+  },
+  {
+    "id": "3in_box",
+    "parent": "box",
+    "attributes": {
+      "description": "3 inch box",
+      "dimensions": {
+        "exterior": {
+          "height": 50,
+          "depth": 102,
+          "width": 102
+        }
+      },
+      "rootId": "box"
+    }
+  },
+  {
+    "id": "4in_box",
+    "parent": "box",
+    "attributes": {
+      "description": "4 inch box",
+      "dimensions": {
+        "exterior": {
+          "height": 50,
+          "depth": 102,
+          "width": 102
+        }
+      },
+      "rootId": "box"
+    }
+  },
+  {
+    "id": "shelving_unit",
+    "child": "shelf",
+    "attributes": {
+      "description": "Shelving unit",
+      "rootId": "shelving_unit"
+    }
+  },
+  {
+    "id": "endylab_workbench_shelving_unit",
+    "parent":"shelving_unit",
+    "child": "shelf",
+    "attributes": {
+      "description": "Endylab Shelving unit",
+      "rootId": "shelving_unit"
+    }
+  },
+  {
+    "id": "cabinet",
+    "child": "shelf",
+    "attributes": {
+      "description": "Cabinet",
+      "rootId": "cabinet"
+    }
+  },
+  {
+    "id": "drawer_unit",
+    "child": "drawer",
+    "attributes": {
+      "description": "Drawer Unit",
+      "rootId": "drawer_unit"
+    }
+  },
+  {
+    "id": "drawer",
+    "attributes": {
+      "description": "Drawer",
+      "rootId": "drawer"
+    }
+  },
+  {
+    "id": "bin",
+    "attributes": {
+      "description": "Bin",
+      "rootId": "bin"
+    }
+  },
+  {
+    "id": "room",
+    "attributes": {
+      "description": "Room",
+      "rootId": "room"
+    }
+  },
+  {
+    "id": "walk_in_freezer",
+    "parent": "room",
+    "attributes": {
+      "description": "Walk in freezer",
+      "rootId": "room"
+    }
+  },
+  {
+    "id": "2in_box_fiberboard",
+    "parent": "2in_box",
+    "child": "tube",
+    "attributes": {
+      "description": "2 in. Box, Fiberboard",
+      "dimensions": {
+        "exterior": {
+          "height": 50,
+          "depth": 51,
+          "width": 51
+        }
+      },
+      "subdivisions": [
+        1,
+        1,
+        1
+      ],
+      "rootId": "box"
+    }
+  },
+  {
+    "id": "3in_box_fiberboard",
+    "parent": "3in_box",
+    "child": "tube",
+    "attributes": {
+      "description": "3 in. Box, Fiberboard",
+      "dimensions": {
+        "exterior": {
+          "height": 50,
+          "depth": 77,
+          "width": 77
+        }
+      },
+      "subdivisions": [
+        1,
+        1,
+        1
+      ],
+      "rootId": "box"
+    }
+  },
+  {
+    "id": "4in_box_fiberboard",
+    "parent": "4in_box",
+    "child": "tube",
+    "attributes": {
+      "description": "4 in. Box, Fiberboard",
+      "dimensions": {
+        "exterior": {
+          "height": 50,
+          "depth": 102,
+          "width": 102
+        }
+      },
+      "subdivisions": [
+        1,
+        1,
+        1
+      ],
+      "rootId": "box"
+    }
+  },
+  {
+    "id": "4in_box_fiberboard_10x10",
+    "parent": "4in_box_fiberboard",
+    "child": "tube",
+    "attributes": {
+      "description": "4 in. Box, Fiberboard 10x10",
+      "subdivisions": [
+        10,
+        10,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 50,
+          "depth": 102,
+          "width": 102
+        }
+      },
+      "rootId": "box"
+    }
+  },
+  {
+    "id": "4in_box_fiberboard_9x9",
+    "parent": "4in_box_fiberboard",
+    "child": "tube",
+    "attributes": {
+      "description": "4 in. Box, Fiberboard 9x9",
+      "subdivisions": [
+        9,
+        9,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 50,
+          "depth": 102,
+          "width": 102
+        }
+      },
+      "rootId": "box"
+    }
+  },
+  {
+    "id": "2in_box_polycarbonate",
+    "parent": "2in_box",
+    "child": "tube",
+    "attributes": {
+      "storageChildren": [
+        "tube"
+      ],
+      "description": "2 in. Box, Polycarbonate",
+      "dimensions": {
+        "exterior": {
+          "height": 51,
+          "depth": 51,
+          "width": 51
+        }
+      },
+      "subdivisions": [
+        1,
+        1,
+        1
+      ],
+      "rootId": "box"
+    }
+  },
+  {
+    "id": "3in_box_polycarbonate",
+    "parent": "3in_box",
+    "child": "tube",
+    "attributes": {
+      "storageChildren": [
+        "tube"
+      ],
+      "description": "3 in. Box, Polycarbonate",
+      "dimensions": {
+        "exterior": {
+          "height": 51,
+          "depth": 80,
+          "width": 80
+        }
+      },
+      "subdivisions": [
+        1,
+        1,
+        1
+      ],
+      "rootId": "box"
+    }
+  },
+  {
+    "id": "rack_4x3_2in_box",
+    "parent": "upright_freezer_rack_2in_box",
+    "attributes": {
+      "description": "Adjustable Side Access Rack",
+      "subdivisions": [
+        4,
+        3,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 239,
+          "depth": 419,
+          "width": 137
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "rack_3x3_3in_box",
+    "parent": "upright_freezer_rack_3in_box",
+    "attributes": {
+      "description": "Side Access Rack",
+      "subdivisions": [
+        3,
+        3,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 239,
+          "depth": 419,
+          "width": 137
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "rack_8x2_2in_box",
+    "parent": "upright_freezer_rack_2in_box",
+    "attributes": {
+      "description": "Adjustable Side Access Rack",
+      "subdivisions": [
+        8,
+        2,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 239,
+          "depth": 561,
+          "width": 137
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "rack_4x3_3in_box",
+    "parent": "upright_freezer_rack_3in_box",
+    "attributes": {
+      "description": "Side Access Rack",
+      "subdivisions": [
+        4,
+        3,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 239,
+          "depth": 561,
+          "width": 137
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "rack2_4x3_3in_box",
+    "parent": "upright_freezer_rack_3in_box",
+    "attributes": {
+      "description": "Side Access Rack",
+      "subdivisions": [
+        4,
+        3,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 240,
+          "depth": 559,
+          "width": 140
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "rack2_4x5_4in_box",
+    "parent": "upright_freezer_rack_4in_box",
+    "child":"4in_box",
+    "attributes": {
+      "description": "Side Access Rack",
+      "subdivisions": [
+        1,
+        -4,
+        -5
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 240,
+          "depth": 559,
+          "width": 140
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "rack_sliding_8x2_2in_box",
+    "parent": "upright_freezer_rack_2in_box",
+    "attributes": {
+      "description": "Sliding Drawer Rack",
+      "subdivisions": [
+        8,
+        2,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 239,
+          "depth": 559,
+          "width": 140
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "rack_sliding_4x3_2in_box",
+    "parent": "upright_freezer_rack_2in_box",
+    "attributes": {
+      "description": "Sliding Drawer Rack",
+      "subdivisions": [
+        4,
+        3,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 239,
+          "depth": 442,
+          "width": 140
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "rack_12x1_2in_box",
+    "parent": "chest_freezer_rack_2in_box",
+    "attributes": {
+      "description": "12 x 1 2 in. Box Rack",
+      "subdivisions": [
+        1,
+        12,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 637,
+          "depth": 140,
+          "width": 140
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "rack_7x1_2in_box",
+    "parent": "chest_freezer_rack_2in_box",
+    "attributes": {
+      "description": "7 x 1 2 in. Box Rack",
+      "subdivisions": [
+        1,
+        7,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 406,
+          "depth": 140,
+          "width": 140
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "rack_5x1_3in_box",
+    "parent": "chest_freezer_rack_3in_box",
+    "attributes": {
+      "description": "5 x 1 3 in. Box Rack",
+      "subdivisions": [
+        1,
+        5,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 406,
+          "depth": 140,
+          "width": 140
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "rack_8x1_3in_box",
+    "parent": "chest_freezer_rack_3in_box",
+    "attributes": {
+      "description": "8 x 1 3 in. Box Rack",
+      "subdivisions": [
+        1,
+        8,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 673,
+          "depth": 140,
+          "width": 140
+        }
+      },
+      "rootId": "rack"
+    }
+  },
+  {
+    "id": "revco_13.4_upright",
+    "parent": "upright_freezer",
+    "attributes": {
+      "description": "13.4 cu.ft. Upright Freezer",
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 379,
+        "cuft": 13.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 500,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 796,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_17.2_upright",
+    "parent": "upright_freezer",
+    "attributes": {
+      "description": "17.2 cu. ft. Upright Freezer",
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 487,
+        "cuft": 17.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1282.7,
+          "width": 597,
+          "depth": 635
+        },
+        "exterior": {
+          "height": 1976.12,
+          "width": 940,
+          "depth": 940
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_17.4_upright",
+    "parent": "upright_freezer",
+    "child": "revco_17.4_upright_shelf",
+    "attributes": {
+      "description": "17.4 cu. ft. Upright Freezer",
+      "subdivisions": [
+        1,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 492.7,
+        "cuft": 17.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 640,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 935,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_17.4_upright_shelf",
+    "parent": "freezer_shelf",
+    "child": "rack2_4x5_4in_box",
+    "attributes": {
+      "description": "17.4 cu. ft. Upright Freezer Shelf",
+      "subdivisions": [
+        4,
+        1,
+        1
+      ],
+      "dimensions": {
+        "exterior": {
+          "height": 256,
+          "depth": 640,
+          "width": 600
+        }
+      },
+      "rootId": "shelf"
+    }
+  },
+  {
+    "id": "revco_20.2_upright",
+    "parent": "upright_freezer",
+    "attributes": {
+      "description": "20.2 cu. ft. Upright Freezer",
+      "subdivisions": [
+        5,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 572,
+        "cuft": 20.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 720
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1070
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_24.4_upright",
+    "parent": "upright_freezer",
+    "attributes": {
+      "description": "24.4 cu. ft. Upright Freezer",
+      "subdivisions": [
+        6,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 691,
+        "cuft": 24.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 880
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1222
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_3.1_chest",
+    "parent": "chest_freezer",
+    "attributes": {
+      "description": "3.1 cu. ft Chest Freezer",
+      "subdivisions": [
+        3,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 88,
+        "cuft": 3.1
+      },
+      "dimensions": {
+        "interior": {
+          "height": 430,
+          "depth": 430,
+          "width": 480
+        },
+        "exterior": {
+          "height": 1156,
+          "depth": 760,
+          "width": 766
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_6.8_chest",
+    "parent": "chest_freezer",
+    "attributes": {
+      "description": "6.8 cu. ft. Chest Freezer",
+      "subdivisions": [
+        4,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 193,
+        "cuft": 6.8
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1230
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_10.3_chest",
+    "parent": "chest_freezer",
+    "attributes": {
+      "description": "10.3 cu. ft. Chest Freezer",
+      "subdivisions": [
+        6,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 292,
+        "cuft": 10.3
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 900
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1530
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_13.7_chest",
+    "parent": "chest_freezer",
+    "attributes": {
+      "description": "13.7 cu. ft. Chest Freezer",
+      "subdivisions": [
+        8,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 388,
+        "cuft": 13.7
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1190
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1830
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_17.1_chest",
+    "parent": "upright_freezer",
+    "attributes": {
+      "description": "17.1 cu. ft. Chest Freezer",
+      "subdivisions": [
+        10,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 484,
+        "cuft": 17.1
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1490
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 2130
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_20.5_chest",
+    "parent": "chest_freezer",
+    "child": "rack_8x1_3in_box",
+    "attributes": {
+      "description": "20.5 cu. ft. Chest Freezer",
+      "subdivisions": [
+        12,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 580,
+        "cuft": 20.5
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1790
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 2430
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_13.4_upright-86C",
+    "parent": "revco_13.4_upright",
+    "attributes": {
+      "description": "Revco Ultima II 13.4cuft -86C Upright Freezer",
+      "temperature": {
+        "min": "-50",
+        "max": "-86"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 379,
+        "cuft": 13.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 500,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 796,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1386-9-A",
+    "parent": "revco_13.4_upright-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-50",
+        "max": "-86"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 379,
+        "cuft": 13.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 500,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 796,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1386-9-D",
+    "parent": "revco_13.4_upright-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-50",
+        "max": "-86"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 379,
+        "cuft": 13.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 500,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 796,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1386-9-V",
+    "parent": "revco_13.4_upright-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-50",
+        "max": "-86"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 379,
+        "cuft": 13.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 500,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 796,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1386-9-W",
+    "parent": "revco_13.4_upright-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-50",
+        "max": "-86"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 379,
+        "cuft": 13.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 500,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 796,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_13.4_upright-40C",
+    "parent": "revco_13.4_upright",
+    "attributes": {
+      "description": "Revco Ultima II 13.4cuft -40C Upright Freezer",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 379,
+        "cuft": 13.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 500,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 796,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1340-9-A",
+    "parent": "revco_13.4_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 379,
+        "cuft": 13.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 500,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 796,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1340-9-D",
+    "parent": "revco_13.4_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 379,
+        "cuft": 13.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 500,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 796,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1340-9-V",
+    "parent": "revco_13.4_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 379,
+        "cuft": 13.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 500,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 796,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1340-9-W",
+    "parent": "revco_13.4_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 379,
+        "cuft": 13.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 500,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 796,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_17.2_upright-40C",
+    "parent": "revco_17.2_upright",
+    "attributes": {
+      "description": "Revco Ultima II 17.2cuft -40C Upright Freezer",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 487,
+        "cuft": 17.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1282.7,
+          "width": 597,
+          "depth": 635
+        },
+        "exterior": {
+          "height": 1976.12,
+          "width": 940,
+          "depth": 940
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1740-9-A",
+    "parent": "revco_17.2_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 487,
+        "cuft": 17.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1282.7,
+          "width": 597,
+          "depth": 635
+        },
+        "exterior": {
+          "height": 1976.12,
+          "width": 940,
+          "depth": 940
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1740-9-D",
+    "parent": "revco_17.2_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 487,
+        "cuft": 17.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1282.7,
+          "width": 597,
+          "depth": 635
+        },
+        "exterior": {
+          "height": 1976.12,
+          "width": 940,
+          "depth": 940
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1740-9-V",
+    "parent": "revco_17.2_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 487,
+        "cuft": 17.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1282.7,
+          "width": 597,
+          "depth": 635
+        },
+        "exterior": {
+          "height": 1976.12,
+          "width": 940,
+          "depth": 940
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1740-9-W",
+    "parent": "revco_17.2_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        4,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 487,
+        "cuft": 17.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1282.7,
+          "width": 597,
+          "depth": 635
+        },
+        "exterior": {
+          "height": 1976.12,
+          "width": 940,
+          "depth": 940
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_17.4_upright-86C",
+    "parent": "revco_17.4_upright",
+    "attributes": {
+      "description": "Revco Ultima Plus 17.4 cf -86C Upright Freezer",
+      "temperature": {
+        "min": "-50",
+        "max": "-86"
+      },
+      "subdivisions": [
+        1,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 492.7,
+        "cuft": 17.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 640,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 935,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT1786-10-D46",
+    "parent": "revco_17.4_upright-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-50",
+        "max": "-86"
+      },
+      "subdivisions": [
+        1,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 492.7,
+        "cuft": 17.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 640,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 935,
+          "width": 942
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_20.2_upright-40C",
+    "parent": "revco_20.2_upright",
+    "attributes": {
+      "description": "Revco Ultima II 20.2cuft -40C Upright Freezer",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        5,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 572,
+        "cuft": 20.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 720
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1070
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2140-9-A",
+    "parent": "revco_20.2_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        5,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 572,
+        "cuft": 20.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 720
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1070
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2140-9-D",
+    "parent": "revco_20.2_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        5,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 572,
+        "cuft": 20.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 720
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1070
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2140-9-V",
+    "parent": "revco_20.2_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        5,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 572,
+        "cuft": 20.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 720
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1070
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2140-9-W",
+    "parent": "revco_20.2_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        5,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 572,
+        "cuft": 20.2
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 720
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1070
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_24.4_upright-40C",
+    "parent": "revco_24.4_upright",
+    "attributes": {
+      "description": "Revco Ultima II 24.4cuft -40C Upright Freezer",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        6,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 691,
+        "cuft": 24.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 880
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1222
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2540-9-A",
+    "parent": "revco_24.4_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        6,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 691,
+        "cuft": 24.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 880
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1222
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2540-9-D",
+    "parent": "revco_24.4_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        6,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 691,
+        "cuft": 24.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 880
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1222
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2540-9-V",
+    "parent": "revco_24.4_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        6,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 691,
+        "cuft": 24.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 880
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1222
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2540-9-W",
+    "parent": "revco_24.4_upright-40C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-10",
+        "max": "-40"
+      },
+      "subdivisions": [
+        6,
+        -5,
+        1
+      ],
+      "volume": {
+        "litre": 691,
+        "cuft": 24.4
+      },
+      "dimensions": {
+        "interior": {
+          "height": 1280,
+          "depth": 620,
+          "width": 880
+        },
+        "exterior": {
+          "height": 1970,
+          "depth": 916,
+          "width": 1222
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_3.1_chest-86C",
+    "parent": "revco_3.1_chest",
+    "attributes": {
+      "description": "Revco Ultima II 3.1cuft -86C Chest Freezer",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        3,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 88,
+        "cuft": 3.1
+      },
+      "dimensions": {
+        "interior": {
+          "height": 430,
+          "depth": 430,
+          "width": 480
+        },
+        "exterior": {
+          "height": 1156,
+          "depth": 760,
+          "width": 766
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-390-9-A",
+    "parent": "revco_3.1_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        3,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 88,
+        "cuft": 3.1
+      },
+      "dimensions": {
+        "interior": {
+          "height": 430,
+          "depth": 430,
+          "width": 480
+        },
+        "exterior": {
+          "height": 1156,
+          "depth": 760,
+          "width": 766
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-390-9-D",
+    "parent": "revco_3.1_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        3,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 88,
+        "cuft": 3.1
+      },
+      "dimensions": {
+        "interior": {
+          "height": 430,
+          "depth": 430,
+          "width": 480
+        },
+        "exterior": {
+          "height": 1156,
+          "depth": 760,
+          "width": 766
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-390-9-V",
+    "parent": "revco_3.1_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        3,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 88,
+        "cuft": 3.1
+      },
+      "dimensions": {
+        "interior": {
+          "height": 430,
+          "depth": 430,
+          "width": 480
+        },
+        "exterior": {
+          "height": 1156,
+          "depth": 760,
+          "width": 766
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-390-9-W",
+    "parent": "revco_3.1_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        3,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 88,
+        "cuft": 3.1
+      },
+      "dimensions": {
+        "interior": {
+          "height": 430,
+          "depth": 430,
+          "width": 480
+        },
+        "exterior": {
+          "height": 1156,
+          "depth": 760,
+          "width": 766
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_6.8_chest-86C",
+    "parent": "revco_6.8_chest",
+    "attributes": {
+      "description": "Revco Ultima II 6.8cuft -86C Chest Freezer",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        4,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 193,
+        "cuft": 6.8
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1230
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-790-9-A",
+    "parent": "revco_6.8_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        4,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 193,
+        "cuft": 6.8
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1230
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-790-9-D",
+    "parent": "revco_6.8_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        4,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 193,
+        "cuft": 6.8
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1230
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-790-9-V",
+    "parent": "revco_6.8_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        4,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 193,
+        "cuft": 6.8
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1230
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-790-9-W",
+    "parent": "revco_6.8_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        4,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 193,
+        "cuft": 6.8
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 600
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1230
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_10.3_chest-86C",
+    "parent": "revco_10.3_chest",
+    "attributes": {
+      "description": "Revco Ultima II 10.3cuft -86C Chest Freezer",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        6,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 292,
+        "cuft": 10.3
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 900
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1530
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1090-9-A",
+    "parent": "revco_10.3_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        6,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 292,
+        "cuft": 10.3
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 900
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1530
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1090-9-D",
+    "parent": "revco_10.3_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        6,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 292,
+        "cuft": 10.3
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 900
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1530
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1090-9-V",
+    "parent": "revco_10.3_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        6,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 292,
+        "cuft": 10.3
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 900
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1530
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1090-9-W",
+    "parent": "revco_10.3_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        6,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 292,
+        "cuft": 10.3
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 900
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1530
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_13.7_chest-86C",
+    "parent": "revco_13.7_chest",
+    "attributes": {
+      "description": "Revco Ultima II 13.7cuft -86C Chest Freezer",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        8,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 388,
+        "cuft": 13.7
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1190
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1830
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1490-9-A",
+    "parent": "revco_13.7_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        8,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 388,
+        "cuft": 13.7
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1190
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1830
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1490-9-D",
+    "parent": "revco_13.7_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        8,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 388,
+        "cuft": 13.7
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1190
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1830
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1490-9-V",
+    "parent": "revco_13.7_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        8,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 388,
+        "cuft": 13.7
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1190
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1830
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1490-9-W",
+    "parent": "revco_13.7_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        8,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 388,
+        "cuft": 13.7
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1190
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1830
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_17.1_chest-86C",
+    "parent": "revco_17.1_chest",
+    "attributes": {
+      "description": "Revco Ultima II 17.1cuft -86C Chest Freezer",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        10,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 484,
+        "cuft": 17.1
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1490
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 2130
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1790-9-A",
+    "parent": "revco_13.7_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        8,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 388,
+        "cuft": 13.7
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1190
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1830
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1790-9-D",
+    "parent": "revco_13.7_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        8,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 388,
+        "cuft": 13.7
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1190
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1830
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1790-9-V",
+    "parent": "revco_13.7_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        8,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 388,
+        "cuft": 13.7
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1190
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1830
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-1790-9-W",
+    "parent": "revco_13.7_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        8,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 388,
+        "cuft": 13.7
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1190
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 1830
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "revco_20.5_chest-86C",
+    "parent": "revco_20.5_chest",
+    "attributes": {
+      "description": "Revco Ultima II 20.5cuft -86C Chest Freezer",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        12,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 580,
+        "cuft": 20.5
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1790
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 2430
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2090-9-A",
+    "parent": "revco_20.5_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        12,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 580,
+        "cuft": 20.5
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1790
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 2430
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2090-9-D",
+    "parent": "revco_20.5_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        12,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 580,
+        "cuft": 20.5
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1790
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 2430
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2090-9-V",
+    "parent": "revco_20.5_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        12,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 580,
+        "cuft": 20.5
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1790
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 2430
+        }
+      },
+      "rootId": "freezer"
+    }
+  },
+  {
+    "id": "ULT-2090-9-W",
+    "parent": "revco_20.5_chest-86C",
+    "attributes": {
+      "description": "Revco ",
+      "temperature": {
+        "min": "-40",
+        "max": "-86"
+      },
+      "subdivisions": [
+        12,
+        1,
+        3
+      ],
+      "volume": {
+        "litre": 580,
+        "cuft": 20.5
+      },
+      "dimensions": {
+        "interior": {
+          "height": 670,
+          "depth": 480,
+          "width": 1790
+        },
+        "exterior": {
+          "height": 1040,
+          "depth": 808,
+          "width": 2430
+        }
+      },
+      "rootId": "freezer"
+    }
+  }
+]

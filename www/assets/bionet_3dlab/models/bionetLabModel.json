@@ -1,0 +1,80 @@
+[{
+        "name": "Endy Lab Main -80 Freezer",
+        "id": "M",
+        "shortcode": "M",
+        "className": "revco_17.4_upright-86C",
+        "position": [9.357231278118874, 4.3, 31.655637728655307],
+        "rotation": [269.99996781922493, 0, 0],
+        "highlight": true
+    }, {
+        "name": "Backup -80 Freezer",
+        "id": "B",
+        "shortcode": "B",
+        "className": "revco_17.4_upright-86C",
+        "position": [9.357231278118874, 4.3, 26.18424037026392],
+        "rotation": [269.99996781922493, 0, 0],
+        "highlight": true
+    }, {
+        "name": "Aux -80 Left",
+        "id": "AL",
+        "shortcode": "AL",
+        "className": "revco_17.4_upright-86C",
+        "position": [9.357231278118874, 4.3, 20.712843011872508],
+        "rotation": [269.99996781922493, 0, 0],
+        "highlight": true
+    }, {
+        "name": "Aux -80 Right",
+        "id": "AR",
+        "shortcode": "AR",
+        "className": "revco_17.4_upright-86C",
+        "position": [9.357231278118874, 4.3, 15.241445653481094],
+        "rotation": [269.99996781922493, 0, 0],
+        "highlight": true
+    }, {
+        "name": "Short-term -4 Left",
+        "id": "STL",
+        "className": "ULT-2090-9-V",
+        "position": [-37.34341536165763, 4.3, 2.2017777868189796],
+        "rotation": [0, 0, 0],
+        "highlight": true
+    }, {
+        "name": "Short-term 2 -4 Right",
+        "id": "STR",
+        "className": "ULT-2090-9-V",
+        "position": [-20.34341536165763, 4.3, 2.2017777868189796],
+        "rotation": [0, 0, 0],
+        "highlight": true
+    }, {
+        "name": "Left -4",
+        "id": "L-4",
+        "shortcode": "L-4",
+        "className": "revco_17.4_upright-86C",
+        "position": [18.19222175560766, 4.3, 2.2017777868189796],
+        "rotation": [0, 0, 0],
+        "highlight": true
+    }, {
+        "name": "Right -4",
+        "id": "R-4",
+        "shortcode": "R",
+        "className": "revco_17.4_upright-86C",
+        "position": [23.390819191055286, 4.3, 2.2017777868189796],
+        "rotation": [0, 0, 0],
+        "highlight": true
+    }, {
+        "name": "Left -20 Freezer",
+        "id": "L-20",
+        "shortcode": "L-20",
+        "className": "revco_17.4_upright-86C",
+        "position": [18.85357673904545, 4.3, 34.40036039512657],
+        "rotation": [90.00003218077507, 0, 0],
+        "highlight": true
+    }, {
+        "name": "Right -20 Freezer",
+        "id": "R-20",
+        "shortcode": "R20",
+        "className": "revco_17.4_upright-86C",
+        "position": [18.85357673904545, 4.3, 28.975609630130464],
+        "rotation": [90.00003218077507, 0, 0],
+        "highlight": true
+    }
+ ]
