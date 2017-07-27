@@ -1,5 +1,7 @@
 #!/bin/bash
 
+script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 usage() {
   if [ -z "$1" ]; then
     out="/dev/stderr"
@@ -45,7 +47,7 @@ if [ $? -ne "0" ]; then
 fi
 
 echo "Running migrations"
-../bin/migrate.js
+${script_path}/../bin/migrate.js
 if [ $? -ne "0" ]; then
   echo "bin/migrate.js failed" > /dev/stderr
   exit 1
