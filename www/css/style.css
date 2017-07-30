@@ -65,7 +65,7 @@ p {
         top: 10%;
     }
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 300px) {
     #index-banner .section {
         top: 0;
     }
@@ -145,23 +145,23 @@ ul.fancytree-container {
     padding-left: 32px;
 }
 @media (max-width:600px) {
-    .fancytree-title {
-        font-size: 8px;
+    .fancytree-title nav ul a {
+        font-size: 6px;
     }
 }
 @media (min-width:601px) {
-    .fancytree-title {
-        font-size: 10px;
+    .fancytree-title nav ul a {
+        font-size: 7px;
     }
 }
 @media (min-width:900px) {
-    .fancytree-title {
-        font-size: 12px;
+    .fancytree-title nav ul a {
+        font-size: 8px;
     }
 }
 @media (min-width:1200px) {
-    .fancytree-title {
-        font-size: 16px;
+    .fancytree-title nav ul a {
+        font-size: 10px;
     }
 }
 .collection .collection-item.avatar2 {
