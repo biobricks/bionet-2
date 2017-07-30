@@ -1,14 +1,9 @@
 <create-physical>
     <div if={opts.topMargin!==undefined} id="createPhysical" style="margin-top:{opts.topMargin}px" />
     <div if={opts.topMargin===undefined} id="createPhysical" style="margin-top:100px" />
-    <form id="createPhysicalForm" ref="createPhysicalForm" onsubmit={submitForm}>
+    <form id="createPhysicalForm" ref="createPhysicalForm" class={classes} onsubmit={submitForm}>
         <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
         <div if={showPhysical}>
-
-            <div class="pixijs">
-                <bionet-container width="200" />
-            </div>
-
 
             <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
             <!--
@@ -33,7 +28,6 @@
                 <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name" />
             </div>
 
-
             <div style="margin-top:30px" />
             <std-button label="save" action={submitForm} />
             <std-button if={formData.label || labelFormData} label="save & print" action={submitFormPrint} />
@@ -42,7 +36,6 @@
             <input type="hidden" ref="type" name="type" value={type} />
             <input type="hidden" ref="virtual_id" name="virtual_id" value={formData.virtual_id} />
             <input type="submit" style="visibility:hidden" />
-        </div>
         </div>
     </form>
     <div id="scanModal" ref="scanModal" class="scanModal modal"></div>
@@ -82,14 +75,15 @@
 
         this.formData = {
             name: '',
-            notes: ''
+            notes: '',
+            parent_id: opts.parent_id
         }
         tag.container = {}
 
         var savePhysical = function(p, labelImage, doPrint) {
             console.log('savePhysical:', doPrint)
-            // TODO: messaging async api call
-            // TODO why is this a route? should simply be a function call
+                // TODO: messaging async api call
+                // TODO why is this a route? should simply be a function call
             app.route('partDataAccessor', 'storePhysical', undefined, {
                 material: p,
                 labelImage: labelImage,
@@ -124,10 +118,11 @@
             }
 
             savePhysical(formData, tag.labelImageData, doPrint);
+
         }
 
         this.submitFormPrint = function(e) {
-          this.submitForm(e, true);
+            this.submitForm(e, true);
         }.bind(this);
 
         this.createLabel = function() {
@@ -171,8 +166,8 @@
                 subTag: "scan", // the tag to mount
                 cb: function(err, m, barcode) {
                     $(tag.refs.scanModal).modal('close');
-                    if(err) return app.ui.toast("Scan failed: " + err); // TODO handle error
-                    if(!barcode) return app.ui.toast("You cannot associate an existing QR code label with a new object")
+                    if (err) return app.ui.toast("Scan failed: " + err); // TODO handle error
+                    if (!barcode) return app.ui.toast("You cannot associate an existing QR code label with a new object")
                     app.ui.toast("Scanned barcode: " + barcode);
 
                     tag.formData.barcode = barcode;
@@ -189,7 +184,7 @@
                 }
             })
             $(tag.refs.scanModal).modal('open');
-            
+
         }
 
         this.scanContainer = function() {
@@ -201,11 +196,11 @@
                 subTag: "scan",
                 cb: function(err, m, barcode) {
                     $('#scanModal').modal('close');
-                    if(err) return app.ui.toast("Scan failed: " + err);
-                    if(barcode) return app.ui.toast("Cryotubes cannot contain other containers");
-        
-                    if(m.id === tag.formData.id) {
-                      return app.ui.toast("Error: An item cannot contain itself.");
+                    if (err) return app.ui.toast("Scan failed: " + err);
+                    if (barcode) return app.ui.toast("Cryotubes cannot contain other containers");
+
+                    if (m.id === tag.formData.id) {
+                        return app.ui.toast("Error: An item cannot contain itself.");
                     }
                     app.ui.toast("Assigned parent: " + m.name);
 
@@ -252,7 +247,6 @@
             tag.labelFormData = null;
             tag.formData = data
             tag.type = data.type
-            
             tag.showPhysical = true
             tag.update()
         }
@@ -392,12 +386,51 @@
 
                 })
             })
-            
+
         });
 
     </script>
 </create-physical>
 
+<modal-physical>
+    <div id="edit-physical-modal" class="modal">
+        <div class="modal-content">
+            <h4>{opts.title}</h4>
+            <div id="modal-physical-contents"></div>
+        </div>
+        <!--
+        <div class="modal-footer">
+            <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+        </div>
+        -->
+    </div>
+
+    <script>
+        var tags;
+
+        this.on('mount', function() {
+            var type
+            var parent_id
+            if (opts.modaldata) {
+                type = opts.modaldata.type
+                parent_id = opts.modaldata.parent_id
+            }
+            tags = riot.mount('#modal-physical-contents', 'create-physical', {
+                topMargin: 10,
+                modal: true,
+                type: type,
+                parent_id: parent_id,
+                modalaction: opts.modalaction,
+                modaldata: opts.modaldata
+            });
+        })
+
+        this.on('before-unmount', function() {
+            tags[0].unmount()
+        })
+
+    </script>
+</modal-physical>
 
 <modal-content>
     <div>
