@@ -8,7 +8,7 @@
                 <div class="nav-wrapper container" style="left:0px; margin-left:25px; width:100%; max-width:100%;">
 
                     <!-- logo -->
-                    <a id="logo-container" href="/" class="brand-logo"><img src={ theme.style.color.smallLogo } style="height:44px; margin-top:10px;" alt="" /></a>
+                    <a id="logo-container" href="/" class="brand-logoleft"><img src={ theme.style.color.smallLogo } style="height:44px; margin-top:10px;" alt="" /></a>
 
                     <div id="appbar-menu" style="margin-left:80px;">
                         <!-- full menu -->
@@ -19,15 +19,19 @@
                     <ul class="right" style="margin-right:25px;">
                         <!--
         <li><a id="searchbar" data-activates="searchbar2"><i class="material-icons left {theme.style.color.navText}">search</i></a></li>
-        -->
                         <settings-button/>
+        -->
                         <login-button/>
                     </ul>
 
                     <!-- mobile slide-out menu -->
+                    <!--
                     <a id="mobile-nav" data-activates={mobileMenu.id} class="button-collapse"><i class="material-icons {theme.style.color.navButton}">menu</i></a>
                     <nav-group tagid={mobileMenu.id} classname={mobileMenu.classname} navitems={mobileMenu.items}/>
+                    -->
+
                 </div>
+
             </nav>
         </div>
 
@@ -61,7 +65,17 @@
         </div>
       </form>
 -->
+    <style>
+        nav .brand-logoleft {
+            position: absolute;
+            color: #fff;
+            display: inline-block;
+            font-size: 2.1rem;
+            padding: 0;
+            white-space: nowrap;
+        }
 
+    </style>
     <script>
         const tag = this
         this.theme = app.getTheme()
@@ -81,9 +95,10 @@
         // initialize primary nav
         const primaryNavItems = app.getModel(app.$.primaryNav)
             //style: 'margin-left:80px;',
+            //classname: 'hide-on-med-and-down left',
         this.fullMenu = {
             id: 'full-menu',
-            classname: 'hide-on-med-and-down left',
+            classname: 'left',
             items: primaryNavItems
         }
         this.mobileMenu = {
@@ -134,10 +149,12 @@
                 })
                 //$("#settings-slideout").dropdown();
             $('#mobile-nav').sideNav({
-                closeOnClick: true
+                closeOnClick: true,
+                dismissible: true
             });
             $('#mobile-nav-secondary').sideNav({
-                closeOnClick: true
+                closeOnClick: true,
+                dismissible: true
             });
             $('.parallax').parallax();
             $(".dropdown-button").dropdown({
