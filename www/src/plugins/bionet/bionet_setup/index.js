@@ -136,6 +136,7 @@ var bionetSetup = {
                 }
                 app.ui.toast(m.name + ' added to favorites');
                 console.log('addFavorite id:', m.id)
+                BIONET.signal.getFavorites.dispatch()
             })
         }
         BIONET.signal.addFavorite = new MiniSignal()
