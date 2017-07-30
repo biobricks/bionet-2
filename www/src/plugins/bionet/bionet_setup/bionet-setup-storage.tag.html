@@ -23,17 +23,17 @@
             </div>
             <div id="physical-view" class="col s8">
                 <div id="pixijsdiv" class="row pixijs">
-                    <bionet-storage-location width={pixiwidth} height={pixiheight}/>
+                    <bionet-storage-location width={pixiwidth} height={pixiheight-10}/>
                 </div>
                 <div id="threedview" class="row threedview" style="margin:0;padding:0;">
                     <babylon-3d></babylon-3d>
                 </div>
                 <div id="physical-props-view" class="row physical-view" style="width:100%;margin:0;padding:0;">
+                    <div id="physical-storage" if={displayPhysical} class="edit-physical" style="width:100%">
+                        <create-physical show="false" top-margin="0px" style="width:100%" />
+                    </div>
                     <div id="box" class="edit-physical" style="width:100%">
                         <box-contents />
-                    </div>
-                    <div id="physical-storage" class="edit-physical" style="width:100%">
-                        <create-physical show="false" top-margin="0px" style="width:100%" />
                     </div>
                 </div>
             </div>
@@ -42,8 +42,8 @@
         <div id="addicon" class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:110px; left:10px; width:55px; height:55px;" data-activates="addmenu"><i class="material-icons">add</i></div>
 
         <ul id="addmenu" class="dropdown-content" style="position:absolute; top:110px; left:10px; width:200px !important; text-align:left;z-index:1000">
-            <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.name}</span></li>
-            <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.name}</span></li>
+            <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.title}</span></li>
+            <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.title}</span></li>
         </ul>
 
         <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" style="position:absolute; top:180px; left:10px; text-align:left" onclick={addToFavorites}><i class="material-icons">star</i></a>
@@ -56,6 +56,7 @@
 
         <delete-modal deleteaction={deleteAction}></delete-modal>
 
+        <modal-physical title={modalPhysicalTitle} modalaction={modalAction} modaldata={modalData}/>
 
     </div>
 
@@ -70,7 +71,7 @@
             margin-top: 15px;
             margin-bottom: 0px;
             width: 100%;
-            height: 35%;
+            height: 20%;
             float: left;
             z-index: 2000;
         }
@@ -83,7 +84,7 @@
             margin-bottom: 0px;
             padding-bottom: 0px;
             width: 100%;
-            height: 65%;
+            height: 80%;
             float: left;
         }
         
@@ -134,6 +135,7 @@
         const appSettings = app.getAppSettings()
         const dataTypes = appSettings.dataTypes
         tag.formData = {}
+        tag.displayPhysical = true
         const cart = app.getStream('cart')
 
         this.addNode = function(e) {
@@ -152,15 +154,25 @@
 
             // initialize storage type
             const active = $(e.target)
-            const type = active.text()
+            const title = active.text()
+            var type = null
+            for (var i = 0; i < tag.locations.length; i++) {
+                if (tag.locations[i].title === title) {
+                    type = tag.locations[i].name
+                }
+            }
+            if (!type) {
+                console.log('addNode, type not found for title:', title)
+                return
+            }
 
             // generate unique name
             const nodeIndex = (node.children) ? node.children.length + 1 : 1
-            const name = type + '_' + node.getIndexHier() + '.' + nodeIndex
+            const name = title + '_' + node.getIndexHier() + '.' + nodeIndex
 
             // initialize standard attributes
             const dbData = {
-                name: name,
+                name: '',
                 type: type,
                 parent_id: parentId
             }
@@ -170,7 +182,27 @@
             for (var i = 0; i < attributes.length; i++) {
                 dbData[attributes[i].name] = type + ' ' + attributes[i].name
             }
-            BIONET.signal.createStorageItem.dispatch(dbData)
+
+            tag.modalPhysicalTitle = "Create " + title
+            tag.modalData = dbData
+            tag.displayPhysical = false
+            tag.modalOpen = true
+            const physicalUpdatedModal = function(modalData) {
+                if (tag.modalOpen) {
+                    console.log('close edit physical modal')
+                    $('#edit-physical-modal').modal('close');
+                    //BIONET.signal.createStorageItem.dispatch(modalData)
+                    tag.displayPhysical = true
+                    tag.update()
+                    tag.modelOpen = false
+                }
+            }
+            BIONET.signal.physicalUpdated.add(physicalUpdatedModal)
+
+            tag.update()
+
+            $('#edit-physical-modal').modal('open');
+            BIONET.signal.getPhysicalResult.dispatch(dbData)
         }
 
         const createStorageItemResult = function(storageItem) {
@@ -211,7 +243,9 @@
                 })
                 for (var i = 0; i < deleteNodes.length; i++) {
                     const node = deleteNodes[i]
-                    const id = (node.data.dbRef !== undefined) ? node.data.dbRef : node.data.dbData.id
+                    var id = null
+                    if (node.data.dbRef) id = node.data.dbRef.id
+                    else id = node.data.dbData.id
                     BIONET.signal.delPhysical.dispatch(id)
                     node.remove()
                 }
@@ -224,12 +258,10 @@
 
         this.addToFavorites = function() {
             const ftree = $("#ftree").fancytree("getTree")
-            ftree.visit(function(node) {
-                if (node.isSelected()) {
-                    BIONET.signal.addFavorite.dispatch(node.data.dbData)
-                }
-            })
-            BIONET.signal.getFavorites.dispatch()
+            var node = ftree.getActiveNode();
+            if (node) {
+                BIONET.signal.addFavorite.dispatch(node.data.dbData)
+            }
         }
 
         const requestStorageResult = function(storageData) {
@@ -341,7 +373,7 @@
             });
             tag.pixiwidth = $('#pixijsdiv').width()
             tag.pixiheight = $('#pixijsdiv').height()
-            
+
             $('.modal').modal();
 
             /*
@@ -466,6 +498,9 @@
                     })
                     */
                     //}
+                },
+                table: {
+                    indentation: 6
                 },
                 dnd5: {
                     // autoExpandMS: 400,
