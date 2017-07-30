@@ -69400,34 +69400,15 @@ const mathUtils = require('../utils/mathUtils');
 const volumeSubdivision = require('./volumeSubdivision');
 const camera = require('../scene/camera');
 const utils = require('../utils');
+
 //---------------------------------------------------------------------------------------------------------
-// model generation
 module.exports = {
     classLib: {},
     classAttributesOverlay: {},
     instances: {},
     state: {},
-    load: function (assetsManager) {
-        var instanceTask = assetsManager.addTextFileTask("instance task", "/static/assets/bionet_3dlab/models/bionetLabModel.json");
-        const thisModule = this;
-        instanceTask.onSuccess = function (task) {
-            console.log('class lib loaded');
-            thisModule.instances = JSON.parse(task.text);
-        };
 
-        var modelLibTask = assetsManager.addTextFileTask("model task", "/static/assets/bionet_3dlab/models/bionetModelLib.json");
-        modelLibTask.onSuccess = function (task) {
-            console.log('class lib loaded');
-            thisModule.classLib = JSON.parse(task.text);
-        };
-
-        var overlayTask = assetsManager.addTextFileTask("model task", "/static/assets/bionet_3dlab/models/bionetModelAttributes.json");
-        overlayTask.onSuccess = function (task) {
-            console.log('class lib attributes loaded');
-            thisModule.classAttributesOverlay = JSON.parse(task.text);
-        };
-    },
-
+    // api functions
     findElement: function (scene, name) {
         return scene.getMeshByName(name);
     },
@@ -69636,6 +69617,7 @@ module.exports = {
         if (extract) this.state.currentExtract = name;else this.state.currentExtract = null;
     },
 
+    // internal utility functions
     initTranslateObjectSpec: function (mesh, deltaVector, frames) {
         const startPos = mesh.position;
         const endPos = mesh.position.add(deltaVector);
@@ -69678,12 +69660,6 @@ module.exports = {
                 var points = [];
                 if (axis === 'yz') {
                     points = [new BABYLON.Vector3(px, p1.y + py, p1.x + pz), new BABYLON.Vector3(px, p2.y + py, p2.x + pz)];
-                    /*
-                    points = [
-                            new BABYLON.Vector3(px, p1.y + py, p1.x + pz),
-                            new BABYLON.Vector3(px, p2.y + py, p2.x + pz)
-                        ]
-                        */
                 } else if (axis === 'xz') {
                     points = [new BABYLON.Vector3(p1.x + px, p1.y + py, pz), new BABYLON.Vector3(p2.x + px, p2.y + py, pz)];
                 }
@@ -69711,7 +69687,6 @@ module.exports = {
                     var position = null;
                     if (axis === 'yz') {
                         position = new BABYLON.Vector3(px - 0.01, py + labelSpec.y, pz + labelSpec.x);
-                        //position = new BABYLON.Vector3(px - 0.01, py + labelSpec.y, pz + labelSpec.x)
                     } else if (axis === 'xz') {
                         position = new BABYLON.Vector3(px + labelSpec.x, py + labelSpec.y, pz - 0.01);
                     }
@@ -69746,7 +69721,6 @@ module.exports = {
     },
 
     addDecal: function (scene, mesh, classObj, id, text) {
-
         if (!mesh) return;
 
         const options = {
@@ -69774,6 +69748,28 @@ module.exports = {
         decalMesh.parent = mesh;
     }.bind(this),
 
+    //----------------------------------------------------------------------------------------------------------------------------
+    // model generation - move to separate class
+    load: function (assetsManager) {
+        var instanceTask = assetsManager.addTextFileTask("instance task", "/static/assets/bionet_3dlab/models/bionetLabModel.json");
+        const thisModule = this;
+        instanceTask.onSuccess = function (task) {
+            console.log('class lib loaded');
+            thisModule.instances = JSON.parse(task.text);
+        };
+
+        var modelLibTask = assetsManager.addTextFileTask("model task", "/static/assets/bionet_3dlab/models/bionetModelLib.json");
+        modelLibTask.onSuccess = function (task) {
+            console.log('class lib loaded');
+            thisModule.classLib = JSON.parse(task.text);
+        };
+
+        var overlayTask = assetsManager.addTextFileTask("model task", "/static/assets/bionet_3dlab/models/bionetModelAttributes.json");
+        overlayTask.onSuccess = function (task) {
+            console.log('class lib attributes loaded');
+            thisModule.classAttributesOverlay = JSON.parse(task.text);
+        };
+    },
     initialize: function (scene, classes, storageInstances) {
         const classLibArray = this.classLib;
         const classLib = {};
@@ -70516,10 +70512,9 @@ module.exports = {
 
         // set camera position
         camera.setTarget(cameraTarget);
-        camera.alpha = BABYLON.Angle.FromDegrees(0).radians();
-        //camera.beta = BABYLON.Angle.FromDegrees(80).radians()
-        camera.beta = BABYLON.Angle.FromDegrees(55).radians();
-        camera.radius = 12;
+        camera.alpha = BABYLON.Angle.FromDegrees(315).radians();
+        camera.beta = BABYLON.Angle.FromDegrees(45).radians();
+        camera.radius = 30;
 
         // lighting
         const light0Color = new BABYLON.Color3(1, 1, 1);
