@@ -93,11 +93,13 @@ var settings = {
   dataTypes: 
     [{
       name: "lab",
+      title:"Lab",
       fields: {
         Description: 'text'
       }
     },{
       name: "-80 freezer",
+      title:"-80C Freezer",
       fields: {
         Description: 'text',
         Shelf: 'text',
@@ -106,6 +108,7 @@ var settings = {
       }
     },{
       name: "-20 freezer",
+      title:"-20C Freezer",
       fields: {
         Description: 'text',
         Shelf: 'text',
@@ -114,6 +117,7 @@ var settings = {
       }
     },{
       name: "-4 fridge",
+      title:"-4C Fridge",
       fields: {
         Description: 'text',
         Shelf: 'text',
@@ -122,54 +126,63 @@ var settings = {
       }
     },{
       name: "freezer rack",
+      title:"Rack",
       fields: {
         Description: 'text'
       }
     },{
       name: "8 x 12 freezer box",
+      title:"8x12 Box",
       fields: {
         Description: 'text'
       }
     },{
       name: "9 x 9 freezer box",
+      title:"9x9 Box",
       fields: {
         Description: 'text'
       }
     },{
       name: "freezer box",
+      title:"Box",
       fields: {
         Description: 'text'
       }
     },{
       name: "shelving unit",
+      title:"Shelving Unit",
       fields: {
         Description: 'text'
       }
     },{
       name: "shelf",
+      title:"Shelf",
       fields: {
         Description: 'text'
       }
     },{
       name: "cabinet",
+      title:"Cabinet",
       fields: {
         Description: 'text'
       }
     },{
       name: "drawer",
+      title:"Drawer",
       fields: {
         Description: 'text'
       }
     },{
       name: "organism",
+      title:"Organism",
       virtual: true,
       fields: {
-        Description: 'text',
         Genotype: 'text',
         Sequence: 'text'
       }
     },{
       name: "vector",
+      title:"Vector",
       virtual: true,
       fields: {
         Description: 'text',
@@ -177,6 +190,7 @@ var settings = {
       }
     },{
       name: "single-stranded",
+      title:"Single-Stranded",
       virtual: true,
       fields: {
         Description: 'text',
@@ -184,6 +198,7 @@ var settings = {
       }
     },{
       name: "double-stranded",
+      title:"Double-Stranded",
       virtual: true,
       fields: {
         Description: 'text',
@@ -191,6 +206,7 @@ var settings = {
       }
     },{
       name: "chemical stock",
+      title:"Chemical Stock",
       virtual: true,
       fields: {
         Description: 'text'
