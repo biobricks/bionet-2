@@ -2,23 +2,10 @@
     <div class="searchheight row">
         <div class="col s5">
             <div class="row">
-                <form id="search-form">
-                    <div class="input-field col" style="width:100%">
-                        <i class="material-icons postfix" style="cursor: pointer; cursor: hand; " onclick={searchClick}>search</i>
-                        <input id="search" ref="search" type="text" value={opts.terms} autofocus/>
-                        <label id="search-label" class="active" for="search">Search biomaterials</label>
-                    </div>
-                    <p class="local-global-radios">
-                      <input class="with-gap" ref="localglobalcheck" name="localglobalcheck" type="radio" id="localsearch" value="local" checked="{!opts.global}" />
-                      <label for="localsearch">Local</label>
-                      <input class="with-gap" ref="localglobalcheck" name="localglobalcheck" type="radio" id="globalsearch" value="global" checked="{opts.global}" />
-                      <label for="globalsearch">Global</label>
-                    </p>
-                    <input type="submit" style="display:none" />
-                </form>
+                <searchbox/>
             </div>
             <div class="row">
-                <div id="searchresults" class="searchresult"  style="width:100%">
+                <div id="searchresults" class="searchresult" style="width:100%">
                     <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
                         <list-item class="searchItem" no-reorder each={item in results} item={item}>
                             <i if={item.isPhysical} class="tiny material-icons" style="float: right">group_work</i>
@@ -29,8 +16,8 @@
             </div>
         </div>
         <div id="edititem" class="edititem col s7">
-            <create-physical if={itemType==='p'} show="false" top-margin="0px" />
-            <part-specification if={itemType==='v'} />
+            <create-physical if={itemType==='p' } show="false" top-margin="0px" />
+            <part-specification if={itemType==='v' } />
         </div>
     </div>
 
@@ -48,8 +35,6 @@
             float: left;
         }
 
-
-
     </style>
 
     <script>
@@ -63,21 +48,21 @@
         tag.results = []
         tag.pagination = []
         const partDataAccessor = app.getStream('partDataAccessor')
+            /*
+                    this.searchClick = function(e) {
+                        e.preventDefault()
 
-        this.searchClick = function(e) {
-            e.preventDefault()
+                        const terms = tag.refs.search.value
 
-            const terms = tag.refs.search.value
-
-            var globalOrLocal = $('#search-form')[0].localglobalcheck.value;
-            if(globalOrLocal === 'global') {
-              route('gsearch/' + encodeURIComponent(terms))
-            } else {
-              route('search/' + encodeURIComponent(terms))
-            }
-            return false
-        }
-
+                        var globalOrLocal = $('#search-form')[0].localglobalcheck.value;
+                        if(globalOrLocal === 'global') {
+                          route('gsearch/' + encodeURIComponent(terms))
+                        } else {
+                          route('search/' + encodeURIComponent(terms))
+                        }
+                        return false
+                    }
+            */
         const breadcrumbs = [{
             'label': 'search',
             'url': '/search'
@@ -96,10 +81,10 @@
                     })
 
                     BIONET.signal.getPhysical.dispatch(item.id)
-                    
+
                     const bionetStorageLocation = app.getStream('bionetStorageLocation')
                     bionetStorageLocation.dispatch('configure', item.id)
-                    
+
                     tag.itemType = 'p'
                 } else if (item.id.indexOf('v-') >= 0) {
                     riot.mount('#edititem', 'part-specification')
@@ -175,28 +160,29 @@
 </search-result>
 
 <global-results>
-  <p>
-    {results}
-  </p>
-  <ul class="global-search-results">
-    
-    <li class="searchItem" each={opts.results} onclick={showResult}>
-      <a href="#">{result.name}</a><span class="result-distance">{peer.name}</span><span class="result-distance">{Math.round(peer.distance)} km</span>
-    </li>
-  </ul>
-  <script>
-    var tag = this;
-    this.on('mount', function() {
-//      tag.update();
-    });
+    <p>
+        {results}
+    </p>
+    <ul class="global-search-results">
 
-    this.showResult = function(e) {
-      e.stopPropagation();
+        <li class="searchItem" each={opts.results} onclick={showResult}>
+            <a href="#">{result.name}</a><span class="result-distance">{peer.name}</span><span class="result-distance">{Math.round(peer.distance)} km</span>
+        </li>
+    </ul>
+    <script>
+        var tag = this;
+        this.on('mount', function() {
+            //      tag.update();
+        });
 
-      riot.mount('div#searchresults', 'show-global-result', e.item)
-      
-      return false;
-    };
-  </script>
+        this.showResult = function(e) {
+            e.stopPropagation();
+
+            riot.mount('div#searchresults', 'show-global-result', e.item)
+
+            return false;
+        };
+
+    </script>
 
 </global-results>

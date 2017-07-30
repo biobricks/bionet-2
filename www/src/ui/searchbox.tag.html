@@ -1,0 +1,34 @@
+<searchbox>
+    <form id="search-form" onsubmit={submitSearch}>
+        <div class="input-field">
+            <i class="material-icons postfix" style="cursor: pointer; cursor: hand; " onclick={submitSearch}>search</i>
+            <input id="search" ref="search" type="text" value={opts.terms} autofocus/>
+            <label id="search-label" class="active" for="search">Search biomaterials</label>
+        </div>
+        <p class="local-global-radios">
+            <input class="with-gap" ref="localglobalcheck" name="localglobalcheck" type="radio" id="localsearch" value="local" checked="{!opts.global}" />
+            <label for="localsearch">Local</label>
+            <input class="with-gap" ref="localglobalcheck" name="localglobalcheck" type="radio" id="globalsearch" value="global" checked="{opts.global}" />
+            <label for="globalsearch">Global</label>
+        </p>
+        <input type="submit" style="display:none" />
+    </form>
+    <script>
+        const tag = this
+        tag.theme = app.getTheme()
+
+        this.submitSearch = function(e) {
+            e.preventDefault()
+
+            const terms = tag.refs.search.value
+
+            var globalOrLocal = $('#search-form')[0].localglobalcheck.value;
+            if(globalOrLocal === 'global') {
+              route('gsearch/' + encodeURIComponent(terms))
+            } else {
+              route('search/' + encodeURIComponent(terms))
+            }
+            return false
+        }
+    </script>
+</searchbox>

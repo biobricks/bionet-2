@@ -3,7 +3,7 @@
         <div id="home-page-content" class={themeClasses}>
             <mpassword-form/>
         </div>
-        <div style="height:30px" />
+        <div style="height:5px" />
         <div class="center red-text" ref="errormessage">{errorMsg}</div>
         <br/>
     </div>
@@ -22,12 +22,20 @@
 </welcome>
 
 <mpassword-form>
-    <form class="col center" onsubmit={searchclick}>
-        <img class="center" src="static/images/home-bionet.png" height="220px" />
-        <div style="height:40px" />
+        <div class="row">
+            <div class="col s3 m3 l3"></div>
+            <div class="col s6 m6 l6 center">
+                <img class="center" src="static/images/home-bionet.png" height="220px" />
+                <div style="height:40px" />
+                <searchbox/>
+            </div>
+            <!--
+        <form onsubmit={searchclick}>
+        </form>
         <input type="submit" style="display:none" />
         <search-input label="search biomaterials" ref="searchbio" name="searchbio" value={searchbioInit}/>
-    </form>
+        -->
+        </div>
 
     <form if={!app.user} onsubmit={signupAction} class="col center">
         <div class="center">OR</div>
@@ -59,6 +67,7 @@
         }.bind(this)
 
         // submit search query and route to search results
+        /*
         this.searchclick = function(e) {
             e.preventDefault()
             var partid = this.refs.searchbio.value
@@ -71,15 +80,16 @@
                 else partid = partid.substr(0, pos - 2)
             }
             const q = {
-                q: this.refs.searchbio.value
-            }
-            // TODO: messaging - async api
+                    q: this.refs.searchbio.value
+                }
+                // TODO: messaging - async api
             app.dispatch('bioClassQuery', q)
             console.log('search query:', JSON.stringify(q))
-            // TODO: messaging - async api
+                // TODO: messaging - async api
             app.dispatch('bioClassCache', [])
             route('search/' + encodeURIComponent(this.refs.searchbio.value))
         }.bind(this)
+        */
 
 
         this.on('before-mount', function() {
@@ -134,7 +144,7 @@
             app.state.signup.email = this.refs.enteremail.value
             riot.mount('div#home-page-content', 'password-form')
         }.bind(this)
-        
+
         this.on('mount', function() {
             $('#enteremail').focus()
         })
@@ -156,7 +166,7 @@
         this.on('mount', function() {
             $('#enterpassword1').focus()
         })
-        
+
         this.submitForm = function(e) {
             e.preventDefault()
 
@@ -181,7 +191,7 @@
                     if (err) return app.ui.toast("Login failed: " + err) // TODO better error handling
 
                     app.state.signup = {} // reset signup state
-                    
+
                     riot.mount('div#home-page-content', 'mpassword-form')
                 })
             }.bind(this))

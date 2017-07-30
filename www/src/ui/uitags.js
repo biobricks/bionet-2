@@ -27,5 +27,5 @@ require('./autocomplete.tag.html')
 require('./create-unknown.tag.html')
 require('./view-physical.tag.html')
 require('./virtual-autocomplete.tag.html')
-
+require('./searchbox.tag.html')
 
