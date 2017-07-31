@@ -1,5 +1,5 @@
 <welcome>
-    <div style="padding-top:100px;">
+    <div id="welcome">
         <div id="home-page-content" class={themeClasses}>
             <mpassword-form/>
         </div>
@@ -11,12 +11,19 @@
         const theme = app.getTheme()
         this.themeClasses = theme.style.color.background + ' ' + theme.style.color.text
         const tag = this
-
+        
         app.on('signupError', function(msg) {
             console.log('signup error:', msg)
             tag.errorMsg = msg
             tag.update()
         })
+        
+        this.on('mount', function() {
+            $('#welcome').css({
+                marginTop: $('#appbar').height() + 50
+            });
+        })
+
 
     </script>
 </welcome>
