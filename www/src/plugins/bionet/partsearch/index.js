@@ -91,12 +91,15 @@ var partsearch = {
                     
                     var secondary_text
                     var itemUrl
+                    var itemRoute
                     if (isVirtual) {
                         secondary_text = result.Description  
-                        itemUrl = app.getUrl('/virtual',result.name)
+                        itemRoute = '/virtual/'+result.id
+                        itemUrl = app.getUrl('/virtual',result.id)
                     } else {
                         secondary_text = 'Created by '+result.created.user
-                        itemUrl = app.getUrl('/physical',result.name)
+                        itemUrl = app.getUrl('/inventory',result.id)
+                        itemRoute = '/inventory/'+result.id
                     }
                     
                     q.results.push({
@@ -104,7 +107,7 @@ var partsearch = {
                         secondary_text: secondary_text,
                         isPhysical: (result.id.indexOf('p-')>=0) ? true : false,
                         id: result.id,
-                        url: itemUrl,
+                        url: itemRoute,
                         url_label: itemUrl
                     });
                 }

@@ -1,16 +1,16 @@
-const riot =require('riot')
-const route =require('riot-route')
+const riot = require('riot')
+const route = require('riot-route')
 
 // is this string formatted like a UUID?
 function isUUID(str) {
-  str = str.trim().toLowerCase();
+    str = str.trim().toLowerCase();
 
-  // Strip off initial "v-" or "p-" if needed
-  if(str.match(/^[vp]-/)) {
-    str = str.slice(2);
-  }
+    // Strip off initial "v-" or "p-" if needed
+    if (str.match(/^[vp]-/)) {
+        str = str.slice(2);
+    }
 
-  return !!str.match(/^[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}$/)
+    return !!str.match(/^[\da-z]{8}-[\da-z]{4}-[\da-z]{4}-[\da-z]{4}-[\da-z]{12}$/)
 }
 
 route('/', function () {
@@ -18,18 +18,18 @@ route('/', function () {
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false,
-        activeItem:'home'
+        activeItem: 'home'
     })
     riot.mount('div#content', 'welcome')
 })
 
 
-route('/logout', function() {
+route('/logout', function () {
     console.log("logout route...");
-    app.rpc.logout(function(err) {
-        if(err) {
-          app.ui.toast("Error logout route: " + err) // TODO handle better
-          return;
+    app.rpc.logout(function (err) {
+        if (err) {
+            app.ui.toast("Error logout route: " + err) // TODO handle better
+            return;
         }
         route('/');
     });
@@ -49,7 +49,7 @@ route('/create', function () {
         enableTopNav: true,
         enableBreadCrumbs: true,
         enableSubbar: false,
-        activeItem:'workbench'
+        activeItem: 'workbench'
     })
     riot.mount('div#content', 'create-form')
 })
@@ -59,33 +59,39 @@ route('/scan', function () {
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false,
-        activeItem:'scan'
+        activeItem: 'scan'
     })
     riot.mount('div#content', 'scan-page')
 })
 
 
-route('/o/*', function (id) {
+route('/o/*', function (idenc) {
     app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
         enableSubbar: false,
-        activeItem:'local inventory'
+        activeItem: 'local inventory'
     })
 
-    app.remote.getByHumanID(id, function (err, m) {
-      if(err || !m) {
-        app.ui.toast("Item not found in inventory");
-        return;
-      }
-      route('/inventory/'+m.id);
+    const id = decodeURIComponent(idenc)
+    console.log('get object route:', id)
+
+    //app.remote.getByHumanID(id, function (err, m) {
+    app.remote.getBy('name', id, function (err, m) {
+        if (err || !m) {
+            app.ui.toast("Item " + id + " not found in inventory");
+            console.log("route o: item %s not found in inventory", id)
+            return;
+        }
+        console.log("route o: item %s found in inventory: %s", id, m.id)
+        route('/inventory/' + m.id);
     });
 
-//    setTimeout(function () {
-//        app.remote.getByHumanID(id, function (err, m) {
-//            riot.mount('div#content', 'view-physical', m)
-//        });
-//    }, 500);
+    //    setTimeout(function () {
+    //        app.remote.getByHumanID(id, function (err, m) {
+    //            riot.mount('div#content', 'view-physical', m)
+    //        });
+    //    }, 500);
 })
 
 // TODO remove again
@@ -110,16 +116,16 @@ function editPhysicalRoute(typeOrID) {
     typeOrID = decodeURIComponent(typeOrID).trim()
 
 
-    if(isUUID(typeOrID)) {
-        if(typeOrID.match(/^p-/)) {
-          opts.physicalID = typeOrID
+    if (isUUID(typeOrID)) {
+        if (typeOrID.match(/^p-/)) {
+            opts.physicalID = typeOrID
         } else {
-          opts.virtualID = typeOrID
+            opts.virtualID = typeOrID
         }
     } else {
-      opts.type = typeOrID
+        opts.type = typeOrID
     }
-    console.log('edit physical id: %s route: %s',typeOrID, JSON.stringify(opts))
+    console.log('edit physical id: %s route: %s', typeOrID, JSON.stringify(opts))
     riot.mount('div#content', 'create-physical', opts);
 }
 
@@ -141,7 +147,7 @@ function createPhysicalRoute(typeOrID, q) {
 
     opts.type = typeOrID
 
-    if(isUUID(typeOrID)) {
+    if (isUUID(typeOrID)) {
         opts.virtualID = typeOrID
     } else {
         opts.type = typeOrID

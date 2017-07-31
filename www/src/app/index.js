@@ -339,7 +339,7 @@ class App extends EventEmitter {
     
   getUrl(path, name) {
       const appSettings = this.getAppSettings()
-      return appSettings.baseUrl+path+'/'+name
+      return appSettings.baseUrl+path+'/'+encodeURIComponent(name)
   }
     
   getAttributesForType(type) {

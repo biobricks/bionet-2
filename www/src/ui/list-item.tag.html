@@ -7,7 +7,7 @@
         <img if={item.avatar} class="circle" src={item.avatar} alt="" />
         <div class="left" style="display: inline-block; width:70%">
             <div style="cursor: pointer; cursor: hand; font-size:18px; color:#1a0dab;">{item.primary_text}</div>
-            <a if={item.url} href="{item.url}" style="cursor: pointer; cursor: hand; font-size:14px; color:#006621; font-style:normal; line-height:16px;">{item.url_label}</a>
+            <div if={item.url} onclick={clickUrl} style="cursor: pointer; cursor: hand; font-size:14px; color:#006621; font-style:normal; line-height:16px;">{item.url_label}</div>
             <div style="cursor: pointer; cursor: hand; color:#545454; font-size:small">{item.secondary_text}</div>
         </div>
         <div class="right" style="display: inline-block; width:30%">
@@ -38,7 +38,12 @@
                 name: tag.item.primary_text
             })
         }
-
+        
+        this.clickUrl = function(e) {
+            const item = tag.item
+            route(item.url)
+        }
+        
         this.clickitem = function(e) {
             const item = tag.item
             e.stopPropagation()

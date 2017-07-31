@@ -139,7 +139,7 @@
 
             cart.addRoute('cartResult', function(data) {
                     console.log('cart tag, result:', JSON.stringify(data, null, 2))
-                    const itemUrl = app.getUrl('/physical',data.physical.name)
+                    const itemUrl = app.getUrl('/inventory',data.physical.id)
                     const item = {
                         primary_text: data.physical.name,
                         secondary_text: 'Created by '+data.physical.created.user,

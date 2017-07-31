@@ -70,15 +70,17 @@ var igempart = {
 
         // TODO why is this necessary? it seems to simply strip all but four properties but why is that important?
         partDataAccessor.reduceRoute('toPhysicalItem', (m, partData) => {
-            return {material: {
-                name: partData.material.name,
-                virtual_id: partData.material.virtual_id,
-                cassetteid: partData.material.cassetteid,
-                locationid: partData.material.locationid
-            }}
+            return {
+                material: {
+                    name: partData.material.name,
+                    virtual_id: partData.material.virtual_id,
+                    cassetteid: partData.material.cassetteid,
+                    locationid: partData.material.locationid
+                }
+            }
         })
 
-      // TODO why is this a route? should simply be a function call
+        // TODO why is this a route? should simply be a function call
         partDataAccessor.addRoute('storePhysical', (physicalData) => {
             console.log('partDataAccessor physicalData:', JSON.stringify(physicalData))
             const toast = app.getThemeMethod().toast
@@ -90,7 +92,7 @@ var igempart = {
                     return;
                 }
                 toast(physicalData.material.name + ' saved')
-                // TODO: messaging - async api
+                    // TODO: messaging - async api
                 app.dispatch('bioPhysicalQuery', physicalData.material.virtual_id)
                 BIONET.signal.physicalUpdated.dispatch(physicalData.material)
             })
@@ -126,7 +128,7 @@ var igempart = {
                 } else {
                     const item = JSON.parse(value)
                     console.log('retrieved item:', JSON.stringify(item))
-                    // TODO: messaging - async api
+                        // TODO: messaging - async api
                     app.dispatch('partData', item)
                 }
             })
@@ -248,14 +250,16 @@ var igempart = {
         })
         */
 
-        route('/edit/*', function (partID) {
+        route('/virtual/*', function (virtualID) {
+            
+            app.appbarConfig({
+                enableTopNav: true,
+                enableBreadCrumbs: false,
+                enableSubbar: false
+            })
 
-            getMaterial(partID, function (data) {
-                console.log('MATERIAL', data)
-                app.state.editPart = data
-                riot.mount('div#content', 'part-form', {
-                    partID
-                })
+            riot.mount('div#content', 'part-form', {
+                id: virtualID
             })
 
         })
