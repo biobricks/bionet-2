@@ -59,7 +59,8 @@ var partsearch = {
             app.appbarConfig({
                 enableTopNav: true,
                 enableBreadCrumbs: true,
-                enableSubbar: false
+                enableSubbar: false,
+                activeItem:'search'
             })
             
             // todo: handle pagination
@@ -87,14 +88,24 @@ var partsearch = {
                     if (!result || !result.name) continue;
                     console.log('result:', JSON.stringify(results[i]))
                     const isVirtual = result.id.charAt(0) === 'v'
-                        //                        url: (isVirtual) ? '/edit/' + result.id : '/edit-physical/' + result.id,
-                        //secondary_text: ((isVirtual) ? 'virtual' : 'physical') + ' id ' + result.id,
-
+                    
+                    var secondary_text
+                    var itemUrl
+                    if (isVirtual) {
+                        secondary_text = result.Description  
+                        itemUrl = app.getUrl('/virtual',result.name)
+                    } else {
+                        secondary_text = 'Created by '+result.created.user
+                        itemUrl = app.getUrl('/physical',result.name)
+                    }
+                    
                     q.results.push({
                         primary_text: result.name,
-                        secondary_text: '',
+                        secondary_text: secondary_text,
                         isPhysical: (result.id.indexOf('p-')>=0) ? true : false,
-                        id: result.id
+                        id: result.id,
+                        url: itemUrl,
+                        url_label: itemUrl
                     });
                 }
 

@@ -1,15 +1,15 @@
 <cart>
-    <div class="searchheight row">
-        <div id="searchresult" class="searchresult col s4">
+    <div id="cart-wrapper" class="searchheight row">
+        <div class="col s1 l1 m1"></div>
+        <div id="cartcontents" class="cartcontents col s6">
             <div if={results.length===0}>Cart is empty.</div>
-            <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}" style="margin-left:65px;">
+            <div class="{theme.style.color.background +' '+ theme.style.color.text}">
                 <list-item class="searchItem" no-reorder each={item in results} item={item}>
-                    <form-checkbox class={left-align} id={item.id}/>
                 </list-item>
             </div>
         </div>
 
-        <div id="physical-view" class="col s8">
+        <div id="physical-view" class="col s5">
             <div id="pixijsdiv" class="row pixijs">
                 <bionet-storage-location width={pixiwidth} height={pixiheight}/>
             </div>
@@ -17,16 +17,15 @@
                 <babylon-3d></babylon-3d>
             </div>
             <div id="physical-props-view" class="row physical-view" style="width:100%;margin:0;padding:0;">
-                <div id="box" class="edit-physical">
-                    <box-contents />
-                </div>
                 <div id="physical-storage" class="edit-physical">
                     <create-physical show="false" top-margin="0px" />
                 </div>
             </div>
         </div>
-
-        <div id="threedicon" style="position:absolute; top:110px; left:10px; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
+        
+        <!--
+        <div id="threedicon" style="position:absolute; top:150px; left:10px; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
+        -->
 
 
     </div>
@@ -39,6 +38,16 @@
             height: 35%;
             float: left;
             z-index: 2000;
+        }
+        
+        .cartcontents {
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding-top: 0px;
+            height: 65%;
+            padding-bottom: 0px;
         }
         
         .threedview {
@@ -70,10 +79,6 @@
             height: calc(100% - 100px)
         }
         
-        .searchresult {
-            float: left;
-        }
-        
         .edititem {
             float: left;
         }
@@ -91,10 +96,16 @@
         BIONET.signal.requestStorage.dispatch()
 
         this.on('mount', function() {
+            $('#cart-wrapper').css({
+                marginTop: $('#appbar').height() + 40
+            });
             const breadcrumbs = [{
                 'label': 'cart',
                 'url': '/cart'
             }]
+            $('#cartcontents').css({
+                height: $(window).innerHeight() - $('#appbar').height()
+            });
             $('#physical-view').css({
                 height: $(window).innerHeight() - $('#appbar').height() - 14
             });
@@ -127,13 +138,16 @@
             }
 
             cart.addRoute('cartResult', function(data) {
-                    //console.log('cart tag, result:', JSON.stringify(data))
+                    console.log('cart tag, result:', JSON.stringify(data, null, 2))
+                    const itemUrl = app.getUrl('/physical',data.physical.name)
                     const item = {
                         primary_text: data.physical.name,
-                        secondary_text: '',
+                        secondary_text: 'Created by '+data.physical.created.user,
                         id: data.physical.id,
                         iconClick: deleteCartItem,
                         starred: true,
+                        url:itemUrl,
+                        url_label:itemUrl,
                         righticon: 'delete',
                         click: itemClick
                     }
@@ -182,9 +196,6 @@
             tag.primaryHeader = 'Search results for "' + opts.terms + '"'
             tag.secondaryHeader = tag.results.length + ' items'
 
-            $('.searchresult').css({
-                height: $(window).innerHeight() - 120
-            });
             $('.edititem').css({
                 height: $(window).innerHeight() - 120
             });
@@ -201,7 +212,6 @@
         });
 
         this.on('unmount', function() {
-            this.searchresult = undefined
         })
 
         tag.emptyCart = function() {

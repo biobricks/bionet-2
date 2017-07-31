@@ -1,8 +1,10 @@
 <inventory-treeview>
-    <div class="inventory-height">
+    <div id="inventory-wrapper" class="inventory-height">
         <div class="row" style="margin-bottom:0; padding-bottom:0">
-            <div id="treeview" class="inventory-tree col s4">
-                <table id="ftree" style="margin-top:15px; margin-left:65px; border:none !important; width:80%; ">
+            <div class="col s1 m1 l1">
+            </div>
+            <div id="treeview" class="inventory-tree col s6">
+                <table id="ftree" style="margin-top:15px; border:none !important; width:100%; ">
                     <thead>
                         <tr>
                             <td></td>
@@ -21,7 +23,7 @@
                     </tbody>
                 </table>
             </div>
-            <div id="physical-view" class="col s8">
+            <div id="physical-view" class="col s5">
                 <div id="pixijsdiv" class="row pixijs">
                     <bionet-storage-location width={pixiwidth} height={pixiheight-10}/>
                 </div>
@@ -39,21 +41,21 @@
             </div>
         </div>
         <!-- add or delete buttons -->
-        <div id="addicon" class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:110px; left:10px; width:55px; height:55px;" data-activates="addmenu"><i class="material-icons">add</i></div>
+        <div id="addicon" class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:150px; left:10px; width:55px; height:55px;" data-activates="addmenu"><i class="material-icons">add</i></div>
 
-        <ul id="addmenu" class="dropdown-content" style="position:absolute; top:110px; left:10px; width:200px !important; text-align:left;z-index:1000">
+        <ul id="addmenu" class="dropdown-content" style="position:absolute; top:150px; left:10px; width:200px !important; text-align:left;z-index:1000">
             <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.title}</span></li>
             <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.title}</span></li>
         </ul>
 
-        <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" style="position:absolute; top:180px; left:10px; text-align:left" onclick={addToFavorites}><i class="material-icons">star</i></a>
+        <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" style="position:absolute; top:220px; left:10px; text-align:left" onclick={addToFavorites}><i class="material-icons">star</i></a>
 
-        <div id="deleteicon" style="position:absolute; top:250px; left:10px; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></div>
+        <div id="deleteicon" style="position:absolute; top:290px; left:10px; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></div>
 
-        <div id="threedicon" style="position:absolute; top:320px; left:10px; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
-
-        <div id="threedicon" style="position:absolute; top:390px; left:10px; width:55px; height:55px;" onclick={select3d} class="btn-floating btn-large waves-effect waves-light blue"><span>-></span></div>
-
+        <div id="threedicon" style="position:absolute; top:360px; left:10px; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
+    <!--
+        <div id="threedicon" style="position:absolute; top:430px; left:10px; width:55px; height:55px;" onclick={select3d} class="btn-floating btn-large waves-effect waves-light blue"><span>-></span></div>
+    -->
         <delete-modal deleteaction={deleteAction}></delete-modal>
 
         <modal-physical title={modalPhysicalTitle} modalaction={modalAction} modaldata={modalData}/>
@@ -273,6 +275,11 @@
                 $('.inventory-tree').css({
                     height: $(window).innerHeight() - $('#appbar').height() - 25
                 });
+                
+                $('#inventory-wrapper').css({
+                    marginTop: $('#appbar').height() +10
+                });
+                
                 //tag.pixiwidth = $('#ftree').width() - 40
 
                 //const children = ftree.getRootNode().children
@@ -369,7 +376,7 @@
             })
 
             $('#physical-view').css({
-                height: $(window).innerHeight() - $('#appbar').height() - 14
+                height: $(window).innerHeight() - $('#appbar').height() - 20
             });
             tag.pixiwidth = $('#pixijsdiv').width()
             tag.pixiheight = $('#pixijsdiv').height()
@@ -392,7 +399,7 @@
                 });
                 */
                 $('.inventory-height').css({
-                    height: $(window).innerHeight() - $('#appbar').height()
+                    height: $(window).innerHeight() - $('#appbar').height() - 20
                 })
                 $('html').css({
                         overflow: 'auto'

@@ -1,21 +1,22 @@
 <search-result>
-    <div class="searchheight row">
-        <div class="col s5">
+    <div id="searchresult-wrapper" class="row">
+        <div class="col s1 m1 l1"></div>
+        <div class="col s6">
             <div class="row">
-                <searchbox/>
-            </div>
-            <div class="row">
-                <div id="searchresults" class="searchresult" style="width:100%">
-                    <div class="z-depth-1 {theme.style.color.background +' '+ theme.style.color.text}">
+                <div id="searchresults" class="searchresult" style="width:100%;">
+                    <div class="{theme.style.color.background +' '+ theme.style.color.text}" style="margin-right:32px;">
                         <list-item class="searchItem" no-reorder each={item in results} item={item}>
-                            <i if={item.isPhysical} class="tiny material-icons" style="float: right">group_work</i>
-                            <i if={item.isPhysical} class="material-icons right-align" style="cursor: pointer; cursor: hand; " onclick={addToCart}>shopping_cart</i>
+                            <i if={item.isPhysical} class="material-icons right" style="cursor: pointer; cursor: hand; color:#545454;" onclick={addToCart}>shopping_cart</i>
+                            <i if={item.isPhysical} class="tiny material-icons right" style="color:#545454;">group_work</i>
                         </list-item>
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <pagination items={pagination_items}/>
+            </div>
         </div>
-        <div id="edititem" class="edititem col s7">
+        <div id="edititem" class="edititem col s5">
             <create-physical if={itemType==='p' } show="false" top-margin="0px" />
             <part-specification if={itemType==='v' } />
         </div>
@@ -28,7 +29,12 @@
         }
         
         .searchresult {
-            float: left;
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding-top: 0px;
+            padding-bottom: 0px;
         }
         
         .edititem {
@@ -38,12 +44,20 @@
     </style>
 
     <script>
+        const tag=this
         const searchResult = require('./index.js')
         console.log('search result, before test')
         searchResult.test();
         console.log('search result, after test')
+        const pagination_items=[]
+        for (var i=0; i<10; i++) {
+            pagination_items.push({
+                label:i,
+                url:i
+            })
+        }
+        tag.pagination_items = pagination_items
 
-        const tag = this
         tag.theme = app.getTheme()
         tag.results = []
         tag.pagination = []
@@ -72,6 +86,13 @@
 
         this.on('mount', function() {
             tag.results = tag.opts.results
+            $('#searchresult-wrapper').css({
+                marginTop: $('#appbar').height() + 40
+            });
+            
+            $('#searchresults').css({
+                height: $(window).innerHeight() - $('#appbar').height()
+            });
 
             const itemClick = function(item) {
 

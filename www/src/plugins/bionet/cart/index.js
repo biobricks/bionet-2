@@ -62,7 +62,8 @@ var cart = {
             app.appbarConfig({
                 enableTopNav: true,
                 enableBreadCrumbs: true,
-                enableSubbar: false
+                enableSubbar: false,
+                activeItem:'shopping_cart'
             })
 
             // todo: set inventory item

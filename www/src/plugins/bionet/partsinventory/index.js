@@ -13,7 +13,8 @@ var partsInventory = {
             app.appbarConfig({
                 enableTopNav: true,
                 enableBreadCrumbs: true,
-                enableSubbar: false
+                enableSubbar: false,
+                activeItem:'local inventory'
             })
 
             // todo: set inventory item

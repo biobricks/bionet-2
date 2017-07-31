@@ -13,33 +13,34 @@ body {
     padding: 0;
     margin: 0;
 }
-
-#app {
-  min-height: 1000px;
-}
-
 .omta-footer {
-  width: 100%;
-  background-color: #DDDDFF;
-  font-size: 12px;
-  color: #777777;
-  margin-top: 20px;
+    width: 100%;
+    background-color: #DDDDFF;
+    font-size: 12px;
+    color: #777777;
+    margin-top: 20px;
 }
-
 .omta-footer p {
-  padding-top: 20px;
-  padding-left: 30px;
-  padding-bottom: 20px;
-  text-align: center;
-  margin-bottom: 0;
+    padding-top: 20px;
+    padding-left: 30px;
+    padding-bottom: 20px;
+    text-align: center;
+    margin-bottom: 0;
 }
-
 #content {
-    margin-top: 100px;
+    overflow-x: hidden;
 }
 nav ul a,
 nav .brand-logo {
     color: #444;
+}
+nav ul li.active {
+    border-bottom: 3px solid #4285f4;
+    background-color: #f5f5f5 !important;
+    color: #4285f4 !important;
+}
+nav ul li.active a {
+    color: #4285f4 !important;
 }
 p {
     line-height: 2rem;
@@ -134,7 +135,6 @@ footer.page-footer {
 .fancytree-title {
     font-family: 'Roboto';
 }
-
 ul.fancytree-container {
     font-family: 'Roboto';
     font-size: 10pt;
@@ -233,40 +233,31 @@ src: url('../fonts/emojione/EmojiOneColor-SVGinOT.ttf');
     font-weight: normal;
     font-style: normal;
 }
-
-
 .local-global-radios label {
     margin-left: 35px;
     padding-left: 35px;
 }
-
 .global-search-results {
-  padding-left: 20px;
-
+    padding-left: 20px;
 }
-
 .global-search-results li {
     height: 25px;
     cursor: pointer;
 }
-
 .global-search-results li:hover {
     background-color: #DDDDFF;
 }
-
 .global-search-results a {
     width: 250px;
     overflow: hidden;
     display: inline-block;
     vertical-align: middle;
 }
-
 .global-search-results .result-lab {
     width: 100px;
     display: inline-block;
     vertical-align: middle;
 }
-
 .global-search-results .result-distance {
     width: 100px;
     display: inline-block;

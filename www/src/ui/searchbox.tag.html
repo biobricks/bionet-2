@@ -1,16 +1,21 @@
 <searchbox>
     <form id="search-form" onsubmit={submitSearch}>
-        <div class="input-field">
-            <i class="material-icons postfix" style="cursor: pointer; cursor: hand; " onclick={submitSearch}>search</i>
-            <input id="search" ref="search" type="text" value={opts.terms} autofocus/>
-            <label id="search-label" class="active" for="search">Search biomaterials</label>
+        <div class="z-depth-1" style="height: 40px; border:1px; border-style: solid; border-radius:2px; border-color:#a0a0a0; background-color:#ffffff">
+            <div class="left" style="height:40px; margin:0px 40px 0px 0px;">
+                <input id="search" ref="search" type="search" value={opts.terms} autofocus style="padding:0px; margin:0px 0px 0px 20px; border-bottom:none; box-shadow:none" />
+            </div>
+            <div class="right" style="margin:8px 10px 0px 0px">
+                <i class="material-icons" style="cursor: pointer; cursor: hand; color:#4285f4;" onclick={submitSearch}>search</i>
+            </div>
         </div>
-        <p class="local-global-radios">
-            <input class="with-gap" ref="localglobalcheck" name="localglobalcheck" type="radio" id="localsearch" value="local" checked="{!opts.global}" />
-            <label for="localsearch">Local</label>
-            <input class="with-gap" ref="localglobalcheck" name="localglobalcheck" type="radio" id="globalsearch" value="global" checked="{opts.global}" />
-            <label for="globalsearch">Global</label>
-        </p>
+        <div class="right local-global-radios">
+            <input class="with-gap right" ref="localglobalcheck" name="localglobalcheck" type="radio" id="localsearch" value="local" checked="{!opts.global}" />
+            <label for="localsearch">local</label>
+            <input class="with-gap right" ref="localglobalcheck" name="localglobalcheck" type="radio" id="globalsearch" value="global" checked="{opts.global}" />
+            <label for="globalsearch">global</label>
+        </div>
+        <!--
+        -->
         <input type="submit" style="display:none" />
     </form>
     <script>
@@ -23,12 +28,14 @@
             const terms = tag.refs.search.value
 
             var globalOrLocal = $('#search-form')[0].localglobalcheck.value;
-            if(globalOrLocal === 'global') {
-              route('gsearch/' + encodeURIComponent(terms))
+            //globalOrLocal = 'local'
+            if (globalOrLocal === 'global') {
+                route('gsearch/' + encodeURIComponent(terms))
             } else {
-              route('search/' + encodeURIComponent(terms))
+                route('search/' + encodeURIComponent(terms))
             }
             return false
         }
+
     </script>
 </searchbox>

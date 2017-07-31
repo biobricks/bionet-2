@@ -15,22 +15,23 @@ stdThemePlugin.start = function (cb) {
         label: 'configure',
         action: '/bionetsetup/config'
   }, {
-    */
+  */
     const loggedInNav = [{
-        label: 'search',
-        action: '/search'
+            label: 'search',
+            action: '/search'
+  },
+        {
+            label: 'local inventory',
+            action: '/inventory'
   }, {
-        label: 'local inventory',
-        action: '/inventory'
+            label: 'workbench',
+            action: '/create'
   }, {
-        label: 'workbench',
-        action: '/create'
+            label: 'scan',
+            action: '/scan'
   }, {
-        label: 'scan',
-        action: '/scan'
-  }, {
-        icon: 'shopping_cart',
-        action: '/cart'
+            icon: 'shopping_cart',
+            action: '/cart'
     }];
 
     // primary nav - logged out
@@ -49,7 +50,7 @@ stdThemePlugin.start = function (cb) {
             background: 'white',
             highlightBackground: 'blue',
             navText: 'grey-text text-darken-2',
-            navBackground: 'white',
+            navBackground: 'grey lighten-4',
             navButton: 'grey-text text-darken-2',
             smallLogo: '/static/images/BioNet_Logo_Vertical_web_sm.png'
         },

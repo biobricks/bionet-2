@@ -318,7 +318,8 @@ var workbench = {
             app.appbarConfig({
                 enableTopNav: true,
                 enableBreadCrumbs: true,
-                enableSubbar: false
+                enableSubbar: false,
+                activeItem:'workbench'
             })
 
             // todo: set inventory item

@@ -17,7 +17,8 @@ route('/', function () {
     app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
-        enableSubbar: false
+        enableSubbar: false,
+        activeItem:'home'
     })
     riot.mount('div#content', 'welcome')
 })
@@ -47,7 +48,8 @@ route('/create', function () {
     app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: true,
-        enableSubbar: false
+        enableSubbar: false,
+        activeItem:'workbench'
     })
     riot.mount('div#content', 'create-form')
 })
@@ -56,7 +58,8 @@ route('/scan', function () {
     app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
-        enableSubbar: false
+        enableSubbar: false,
+        activeItem:'scan'
     })
     riot.mount('div#content', 'scan-page')
 })
@@ -66,7 +69,8 @@ route('/o/*', function (id) {
     app.appbarConfig({
         enableTopNav: true,
         enableBreadCrumbs: false,
-        enableSubbar: false
+        enableSubbar: false,
+        activeItem:'local inventory'
     })
 
     app.remote.getByHumanID(id, function (err, m) {

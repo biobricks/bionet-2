@@ -1,199 +1,218 @@
 <scan>
 
-  <div class="scan">
-    <div class="error"></div>
+    <div id="scan-wrapper" class="scan">
+        
+        <div class="row">
+            <div class="col s1 m1 l1"></div>
+            
+            <div class="col s6 m6 l6">
+                <div class="error"></div>
 
-    <div id="cameraAccessMsg">
-      <h5 style="color:green">Waiting for browser camera access</h5>
-      <p>Without camera access you will only be able to scan using an attached USB barcode scanner</p>
+                <div id="cameraAccessMsg">
+                    <h5 style="color:green">Waiting for browser camera access</h5>
+                    <p>Without camera access you will only be able to scan using an attached USB barcode scanner</p>
+                </div>
+
+                <canvas ref="scanCanvas" class="scanCanvas" width="560" height="560"></canvas>
+                <video ref="scanVideo" class="scanVideo" width="440" height="330"></video>
+                <div id="debug"></div>
+                <div class="canvas-layers"></div>
+                <div class="canvas-box"></div>
+            </div>
+            
+            <div class="col s5 m5 l5">
+                <form class="keyboard-form" ref="keyboardInputForm" onsubmit={keyboardScan}>
+                    <input id="keyboardInput" type="text" ref="code" autocomplete="off" />
+                    <input type="submit" />
+                </form>
+            </div>
+        </div>
+        
     </div>
+    <script>
+        var cameraStream;
+        var modalCallback;
 
-    <canvas ref="scanCanvas" class="scanCanvas" width="560" height="560"></canvas>
-    <video ref="scanVideo" class="scanVideo" width="440" height="330"></video>
-    <div id="debug"></div>
-    <div class="canvas-layers"></div>
-    <div class="canvas-box"></div>
-    <form class="keyboard-form" ref="keyboardInputForm" onsubmit={keyboardScan}>
-      <input id="keyboardInput" type="text" ref="code" autocomplete="off" />
-      <input type="submit" />
-    </form>
-  </div>
-  <script>
+        var keepScanning = true;
+        var enableDM = false;
 
-    var cameraStream;
-    var modalCallback;
+        var QrCode = require('qrcode-reader');
+        var getUserMedia = require('getusermedia');
+        var path = require('path');
+        var settings = require('../../../settings.js')();
 
-    var keepScanning = true;
-    var enableDM = false;
+        //    var dmdecode = require("datamatrix-decode");
+        //    var datamatrix = require('../../../../biomatrix-scratch');
 
-    var QrCode = require('qrcode-reader');
-    var getUserMedia = require('getusermedia');
-    var path = require('path');
-    var settings = require('../../../settings.js')();
-
-//    var dmdecode = require("datamatrix-decode");
-//    var datamatrix = require('../../../../biomatrix-scratch');
-
-    // check if something is a v4 uuid
-    function isUUID(id) {
-      return !!(id.match(/[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/i))
-    }
-    
-    function getIDFromURL(url) {
-      var m = url.match(new RegExp('^'+settings.baseUrl+'/o/(\\d+)'));
-      if(!m || (m.length < 2)) return null;
-      return parseInt(m[1]);
-    }
-
-    function decodeQrCode(self, cb) {
-      var data = self.scanCtx.getImageData(0, 0, self.refs.scanCanvas.width, self.refs.scanCanvas.height);
-      self.qr.callback = cb;
-      self.qr.decode(data);
-    }
-
-    function decodeDMCode(cb) {
-      datamatrix(null, this.refs.scanCanvas, {
-        debug: true
-      }, function(err, data) {
-        $('.canvas-layers').html(' '); // TODO tmp debug removal
-        $('.canvas-box').html(' '); // TODO tmp debug removal
-        if(err) return cb(null)
-        cb(data);
-      });
-    }
-
-    function debug(str) {
-      str = $('#debug').html() + "<br/>\n" + str;
-      $('#debug').html(str);
-    }
-
-    function scanSuccess(code) {
-      app.remote.getBy('barcode', code, function (err, m) {
-        if(err || !m) {
-           app.remote.getByHumanID(code, function (err, m) {
-             if(err || !m) {
-               runCallback(null, null, code)
-               return;
-              }              
-              runCallback(null, m)
-           })
-           return;
+        // check if something is a v4 uuid
+        function isUUID(id) {
+            return !!(id.match(/[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}/i))
         }
-        runCallback(null, m, code)
-      });
-    }
 
-    function scan(delay) {
-      if(!keepScanning) return;
-      delay = delay || 500; // delay between frames in ms
+        function getIDFromURL(url) {
+            var m = url.match(new RegExp('^' + settings.baseUrl + '/o/(\\d+)'));
+            if (!m || (m.length < 2)) return null;
+            return parseInt(m[1]);
+        }
 
-      this.scanCtx.drawImage(this.refs.scanVideo, 0, 0);
-//      console.log("scanning...")
-      decodeQrCode(this, function(data) {
-        if(!data) {
-          if(!enableDM) {
-            setTimeout(scan.bind(this), delay);
-          } else {
-            decodeDMCode(function(data) {
-              if(!data) return setTimeout(scan.bind(this), delay);
-              // TODO decode then call scanSuccess
+        function decodeQrCode(self, cb) {
+            var data = self.scanCtx.getImageData(0, 0, self.refs.scanCanvas.width, self.refs.scanCanvas.height);
+            self.qr.callback = cb;
+            self.qr.decode(data);
+        }
+
+        function decodeDMCode(cb) {
+            datamatrix(null, this.refs.scanCanvas, {
+                debug: true
+            }, function(err, data) {
+                $('.canvas-layers').html(' '); // TODO tmp debug removal
+                $('.canvas-box').html(' '); // TODO tmp debug removal
+                if (err) return cb(null)
+                cb(data);
             });
-          }
-          return
         }
-        var id = getIDFromURL(data);
-        if(!id) return setTimeout(scan.bind(this), delay);
-        // TODO visual indication of scan success
-        scanSuccess(id);
-      }.bind(this));
-    }
 
-    function scanError(str) {
-      $('.scan .error').html(str);
-      $('.scanVideo').css('display', 'none');
-    }
+        function debug(str) {
+            str = $('#debug').html() + "<br/>\n" + str;
+            $('#debug').html(str);
+        }
 
-    this.on('unmount', function() {
-      keepScanning = false;
-    })
+        function scanSuccess(code) {
+            app.remote.getBy('barcode', code, function(err, m) {
+                if (err || !m) {
+                    app.remote.getByHumanID(code, function(err, m) {
+                        if (err || !m) {
+                            runCallback(null, null, code)
+                            return;
+                        }
+                        runCallback(null, m)
+                    })
+                    return;
+                }
+                runCallback(null, m, code)
+            });
+        }
 
-    this.keyboardScan = function(e) {
-      e.preventDefault();
-      var code = this.refs.code.value;
-      this.refs.code.value = '';
-      code = code.replace(/[^\d]+/g, '');
-      if(code.length <= 0) {
-        $('#keyboardInput').val('');
-        app.ui.toast("Invalid scan..."); // TODO better error handling
-        return;                       
-      }
-      scanSuccess(code);
-    }.bind(this);
+        function scan(delay) {
+            if (!keepScanning) return;
+            delay = delay || 500; // delay between frames in ms
 
-    // prevent text input field from loosing focus
-    function initKeyboardCapture() {
+            this.scanCtx.drawImage(this.refs.scanVideo, 0, 0);
+            //      console.log("scanning...")
+            decodeQrCode(this, function(data) {
+                if (!data) {
+                    if (!enableDM) {
+                        setTimeout(scan.bind(this), delay);
+                    } else {
+                        decodeDMCode(function(data) {
+                            if (!data) return setTimeout(scan.bind(this), delay);
+                            // TODO decode then call scanSuccess
+                        });
+                    }
+                    return
+                }
+                var id = getIDFromURL(data);
+                if (!id) return setTimeout(scan.bind(this), delay);
+                // TODO visual indication of scan success
+                scanSuccess(id);
+            }.bind(this));
+        }
 
-      setTimeout(function() {
-        $('#keyboardInput').focus()
-        $('#keyboardInput').blur(function(e) {
-          $('#keyboardInput').focus()
+        function scanError(str) {
+            $('.scan .error').html(str);
+            $('.scanVideo').css('display', 'none');
+        }
+
+        this.on('mount', function() {
+            $('#scan-wrapper').css({
+                marginTop: $('#appbar').height() + 10
+            });
+        })
+        this.on('unmount', function() {
+            keepScanning = false;
+        })
+
+        this.keyboardScan = function(e) {
+            e.preventDefault();
+            var code = this.refs.code.value;
+            this.refs.code.value = '';
+            code = code.replace(/[^\d]+/g, '');
+            if (code.length <= 0) {
+                $('#keyboardInput').val('');
+                app.ui.toast("Invalid scan..."); // TODO better error handling
+                return;
+            }
+            scanSuccess(code);
+        }.bind(this);
+
+        // prevent text input field from loosing focus
+        function initKeyboardCapture() {
+
+            setTimeout(function() {
+                $('#keyboardInput').focus()
+                $('#keyboardInput').blur(function(e) {
+                    $('#keyboardInput').focus()
+                });
+            }, 1)
+        }
+
+        function stopCameraStream() {
+            if (cameraStream) {
+                var tracks = cameraStream.getTracks();
+                var i;
+                for (i = 0; i < tracks.length; i++) {
+                    tracks[i].stop();
+                }
+                cameraStream = null
+            }
+        }
+
+        function runCallback(err, m, barcode) {
+            stopCameraStream();
+            if (modalCallback) return modalCallback(err, m, barcode);
+
+            if (!m) {
+                app.ui.toast("That tube is not associated with the bionet");
+                return;
+            }
+            route('/inventory/' + m.id);
+        }
+
+        this.on('before-unmount', function() {
+            stopCameraStream();
         });
-      }, 1)
-    }
 
-    function stopCameraStream() {
-      if(cameraStream) {
-        var tracks = cameraStream.getTracks();
-        var i;
-        for(i=0; i < tracks.length; i++) {
-          tracks[i].stop();
-        }
-        cameraStream = null
-      }
-    }
+        this.on('mount', function() {
+            modalCallback = this.opts.cb
+            this.qr = new QrCode();
+            this.scanCtx = this.refs.scanCanvas.getContext("2d");
 
-    function runCallback(err, m, barcode) {
-      stopCameraStream();
-      if(modalCallback) return modalCallback(err, m, barcode);
+            initKeyboardCapture()
 
-      if(!m) {
-        app.ui.toast("That tube is not associated with the bionet");
-        return;
-      }
-      route('/inventory/'+m.id);
-    }
+            getUserMedia({
+                video: true,
+                audio: false
+            }, function(err, stream) {
+                $('#cameraAccessMsg').css('display', 'none');
+                if (err) {
+                    if (err.name === 'DevicesNotFoundError' || err.name === 'NotFoundError') {
+                        scanError("Hmm, looks like your device doesn't have a camera.<br/>You can still use the hand-held USB scanner.");
+                    } else if (err.name === 'InternalError') {
+                        scanError("Could not access your camera. Is another application using it?");
+                    } else {
+                        scanError("Unknown camera access error: " + err.msg || err)
+                    }
+                    return;
+                }
+                cameraStream = stream
 
-    this.on('before-unmount', function() {
-      stopCameraStream();
-    });
+                $(this.refs.scanVideo).css('visibility', 'visible');
+                this.refs.scanVideo.src = window.URL.createObjectURL(stream);
+                this.refs.scanVideo.play();
 
-    this.on('mount', function() {
-      modalCallback = this.opts.cb
-      this.qr = new QrCode();
-      this.scanCtx = this.refs.scanCanvas.getContext("2d");
+                setTimeout(scan.bind(this), 500);
+            }.bind(this));
+        });
 
-      initKeyboardCapture()
-
-      getUserMedia({video: true, audio: false}, function(err, stream) {
-        $('#cameraAccessMsg').css('display', 'none');
-        if(err) {
-          if(err.name === 'DevicesNotFoundError' || err.name === 'NotFoundError') {
-            scanError("Hmm, looks like your device doesn't have a camera.<br/>You can still use the hand-held USB scanner.");
-          } else if(err.name === 'InternalError') {
-            scanError("Could not access your camera. Is another application using it?");
-          } else {
-            scanError("Unknown camera access error: " + err.msg || err)
-          }
-          return;
-        }
-        cameraStream = stream
-
-        $(this.refs.scanVideo).css('visibility', 'visible');
-        this.refs.scanVideo.src = window.URL.createObjectURL(stream);
-        this.refs.scanVideo.play();
-
-        setTimeout(scan.bind(this), 500);
-      }.bind(this));
-    });
-  </script>
+    </script>
 </scan>

@@ -1,19 +1,25 @@
 <list-item>
     <!-- avatar list item template -->
+    <!--
     <div class="collection-item  avatar2 valign-wrapper {theme.style.color.background+' '+theme.style.color.text}" style="padding-left:{item.indent ? item.indent * 15 : 0}px;padding-top:5px; padding-bottom:5px" onclick={clickitem}>
+    -->
+    <div class="collection-item  avatar2 valign-wrapper {theme.style.color.background+' '+theme.style.color.text}" style="margin-bottom:26px; width:100%" onclick={clickitem}>
         <img if={item.avatar} class="circle" src={item.avatar} alt="" />
-        <div if={!item.avatar} style="width:20px" />
         <div class="left" style="display: inline-block; width:70%">
-            <div class="left" style="cursor: pointer; cursor: hand; {item.highlight ? 'color:green' : ''}">{item.primary_text}</div>
-            <br/>
-            <div class="left" style="cursor: pointer; cursor: hand;">{item.secondary_text}</div>
+            <div style="cursor: pointer; cursor: hand; font-size:18px; color:#1a0dab;">{item.primary_text}</div>
+            <a if={item.url} href="{item.url}" style="cursor: pointer; cursor: hand; font-size:14px; color:#006621; font-style:normal; line-height:16px;">{item.url_label}</a>
+            <div style="cursor: pointer; cursor: hand; color:#545454; font-size:small">{item.secondary_text}</div>
         </div>
         <div class="right" style="display: inline-block; width:30%">
-            <i if={item.starred} class="material-icons right {theme.style.color.text} valign" style="cursor: pointer; cursor: hand;" onclick={iconclick} >{item.righticon}</i>
-            <i if={!item.starred} class="material-icons right grey-text valign" style="cursor: pointer; cursor: hand;" onclick={iconclick} >{item.righticon}</i>
+            <i if={item.starred} class="material-icons right {theme.style.color.text} valign" style="cursor: pointer; cursor: hand; color:#545454;" onclick={iconclick}>{item.righticon}</i>
+            <i if={!item.starred} class="material-icons right grey-text valign" style="cursor: pointer; cursor: hand; color:#545454;" onclick={iconclick}>{item.righticon}</i>
             <span class="right" if={item.secondary_url} href="{item.secondary_url}" style="cursor: pointer; cursor: hand; ">{item.secondary_url_label}</span>
+            <yield/>
         </div>
-        <yield/>
+        <!--
+        -->
+        <br/>
+        <br/>
     </div>
 
     <script>
@@ -26,7 +32,7 @@
             e.preventDefault()
             e.stopPropagation()
             console.log('adding item to cart:', tag.item.id)
-            // TODO: messaging async api call
+                // TODO: messaging async api call
             cart.route('addToCart', undefined, {
                 id: tag.item.id,
                 name: tag.item.primary_text
@@ -36,19 +42,22 @@
         this.clickitem = function(e) {
             const item = tag.item
             e.stopPropagation()
+            item.click(item)
+                /*
             if (item.url !== undefined) {
                 console.log("List item, routing to: ", item.url);
                 route(item.url)
             } else if (item.click !== undefined) {
                 item.click(item)
             }
+                 */
         }
-        
+
         this.iconclick = function(e) {
             e.preventDefault()
             e.stopPropagation()
             if (tag.item.iconClick) {
-                tag.item.iconClick(e,tag.item)
+                tag.item.iconClick(e, tag.item)
             }
             return false;
         }
