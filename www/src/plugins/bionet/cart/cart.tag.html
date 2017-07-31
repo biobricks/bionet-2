@@ -139,6 +139,7 @@
 
             cart.addRoute('cartResult', function(data) {
                     console.log('cart tag, result:', JSON.stringify(data, null, 2))
+                    const itemUrlRoute = '/inventory/'+data.physical.id
                     const itemUrl = app.getUrl('/inventory',data.physical.id)
                     const item = {
                         primary_text: data.physical.name,
@@ -146,7 +147,7 @@
                         id: data.physical.id,
                         iconClick: deleteCartItem,
                         starred: true,
-                        url:itemUrl,
+                        url:itemUrlRoute,
                         url_label:itemUrl,
                         righticon: 'delete',
                         click: itemClick
