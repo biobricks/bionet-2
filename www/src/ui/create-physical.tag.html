@@ -20,6 +20,7 @@
 
             <a id="scanButton" ref="scanButton" class="waves-effect waves-light grey btn" onclick={scanItem} style="margin-right:10px; margin-left:0.75rem">{formData.barcode ? 'rescan tube' : 'scan tube'}</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect grey waves-light btn" onclick={createLabel} style="margin-left:10px">{(formData.label || labelFormData) ? 'edit' : 'create'} label</a>
 
+            <input type="hidden" ref="locationid" name="parent_id" value={formData.parent_id} />
             <!--
             <form-text-input3 label="Parent ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
             -->
