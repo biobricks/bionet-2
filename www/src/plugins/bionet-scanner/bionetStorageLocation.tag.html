@@ -119,6 +119,7 @@
                             //toast(container.name + ' saved at ' + container.parent_x + ' ' + container.parent_y)
                             console.log(container.name + ' saved at ' + container.parent_x + ' ' + container.parent_y)
                             BIONET.signal.getBoxContents.dispatch(container.parent_id)
+                            BIONET.signal.getPhysicalResult.dispatch(container)
                         })
                     },
                     configureParent: function(msg) {

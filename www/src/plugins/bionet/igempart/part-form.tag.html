@@ -1,7 +1,7 @@
 <part-form>
     <div id="part-form-wrapper" class="row">
         <div class="col s1 m1 l1"></div>
-        <div class="col s10">
+        <div class="col s6 m6 l6">
             <div if={virtualId} id="edit-part-content" class="{theme.style.color.background} {theme.style.color.text}">
                 <part-specification virtualId={virtualId}/>
             </div>
@@ -67,7 +67,7 @@
     <!--
     <h5 id="createVirtualHeader" ref="createVirtualHeader">Edit {formData.type}</h5>
     -->
-    <form id="editPartForm" name="editPartForm" class="col s12">
+    <form id="editPartForm" name="editPartForm">
         <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
         <!--
         <form-textarea-input label="Description" ref="description" name="description" value={formData.description}/>
