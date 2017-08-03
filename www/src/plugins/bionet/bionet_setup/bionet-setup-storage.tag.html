@@ -1,11 +1,11 @@
 <inventory-treeview>
     <div id="inventory-wrapper" class="inventory-height">
         <div class="row" style="margin-bottom:0; padding-bottom:0">
-            <div class="col s1 m1 l1">
+            <div id="action-icons" class="col s1 m1 l1" style="padding:0">
             </div>
-            <div id="treeview" class="inventory-tree col s6">
-                <table id="ftree" style="margin-top:15px; border:none !important; width:100%; ">
-                    <thead>
+            <div id="treeview" class="inventory-tree col s4">
+                <table id="ftree" style="margin-top:15px; border:none !important; width:100%;outline: 0px solid transparent; ">
+                    <thead style="border: none !important;outline: 0px solid transparent;">
                         <tr>
                             <td></td>
                             <td></td>
@@ -15,7 +15,7 @@
                         <col></col>
                         <col></col>
                     </colgroup>
-                    <tbody style="border: none !important;">
+                    <tbody style="border: none !important;outline: 0px solid transparent;">
                         <tr>
                             <td></td>
                             <td></td>
@@ -23,14 +23,14 @@
                     </tbody>
                 </table>
             </div>
-            <div id="physical-view" class="col s5">
+            <div id="physical-view" class="col s7">
                 <div id="pixijsdiv" class="row pixijs">
                     <bionet-storage-location width={pixiwidth} height={pixiheight-10}/>
                 </div>
                 <div id="threedview" class="row threedview" style="margin:0;padding:0;">
                     <babylon-3d></babylon-3d>
                 </div>
-                <div id="physical-props-view" class="row physical-view" style="width:100%;margin:0;padding:0;">
+                <div id="physical-props-view" class="row physical-view">
                     <div id="physical-storage" if={displayPhysical} class="edit-physical" style="width:100%">
                         <create-physical show="false" top-margin="0px" style="width:100%" />
                     </div>
@@ -41,21 +41,21 @@
             </div>
         </div>
         <!-- add or delete buttons -->
-        <div id="addicon" class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:150px; left:10px; width:55px; height:55px;" data-activates="addmenu"><i class="material-icons">add</i></div>
+        <div id="addicon" class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:fixed; top:170px; {iconXPos}; width:55px; height:55px;" data-activates="addmenu"><i class="material-icons">add</i></div>
 
-        <ul id="addmenu" class="dropdown-content" style="position:absolute; top:150px; left:10px; width:200px !important; text-align:left;z-index:1000">
+        <ul id="addmenu" class="dropdown-content" style="position:fixed; top:150px; {iconXPos}; width:200px !important; text-align:left;z-index:1000">
             <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.title}</span></li>
             <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.title}</span></li>
         </ul>
 
-        <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" style="position:absolute; top:220px; left:10px; text-align:left" onclick={addToFavorites}><i class="material-icons">star</i></a>
+        <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:fixed; top:240px; {iconXPos}; text-align:left" onclick={addToFavorites}><i class="material-icons">star</i></a>
 
-        <div id="deleteicon" style="position:absolute; top:290px; left:10px; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">delete</i></div>
+        <div id="deleteicon" style="position:fixed; top:310px; {iconXPos}; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">delete</i></div>
 
-        <div id="threedicon" style="position:absolute; top:360px; left:10px; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
-    <!--
-        <div id="threedicon" style="position:absolute; top:430px; left:10px; width:55px; height:55px;" onclick={select3d} class="btn-floating btn-large waves-effect waves-light blue"><span>-></span></div>
-    -->
+        <div id="threedicon" style="position:fixed; top:380px; {iconXPos}; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
+        <!--
+        <div id="threedicon" style="position:absolute; top:450px; {iconXPos}; width:55px; height:55px;" onclick={select3d} class="btn-floating btn-large waves-effect waves-light blue"><span>-></span></div>
+-->
         <delete-modal deleteaction={deleteAction}></delete-modal>
 
         <modal-physical title={modalPhysicalTitle} modalaction={modalAction} modaldata={modalData}/>
@@ -73,7 +73,7 @@
             margin-top: 15px;
             margin-bottom: 0px;
             width: 100%;
-            height: 20%;
+            height: 30%;
             float: left;
             z-index: 2000;
         }
@@ -86,7 +86,7 @@
             margin-bottom: 0px;
             padding-bottom: 0px;
             width: 100%;
-            height: 80%;
+            height: 70%;
             float: left;
         }
         
@@ -96,10 +96,22 @@
             margin-top: 0px;
             margin-bottom: 0px;
             padding-top: 0px;
-            padding-bottom: 0px;
+            padding-bottom: 40px;
             width: 100%;
-            height: 65%;
+            height: 70%;
             float: left;
+        }
+        
+        #physical-view {
+            position: fixed;
+            margin-top: 15px;
+        }
+        
+        #physical-props-view {
+            z-index: 1;
+            width: 100%;
+            margin: 0;
+            padding: 0;
         }
         
         .inventory-tree {
@@ -107,7 +119,7 @@
             margin-left: 65px;
             margin-bottom: 0px;
             padding-bottom: 0px;
-            overflow-y: scroll;
+            overflow-y: auto;
             overflow-x: hidden;
             display: block;
         }
@@ -272,14 +284,16 @@
             const bionetStorageLocation = app.getStream('bionetStorageLocation')
 
             ftree.reload(storageData).then(function() {
+                /*
                 $('.inventory-tree').css({
                     height: $(window).innerHeight() - $('#appbar').height() - 25
                 });
-                
+                */
+
                 $('#inventory-wrapper').css({
-                    marginTop: $('#appbar').height() +10
+                    marginTop: $('#appbar').height() + 10
                 });
-                
+
                 //tag.pixiwidth = $('#ftree').width() - 40
 
                 //const children = ftree.getRootNode().children
@@ -367,6 +381,10 @@
                 label: 'strains',
                 action: '/bionetsetup/strains'
             }])
+            $('#physical-view').css({
+                top: $('#appbar').height(),
+                right: 20
+            });
 
             // configure app bar
             app.appbarConfig({
@@ -380,14 +398,13 @@
             });
             tag.pixiwidth = $('#pixijsdiv').width()
             tag.pixiheight = $('#pixijsdiv').height()
+            tag.iconXPos = 'left:' + ($('#action-icons').width() - 55) * 0.5 + 'px'
 
             $('.modal').modal();
 
-            /*
             $('#physical-props-view').css({
-                height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 14
+                height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 30
             });
-            */
 
             const configureWindowSize = function() {
                 /*
@@ -398,9 +415,11 @@
                     height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 50
                 });
                 */
+                /*
                 $('.inventory-height').css({
                     height: $(window).innerHeight() - $('#appbar').height() - 20
                 })
+                */
                 $('html').css({
                         overflow: 'auto'
                     })

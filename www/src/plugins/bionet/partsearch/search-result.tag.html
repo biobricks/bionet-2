@@ -6,15 +6,17 @@
                 <div id="searchresults" class="searchresult" style="width:100%;">
                     <div class="{theme.style.color.background +' '+ theme.style.color.text}" style="margin-right:32px;">
                         <list-item class="searchItem" no-reorder each={item in results} item={item}>
-                            <i if={item.isPhysical} class="material-icons right" style="cursor: pointer; cursor: hand; color:#545454;" onclick={addToCart}>shopping_cart</i>
-                            <i if={item.isPhysical} class="tiny material-icons right" style="color:#545454;">group_work</i>
+                            <i if={item.isPhysical} class="material-icons right" style="cursor: pointer; cursor: hand; color:#808080;" onclick={addToCart}>shopping_cart</i>
+                            <i if={item.isPhysical} class="tiny material-icons right" style="color:#808080;">group_work</i>
                         </list-item>
                     </div>
                 </div>
             </div>
+            <!--
             <div class="row">
                 <pagination items={pagination_items}/>
             </div>
+            -->
         </div>
         <div id="edititem" class="edititem col s5">
             <create-physical if={itemType==='p' } show="false" top-margin="0px" />
@@ -29,7 +31,6 @@
         }
         
         .searchresult {
-            overflow-y: auto;
             overflow-x: hidden;
             margin-top: 0px;
             margin-bottom: 0px;
@@ -37,8 +38,8 @@
             padding-bottom: 0px;
         }
         
-        .edititem {
-            float: left;
+        #edititem {
+            position:fixed;
         }
 
     </style>
@@ -90,8 +91,14 @@
                 marginTop: $('#appbar').height() + 40
             });
             
+            /*
             $('#searchresults').css({
                 height: $(window).innerHeight() - $('#appbar').height()
+            });
+            */
+            $('#edititem').css({
+                top: $('#appbar').height() + 40,
+                right:20
             });
 
             const itemClick = function(item) {
@@ -155,9 +162,6 @@
             tag.secondaryHeader = tag.results.length + ' items'
             tag.update()
 
-            $('.searchresult').css({
-                height: $(window).innerHeight() - 120
-            });
             $('.edititem').css({
                 height: $(window).innerHeight() - 120
             });

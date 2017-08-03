@@ -94,8 +94,8 @@ var partsearch = {
                     var itemRoute
                     if (isVirtual) {
                         secondary_text = result.Description  
-                        itemRoute = '/virtual/'+result.id
-                        itemUrl = app.getUrl('/virtual',result.id)
+                        itemRoute = '/biomaterials/'+result.id
+                        itemUrl = app.getUrl('/biomaterials',result.id)
                     } else {
                         secondary_text = 'Created by '+result.created.user
                         itemUrl = app.getUrl('/inventory',result.id)

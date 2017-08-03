@@ -2,39 +2,43 @@
     <div id="part-form-wrapper" class="row">
         <div class="col s1 m1 l1"></div>
         <div class="col s10">
-            <div id="edit-part-content" class="{theme.style.color.background} {theme.style.color.text}">
+            <div if={virtualId} id="edit-part-content" class="{theme.style.color.background} {theme.style.color.text}">
                 <part-specification virtualId={virtualId}/>
+            </div>
+            <div if={virtualBrowser}>
+                <h6>Placeholder for biomaterials browser, my biomaterials and new biomaterials</h6>
             </div>
         </div>
     </div>
     <script>
         const tag = this
+        tag.virtualBrowser = true
         this.theme = app.getTheme()
             // setup secondary nav
-        /*
-        app.setSecondaryNav([{
-            label: 'virtual properties',
-            icon: undefined,
-            action: '/edit/' + opts.partID + '/specs'
-        }, {
-            label: 'physical properties',
-            icon: undefined,
-            action: '/edit/' + opts.partID + '/instances'
-        }, {
-            label: 'attachments',
-            icon: undefined,
-            action: '/edit/' + opts.partID + '/attachment'
-        }])
+            /*
+            app.setSecondaryNav([{
+                label: 'virtual properties',
+                icon: undefined,
+                action: '/edit/' + opts.partID + '/specs'
+            }, {
+                label: 'physical properties',
+                icon: undefined,
+                action: '/edit/' + opts.partID + '/instances'
+            }, {
+                label: 'attachments',
+                icon: undefined,
+                action: '/edit/' + opts.partID + '/attachment'
+            }])
 
-        // initialize breadcrumbs
-        app.setBreadcrumbs([{
-            'label': 'inventory',
-            'url': '/'
-        }, {
-            'label': 'edit part',
-            'url': '#'
-        }]);
-        */
+            // initialize breadcrumbs
+            app.setBreadcrumbs([{
+                'label': 'inventory',
+                'url': '/'
+            }, {
+                'label': 'edit part',
+                'url': '#'
+            }]);
+            */
 
         // configure app bar
         app.appbarConfig({
@@ -42,17 +46,18 @@
             enableBreadCrumbs: false,
             enableSubbar: false
         })
-        
+
         this.on('mount', function() {
             $('#part-form-wrapper').css({
                 marginTop: $('#appbar').height() + 40
             });
-            
+
             if (opts.id) {
                 tag.virtualId = opts.id
+                tag.virtualBrowser = false
                 tag.update()
             }
-            
+
         })
 
     </script>
@@ -70,17 +75,21 @@
         <form-switch label="Biohazardous?" ref="biohazard" name="biohazard" value={formData.biohazard} options={[ 'No', 'Yes']}/>
         <form-textarea-input label="Notes" name="notes" value={formData.notes}/>
         -->
+        
         <div each={field in fields}>
             <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value={formData[field.name]} />
         </div>
-        <div style="margin-bottom:30px">
+        <div style="margin-bottom:30px; margin-left:0.75rem">
             <p>
                 Created by: {(formData.created.user) ? formData.created.user : ''}
                 <br/> Created: {createdDate}
                 <br/> Updated: {updatedDate}
             </p>
         </div>
-        <input type="submit" class="waves-effect waves-light btn darken-1" label="submit" />
+        
+        <div style="margin-bottom:30px; margin-left:0.75rem">
+            <input type="submit" class="waves-effect waves-light btn darken-1" label="submit" />
+        </div>
 
     </form>
     <script>
@@ -94,8 +103,8 @@
         tag.formData = {
             created: ''
         }
-        
-        const configureVirtualAttributes=function(type) {
+
+        const configureVirtualAttributes = function(type) {
             if (!type) return
             tag.fields = app.getAttributesForType(tag.formData.type)
             var d = new Date()
@@ -115,7 +124,7 @@
 
         this.on('mount', function() {
             app.state.editPart = {}
-            
+
             configureVirtualAttributes(tag.formData.type)
 
             console.log("part-specification mount:", JSON.stringify(tag.formData))
@@ -149,7 +158,7 @@
                 app.state.editPart = tag.formData
                 tag.update();
             })
-            
+
             if (opts.virtualId) {
                 const partDataAccessor = app.getStream('partDataAccessor')
                 partDataAccessor.route('getVirtual', undefined, opts.virtualId)
@@ -227,31 +236,31 @@
     </form>
     <script>
         /*
-                                                                                                            var formData = app.getModel('partData')
-                                                                                                              //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
+                                                                                                                    var formData = app.getModel('partData')
+                                                                                                                      //console.log('plasmid:',JSON.stringify(formData.plasmidAnnotations))
 
-                                                                                                            // map igem plasmid annotations to flash plasmid viewer component
-                                                                                                            var annotations = formData.plasmidAnnotations
-                                                                                                            var features = []
-                                                                                                            if (annotations !== undefined) {
-                                                                                                              for (var i = 0; i < annotations.length; i++) {
-                                                                                                                var annotation = annotations[i]
-                                                                                                                features.push({
-                                                                                                                  name: annotation[3],
-                                                                                                                  type: annotation[0],
-                                                                                                                  from: annotation[1],
-                                                                                                                  to: annotation[2]
-                                                                                                                })
-                                                                                                              }
-                                                                                                            }
-                                                                                                            var seq_obj = {
-                                                                                                              name: formData.name,
-                                                                                                              sequence: formData.sequence,
-                                                                                                              features: features
-                                                                                                            }
-                                                                                                            this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
-                                                                                                              //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
-                                                                                                                                */
+                                                                                                                    // map igem plasmid annotations to flash plasmid viewer component
+                                                                                                                    var annotations = formData.plasmidAnnotations
+                                                                                                                    var features = []
+                                                                                                                    if (annotations !== undefined) {
+                                                                                                                      for (var i = 0; i < annotations.length; i++) {
+                                                                                                                        var annotation = annotations[i]
+                                                                                                                        features.push({
+                                                                                                                          name: annotation[3],
+                                                                                                                          type: annotation[0],
+                                                                                                                          from: annotation[1],
+                                                                                                                          to: annotation[2]
+                                                                                                                        })
+                                                                                                                      }
+                                                                                                                    }
+                                                                                                                    var seq_obj = {
+                                                                                                                      name: formData.name,
+                                                                                                                      sequence: formData.sequence,
+                                                                                                                      features: features
+                                                                                                                    }
+                                                                                                                    this.gfpSeqString = 'json=' + encodeURI(JSON.stringify(seq_obj))
+                                                                                                                      //console.log('plasmid viewer: %s', JSON.stringify(seq_obj, null, 2))
+                                                                                                                                        */
         const tag = this
         tag.formData = {}
         this.on('mount', function() {

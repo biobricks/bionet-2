@@ -54,18 +54,22 @@
 
 <create-virtual-form>
     <div style="margin:0;padding:0;width:100%">
-        <h5 id="createVirtualHeader" ref="createVirtualHeader">Create {type}</h5>
         <form id="createPartForm" ref="createPartForm" class="col s12" onsubmit={submitForm}>
+            <h6 id="createVirtualHeader" ref="createVirtualHeader" style="margin-left:0.75rem; margin-bottom:20px">Create {type}</h6>
             <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
             <form-text-input label="Created by" ref="creator" name="creator.user" value={formData.creator.user}/>
             <form-text-input label="Created" ref="created" name="creator.time" value={formData.creator.time}/>
+
             <div each={field in fields}>
                 <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="" />
             </div>
+
             <!-- create physical instances option -->
             <form-text-input label="Physical Instances" ref="instances" name="instances" value={physicalInstances}/>
 
-            <std-button label="submit" action={submitForm} />
+            <div style="margin-left:0.75rem">
+                <std-button label="submit" action={submitForm} />
+            </div>
             <input type="submit" style="visibility:hidden" />
         </form>
     </div>
@@ -124,9 +128,9 @@
 
                 if (physicalInstances !== undefined && physicalInstances !== '0') {
                     BIONET.signal.generatePhysicals.dispatch(virtualName, physicalInstances)
-                    app.ui.toast('Created '+physicalInstances+' instances of '+opts.type+' '+virtualName)
+                    app.ui.toast('Created ' + physicalInstances + ' instances of ' + opts.type + ' ' + virtualName)
                 } else {
-                    app.ui.toast('Created '+opts.type+' '+virtualName)
+                    app.ui.toast('Created ' + opts.type + ' ' + virtualName)
                 }
             });
 

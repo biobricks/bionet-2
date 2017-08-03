@@ -15,23 +15,28 @@ stdThemePlugin.start = function (cb) {
         label: 'configure',
         action: '/bionetsetup/config'
   }, {
-  */
-    const loggedInNav = [{
+{
             label: 'search',
             action: '/search'
   },
-        {
-            label: 'local inventory',
-            action: '/inventory'
+  
+            label: 'biomaterials',
+            action: '/biomaterials'
   }, {
-            label: 'workbench',
-            action: '/create'
+  
+  */
+    const loggedInNav = [{
+        label: 'local inventory',
+        action: '/inventory'
   }, {
-            label: 'scan',
-            action: '/scan'
+        label: 'workbench',
+        action: '/create'
   }, {
-            icon: 'shopping_cart',
-            action: '/cart'
+        label: 'scan',
+        action: '/scan'
+  }, {
+        icon: 'shopping_cart',
+        action: '/cart'
     }];
 
     // primary nav - logged out
@@ -100,7 +105,7 @@ stdThemePlugin.start = function (cb) {
     else app.setPrimaryNav(loggedOutNav)
 
     // login state
-    app.addObserver(app.$.loginState, (loginState) => {
+    const loginState = function (loginState) {
         const toast = app.getThemeMethod().toast
         if (loginState) {
             toast('logged into bionet')
@@ -109,7 +114,8 @@ stdThemePlugin.start = function (cb) {
             toast('logged out of bionet')
             app.setPrimaryNav(loggedOutNav)
         }
-    })
+    }
+    var loginStateBinding = BIONET.signal.login.add(loginState)
 
     cb();
 }

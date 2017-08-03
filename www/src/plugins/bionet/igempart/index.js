@@ -250,16 +250,30 @@ var igempart = {
         })
         */
 
-        route('/virtual/*', function (virtualID) {
-            
+        route('/biomaterials/*', function (virtualID) {
+
             app.appbarConfig({
                 enableTopNav: true,
                 enableBreadCrumbs: false,
-                enableSubbar: false
+                enableSubbar: false,
+                activeItem: 'biomaterials'
             })
 
             riot.mount('div#content', 'part-form', {
                 id: virtualID
+            })
+
+        })
+        route('/biomaterials', function () {
+
+            app.appbarConfig({
+                enableTopNav: true,
+                enableBreadCrumbs: false,
+                enableSubbar: false,
+                activeItem: 'biomaterials'
+            })
+
+            riot.mount('div#content', 'part-form', {
             })
 
         })

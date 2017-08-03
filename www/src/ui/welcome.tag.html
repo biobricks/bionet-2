@@ -11,41 +11,40 @@
         const theme = app.getTheme()
         this.themeClasses = theme.style.color.background + ' ' + theme.style.color.text
         const tag = this
-        
+
         app.on('signupError', function(msg) {
             console.log('signup error:', msg)
             tag.errorMsg = msg
             tag.update()
         })
-        
+
         this.on('mount', function() {
             $('#welcome').css({
                 marginTop: $('#appbar').height() + 50
             });
         })
 
-
     </script>
 </welcome>
 
 <mpassword-form>
-        <div class="row">
-            <div class="col s3 m3 l3"></div>
-            <div class="col s6 m6 l6 center">
-                <img class="center" src="static/images/home-bionet.png" height="220px" />
-                <div style="height:40px" />
+    <div class="row">
+        <div class="col s3 m3 l3"></div>
+        <div class="col s6 m6 l6 center">
+            <img class="center" src="static/images/home-bionet.png" height="220px" />
+            <div style="height:40px" />
+        </div>
+        <!--
                 <searchbox/>
-            </div>
-            <!--
         <form onsubmit={searchclick}>
         </form>
         <input type="submit" style="display:none" />
         <search-input label="search biomaterials" ref="searchbio" name="searchbio" value={searchbioInit}/>
+        <div class="center">OR</div>
         -->
-        </div>
+    </div>
 
     <form if={!app.user} onsubmit={signupAction} class="col center">
-        <div class="center">OR</div>
         <input type="submit" style="display:none" />
         <form-text-input-empty label="enter invitation code, hint:code" ref="mpassword" name="mpassword" value={mpasswordInit}/>
         <std-button label="sign up" action={signupAction}/>
@@ -56,7 +55,6 @@
         this.mpasswordInit = ''
 
         this.loggedin = app.getLoginState()
-        var observer = {}
 
         const getParam = function(q, token) {
             var value = '';
@@ -99,14 +97,20 @@
         */
 
 
-        this.on('before-mount', function() {
-            observer = app.addObserver(app.$.loginState, function(loginState) {
+        var observer
+        var loginStateBinding
+        
+        this.on('mount', function() {
+            const loginStateUpdate = function(loginState) {
                 tag.loggedin = loginState
                 tag.update()
-            })
+                if (loginState) route('/inventory')
+            }
+            loginStateBinding = BIONET.signal.login.add(loginStateUpdate)
         })
+        
         this.on('unmount', function() {
-            app.removeObserver(app.$.loginState, observer)
+            loginStateBinding.detach()
         })
 
         // TODO on app.user change we need to update

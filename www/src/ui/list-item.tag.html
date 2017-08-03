@@ -7,8 +7,8 @@
         <img if={item.avatar} class="circle" src={item.avatar} alt="" />
         <div class="left" style="display: inline-block; width:70%">
             <div style="cursor: pointer; cursor: hand; font-size:18px; color:#1a0dab;">{item.primary_text}</div>
-            <div if={item.url} onclick={clickUrl} style="cursor: pointer; cursor: hand; font-size:14px; color:#006621; font-style:normal; line-height:16px;">{item.url_label}</div>
-            <div style="cursor: pointer; cursor: hand; color:#545454; font-size:small">{item.secondary_text}</div>
+            <div if={item.url} onclick={clickUrl} class="search-result-cite line-clamp">{item.url_label}</div>
+            <span class="search-result-secondary">{item.secondary_text}</span>
         </div>
         <div class="right" style="display: inline-block; width:30%">
             <i if={item.starred} class="material-icons right {theme.style.color.text} valign" style="cursor: pointer; cursor: hand; color:#545454;" onclick={iconclick}>{item.righticon}</i>
@@ -21,6 +21,46 @@
         <br/>
         <br/>
     </div>
+    <style>
+        .search-result-secondary {
+            cursor: auto;
+            color: #545454;
+            font-size: 13px;
+            font-weight: normal;
+            line-height: 18px;
+            font-family: 'Roboto', arial, sans-serif;
+        }
+        
+        .search-result-cite {
+            cursor: hand;
+            font-size: 14px;
+            line-height: 16px;
+            color: #006621;
+            font-style: normal;
+            line-height: 16px;
+            font-family: arial, sans-serif;
+        }
+        
+        .search-result-cite2 {
+            text-overflow: ellipsis;
+            display: block;
+            width: 100px;
+            white-space: nowrap;
+        }
+        
+        .line-clamp {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .line-clamp2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+        }
+
+    </style>
 
     <script>
         const tag = this
@@ -38,12 +78,12 @@
                 name: tag.item.primary_text
             })
         }
-        
+
         this.clickUrl = function(e) {
             const item = tag.item
             route(item.url)
         }
-        
+
         this.clickitem = function(e) {
             const item = tag.item
             e.stopPropagation()

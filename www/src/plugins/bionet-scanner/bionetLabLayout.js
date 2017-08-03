@@ -103,7 +103,7 @@ const bionetLabLayout = {
         this.config = config
         this.sceneWidth=1600
         if (config.title !== undefined) {
-            this.title = config.title
+            //this.title = config.title
         }
         const locationPath = this.config.locationPath
         const appSettings = BIONET.getAppSettings()
@@ -197,7 +197,8 @@ const bionetLabLayout = {
 
         //var celldx = Math.max(divwidth / locations.length, 250)
         var celldx = 250
-        var celldy = (150 / 190) * celldx - 60
+        var celldy = (150 / 190) * celldx
+        //var celldy = (150 / 190) * celldx
         /*
         if (celldy * scale > divheight) {
             celldy = divheight - 60
@@ -206,8 +207,9 @@ const bionetLabLayout = {
         }
         */
 
-        const marginx = 30
-        const marginy = 20
+        const marginx = 0
+        const marginy = 0
+        //const marginy = 20
         //const marginy = (locations.length > 2) ? 30 : 50
         var lx = marginx;
         var ly = marginy;
@@ -228,10 +230,15 @@ const bionetLabLayout = {
             y: marginy,
             scale: 2.5
         }
-        */
         const centerStage = {
             x: marginx,
             y: celldy + marginy * 3,
+            scale: 2.5
+        }
+        */
+        const centerStage = {
+            x: marginx,
+            y: celldy - 60,
             scale: 2.5
         }
 

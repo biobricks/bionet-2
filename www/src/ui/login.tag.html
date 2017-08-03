@@ -57,7 +57,6 @@
     <script>
         const tag = this;
         this.theme = app.getTheme()
-        var observer = {}
         this.username = ''
 
         const showLogin = function(login) {
@@ -80,24 +79,21 @@
         this.logout = function() {
             route('/logout')
         }
-
-        this.on('before-mount', function() {
-
-            observer = app.addObserver(app.$.loginState, function(loggedIn) {
+        
+        var loginStateBinding 
+        this.on('mount', function() {
+            const loginStateUpdate = function(loggedIn) {
                 tag.loggedIn = loggedIn
                 showLogin(loggedIn)
                 tag.update()
-            }.bind(this))
-
-        })
-
-        this.on('mount', function() {
+            }
+            loginStateBinding = BIONET.signal.login.add(loginStateUpdate)
             tag.loggedIn = app.getLoginState()
             showLogin(tag.loggedIn)
         });
 
         this.on('unmount', function() {
-            app.removeObserver(app.$.loginState, observer)
+            loginStateBinding.detach()
         })
 
     </script>

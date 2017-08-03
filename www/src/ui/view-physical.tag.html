@@ -10,8 +10,11 @@
         </form>
     </div>
     <script>
+        
         var path = require('path');
-
+        const tag = this
+        tag.formData = {}
+        
         this.createLabel = function() {
 
             var labelOpts = {
@@ -89,7 +92,7 @@
 
         this.on('mount', function() {
             this.formData = this.opts
-            this.imgPath = '/static/labels/' + path.basename(formData.labelImagePath)
+            this.imgPath = '/static/labels/' + path.basename(this.formData.labelImagePath)
             this.update()
             $(this.printModal).modal()
 

@@ -14,15 +14,25 @@ function isUUID(str) {
 }
 
 route('/', function () {
-    app.appbarConfig({
-        enableTopNav: true,
-        enableBreadCrumbs: false,
-        enableSubbar: false,
-        activeItem: 'home'
-    })
-    riot.mount('div#content', 'welcome')
+    
+    if (app.user) {
+        app.appbarConfig({
+            enableTopNav: true,
+            enableBreadCrumbs: true,
+            enableSubbar: false,
+            activeItem: 'local inventory'
+        })
+        riot.mount('div#content', 'inventory-treeview')
+    } else {
+        app.appbarConfig({
+            enableTopNav: true,
+            enableBreadCrumbs: false,
+            enableSubbar: false,
+            activeItem: 'home'
+        })
+        riot.mount('div#content', 'welcome')
+    }
 })
-
 
 route('/logout', function () {
     console.log("logout route...");
@@ -31,8 +41,9 @@ route('/logout', function () {
             app.ui.toast("Error logout route: " + err) // TODO handle better
             return;
         }
-        route('/');
+        riot.mount('div#content', 'welcome')
     });
+    route('/')
 })
 
 route('/create-unknown/*', function (name) {
@@ -76,7 +87,6 @@ route('/o/*', function (idenc) {
     const id = decodeURIComponent(idenc)
     console.log('get object route:', id)
 
-    //app.remote.getByHumanID(id, function (err, m) {
     app.remote.getBy('name', id, function (err, m) {
         if (err || !m) {
             app.ui.toast("Item " + id + " not found in inventory");
@@ -84,7 +94,8 @@ route('/o/*', function (idenc) {
             return;
         }
         console.log("route o: item %s found in inventory: %s", id, m.id)
-        route('/inventory/' + m.id);
+            //route('/inventory/' + m.id);
+        riot.mount('div#content', 'view-physical', m)
     });
 
     //    setTimeout(function () {

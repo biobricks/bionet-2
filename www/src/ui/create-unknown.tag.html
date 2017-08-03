@@ -9,21 +9,22 @@
     <div style="padding-top:0; margin-top:0;width:100%">
         <div id="createNodeForm">
             <form onsubmit={addNode}>
-                <h5>Create biomaterials</h5>
+                <h6 style="margin-left:0.75rem;margin-bottom:30px">Create biomaterials</h6>
                 <autocomplete ref="selectVirtual" searchcallback={updateAutocomplete} placeholder='select virtual' />
                 <form-text-input label="Instances" ref="instances" name="instances" value={formData.instances}/>
-                <div style="margin-top:30px" />
-                <std-button label="add to workbench" action={addNode} />
+                <div style="margin-top:30px; margin-left:0.75rem">
+                    <std-button label="add to workbench" action={addNode} />
+                </div>
                 <input type="submit" style="visibility:hidden" />
             </form>
         </div>
-        
+
         <div style="margin-top:25px">
             <div each={field in fields}>
                 <form-text-input3 label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
             </div>
         </div>
-<!--
+        <!--
         <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:110px; left:10px; text-align:left" onclick={addNode} data-activates="addmenu2"><i class="material-icons">queue</i></a>
 
         <a class="btn-floating btn-large waves-effect waves-light red dropdown-button" data-constrainwidth="false" style="position:absolute; top:180px; left:10px; text-align:left" onclick={deleteNode}><i class="material-icons">delete</i></a>
@@ -82,7 +83,7 @@
 
     <script>
         const tag = this
-        
+
         tag.formData = {
             name: '',
             instances: '1'
@@ -155,7 +156,8 @@
                 const node = deleteNodes[i]
                 const id = node.data.dbData.id
                 console.log('removing %s %s', node.title, id)
-                BIONET.signal.delPhysical.dispatch(id)``
+                BIONET.signal.delPhysical.dispatch(id)
+                ``
                 node.remove()
             }
         }

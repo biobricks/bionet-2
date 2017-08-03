@@ -1,4 +1,3 @@
-
 var async = require('async');
 import Plugin from './plugin';
 import Persist from './persist'
@@ -7,6 +6,7 @@ import NanoRoute from './NanoRoute';
 const EventEmitter = require('events');
 import search from './search'
 var appSettings = require('../../../settings.js')();
+const MiniSignal = require('mini-signals')
 
 var pluginsInitialized = false
 
@@ -63,6 +63,7 @@ class App extends EventEmitter {
     // login data streams
     this.addStream(this.$.login)
     this.addStream(this.$.loginState, new NanoStream(false))
+    BIONET.signal.login = new MiniSignal()
 
     // navigation data streams
     this.addStream(this.$.primaryNav)
@@ -211,7 +212,7 @@ class App extends EventEmitter {
   }
 
   addObserver(name, observer) {
-    console.log('addObserver:', name)
+    //console.log('addObserver:', name)
     this.stream[name].addObserver(observer);
     return observer;
   }
@@ -284,12 +285,15 @@ class App extends EventEmitter {
 
   // login methods
   getLoginState() {
-    return this.getModel(this.$.loginState)
+    return app.user
+    //return this.getModel(this.$.loginState)
   }
 
   setLoginState(user) {
     app.user = user;
-    app.dispatch(app.$.loginState, !!user)
+    //app.dispatch(app.$.loginState, !!user)
+    BIONET.signal.login.dispatch(!!user)
+    //app.dispatch(app.$.loginState, !!user)
   }
 
   appbarConfig(config) {

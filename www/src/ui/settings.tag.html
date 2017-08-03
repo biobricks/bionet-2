@@ -48,12 +48,19 @@
         }
 
         this.updateAccountSettings = function() {}
-        this.on('before-mount', function() {
+
+        var observer
+        var loginStateBinding
+        this.on('mount', function() {
             //console.log('mpassword-form mount')
-            app.addObserver(app.$.loginState, function(loginState) {
+            const loginStateUpdate = function(loginState) {
                 tag.loggedin = loginState
                 tag.update()
-            })
+            }
+            loginStateBinding = BIONET.signal.login.add(loginStateUpdate)
+        })
+        this.on('unmount', function() {
+            loginStateBinding.detach()
         })
 
         //<div class="{theme.style.color.background}" style="margin:0;padding:10px">

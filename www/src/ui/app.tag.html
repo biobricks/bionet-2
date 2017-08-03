@@ -1,7 +1,10 @@
 <app>
-      <appbar/>
-      <div id="content" class="{theme.style.color.background} {theme.style.color.text}"></div>
-      <bottom-notify/>
+    <appbar/>
+    <div id="content" class="{theme.style.color.background} {theme.style.color.text}"></div>
+    <div id="scanModal" ref="scanModal" class="scanModal modal" style="z-index:10000;"></div>
+    <div id="printModal" ref="printModal" class="printModal modal" style="z-index:10000;"></div>
+    <footer-tag/>
+    <bottom-notify/>
 
     <script>
         const tag = this
@@ -24,11 +27,9 @@
             })
         })
         this.on('mount', function() {
-            $('#content').css('display', 'none')
-            $('#content').fadeIn(300)
-        })
-        this.on('before-unmount', function() {
-            $('#content').fadeOut(300)
+            $('#content').css({
+                minHeight: $(window).innerHeight()-36
+            })
         })
         this.on('unmount', function() {
             app.removeObserver(app.$.theme, observer)

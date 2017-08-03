@@ -1,9 +1,9 @@
 <create-form>
-    <div id="workbench-wrapper" class="content-height">
+    <div id="workbench-wrapper">
         <div class="row">
-            <div class="col s1 m1 l1"></div>
-            <div id="treeview" class="inventory-tree col s6">
-                <table id="ftree" style="margin-top:15px; border:none !important;">
+            <div id="action-icons" class="col s1 m1 l1" style="padding:0;"></div>
+            <div id="treeview" class="inventory-tree col s4">
+                <table id="ftree" style="margin-top:15px; border:none !important;outline: 0px solid transparent;">
                     <colgroup>
                         <col></col>
                         <col></col>
@@ -17,7 +17,7 @@
                 </table>
             </div>
 
-            <div id="physical-view" class="col s5">
+            <div id="physical-view" class="col s7">
                 <div id="pixijsdiv" class="row pixijs">
                     <bionet-storage-item width={pixiwidth} height={pixiheight}/>
                 </div>
@@ -27,15 +27,15 @@
                 </div>
             </div>
 
-            <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:absolute; top:150px; left:10px; text-align:left" onclick={addNode} data-activates="addmenu2"><i class="material-icons">queue</i></a>
+            <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:fixed; top:170px; {iconXPos}; text-align:left" onclick={addNode} data-activates="addmenu2"><i class="material-icons">queue</i></a>
 
-            <a class="btn-floating btn-large waves-effect waves-light green dropdown-button" data-constrainwidth="false" style="position:absolute; top:220px; left:10px; text-align:left" onclick={saveWorkbench}><i class="material-icons">save</i></a>
+            <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:fixed; top:240px; {iconXPos}; text-align:left" onclick={saveWorkbench}><i class="material-icons">save</i></a>
 
-            <a class="btn-floating btn-large waves-effect waves-light red dropdown-button" data-constrainwidth="false" style="position:absolute; top:290px; left:10px; text-align:left" onclick={deleteNode}><i class="material-icons">delete</i></a>
+            <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:fixed; top:310px; {iconXPos}; text-align:left" onclick={deleteNode}><i class="material-icons">delete</i></a>
 
-            <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:absolute; top:360px; left:10px; text-align:left" onclick={upload}><i class="material-icons">open_in_browser</i></a>
+            <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:fixed; top:380px; {iconXPos}; text-align:left" onclick={upload}><i class="material-icons">open_in_browser</i></a>
 
-            <ul id="addmenu2" class="dropdown-content" style="position:absolute; top:150px; left:80px; width:200px !important; text-align:left;z-index:1000">
+            <ul id="addmenu2" class="dropdown-content" style="position:fixed; top:170px; {iconXPos}; width:200px !important; text-align:left;z-index:1000">
                 <li each={item in virtuals} class="add-type"><span onclick={createNode}>{item.name}</span></li>
             </ul>
         </div>
@@ -44,23 +44,22 @@
 
     <style>
         .pixijs {
-            margin-top: 15px;
             margin-bottom: 0px;
             width: 100%;
-            height: 25%;
+            height: 30%;
             float: left;
             z-index: 2000;
         }
         
         .physical-view {
+            margin-top: 20px;
             overflow-y: auto;
             overflow-x: hidden;
-            margin-top: 0px;
             margin-bottom: 0px;
             padding-top: 0px;
             padding-bottom: 0px;
             width: 100%;
-            height: 75%;
+            height: 70%;
             float: left;
             display: block;
         }
@@ -68,6 +67,13 @@
         .matchlist {
             background-color: rgba(255, 255, 255, 1);
             z-index: 1000;
+        }
+        
+        #physical-view {
+            position: fixed;
+            margin-top: 15px;
+            overflow-y: hidden;
+            overflow-x: hidden;
         }
         
         table.fancytree-ext-table tr td {
@@ -93,10 +99,6 @@
         
         .create-virtual {
             float: left;
-        }
-        
-        div.content-height {
-            margin-top: 100px;
         }
 
     </style>
@@ -143,16 +145,13 @@
                 const node = children[0]
                 if (node) {
                     node.setExpanded();
-                    node.setFocus();
+                    //node.setFocus();
                 }
-                $('.inventory-tree').css({
-                    top: 5,
-                    height: $(window).innerHeight() - $('#appbar').height() - 15
-                });
                 $('#ftree').css({
                     width: $('#treeview').width() - 75
                 });
                 tag.update()
+                    //$('#workbench-wrapper').scrollTop(0)
 
                 BIONET.signal.getFavorites.dispatch()
             })
@@ -195,6 +194,9 @@
                 favoritesNode.addChildren(childNodes, 0)
             }
             favoritesNode.setExpanded()
+            favoritesNode.setActive()
+            favoritesNode.setFocus();
+            favoritesNode.scrollIntoView();
         }
         const getFavoritesResultBinding = BIONET.signal.getFavoritesResult.add(getFavoritesResult)
 
@@ -206,8 +208,12 @@
             if (enable) {
                 $('#pixijsdiv').show()
                 $('#physical-props-view').css({
-                    height: '65%'
+                    height: '70%'
                 });
+                tag.pixiwidth = $('#pixijsdiv').width()
+                tag.pixiheight = $('#pixijsdiv').height()
+                console.log('tag.pixiheight', tag.pixiheight)
+                tag.update()
 
             } else {
                 $('#pixijsdiv').hide()
@@ -219,22 +225,28 @@
 
         this.on('mount', function() {
 
-            $('#treeview').css({
-                height: $(window).innerHeight() - $('#appbar').height() - 20
-            });
-            $('#physical-view').css({
-                height: $(window).innerHeight() - $('#appbar').height() - 20
-            });
             tag.pixiwidth = $('#pixijsdiv').width()
             tag.pixiheight = $('#pixijsdiv').height()
+            console.log('tag.pixiheight', tag.pixiheight)
+
+            $('#physical-view').css({
+                top: $('#appbar').height(),
+                right: 20
+            });
+
+            $('#physical-props-view').css({
+                height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 10
+            });
+
             toggleLocationPath(false)
             tag.update()
 
             $('.modal').modal();
 
             $('#workbench-wrapper').css({
-                marginTop: $('#appbar').height() + 10
+                marginTop: $('#appbar').height()
             });
+            tag.iconXPos = 'left:' + ($('#action-icons').width() - 55) * 0.5 + 'px'
 
             // set default create form to create quilt
             riot.mount('div#workbench-form', 'create-quilt')
@@ -373,58 +385,60 @@
             }.bind(this))
 
             const ftSettings = {
-                extensions: ["table", "gridnav", "dnd5", "persist"],
-                source: [],
-                checkbox: true,
-                icon: false,
-                renderColumns: function(event, data) {},
-                beforeSelect: function(event, data) {},
-                modifyChild: function(event, data) {
-                    if (data.operation === 'remove') {
-                        //const deleteNode = data.childNode
-                    }
-                },
-                keydown: function(event, data) {},
-                dnd5: {
-                    dragStart: function(node, data) {
-                        return true;
-                    },
-                    dragDrag: function(node, data) {
-                        data.dataTransfer.dropEffect = "move";
-                    },
-                    dragEnd: function(node, data) {},
-                    dragEnter: function(node, data) {
-                        data.dataTransfer.dropEffect = "move";
-                        return true;
-                    },
-                    dragOver: function(node, data) {
-                        data.dataTransfer.dropEffect = "move";
-                    },
-                    dragLeave: function(node, data) {},
-                    dragDrop: function(node, data) {
-                        var transfer = data.dataTransfer;
-
-                        if (data.otherNode) {
-                            var sameTree = (data.otherNode.tree === data.tree);
-
-                            data.otherNode.moveTo(node, data.hitMode);
-                        } else if (data.otherNodeData) {
-                            node.addChild(data.otherNodeData, data.hitMode);
-                        } else {
-                            node.addNode({
-                                title: transfer.getData("text")
-                            }, data.hitMode);
+                    extensions: ["table", "gridnav", "dnd5", "persist"],
+                    source: [],
+                    checkbox: true,
+                    icon: false,
+                    renderColumns: function(event, data) {},
+                    beforeSelect: function(event, data) {},
+                    modifyChild: function(event, data) {
+                        if (data.operation === 'remove') {
+                            //const deleteNode = data.childNode
                         }
-                        node.setExpanded();
-                    }
-                },
-                persist: {
-                    cookiePrefix: 'workbench',
-                    expandLazy: false,
-                    overrideSource: true, // true: cookie takes precedence over `source` data attributes.
-                    store: "auto" // 'cookie', 'local': use localStore, 'session': sessionStore
-                },
-            }
+                    },
+                    keydown: function(event, data) {},
+                    dnd5: {
+                        dragStart: function(node, data) {
+                            return true;
+                        },
+                        dragDrag: function(node, data) {
+                            data.dataTransfer.dropEffect = "move";
+                        },
+                        dragEnd: function(node, data) {},
+                        dragEnter: function(node, data) {
+                            data.dataTransfer.dropEffect = "move";
+                            return true;
+                        },
+                        dragOver: function(node, data) {
+                            data.dataTransfer.dropEffect = "move";
+                        },
+                        dragLeave: function(node, data) {},
+                        dragDrop: function(node, data) {
+                            var transfer = data.dataTransfer;
+
+                            if (data.otherNode) {
+                                var sameTree = (data.otherNode.tree === data.tree);
+
+                                data.otherNode.moveTo(node, data.hitMode);
+                            } else if (data.otherNodeData) {
+                                node.addChild(data.otherNodeData, data.hitMode);
+                            } else {
+                                node.addNode({
+                                    title: transfer.getData("text")
+                                }, data.hitMode);
+                            }
+                            node.setExpanded();
+                        }
+                    },
+                }
+                /*
+                    persist: {
+                        cookiePrefix: 'workbench',
+                        expandLazy: false,
+                        overrideSource: true, // true: cookie takes precedence over `source` data attributes.
+                        store: "auto" // 'cookie', 'local': use localStore, 'session': sessionStore
+                    },
+                */
 
             var boxObj = {};
 
@@ -635,6 +649,8 @@
             }
 
             tag.createNode = function(e) {
+                toggleLocationPath(false)
+                tag.update()
                 const active = $(e.target)
                 const type = active.text()
                 riot.mount('div#workbench-form', 'create-virtual-form', {
@@ -645,11 +661,14 @@
             }
 
             tag.addNode = function(e) {
+                toggleLocationPath(false)
+                tag.update()
                 BIONET.signal.generatePhysicals.dispatch(tag.refs.selectVirtual.value, tag.refs.instances.value)
             }
             tag.update()
 
             tag.upload = function(e) {
+                toggleLocationPath(false)
                 riot.mount('div#workbench-form', 'part-attachment')
                 $('#createNodeForm').hide()
                 tag.update()
@@ -675,7 +694,7 @@
         <br/>
 
         <div class="file-field input-field">
-            <div class="btn">
+            <div class="btn blue">
                 <span>Import</span>
                 <input id="upload-file" type="file">
             </div>
@@ -794,7 +813,7 @@
             <p>Do you really want to delete?</p>
         </div>
         <div class="modal-footer">
-            <a href="#!" class="modal-action waves-effect waves-green btn-flat" onclick={deleteAction}>Delete</a>
+            <a href="#!" class="modal-action waves-effect waves-blue blue btn-flat" onclick={deleteAction}>Delete</a>
             <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
         </div>
     </div>
