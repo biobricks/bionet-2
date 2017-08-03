@@ -1,6 +1,6 @@
 <create-physical>
     <div if={opts.topMargin!==undefined} id="createPhysical" style="margin-top:{opts.topMargin}px" />
-    <div if={opts.topMargin===undefined} id="createPhysical" style="margin-top:100px" />
+    <div if={opts.topMargin===undefined} id="createPhysical" style="margin-top:0px" />
     <form id="createPhysicalForm" ref="createPhysicalForm" class={classes} onsubmit={submitForm}>
         <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
         <div if={showPhysical}>
