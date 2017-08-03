@@ -20,8 +20,8 @@
 
             <a id="scanButton" ref="scanButton" class="waves-effect waves-light grey btn" onclick={scanItem} style="margin-right:10px; margin-left:0.75rem">{formData.barcode ? 'rescan tube' : 'scan tube'}</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect grey waves-light btn" onclick={createLabel} style="margin-left:10px">{(formData.label || labelFormData) ? 'edit' : 'create'} label</a>
 
-            <input type="hidden" ref="locationid" name="parent_id" value={formData.parent_id} />
             <!--
+            <input type="hidden" ref="locationid" name="parent_id" value={formData.parent_id} />
             <form-text-input3 label="Parent ID" ref="locationid" name="parent_id" value={formData.parent_id}/>
             -->
             <div style="margin-top:30px">
@@ -104,10 +104,13 @@
         this.submitForm = function(e, doPrint) {
 
             e.preventDefault()
-            var formData = $.formToObject('createPhysicalForm') || {};
+            var formData = tag.formData;
+            $.extend(formData, $.formToObject('createPhysicalForm'))
+
             formData.label = tag.labelFormData;
             formData.type = tag.type
-
+            //todo: merge attributes in formdata not found in create physical form
+            
             if (!formData.parent_id && formData.parent_name) {
                 app.remote.getBy('name', formData.parent_name, function(err, m) {
                     if (err) return app.ui.toast("Error:" + err);
