@@ -1,10 +1,11 @@
 <inventory-treeview>
     <div id="inventory-wrapper" class="inventory-height">
+        <div class="row" style="margin-top:20px; padding:0"></div>
         <div class="row" style="margin-bottom:0; padding-bottom:0">
             <div id="action-icons" class="col s1 m1 l1" style="padding:0">
             </div>
             <div id="treeview" class="inventory-tree col s4">
-                <table id="ftree" style="margin-top:15px; border:none !important; width:100%;outline: 0px solid transparent; ">
+                <table id="ftree" style="margin-top:0px; border:none !important; width:100%;outline: 0px solid transparent; ">
                     <thead style="border: none !important;outline: 0px solid transparent;">
                         <tr>
                             <td></td>
@@ -70,7 +71,7 @@
         }
         
         .pixijs {
-            margin-top: 15px;
+            margin-top: 0px;
             margin-bottom: 0px;
             width: 100%;
             height: 30%;
@@ -104,7 +105,7 @@
         
         #physical-view {
             position: fixed;
-            margin-top: 15px;
+            margin-top: 0px;
         }
         
         #physical-props-view {
@@ -116,7 +117,7 @@
         
         .inventory-tree {
             float: left;
-            margin-left: 65px;
+            margin-left: 35px;
             margin-bottom: 0px;
             padding-bottom: 0px;
             overflow-y: auto;
@@ -313,8 +314,6 @@
                     } else {
                         node.setExpanded();
                     }
-                    $('#physical-view').scrollTop(0)
-                    $('html').scrollTop(0)
 
                 } else {
                     const children = ftree.getRootNode().children
@@ -369,21 +368,14 @@
         const getFavoritesResultBinding = BIONET.signal.getFavoritesResult.add(getFavoritesResult)
 
         this.on('mount', function() {
-            console.log("OOOOOOOOOPTS:", opts)
-                // setup secondary nav
-            app.setSecondaryNav([{
-                label: 'storage',
-                action: '/bionetsetup/storage'
-            }, {
-                label: 'schemas',
-                action: '/bionetsetup/schemas'
-            }, {
-                label: 'strains',
-                action: '/bionetsetup/strains'
-            }])
+            
             $('#physical-view').css({
-                top: $('#appbar').height(),
+                top: $('#appbar').height()+15,
+                height: $(window).innerHeight() - $('#appbar').height() - 20,
                 right: 20
+            });
+            $('#physical-props-view').css({
+                height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 50
             });
 
             // configure app bar
@@ -393,19 +385,12 @@
                 enableSubbar: false
             })
 
-            $('#physical-view').css({
-                height: $(window).innerHeight() - $('#appbar').height() - 20
-            });
             tag.pixiwidth = $('#pixijsdiv').width()
             tag.pixiheight = $('#pixijsdiv').height()
             tag.iconXPos = 'left:' + ($('#action-icons').width() - 55) * 0.5 + 'px'
 
             $('.modal').modal();
-
-            $('#physical-props-view').css({
-                height: $(window).innerHeight() - $('#appbar').height() - $('#pixijsdiv').height() - 30
-            });
-
+            
             const configureWindowSize = function() {
                 /*
                 $('.edit-physical').css({

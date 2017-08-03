@@ -29,7 +29,7 @@
             </div>
 
             <div id="autocomplete-container" style="margin-top:30px ">
-                <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name" />
+                <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name"/>
             </div>
 
             <div style="margin-top:30px; margin-left:0.75rem">
@@ -62,7 +62,7 @@
         console.log("create physical tag init, opts:%s", JSON.stringify(opts))
         this.fields = app.getAttributesForType(opts.type)
         tag.type = opts.type
-        tag.labelFormData = null;
+        tag.labelFormData = null
         this.isMaterial = false
         this.showPhysical = true
         if (opts.show === undefined || opts.show === true) this.showPhysical = true
@@ -91,11 +91,11 @@
                 // TODO: messaging async api call
                 // TODO why is this a route? should simply be a function call
             app.route('partDataAccessor', 'storePhysical', undefined, {
-                material: p,
-                labelImage: labelImage,
-                doPrint: doPrint
-            })
-            // TODO: if inventory view, add physical to parent node in tree
+                    material: p,
+                    labelImage: labelImage,
+                    doPrint: doPrint
+                })
+                // TODO: if inventory view, add physical to parent node in tree
         }
 
         /*
@@ -258,6 +258,7 @@
 
         const getPhysicalResult = function(data) {
             console.log('create physical getPhysicalResult', JSON.stringify(data))
+            if (tag.refs && tag.refs.selectContainer) tag.refs.selectContainer.value = null
             tag.formData = data
             tag.type = data.type
             tag.showPhysical = true

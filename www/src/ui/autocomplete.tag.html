@@ -13,15 +13,15 @@
 
     <div class="input-field col s12">
         <div class="query-container">
-            <input type="text" ref={refName} name={opts.ref || opts.name || 'q'} id="autocomplete_q" placeholder={opts.placeholder} autocomplete="off"  onblur={hideMatches} value={data}/>
+            <input type="text" ref={refName} name={opts.ref || opts.name || 'q'} id="autocomplete_q" placeholder={opts.placeholder} autocomplete="off" onblur={hideMatches} value={data}/>
             <label for={opts.name || 'q'} class="active">Name</label>
         </div>
         <ul id="matchlist_q" class="matchlist">
             <li each={match, index in matches} class="matchlist-element {highlight: selected === index} {match.extraClass || ''}" onmousedown={clickSelect} onmouseover={elementOver}>{!selectedType ? match.pre : ''}{(match.pre && !selectedType) ? ': ' : ''}{match.name}</li>
             <li if={matches && !matches.length} class="matchlist-element no-match">No matches found</li>
         </ul>
-        
-        
+
+
     </div>
 
     <style>
@@ -32,7 +32,7 @@
         const tag = this
         var searchCallback;
         tag.refName = opts.ref || opts.name || 'q'
-        tag.data=''
+        tag.data = opts.value || ''
 
         function query(s, cb) {
             if (!opts.searchcallback) return;
@@ -46,19 +46,20 @@
         this.selected = null
 
         this.on('mount', function() {
-            
+
             if (tag.value === undefined) {
                 Object.defineProperty(tag, "value", {
                     get: function() {
                         return tag.refs[tag.refName].value;
                     },
                     set: function(value) {
+                        tag.refs[tag.refName].value = value
                         tag.data = value;
                         tag.update();
                     }
                 });
             }
-            
+
             searchCallback = opts.searchCallback;
 
             this.updateMatchListPosition = function() {
@@ -93,14 +94,14 @@
             }.bind(this)
 
             this.elementOver = function(e) {
-                if($(e.target).hasClass('no-match')) return;
+                if ($(e.target).hasClass('no-match')) return;
 
                 var lis = $('#matchlist_q').find('li');
 
                 var i;
-                for(i = 0; i < lis.length; i++) {
+                for (i = 0; i < lis.length; i++) {
 
-                    if(lis[i] == e.target) {
+                    if (lis[i] == e.target) {
                         this.selected = i;
                         break
                     }
