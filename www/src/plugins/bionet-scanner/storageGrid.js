@@ -2,6 +2,10 @@ const PIXI = require('pixi.js')
 const pixijsutils = require('./pixijsutils')
 const async = require('async')
 
+const selectColor = 0x00ffff
+const selectColorOutline = 0x007070
+const cellArrayColor = 0x00b0ff
+
 const StorageGrid = function (xcells, ycells, width, height, xalpha, yalpha) {
     this.xcells = xcells
     this.ycells = ycells
@@ -24,7 +28,7 @@ StorageGrid.prototype.drawGrid = function (container) {
     const margin = 10
     const dx = this.dx
     const dy = this.dy
-    const ticLength = 4
+    const ticLength = 0
     const lineThickness = 3
     const t2 = lineThickness / 2
     const anchorPoint = new PIXI.Point(0.5, 0.5)
@@ -38,7 +42,7 @@ StorageGrid.prototype.drawGrid = function (container) {
     // grid labels text style
     const textProps = {
         fontFamily: 'Roboto',
-        fontSize: '70px',
+        fontSize: '100px',
         fill: textColor,
         fontWeight: 1600,
         backgroundColor: '#00000000',
@@ -184,7 +188,7 @@ StorageGrid.prototype.highlightMouseover = function (name, x, y, container) {
 }
 
 StorageGrid.prototype.highlightId = function (id, data, x, y, container, cellColor, multiple) {
-    const cColor = (cellColor !== undefined) ? cellColor : 0x00ffff
+    const cColor = (cellColor !== undefined) ? cellColor : cellArrayColor
     const graphics = this.highlight(x, y, container, multiple, cellColor)
     graphics.interactive = true
     graphics.mouseover = function () {
@@ -254,7 +258,8 @@ StorageGrid.prototype.initHighlight = function (x1, y1, x2, y2, container) {
 }
 
 StorageGrid.prototype.drawHighlight = function (p1x, p1y, p2x, p2y, container, multiple, highlightColor) {
-    const color = (highlightColor !== undefined) ? highlightColor : 0xff0000
+    const color = (highlightColor !== undefined) ? highlightColor : selectColor
+    const ocolor = (highlightColor !== undefined) ? highlightColor : selectColorOutline
     var pos = 0
     if (multiple !== true) {
         if (this.highlightSprite) {
@@ -262,10 +267,10 @@ StorageGrid.prototype.drawHighlight = function (p1x, p1y, p2x, p2y, container, m
         }
         pos = (container.children !== undefined && container.children.length > 0) ? container.children.length - 1 : 0
     }
-    const alpha = 0.3
-        //const alpha = 1
+    //const alpha = 0.3
+    const alpha = 1
     var graphics = new PIXI.Graphics();
-    graphics.lineStyle(6, color, alpha);
+    graphics.lineStyle(6, ocolor, alpha);
     graphics.moveTo(p1x, p1y)
     graphics.lineTo(p2x, p1y)
     graphics.lineTo(p2x, p2y)

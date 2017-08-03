@@ -11,6 +11,8 @@
         const PIXI_WIDTH = 500
         const PIXI_HEIGHT = 300
 
+        const tempHighlightColor = 0x00ff00
+
         const pixiController = app.getStream('bionetStorageLocation')
         tag.pixiController = pixiController
 
@@ -36,7 +38,7 @@
             const renderScene = function(locationPath) {
 
                 const bionetLabLayoutScene = new PIXI.Container()
-                //bionetLabLayout.createScene(bionetLabLayoutScene, tag.width, tag.height)
+                    //bionetLabLayout.createScene(bionetLabLayoutScene, tag.width, tag.height)
                 bionetLabLayout.createScene(bionetLabLayoutScene, pixijsutils.PIXI_WIDTH, pixijsutils.PIXI_HEIGHT)
 
                 if (locationPath) {
@@ -84,9 +86,8 @@
                 pixijsutils.renderStage()
             }
             const getContainerContentsResultBinding = BIONET.signal.getContainerContentsResult.add(highlightOccupiedCells)
-
             const highlightCellArray = function(id, cells) {
-                bionetLabLayout.highlightCellArray(id, cells, 0x00ff00)
+                bionetLabLayout.highlightCellArray(id, cells, tempHighlightColor)
                 pixijsutils.renderStage()
             }
             const highlightCellArrayBinding = BIONET.signal.highlightCellArray.add(highlightCellArray)
@@ -158,7 +159,7 @@
 
                         if (tag.resources) {
                             renderScene(newLocationPath)
-                            bionetLabLayout.highlightCellArray(parent.id, tempAssignments, 0x00ff00)
+                            bionetLabLayout.highlightCellArray(parent.id, tempAssignments, tempHighlightColor)
                             pixijsutils.renderStage()
                         }
                     },
@@ -195,7 +196,7 @@
 
                             if (tag.resources) {
                                 renderScene(newLocationPath)
-                                bionetLabLayout.highlightCellArray(id, tempAssignments, 0x00ff00)
+                                bionetLabLayout.highlightCellArray(id, tempAssignments, tempHighlightColor)
                                 pixijsutils.renderStage()
                             }
                         })

@@ -448,7 +448,6 @@ const scanner = {
             graphics.alpha = 0.5
 
             // draw highlighted cell
-            //graphics.beginFill(0x0080ff);
             const u = 15
             graphics.lineStyle(30, cellColor);
             graphics.moveTo(u, u)

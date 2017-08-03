@@ -1,5 +1,7 @@
 const PIXI = require('pixi.js')
 
+const selectColor = 0xff0000
+
 const StorageArray = function (units, width, height) {
     this.width = width
     this.height = height
@@ -73,15 +75,15 @@ StorageArray.prototype.drawHighlight = function (p1x, p1y, p2x, p2y, container) 
     if (this.highlightSprite) {
         container.removeChild(this.highlightSprite)
     }
-    const alpha = 0.3
+    const alpha = 1
     var graphics = new PIXI.Graphics();
-    graphics.lineStyle(6, 0xff0000, alpha);
+    graphics.lineStyle(6, selectColor, alpha);
     graphics.moveTo(p1x, p1y)
     graphics.lineTo(p2x, p1y)
     graphics.lineTo(p2x, p2y)
     graphics.lineTo(p1x, p2y)
     graphics.lineTo(p1x, p1y)
-    graphics.beginFill(0xff0000, alpha);
+    graphics.beginFill(selectColor, alpha);
     graphics.drawRect(p1x, p1y, p2x - p1x, p2y - p1y)
     graphics.endFill();
     container.addChild(graphics);

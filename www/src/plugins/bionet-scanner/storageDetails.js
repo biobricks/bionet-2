@@ -35,9 +35,6 @@ StorageDetails.prototype.outline = function (container) {
     graphics.lineTo(p2x, p2y)
     graphics.lineTo(p1x, p2y)
     graphics.lineTo(p1x, p1y)
-    //graphics.beginFill(0xff0000, alpha);
-    //graphics.drawRect(p1x, p1y, p2x - p1x, p2y - p1y)
-    //graphics.endFill();
     container.addChild(graphics);
     this.outlineSprite = graphics
 }

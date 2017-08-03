@@ -3,6 +3,10 @@ const StorageGrid = require('./storageGrid')
 import moveAndZoomXform from './moveAndZoomXform'
 const BionetStorageContainer = require('./bionetStorageContainer')
 
+const cellArrayColor = 0x00b0ff
+const highlightColor = 0x00ffff
+const outlineColor = 0x808080
+
 const bionetLabLayout = {
     assets: '/static/assets/lab-storage/',
     storageSprite: null,
@@ -101,7 +105,7 @@ const bionetLabLayout = {
 
     initializeModel: function (config) {
         this.config = config
-        this.sceneWidth=1600
+        this.sceneWidth = 1600
         if (config.title !== undefined) {
             //this.title = config.title
         }
@@ -192,25 +196,25 @@ const bionetLabLayout = {
             align: 'center',
             backgroundColor: '#00000000'
         };
-        const containerOutlineColor = 0x000000
-        const containerFillColor = 0x000000
+        const containerOutlineColor = outlineColor
+        const containerFillColor = outlineColor
 
         //var celldx = Math.max(divwidth / locations.length, 250)
         var celldx = 250
         var celldy = (150 / 190) * celldx
-        //var celldy = (150 / 190) * celldx
-        /*
-        if (celldy * scale > divheight) {
-            celldy = divheight - 60
-            const sc = celldx / celldy
-            celldx = celldy * sc
-        }
-        */
+            //var celldy = (150 / 190) * celldx
+            /*
+            if (celldy * scale > divheight) {
+                celldy = divheight - 60
+                const sc = celldx / celldy
+                celldx = celldy * sc
+            }
+            */
 
         const marginx = 0
         const marginy = 0
-        //const marginy = 20
-        //const marginy = (locations.length > 2) ? 30 : 50
+            //const marginy = 20
+            //const marginy = (locations.length > 2) ? 30 : 50
         var lx = marginx;
         var ly = marginy;
 
@@ -301,7 +305,7 @@ const bionetLabLayout = {
 
         if (thisModule.title !== undefined) {
             const titleTextSize = '20px'
-            //const titleTextSize = (locations.length > 2) ? '22px' : '44px'
+                //const titleTextSize = (locations.length > 2) ? '22px' : '44px'
             var titleTextProps = {
                 fontFamily: 'Roboto',
                 fontSize: titleTextSize,
@@ -315,8 +319,6 @@ const bionetLabLayout = {
             fontSize: '34px',
             fill: '#000000',
         };
-
-        //const moveRightButtonText = String.fromCharCode(parseInt(0xE315, 16))
 
         const makeInteractive = function (sprite, clickFunction) {
             sprite.interactive = true
@@ -427,7 +429,7 @@ const bionetLabLayout = {
         makeInteractive(threedbutton, toggle3d)
             //EmojiOneColor-SVGinOT.ttf
             */
-        
+
         for (var i = 0; i < locations.length; i++) {
             const storageItem = locations[i];
             console.log('labStorage.onLoadComplete: initializing storage location %s %s', storageItem.name, storageItem.type)
@@ -454,15 +456,15 @@ const bionetLabLayout = {
                 if (storageItem.xc === storageItem.yc) {
                     height = celldx - marginy * 2
                     width = height
-                        width = celldx *0.66
-                        height = celldx *0.66
+                    width = celldx * 0.66
+                    height = celldx * 0.66
                 } else {
                     if (storageItem.xc > storageItem.yc) {
                         width = celldx
                         height = celldx * 0.66
                     } else {
-                        width = celldx *0.5
-                        height = celldx *0.66
+                        width = celldx * 0.5
+                        height = celldx * 0.66
                     }
                 }
                 const childLoc = locations[i + 1]
@@ -531,23 +533,21 @@ const bionetLabLayout = {
         this.connectCells()
         console.log('lab storage initialized')
     },
-
     highlightCell: function (id, data, x, y) {
         const storageLocations = this.storageLocations
         for (var i = 0; i < storageLocations.length; i++) {
             var loc = storageLocations[i]
             if (loc.id === id) {
                 if (loc.grid !== undefined && loc.grid.highlightId !== undefined) {
-                    loc.grid.highlightId(id, data, x, y, loc.bionetStorage.gridSprite, 0xff0000, true)
+                    loc.grid.highlightId(id, data, x, y, loc.bionetStorage.gridSprite, highlightColor, true)
                 }
             }
         }
     },
-
     highlightCellArray: function (id, cells, cellColor) {
         const storageLocations = this.storageLocations
         if (storageLocations === undefined) return
-        const cColor = (cellColor !== undefined) ? cellColor : 0x00ffff
+        const cColor = (cellColor !== undefined) ? cellColor : cellArrayColor
         for (var i = 0; i < storageLocations.length; i++) {
             var loc = storageLocations[i]
             if (loc.id === id) {
@@ -599,9 +599,9 @@ const bionetLabLayout = {
             const pa_active = storageLocations[a].mz.toggleState === false
             const pb_active = storageLocations[b].mz.toggleState === false
             if (pa_active || pb_active) direction = false
-            graphics.alpha = 0.15
-            graphics.beginFill(0xff0000);
-            graphics.lineStyle(4, 0xff0000);
+            graphics.alpha = 0.3
+            graphics.beginFill(highlightColor);
+            graphics.lineStyle(4, highlightColor);
             if (direction === true) {
                 graphics.moveTo(p2a.x, p1a.y)
                 graphics.lineTo(p1b.x, p1b.y)
