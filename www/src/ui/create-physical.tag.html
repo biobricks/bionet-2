@@ -85,6 +85,8 @@
         tag.container = {}
 
         var savePhysical = function(p, labelImage, doPrint) {
+            delete p.selectContainer
+            delete p.parent_name
             console.log('savePhysical :%s', JSON.stringify(p, null, 2))
                 // TODO: messaging async api call
                 // TODO why is this a route? should simply be a function call
@@ -93,6 +95,7 @@
                 labelImage: labelImage,
                 doPrint: doPrint
             })
+            // TODO: if inventory view, add physical to parent node in tree
         }
 
         /*
@@ -103,7 +106,6 @@
 
             e.preventDefault()
             const physicalFormData = $.formToObject('createPhysicalForm')
-            delete physicalFormData.selectContainer
 
             //console.log('create-physical submit before merge formData:%s\nform:%s', JSON.stringify(tag.formData, null, 2), JSON.stringify(physicalFormData, null, 2))
 
@@ -114,8 +116,9 @@
 
             tag.formData = formData
 
-            if (!formData.parent_id && formData.parent_name) {
-                app.remote.getBy('name', formData.parent_name, function(err, m) {
+            //if (!formData.parent_id && formData.parent_name) {
+            if (formData.selectContainer) {
+                app.remote.getBy('name', formData.selectContainer, function(err, m) {
                     if (err) return app.ui.toast("Error:" + err);
 
                     if (!m) {
