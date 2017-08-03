@@ -1,12 +1,12 @@
 <searchbox>
     <form id="search-form" onsubmit={submitSearch}>
-        <div class="z-depth-1" style="height: 40px; border:1px; border-style: solid; border-radius:2px; border-color:#a0a0a0; background-color:#ffffff">
-            <div class="left" style="height:40px; margin:0px 40px 0px 0px;">
-                <input id="search" ref="search" type="search" value={opts.terms} autofocus style="padding:0px; margin:0px 0px 0px 20px; border-bottom:none; box-shadow:none" />
-            </div>
-            <div class="right" style="margin:8px 10px 0px 0px">
+        <div class="z-depth-1" style="width:100%;height: 40px; border:1px; border-style: solid; border-radius:2px; border-color:#a0a0a0; background-color:#ffffff; white-space:nowrap">
+            <span class="left" style="width:70%;height:40px; margin:0px 40px 0px 0px;">
+                <input id="search" ref="search" type="search" value={opts.terms} autofocus style="width:100%; padding:0px; margin:0px 0px 0px 20px; border-bottom:none; box-shadow:none" />
+            </span>
+            <span class="right" style="margin:8px 10px 0px 0px">
                 <i class="material-icons" style="cursor: pointer; cursor: hand; color:#4285f4;" onclick={submitSearch}>search</i>
-            </div>
+            </span>
         </div>
         <div class="right local-global-radios">
             <input class="with-gap blue right" ref="localglobalcheck" name="localglobalcheck" type="radio" id="localsearch" value="local" checked="{!opts.global}" />
