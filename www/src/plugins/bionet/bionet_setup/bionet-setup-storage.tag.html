@@ -360,6 +360,7 @@
         const getFavoritesResultBinding = BIONET.signal.getFavoritesResult.add(getFavoritesResult)
         
         //height: $(window).innerHeight() - $('#appbar').height(),
+
         this.on('mount', function() {
 
             $('#inventory-wrapper').css({
@@ -454,7 +455,7 @@
 
             //extensions: ["table", "gridnav", "dnd5", "persist"],
             const ftSettings = {
-                extensions: ["table", "gridnav", "dnd5", "persist"],
+                extensions: ["table", "gridnav", "persist"],
                 source: [],
                 checkbox: true,
                 icon: false,
