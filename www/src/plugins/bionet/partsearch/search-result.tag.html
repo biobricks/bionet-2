@@ -25,11 +25,6 @@
     </div>
 
     <style>
-        .searchheight {
-            margin-top: 115px;
-            height: calc(100% - 100px)
-        }
-        
         .searchresult {
             overflow-x: hidden;
             margin-top: 0px;
@@ -88,7 +83,7 @@
         this.on('mount', function() {
             tag.results = tag.opts.results
             $('#searchresult-wrapper').css({
-                marginTop: $('#appbar').height() + 40
+                marginTop: $('#appbar').height()
             });
             
             /*
@@ -97,7 +92,7 @@
             });
             */
             $('#edititem').css({
-                top: $('#appbar').height() + 40,
+                top: $('#appbar').height(),
                 right:20
             });
 

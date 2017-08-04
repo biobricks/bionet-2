@@ -1,5 +1,5 @@
 <appbar>
-    <div id="appbar" class="pinned" style="top:0px; width:100%;z-index:1000;border-bottom:1px solid #a0a0a0;">
+    <div id="appbar" class="pinned" style="top:0px; width:100%;z-index:1000;">
 
         <!-- primary navigation -->
         <!--<topnav-container if={enableTopNav}>-->
@@ -23,7 +23,7 @@
                 </ul>
             </nav>
         </div>
-        <div class="row grey lighten-4" style="margin:0">
+        <div class="row grey lighten-4" style="margin:0;">
             <div class="col s1 l1 m1">
             </div>
             <nav class="col s6 m6 l6 grey lighten-4" style="box-shadow:none;  height:64px; line-height:64px">
@@ -59,6 +59,7 @@
         <!--
         <breadcrumbs if={enableBreadCrumbs} items={breadcrumbs} background={theme.style.color.highlightBackground} />
         -->
+        <div class="row" style="height:20px; margin:0;padding:0;z-index:1000;background-image: url('/static/images/appbarBorder.png');background-repeat:repeat-x;"></div>
     </div>
 
     <login/>

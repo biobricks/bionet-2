@@ -1,6 +1,5 @@
 <create-form>
     <div id="workbench-wrapper">
-        <div class="row" style="margin-top:20px; padding:0"></div>
         <div class="row">
             <div id="action-icons" class="col s1 m1 l1" style="padding:0;"></div>
             <div id="treeview" class="inventory-tree col s4">
@@ -239,12 +238,12 @@
                 marginTop: appbarHeight
             });
             $('#physical-view').css({
-                top: $('#appbar').height()+20,
-                height: $(window).innerHeight() - $('#appbar').height() - 20,
+                top: $('#appbar').height(),
+                height: $(window).innerHeight() - appbarHeight,
                 right: 0
             });
             $('#physical-props-view').css({
-                height: $(window).innerHeight() - appbarHeight - $('#pixijsdiv').height() - 50
+                height: $(window).innerHeight() - appbarHeight - $('#pixijsdiv').height() - 30
             });
 
             toggleLocationPath(false)

@@ -1,6 +1,5 @@
 <inventory-treeview>
-    <div id="inventory-wrapper" class="inventory-height">
-        <div class="row" style="margin-top:20px; padding:0"></div>
+    <div id="inventory-wrapper">
         <div class="row" style="margin-bottom:0; padding-bottom:0">
             <div id="action-icons" class="col s1 m1 l1" style="padding:0">
             </div>
@@ -48,7 +47,7 @@
             <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.title}</span></li>
             <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.title}</span></li>
         </ul>
-+
+        +
         <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:fixed; top:240px; {iconXPos}; text-align:left" onclick={addToFavorites}><i class="material-icons">star</i></a>
 
         <div id="deleteicon" style="position:fixed; top:310px; {iconXPos}; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">delete</i></div>
@@ -140,9 +139,6 @@
             outline: 1px solid #70C0E7;
         }
         
-        .inventory-height {
-            margin-top: 100px;
-        }
 
     </style>
     <script>
@@ -291,10 +287,6 @@
                 });
                 */
 
-                $('#inventory-wrapper').css({
-                    marginTop: $('#appbar').height()
-                });
-
                 //tag.pixiwidth = $('#ftree').width() - 40
 
                 //const children = ftree.getRootNode().children
@@ -366,11 +358,16 @@
             favoritesNode.setExpanded()
         }
         const getFavoritesResultBinding = BIONET.signal.getFavoritesResult.add(getFavoritesResult)
-
+        
+        //height: $(window).innerHeight() - $('#appbar').height(),
         this.on('mount', function() {
-            
+
+            $('#inventory-wrapper').css({
+                marginTop: $('#appbar').height(),
+            });
+
             $('#physical-view').css({
-                top: $('#appbar').height()+20,
+                top: $('#appbar').height() + 20,
                 height: $(window).innerHeight() - $('#appbar').height() - 20,
                 right: 0
             });
@@ -390,7 +387,7 @@
             tag.iconXPos = 'left:' + ($('#action-icons').width() - 55) * 0.5 + 'px'
 
             $('.modal').modal();
-            
+
             const configureWindowSize = function() {
                 /*
                 $('.edit-physical').css({
