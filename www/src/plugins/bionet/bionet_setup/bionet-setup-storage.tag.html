@@ -138,7 +138,6 @@
             background-color: #E5F3FB;
             outline: 1px solid #70C0E7;
         }
-        
 
     </style>
     <script>
@@ -274,26 +273,48 @@
                 BIONET.signal.addFavorite.dispatch(node.data.dbData)
             }
         }
-
+        var selectQ = true
         const requestStorageResult = function(storageData) {
             //console.log('initializing storage:', JSON.stringify(storageData))
             const ftree = $("#ftree").fancytree("getTree");
             const bionetStorageLocation = app.getStream('bionetStorageLocation')
 
             ftree.reload(storageData).then(function() {
-                /*
-                $('.inventory-tree').css({
-                    height: $(window).innerHeight() - $('#appbar').height() - 25
-                });
-                */
 
-                //tag.pixiwidth = $('#ftree').width() - 40
+                var node
 
-                //const children = ftree.getRootNode().children
-                //const node = children[0]
-                var node = ftree.getActiveNode();
+                if (opts.q && selectQ) {
+                    selectQ = false
+                    var selNode = ftree.findFirst(function(node) {
+                        if (!node.data || !node.data.dbData) return;
+                        var m = node.data.dbData;
+                        if (m.id === opts.q) return true;
+                    });
+                    if (!selNode) {
+                        app.ui.toast("Could not find item in local inventory");
+                        return;
+                    }
+                    node = selNode
+                } else {
+                    node = ftree.fancytree("getActiveNode");
+                }
+
                 if (node) {
-                    node.setFocus();
+                    node.setActive()
+                    /*
+                    setTimeout(function() {
+                            node.scrollIntoView(true)
+                            //$('#inventory-wrapper').scrollTo(300);
+                    }, 4000)
+                    */
+                    
+                        /*
+                        try {
+                            //$('#inventory-wrapper').scrollTo($('#appbar').height());
+                            $('#inventory-wrapper').scrollTo(150);
+                        } catch (e) {}
+                        */
+
                     const dbData = node.data.dbData
                     console.log('ftree reload, active node:', JSON.stringify(dbData, null, 2))
 
@@ -358,7 +379,7 @@
             favoritesNode.setExpanded()
         }
         const getFavoritesResultBinding = BIONET.signal.getFavoritesResult.add(getFavoritesResult)
-        
+
         //height: $(window).innerHeight() - $('#appbar').height(),
 
         this.on('mount', function() {
@@ -368,7 +389,7 @@
             });
 
             $('#physical-view').css({
-                top: $('#appbar').height() + 20,
+                top: $('#appbar').height(),
                 height: $(window).innerHeight() - $('#appbar').height() - 20,
                 right: 0
             });
@@ -414,6 +435,7 @@
             configureWindowSize()
 
             // initialize breadcrumbs
+            /*
             /*
             $('#addicon').css({
                 left: treeViewIconX
@@ -622,10 +644,8 @@
                 const active = $(e.target)
                 const elementType = active.prop('nodeName');
                 console.log('elementType:', elementType)
-                    //if (!active.hasClass('fancytree-edit')) {
+
                 var node = $("#ftree").fancytree("getActiveNode");
-                /*
-                 */
                 if (node) {
                     const dbData = node.data.dbData
                     const type = dbData.type
@@ -655,7 +675,9 @@
                         'label': node.title,
                         'url': '/inventory'
                     }]);
-
+                    //node.setActive()
+                    //node.setExpanded()
+                    //node.scrollIntoView()
                 }
                 //}
                 //if (!active.text()) return
@@ -706,23 +728,6 @@
             })
             BIONET.signal.requestStorage.dispatch()
 
-            if (opts.q) {
-                setTimeout(function() {
-                    var ourTree = $("#ftree").fancytree("getTree");
-                    var selNode = ourTree.findFirst(function(node) {
-                        if (!node.data || !node.data.dbData) return;
-                        var m = node.data.dbData;
-                        if (m.id === opts.q) return true;
-                    });
-                    if (!selNode) {
-                        app.ui.toast("Could not find item in local inventory");
-                        return;
-                    }
-
-                    ourTree.activateKey(selNode.key);
-
-                }, 2000);
-            }
         })
 
 
