@@ -58,12 +58,52 @@ rpcClient.on('methods', function (remote) {
   }, function(err, token, userData) {
     if(err) {
       console.error("Login failed. Is something wrong with your test user?");
-      console.error("\nHint: You can run `./bin/db.js user test-redo` to re-create a test user.\n")
+      console.error("\nHint: You can run `./bin/db.js user test` to re-create a test user.\n")
       fail(err);
       process.exit(1);
     }
 
     console.log("Logged in:", userData);
+
+    remote.savePhysical({
+      name: "test-physical-3344351"
+
+
+    }, null, false, function(err, id) {
+      if(err) return fail(err);
+
+      console.log("Created physical with ID:", id);
+
+      remote.clearDeleted(function(err) {
+        if(err) return fail(err);
+        remote.delPhysical(id, function(err) {
+          if(err) return fail(err);
+          
+          console.log("Deleted physical with ID:", id);
+          
+          var s = remote.listDeleted();
+          var latest;
+          s.on('data', function(data) {
+//            console.log("Deleted:", data);
+            latest = data;
+          });
+          
+          s.on('end', function() {
+            remote.undelete(latest.key, function(err) {
+              if(err) return fail(err);
+              
+              console.log("Undeleted:", latest.value);
+              
+              remote.get(latest.value.data.id, function(err, o) {
+                if(err) return fail(err);
+                
+                console.log("Got:", o);
+              });
+            });
+          });
+        });
+      });
+    });
     
   });
 

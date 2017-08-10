@@ -5,26 +5,27 @@ var async = require('async');
 var through = require('through2');
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
-function del(curUser, dbName, key, cb) {
+function del(curUser, db, dbName, key, cb) {
   if(!dbName || dbName === 'user' || dbName === 'index') return cb(new Error("not allowed"));
   if(!db[dbName]) return cb(new Error("database '"+dbname+"' does not exit"));
   if(!key) return cb(new Error("Missing key"));
   
-  key = translateKey(key, dbName);
+  key = db.translateKey(key, db[dbName]);
     
   db.db.get(key, function(err, o) {
     if(err) return cb(err);
-    
+    console.log("GOT HERE!");
     var now = (new Date).getTime();
     var dKey = (Number.MAX_SAFE_INTEGER - now).toString() + uuid();
-    
+        console.log("GOT HERE! 2");
     db.deleted.put(dKey, {
       db: dbName,
       key: key,
       deletedAt: now,
       deletedBy: curUser.user.email,
-      data: o
+      data: JSON.parse(o)
     }, function(err) {
+    console.log("GOT HERE! 3");
       if(err) return cb(err);
       
       db.db.del(key, cb);
@@ -140,19 +141,28 @@ module.exports = function(settings, users, accounts, db, index, mailer, p2p) {
     clearDeleted: function(curUser, cb) {
       var s = db.deleted.createKeyStream();
 
-      s.pipe.through(function(key, enc, next) {
+      var d = through.obj(function(key, enc, next) {
         db.deleted.del(key, next);
+        console.log("AAAAA");
       })
-      .on('end', cb)
-      .on('err', cb);
+      s.pipe(d);
+
+      d.on('data', function(data) {
+        console.log("DAAAAAAAATAAAAAA");
+      });
+
+      d.on('end', cb);
+      d.on('error', cb);
     },
     
     undelete: function(curUser, key, cb) {
+
       db.deleted.get(key, function(err, o) {
         if(err) return cb(err);
         if(!o.key) return cb(new Error("Unable to undelete: Original key missing."))
-
-        db.db.put(o.key, o.data, function(err) {
+        // TODO check if a physical already exists with this name
+        console.log("UNDELETING:", o);
+        db.db.put(o.key, JSON.stringify(o.data), function(err) {
           if(err) return cb(err);
           
           db.deleted.del(key, cb);
@@ -162,7 +172,7 @@ module.exports = function(settings, users, accounts, db, index, mailer, p2p) {
 
     delPhysical: function(curUser, id, cb) {
       console.log('delPhysical:',id);
-      del(curUser, 'physical', id);
+      del(curUser, db, 'physical', id, cb);
     },
 
     physicalAutocomplete: function(curUser, query, cb) {
