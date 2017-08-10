@@ -117,6 +117,35 @@ con.on('connect', function() {
   main();
 });
 
+function createTestUser(users, cb, failed) {
+  var newUser = {
+    email: 'unit-tester@example.org',
+    password: uuid()
+  }
+  
+  accounts.create(users, {
+    email: newUser.email
+  }, newUser.password, null, function(err) {
+    if(err) {
+      if(failed) fail(err);
+      
+      users.remove(newUser.email, function(err) {
+        if(err) fail(err);
+        createTestUser(users, cb, true);
+      });
+      return;
+    }
+
+    fs.writeFile(path.join(__dirname, '..', 'test_user.json'), JSON.stringify(newUser), {encoding: 'utf8', mode: 0o640}, function(err) {
+      if(err) fail(err);
+      
+      cb();
+    });
+    
+  });
+
+}
+
 
 function main() {
 
@@ -193,26 +222,15 @@ function main() {
 
       } else if(subCmd.match(/^t/)) {
         console.log("Creating test user");
-        
-        var newUser = {
-          email: 'unit-tester2@example.org',
-          password: uuid()
-        }
 
-        accounts.create(users, {
-          email: newUser.email
-        }, newUser.password, null, function(err) {
+        createTestUser(users, function(err) {
           if(err) fail(err);
 
-          fs.writeFile(path.join(__dirname, '..', 'test_user.json'), JSON.stringify(newUser), {encoding: 'utf8'}, function(err) {
-            if(err) fail(err);
-
-            console.log("Created user. Credentials saved to test_user.json");
-            process.exit(0);
-          });
-
+          console.log("Created user. Credentials saved to test_user.json");
+          process.exit(0);
         });
 
+        
       } else {
         usage("Invalid user command");
       }
