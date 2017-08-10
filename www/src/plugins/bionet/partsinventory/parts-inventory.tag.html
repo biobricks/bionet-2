@@ -32,6 +32,7 @@
                         <div class="flex-row">
                             <div id="zoomItemTable" class="flex-item"></div>
                             <div id="zoomItem_vis" class="flex-item"></div>
+                            <div id="zoomItemImage_vis" class="flex-item"></div>
                         </div>
                     </div>
                 </div>
@@ -53,20 +54,21 @@
             </div>
             -->
         </div>
-        <!-- add or delete buttons -->
+
         <div id="addicon" class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" data-hover="true" style="position:fixed; top:170px; {iconXPos}; width:55px; height:55px;" data-activates="addmenu"><i class="material-icons">add</i></div>
 
         <ul id="addmenu" class="dropdown-content" style="position:fixed; top:150px; {iconXPos}; width:200px !important; text-align:left;z-index:1000">
-            <li if={createType==='storage' } each={item in locations} class="add-type"><span onclick={addNode}>{item.title}</span></li>
-            <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addNode}>{item.title}</span></li>
+            <li each={item in locations} class="add-type"><span onclick={addItem}>{item.title}</span></li>
         </ul>
-        +
+
         <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:fixed; top:240px; {iconXPos}; text-align:left" onclick={addToFavorites}><i class="material-icons">star</i></a>
 
-        <div id="deleteicon" style="position:fixed; top:310px; {iconXPos}; width:55px; height:55px;" onclick={deleteNode} class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">delete</i></div>
+        <div id="deleteicon" style="position:fixed; top:310px; {iconXPos}; width:55px; height:55px;" onclick={deleteItem} class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">delete</i></div>
 
         <div id="threedicon" style="position:fixed; top:380px; {iconXPos}; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
 
+        <delete-modal deleteaction={deleteAction}></delete-modal>
+        <modal-physical title={modalPhysicalTitle} modalaction={modalAction} modaldata={modalData}/>
 
         <!--
         <a id="navigateButton" class="waves-effect waves-teal btn-flat" onclick={setMode} style="position:fixed; top:450px; left:0px;">Navigate</a>
@@ -200,17 +202,42 @@
     </style>
     <script>
         const tag = this
+        tag.currentItemId = null
+        tag.currentItem = {}
+
+        const appSettings = BIONET.getAppSettings()
+        const dataTypes = appSettings.dataTypes
+        tag.locations = []
+        for (var i = 0; i < dataTypes.length; i++) {
+            const type = dataTypes[i]
+            if (type.virtual !== true) {
+                type.url = '/create-physical/' + encodeURI(type.name)
+                tag.locations.push(type)
+            }
+        }
+
         this.on('mount', function() {
 
             $('#inventory-wrapper').css({
                 marginTop: $('#appbar').height(),
                 height: $(window).innerHeight() - $('#appbar').height() - $('.bionet-page-footer').height(),
             });
-            
+
             $('#lab_vis').hide()
             $('#zoomItem_vis').hide()
 
             tag.iconXPos = 'left:' + ($('#action-icons').width() - 55) * 0.5 + 'px'
+
+            $('.dropdown-button').dropdown({
+                inDuration: 300,
+                outDuration: 225,
+                constrainWidth: false,
+                hover: true,
+                gutter: 0,
+                belowOrigin: true,
+                alignment: 'left',
+                stopPropagation: false
+            });
 
             tag.randomTest = function() {
                 BIONET_VIS.signal.test.dispatch('random')
@@ -225,6 +252,12 @@
 
             var selectionMode = 'nav'
 
+            tag.addToFavorites = function() {
+                if (tag.currentItem) {
+                    BIONET.signal.addFavorite.dispatch(tag.currentItem)
+                }
+            }
+
             const getChildren = function(id, cb) {
                 BIONET.remote.getChildren(id, function(err, children) {
                     if (err) return console.error(err);
@@ -232,7 +265,100 @@
                 })
             }
 
-            tag.currentItem = {}
+            tag.addItem = function(e) {
+                return
+                // get active item
+                var item = tag.currentItem;
+
+                // initialize parent id
+                var parentId
+                if (!item) {
+                    item = tag.rootItem;
+                } else {
+                    parentId = item.parent_id
+                }
+
+                // initialize storage type
+                const active = $(e.target)
+                const title = active.text()
+                var type = null
+                for (var i = 0; i < tag.locations.length; i++) {
+                    if (tag.locations[i].title === title) {
+                        type = tag.locations[i].name
+                    }
+                }
+                if (!type) {
+                    console.log('addNode, type not found for title:', title)
+                    return
+                }
+
+                // generate unique name
+                const name = title
+
+                // initialize standard attributes
+                const dbData = {
+                    name: '',
+                    type: type,
+                    parent_id: parentId
+                }
+
+                // initialize attributes
+                const attributes = app.getAttributesForType(type)
+                for (var i = 0; i < attributes.length; i++) {
+                    dbData[attributes[i].name] = type + ' ' + attributes[i].name
+                }
+
+                tag.modalPhysicalTitle = "Create " + title
+                tag.modalData = dbData
+                tag.displayPhysical = false
+                tag.modalOpen = true
+                const physicalUpdatedModal = function(modalData) {
+                    if (tag.modalOpen) {
+                        console.log('close edit physical modal')
+                        $('#edit-physical-modal').modal('close');
+                        tag.displayPhysical = true
+                        tag.update()
+                        tag.modelOpen = false
+                    }
+                }
+                BIONET.signal.physicalUpdated.add(physicalUpdatedModal)
+
+                tag.update()
+
+                $('#edit-physical-modal').modal('open');
+                BIONET.signal.getPhysicalResult.dispatch(dbData)
+
+            }
+
+            // todo retrieve children for item and iterate
+            tag.deleteItem = function() {
+                return
+                tag.deleteAction = function() {
+                    const deleteNodes = []
+
+                    const delChildren = function(item) {
+                        if (!item.children) return
+                        getChildren(item.id, (pid, children) => {
+                            for (var i = 0; i < item.children.length; i++) {
+                                const childNode = item.children[i]
+                                delChildren(childNode)
+                                deleteNodes.push(childNode)
+                            }
+                        })
+                    }
+                    delChildren(tag.currentItem)
+
+                    for (var i = 0; i < deleteNodes.length; i++) {
+                        const node = deleteNodes[i]
+                        var id = null
+                        if (item.favorite_id) id = item.favorite_id
+                        else id = item.id
+                        BIONET.signal.delPhysical.dispatch(id)
+                    }
+                }
+                $('#deleteModal').modal('open');
+            }
+
 
             const retrieveLocationPath = function(id, cb) {
                 const locationPath = {}
@@ -248,6 +374,7 @@
                         var locationId = location.id
                         if (locationId === id) {
                             tag.currentItem = location
+                            tag.currentItemId = id
                             tag.update()
                         }
                         locationPath[locationId] = location
@@ -260,9 +387,12 @@
             }
 
             const selectInventoryItem = function(id) {
+                tag.currentItemId = id
                 console.log('selectInventoryItem %s mode %s', id, selectionMode)
                 retrieveLocationPath(id, (path) => {
                     //console.log('retrieveLocationPath:', JSON.stringify(path, null, 2))
+                    tag.currentItemId = id
+                    tag.currentItem = path[id]
                     BIONET_VIS.signal.setLocationPath.dispatch(id, path)
                 })
             }
@@ -285,27 +415,42 @@
                 }
             }
 
+            const getFavoritesResult = function(favorites) {
+                const favoritesArr = []
+                    //console.log('getFavoritesResult:',JSON.stringify(favorites,null,2))
+                for (var i = 0; i < favorites.length; i++) {
+                    var favorite = favorites[i].favorite
+                    var material = favorites[i].material
+                    material.material_id = favorite.material_id
+                    material.favorite_id = favorite.id
+                    favoritesArr.push(material)
+                }
+                BIONET_VIS.signal.setFavorites.dispatch(favoritesArr)
+            }
+
             tag.rootId = null
             BIONET_VIS.init(() => {
                 const selectInventoryItemBinding = BIONET_VIS.signal.selectInventoryItem.add(selectInventoryItem)
                 const setSelectionModeBinding = BIONET_VIS.signal.setSelectionMode.add(setSelectionMode)
                 const enableLocationPathSectionsBinding = BIONET_VIS.signal.enableLocationPathSections.add(enableLocationPathSections)
-                //setTimeout(function() {
-                    BIONET.remote.inventoryTree(function(err, children) {
-                        //console.log('inventory tree:',JSON.stringify(children, null, 2))
-                        for (var i = 0; i < children.length; i++) {
-                            var item = children[i].value
-                            if (!item.parent_id) {
-                                tag.rootId = item.id
-                                console.log('rootId:', tag.rootId)
-                                //BIONET_VIS.signal.navigateInventoryItem.dispatch('p-a4b81480-e449-4563-9fd6-8194cd21c348')
-                                //BIONET_VIS.signal.navigateInventoryItem.dispatch(tag.rootId)
-                                selectInventoryItem(tag.rootId)
-                                break;
-                            }
+                const getFavoritesResultBinding = BIONET.signal.getFavoritesResult.add(getFavoritesResult)
+
+                // request favorites
+                BIONET.signal.getFavorites.dispatch()
+
+                // retrieve inventory root node
+                // todo: skip if id parameter
+                BIONET.remote.inventoryTree(function(err, children) {
+                    for (var i = 0; i < children.length; i++) {
+                        var item = children[i].value
+                        if (!item.parent_id) {
+                            tag.rootId = item.id
+                            tag.rootItem = item
+                            selectInventoryItem(tag.rootId)
+                            break;
                         }
-                    })
-                //}, 5000);
+                    }
+                })
             })
         })
 
@@ -419,8 +564,8 @@
     <list-item each={node in opts.nodes} item={node} />
     <script>
         /*
-                                                                                                                                                                                                                                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-                                                                                                                                                                                                                                                                    */
+                                                                                                                                                                                                                                                                                                                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                                                                                                                                                                                                                                                                                                                                    */
         const tag = this;
 
 
