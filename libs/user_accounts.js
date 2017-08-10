@@ -63,7 +63,11 @@ var accounts = {
                 }
             }
           console.log("USER CREATED, sending verification", user, opts.value.verificationCode);
+          if(mailer) {
             mailer.sendVerification(user, opts.value.verificationCode, cb);
+          } else {
+            cb();
+          }
         });
     },
 

@@ -9,6 +9,8 @@ var multilevel = require('multileveldown'); // remote db access
 var sublevel = require('subleveldown'); // leveldb multiplexing
 var accountdown = require('accountdown'); // user/login management
 var JSONStream = require('JSONStream');
+var uuid = require('uuid').v4;
+var accounts = require('../libs/user_accounts.js');
 
 var minimist = require('minimist');
 var argv = minimist(process.argv.slice(2), {
@@ -47,6 +49,7 @@ function usage(err) {
   f("  import [-f] file.json: Import database from JSON (use -f to force)");
   f("  user: view users");
   f("    list: Print list of all users");
+  f("    test: Create a user for unit testing and save credentials to test_user.json");
   f("  help: Display this usage message");
   f('');
   f("  The --online flag will cause this script to fail if the bionet app");
@@ -187,6 +190,28 @@ function main() {
           console.log("Listed", count, "users");
           process.exit(0);
         }));
+
+      } else if(subCmd.match(/^t/)) {
+        console.log("Creating test user");
+        
+        var newUser = {
+          email: 'unit-tester2@example.org',
+          password: uuid()
+        }
+
+        accounts.create(users, {
+          email: newUser.email
+        }, newUser.password, null, function(err) {
+          if(err) fail(err);
+
+          fs.writeFile(path.join(__dirname, '..', 'test_user.json'), JSON.stringify(newUser), {encoding: 'utf8'}, function(err) {
+            if(err) fail(err);
+
+            console.log("Created user. Credentials saved to test_user.json");
+            process.exit(0);
+          });
+
+        });
 
       } else {
         usage("Invalid user command");

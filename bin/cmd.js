@@ -36,6 +36,7 @@ default: {
 var settings = require(argv.settings)(argv);
 
 var db = require('../libs/db.js')(settings, users, accounts);
+
 var index = require('../libs/indexing.js')(settings, db);
 
 var mailer = new Mailer(settings.mailer, settings.baseUrl);

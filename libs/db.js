@@ -10,19 +10,72 @@ var uuid = require('uuid').v4;
 
 module.exports = function(settings, users, acccounts) {
 
+  var sep = '!';
+
   var db = level(settings.dbPath || './db');
-  var userDB = sublevel(db, 'u', { valueEncoding: 'json' });
-  var indexDB = sublevel(db, 'i');
+  var userDB = sublevel(db, 'u', {separator: sep, valueEncoding: 'json'});
+  var indexDB = sublevel(db, 'i', {separator: sep});
 
   // TODO is miscDB and idGenerator even used?
-  var miscDB = sublevel(db, 'm');
+  var miscDB = sublevel(db, 'm', {separator: sep});
   var idGenerator = new IDGenerator(miscDB);
 
-  var bioDB = sublevel(db, 'b');
-  var virtualDB = sublevel(bioDB, 'v-', {valueEncoding: 'json'});
-  var physicalDB = sublevel(bioDB, 'p-', {valueEncoding: 'json'});
-  var cartDB = sublevel(bioDB, 'c-', {valueEncoding: 'json'});
-  
+  var bioDB = sublevel(db, 'b', {separator: sep});
+  var virtualDB = sublevel(bioDB, 'v-', {separator: sep, valueEncoding: 'json'});
+  var physicalDB = sublevel(bioDB, 'p-', {separator: sep, valueEncoding: 'json'});
+  var cartDB = sublevel(bioDB, 'c-', {separator: sep, valueEncoding: 'json'});
+
+  var deletedDB = sublevel(bioDB, 'd-', {separator: sep, valueEncoding: 'json'});
+
+  // Take a key from one sublevel db and add or remove prefixes
+  // to make it usable in another sublevel db that is a parent or child
+  // If dbTo is not specified then the highest leveldb (no sublevels) is assumed
+  function translateKey(key, dbFrom, dbTo) {
+    if(!dbTo) dbTo = db;
+    if(!dbFrom.db.prefix && !dbTo.db.prefix) throw new Error("Either the database has not finished initializing or neither of the specified DBs are sublevels");
+
+    var fromPrefix = dbFrom.db.prefix || '';
+    var toPrefix = dbTo.db.prefix || '';
+
+    // going to a deeper level
+    if(toPrefix.indexOf(fromPrefix) === 0) {
+
+      var diff;
+      if(fromPrefix) {
+        diff = toPrefix.slice(fromPrefix.length);
+      } else {
+        diff = toPrefix;
+      }
+
+      if(key.indexOf(diff) !== 0) {
+        throw new Error("key is not part of destination sublevel");
+      }
+      
+      return key.slice(diff.length);
+
+
+    // going to a higher level
+    } else if(!toPrefix || fromPrefix.indexOf(toPrefix) === 0) {
+
+      var diff;
+      if(toPrefix) {
+        diff = fromPrefix.slice(toPrefix.length);
+      } else {
+        diff = fromPrefix;
+      }
+
+      return diff + key;
+
+    // going to the same level (do nothing)
+    } else if(fromPrefix === toPrefix) {
+
+      return key;
+
+    } else {
+
+      throw new Error("The specified DBs have neither a descendant nor ancestor relationship");
+    }
+  }
 
   function ensureUserData(users, user, accounts, cb) {
     
@@ -301,6 +354,7 @@ module.exports = function(settings, users, acccounts) {
     bio: bioDB,
     virtual: virtualDB,
     physical: physicalDB,
+    deleted: deletedDB,
 
     // functions
     idGenerator: idGenerator,
@@ -310,7 +364,7 @@ module.exports = function(settings, users, acccounts) {
     unixEpochTime: unixEpochTime,
     ensureUserData: ensureUserData,
     getBy: getBy,
-
+    translateKey: translateKey,
     init: init
 
   }
