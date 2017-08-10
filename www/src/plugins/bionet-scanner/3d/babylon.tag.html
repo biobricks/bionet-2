@@ -91,10 +91,39 @@
                 */
             }
 
+            const getChildren = function(id, cb) {
+                BIONET.remote.getChildren(id, function(err, children) {
+                    if (err) return console.error(err);
+                    cb(id, children)
+                })
+            }
+
+            const retrieveLocationPath = function(id, cb) {
+                const locationPath = {}
+                var results = 0
+                BIONET.remote.getLocationPath(id, function(err, locationPathAr) {
+                    if (err) {
+                        console.log('getLocationPath error:', err)
+                        return
+                    }
+                    results = locationPathAr.length
+                    for (var i = 0; i < locationPathAr.length; i++) {
+                        var location = locationPathAr[i]
+                        var id = location.id
+                        locationPath[id] = location
+                        getChildren(id, (pid, children) => {
+                            locationPath[pid].children = children
+                            if (--results <= 0) cb(locationPath)
+                        })
+                    }
+                })
+            }
+
             function onPixiEvent(cmd, msgdata) {
                 if (cmd === undefined) return;
                 const pixiMsgHandler = {
                     selectCell: function(msg) {
+                        return
                         // find item in the location path that was clicked
                         const locationPath = tag.locationPath
                         const id = msg.id
@@ -112,9 +141,15 @@
                         }
                     },
                     configure: function(msg) {
+                        return
                         const id = msg
                         tag.id = id
                         console.log('babylon-3d tag configure function, id=', id)
+
+                        retrieveLocationPath(id, (path) => {
+                            console.log('retrieveLocationPath:', JSON.stringify(path, null, 2))
+                        })
+
                         app.remote.getLocationPath(id, function(err, locationPathAr) {
                             if (err) {
                                 console.log('getLocationPath error:', err)
@@ -149,7 +184,8 @@
 
             const highlightOccupiedCells = function(id, physicals) {
                 if (id !== tag.id) return
-                
+                console.log('highlightOccupiedCells:%s\n%s', id, JSON.stringify(physicals))
+
                 app.remote.getLocationPath(id, function(err, locationPathAr) {
                     if (err) {
                         console.log('getLocationPath error:', err)

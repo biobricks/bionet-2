@@ -14,7 +14,7 @@ function isUUID(str) {
 }
 
 route('/', function () {
-    
+
     if (app.user) {
         app.appbarConfig({
             enableTopNav: true,
@@ -75,6 +75,15 @@ route('/scan', function () {
     riot.mount('div#content', 'scan-page')
 })
 
+route('/parts-inventory', function () {
+    app.appbarConfig({
+        enableTopNav: true,
+        enableBreadCrumbs: false,
+        enableSubbar: false,
+        activeItem: 'local inventory'
+    })
+    riot.mount('div#content', 'parts-inventory')
+})
 
 route('/o/*', function (idenc) {
     app.appbarConfig({
