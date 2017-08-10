@@ -1,7 +1,11 @@
 {
     "$schema": "https://vega.github.io/schema/vega/v3.0.json",
-    "width": {"signal": "width"},
-    "height": {"signal": "height"},
+    "width": {
+        "signal": "width"
+    },
+    "height": {
+        "signal": "height"
+    },
     "padding": 0,
     "autosize": "pad",
     "signals": [
@@ -16,6 +20,10 @@
         {
             "name": "height",
             "value": 100
+        },
+        {
+            "name": "scale",
+            "value": 1.0
         },
         {
             "name": "visWidth",
@@ -52,29 +60,29 @@
             "values": [
                 {
                     "id": 0,
-                    "name": "Backup -80 Freezera",
+                    "name": "1. Fearless Wanderer (Main -80C)",
                     "class": "o",
-                    "selected":false,
+                    "selected": false,
                     "x": 135,
-                    "y": 40,
-                    "w": 8,
-                    "h": 8
-                        },
-                {
-                    "id": 1,
-                    "name": "Endy Lab Main -80 Freezer",
-                    "class": "o",
-                    "x": 135,
-                    "selected":true,
                     "y": 30,
                     "w": 8,
                     "h": 8
                         },
                 {
-                    "id": 2,
-                    "name": "Aux 1",
+                    "id": 1,
+                    "name": "2. Wacko Overlord (Backup -80C)",
                     "class": "o",
-                    "selected":false,
+                    "x": 135,
+                    "selected": true,
+                    "y": 40,
+                    "w": 8,
+                    "h": 8
+                        },
+                {
+                    "id": 2,
+                    "name": "3. Irate Mastermind (Walk-in 4C)",
+                    "class": "o",
+                    "selected": false,
                     "x": 135,
                     "y": 50,
                     "w": 8,
@@ -82,15 +90,47 @@
                         },
                 {
                     "id": 3,
-                    "name": "Aux 2",
+                    "name": "4. Bittah Genius (Left -20C)",
                     "class": "o",
-                    "selected":false,
+                    "selected": false,
                     "x": 135,
                     "y": 60,
                     "w": 8,
                     "h": 8
+                        },
+                {
+                    "id": 4,
+                    "name": "5. Lucky Watcher (Right -20C)",
+                    "class": "o",
+                    "selected": false,
+                    "x": 135,
+                    "y": 70,
+                    "w": 8,
+                    "h": 8
                         }
-                  ]
+                  ],
+            "transform": [
+                {
+                    "type": "formula",
+                    "as": "x",
+                    "expr": "datum.x * scale"
+                },
+                {
+                    "type": "formula",
+                    "as": "y",
+                    "expr": "datum.y * scale"
+                },
+                {
+                    "type": "formula",
+                    "as": "w",
+                    "expr": "datum.w * scale"
+                },
+                {
+                    "type": "formula",
+                    "as": "h",
+                    "expr": "datum.h * scale"
+                }
+                ]
                 }
               ],
     "marks": [
@@ -98,8 +138,12 @@
             "description": "Lab Layout",
             "name": "lablayout",
             "type": "group",
-            "width": 200,
-            "height": 100,
+            "width": {
+                "signal": "width"
+            },
+            "height": {
+                "signal": "height"
+            },
             "title": {
                 "text": "Endy Lab"
             },
@@ -112,10 +156,10 @@
                         "value": 0
                     },
                     "width": {
-                        "value": 200
+                        "signal": "width"
                     },
                     "height": {
-                        "value": 100
+                        "signal": "height"
                     }
                 },
                 "update": {
@@ -126,10 +170,10 @@
                         "value": 0
                     },
                     "width": {
-                        "value": 200
+                        "signal": "width"
                     },
                     "height": {
-                        "value": 100
+                        "signal": "height"
                     }
                 }
             },
@@ -151,10 +195,10 @@
                                 "value": 0
                             },
                             "width": {
-                                "value": 200
+                                "signal": "width"
                             },
                             "height": {
-                                "value": 100
+                                "signal": "height"
                             }
                         },
                         "update": {
@@ -187,9 +231,6 @@
                             "height": {
                                 "field": "h"
                             },
-                            "fill": {
-                                "value": "transparent"
-                            },
                             "stroke": [
                                 {
                                     "test": "datum.selected",
@@ -214,7 +255,7 @@
                                 },
                                 {
                                     "test": "datum.class==='o'",
-                                    "value": "white"
+                                    "value": "#60b0ff"
                                 },
                                 {
                                     "value": "#cccccc"
@@ -258,7 +299,7 @@
                                 },
                                 {
                                     "test": "datum.class==='o'",
-                                    "value": "white"
+                                    "value": "#60b0ff"
                                 },
                                 {
                                     "value": "#cccccc"

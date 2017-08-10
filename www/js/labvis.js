@@ -53176,6 +53176,14 @@ module.exports = {
         };
         const setLocationPathBinding = BIONET_VIS.signal.setLocationPath.add(setLocationPath);
 
+        const setFavorites = function (favorites) {
+            //var favorites = modelApi.normalizeLocationPath(id, locationPath)
+            //viewApi.setLocationPath(id, path)
+            //console.log('setFavorites:',JSON.stringify(favorites,null,2))
+            viewApi.setFavorites(favorites);
+        };
+        const setFavoritesBinding = BIONET_VIS.signal.setFavorites.add(setFavorites);
+
         testUpdateView = function (testName) {
             switch (testName) {
                 case 'random':
@@ -53244,6 +53252,7 @@ window.BIONET_VIS = {
         this.signal.setSelectionMode = new MiniSignal();
         this.signal.test = new MiniSignal();
         this.signal.enableLocationPathSections = new MiniSignal();
+        this.signal.setFavorites = new MiniSignal();
 
         const loader = new Loader();
         loader.onError.add(() => {
@@ -53273,109 +53282,106 @@ module.exports = {
         // retrieve location path for id
         // retrieve occupied cell list for each element in location path
     },
+    types: {
+        'lab': {
+            image: 'endylab.png'
+        },
+        '-80 freezer': {
+            xc: 1,
+            yc: 5
+        },
+        '-20 freezer': {
+            xc: 1,
+            yc: 5
+        },
+        '-4 fridge': {
+            xc: 1,
+            yc: 5
+        },
+        'shelf': {
+            xc: 4,
+            yc: 1
+        },
+        'freezer rack': {
+            xc: 5,
+            yc: 4
+        },
+        '5 x 4 freezer rack': {
+            xc: 4,
+            yc: 3
+        },
+        '4 x 3 freezer rack': {
+            xc: 4,
+            yc: 3
+        },
+        '8 x 12 freezer box': {
+            xc: 12,
+            yc: 8
+        },
+        '9 x 9 freezer box': {
+            xc: 9,
+            yc: 9
+        },
+        '10 x 10 freezer box': {
+            xc: 10,
+            yc: 10
+        },
+        'freezer box': {
+            xc: 1,
+            yc: 1
+        },
+        'physical': {
+            image: 'storageTube.png'
+        },
+        'workbench': {
+            image: 'workbench.png'
+        }
+    },
+    typeFromDBType: function (type) {
+        var stype = null;
+        if (type.indexOf('physical') >= 0) {
+            stype = 'tube';
+        }
+        if (type.indexOf('lab') >= 0) {
+            stype = 'lab';
+        } else if (type.indexOf('box') >= 0) {
+            stype = 'box';
+        } else if (type.indexOf('rack') >= 0) {
+            stype = 'rack';
+        } else if (type.indexOf('shelf') >= 0) {
+            stype = 'shelf';
+        } else if (type.indexOf('freezer') >= 0 || type.indexOf('fridge') >= 0) {
+            stype = 'freezer';
+        }
+        return stype;
+    },
+
+    initTuple: function (physical, id) {
+        var x = physical.parent_x;
+        var y = physical.parent_y;
+        cellId = x && y ? Number(x).toString() + "," + Number(y).toString() : physical.name;
+        var tuple = {
+            id: id,
+            class: 'o',
+            name: physical.name,
+            physicalId: physical.id,
+            cellId: cellId,
+            dbData: physical
+        };
+        return tuple;
+    },
+
+    normalizeFavorites: function (favorites) {
+        var normalizedFavorites = [];
+        for (var i = 0; i < favorites.length; i++) {
+            normalizedFavorites.push(this.initTuple(favorites[i], i));
+        }
+        return normalizedFavorites;
+    },
 
     normalizeLocationPath: function (physical_id, bionetPath) {
-        // init path sequence
-
-        const types = {};
-        const initTypeSpecs = function () {
-            types['lab'] = {
-                image: 'endylab.png'
-            };
-            types['-80 freezer'] = {
-                xc: 1,
-                yc: 5
-            };
-            types['-20 freezer'] = {
-                xc: 1,
-                yc: 5
-            };
-            types['-4 fridge'] = {
-                xc: 1,
-                yc: 5
-            };
-            types['shelf'] = {
-                xc: 4,
-                yc: 1
-            };
-            types['freezer rack'] = {
-                xc: 5,
-                yc: 4
-            };
-            types['5 x 4 freezer rack'] = {
-                xc: 4,
-                yc: 3
-            };
-            types['4 x 3 freezer rack'] = {
-                xc: 4,
-                yc: 3
-            };
-            types['8 x 12 freezer box'] = {
-                xc: 12,
-                yc: 8
-            };
-            types['9 x 9 freezer box'] = {
-                xc: 9,
-                yc: 9
-            };
-            types['10 x 10 freezer box'] = {
-                xc: 10,
-                yc: 10
-            };
-            types['freezer box'] = {
-                xc: 1,
-                yc: 1
-            };
-            types['physical'] = {
-                image: 'storageTube.png'
-            };
-            types['workbench'] = {
-                image: 'workbench.png'
-            };
-        };
-        initTypeSpecs();
-
-        const typeFromDBType = function (type) {
-            var stype = null;
-            if (type.indexOf('physical') >= 0) {
-                stype = 'tube';
-            }
-            if (type.indexOf('lab') >= 0) {
-                stype = 'lab';
-            } else if (type.indexOf('box') >= 0) {
-                stype = 'box';
-            } else if (type.indexOf('rack') >= 0) {
-                stype = 'rack';
-            } else if (type.indexOf('shelf') >= 0) {
-                stype = 'shelf';
-            } else if (type.indexOf('freezer') >= 0 || type.indexOf('fridge') >= 0) {
-                stype = 'freezer';
-            }
-            return stype;
-        };
 
         var id = 0;
-        const initTuple = function (physical) {
-            var x = physical.parent_x;
-            var y = physical.parent_y;
-            cellId = x && y ? Number(x).toString() + "," + Number(y).toString() : physical.name;
-
-            var tuple = {
-                id: id,
-                class: 'o',
-                name: physical.name,
-                physicalId: physical.id,
-                cellId: cellId,
-                dbData: physical
-            };
-            if (x && y) {
-                //tuple.x = physical.parent_x
-                //tuple.y = physical.parent_y
-            }
-            id++;
-            return tuple;
-        };
-
         const locationPath = [];
         var prevItemId = null;
         for (var pathId = physical_id; pathId && bionetPath[pathId]; pathId = bionetPath[pathId].parent_id) {
@@ -53384,14 +53390,14 @@ module.exports = {
             for (var i = 0; i < physicalContainer.children.length; i++) {
                 var child = physicalContainer.children[i].value;
                 if (child.parent_id === pathId) {
-                    var tuple = initTuple(child);
+                    var tuple = this.initTuple(child, id++);
                     tuple.selected = tuple.physicalId === prevItemId ? true : false;
                     children.push(tuple);
                 }
             }
-            var containerTuple = initTuple(physicalContainer);
+            var containerTuple = this.initTuple(physicalContainer, id++);
             var type = physicalContainer.type;
-            var typeSpecs = types[type];
+            var typeSpecs = this.types[type];
             if (typeSpecs) {
                 if (typeSpecs.xc) {
                     containerTuple.nx = typeSpecs.xc;
@@ -53401,7 +53407,7 @@ module.exports = {
                 }
             }
             containerTuple.type = type;
-            containerTuple.rootType = typeFromDBType(type);
+            containerTuple.rootType = this.typeFromDBType(type);
             containerTuple.selection = prevItemId;
             containerTuple.children = children;
             locationPath.push(containerTuple);
@@ -53425,6 +53431,10 @@ module.exports = {
         const bionetPath = bionetModel.loadLocationPath(id);
         this.normalizeLocationPath(id, bionetPath);
         return path;
+    },
+
+    normalizeFavorites: function (favorites) {
+        return bionetModel.normalizeFavorites(favorites);
     },
 
     normalizeLocationPath: function (id, bionetPath) {
@@ -53756,6 +53766,7 @@ module.exports = {
     initialize: function (resources) {
         const labSpec = resources.lab.data;
         this.initializeView('lab', 'lab_vis', labSpec, 200, 100);
+        this.initializeView('zoomItemImage', 'zoomItemImage_vis', labSpec, 400, 200);
 
         const storageEntitySpec = resources.storageEntity.data;
         this.initializeView('freezer', 'freezer_vis', storageEntitySpec, 120, 100);
@@ -53780,6 +53791,33 @@ module.exports = {
         this.view[viewId] = vegaView;
     },
 
+    setFavorites: function (favorites) {
+        var normalizedFavorites = modelApi.normalizeFavorites(favorites);
+        var favoritesView = this.getView('favorites');
+        const cellHeight = 25;
+        //var nRows = Math.trunc(favoritesView._height / cellHeight)
+        var nRows = normalizedFavorites.length;
+        var ttable = modelApi.condenseTuples(normalizedFavorites, nRows);
+
+        /*
+        const nTuples = ttable.length
+        var nCols = Math.trunc(nTuples / nRows)
+        if (nTuples % nRows != 0) nCols++
+        var colWidth = Math.min(favoritesView._width / nCols, 200)
+        var width = nCols * colWidth
+        */
+
+        var visFavorites = favoritesView.view;
+        //visTable.signal('colWidth', colWidth)
+        //visTable.signal('width', width)
+        //visTable.signal('height', favoritesView._height)
+        visFavorites.signal('colWidth', 200);
+        visFavorites.signal('title', 'Favorites');
+        visFavorites.signal('width', 200);
+        visFavorites.signal('height', ttable.length * cellHeight);
+        this.update('favorites', 'tree', ttable);
+    },
+
     setLocationPath: function (id, locationPath) {
         const selectType = 'box';
 
@@ -53791,7 +53829,8 @@ module.exports = {
             'shelf': false,
             'rack': false,
             'box': false,
-            'zoomItem': true
+            'zoomItem': true,
+            'zoomItemImage': false
         };
         var rootPath = [];
         var selectedItem = null;
@@ -53819,10 +53858,12 @@ module.exports = {
                 if (cellSize < 15) fontSize = 0;else if (cellSize < 30) fontSize = 7;else if (cellSize > 100) fontSize = 14;
                 index = modelApi.generateTupleIndex(ituples);
                 modelApi.overlayDataset(ituples, item.children, index);
+                visView.signal('transformMethod', transformMethod);
             } else if (item.image) {
                 ituples = view.getData(visView);
                 index = modelApi.generateTupleIndex(ituples, 'name');
                 modelApi.overlayDataset(ituples, item.children, index, 'name');
+                visView.signal('scale', 1);
             }
 
             var width = view._width;
@@ -53834,7 +53875,6 @@ module.exports = {
             visView.signal('height', height);
             visView.signal('visWidth', visWidth);
             visView.signal('fontSize', fontSize);
-            visView.signal('transformMethod', transformMethod);
 
             this.update(rootType, 'tree', ituples);
 
@@ -53876,15 +53916,30 @@ module.exports = {
                     var visViewZoom = zoomView.view;
                     var aspectRatio = view._width / view._height;
                     width = aspectRatio * zoomView._height;
+                    var visWidth = width;
+                    if (rootType === 'freezer') visWidth *= 0.7;
                     visViewZoom.signal('title', item.name);
                     visViewZoom.signal('width', width);
                     visViewZoom.signal('height', zoomView._height);
-                    visViewZoom.signal('visWidth', width);
+                    visViewZoom.signal('visWidth', visWidth);
                     //visViewZoom.signal('fontSize', fontSize)
                     visViewZoom.signal('transformMethod', transformMethod);
                     this.update('zoomItem', 'tree', zoomTuples);
                 } else {
+                    var zoomTuples = JSON.parse(JSON.stringify(ituples));
+                    var zoomView = this.getView('zoomItemImage');
+                    var visViewZoom = zoomView.view;
+                    var scale = 2;
+                    //var aspectRatio = view._width / view._height
+                    //width = aspectRatio * zoomView._height
+                    visViewZoom.signal('title', item.name);
+                    visViewZoom.signal('scale', scale);
+                    //visViewZoom.signal('width', width)
+                    //visViewZoom.signal('height', zoomView._height)
+
                     sectionId.zoomItem = false;
+                    sectionId.zoomItemImage = true;
+                    this.update('zoomItemImage', 'tree', zoomTuples);
                 }
 
                 if (item.selection) {
@@ -53912,14 +53967,16 @@ module.exports = {
         visPath.signal('height', rootPath.length * 25);
         this.update('path', 'tree', pathTable);
 
-        var favoritesView = this.getView('favorites');
-        var visFavorites = favoritesView.view;
-        var favoritesTable = JSON.parse(JSON.stringify(pathTable));
-        visFavorites.signal('colWidth', 200);
-        visFavorites.signal('title', 'Favorites');
-        visFavorites.signal('width', 200);
-        visFavorites.signal('height', rootPath.length * 25);
-        this.update('favorites', 'tree', favoritesTable);
+        /*
+        var favoritesView = this.getView('favorites')
+        var visFavorites = favoritesView.view
+        var favoritesTable = JSON.parse(JSON.stringify(pathTable))
+        visFavorites.signal('colWidth', 200)
+        visFavorites.signal('title', 'Favorites')
+        visFavorites.signal('width', 200)
+        visFavorites.signal('height', rootPath.length * 25)
+        this.update('favorites', 'tree', favoritesTable)
+        */
 
         BIONET_VIS.signal.enableLocationPathSections.dispatch(sectionId);
     },
