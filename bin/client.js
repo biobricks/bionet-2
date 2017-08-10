@@ -2,7 +2,6 @@
 
 var websocket = require('websocket-stream');
 var rpc = require('rpc-multistream'); // RPC and multiple streams over one stream
-var auth = require('rpc-multiauth'); // authentication
 
 var websocketUrl = "ws://localhost:8000";
 
@@ -33,5 +32,14 @@ rpcClient.on('error', function(err) {
 
 rpcClient.on('methods', function (remote) {
 
-  console.log('connected');
+  remote.login({
+    email: 'foo@juul.io',
+    password: 'foobarbaz'
+  }, function(err, token, userData) {
+    if(err) return fail(err);
+
+    console.log("Logged in:", userData);
+    
+  });
+
 });
