@@ -1,0 +1,284 @@
+[
+    {
+        "id": "revco_13.4_upright",
+        "parent": "upright_freezer",
+        "attributes": {
+            "description": "13.4 cu.ft. Upright Freezer",
+            "subdivisions": [4, -5, 1],
+            "volume": {
+                "litre": 379,
+                "cuft": 13.4
+            },
+            "dimensions": {
+                "interior": {
+                    "height": 1280,
+                    "depth": 500,
+                    "width": 600
+                },
+                "exterior": {
+                    "height": 1970,
+                    "depth": 796,
+                    "width": 942
+                }
+            }
+        }
+    },
+    {
+        "id": "revco_17.2_upright",
+        "parent": "upright_freezer",
+        "attributes": {
+            "description": "17.2 cu. ft. Upright Freezer",
+            "subdivisions": [4, -5, 1],
+            "volume": {
+                "litre": 487,
+                "cuft": 17.2
+            },
+            "dimensions": {
+                "interior": {
+                    "height": 1282.7,
+                    "width": 597,
+                    "depth": 635
+                },
+                "exterior": {
+                    "height": 1976.12,
+                    "width": 940,
+                    "depth": 940
+                }
+            }
+        }
+    },
+    {
+        "id": "revco_17.4_upright",
+        "parent": "upright_freezer",
+        "child":"revco_17.4_upright_shelf",
+        "attributes": {
+            "description": "17.4 cu. ft. Upright Freezer",
+            "subdivisions": [1, -5, 1],
+            "volume": {
+                "litre": 492.7,
+                "cuft": 17.4
+            },
+            "dimensions": {
+                "interior": {
+                    "height": 1280,
+                    "depth": 640,
+                    "width": 600
+                },
+                "exterior": {
+                    "height": 1970,
+                    "depth": 935,
+                    "width": 942
+                }
+            }
+        }
+    },
+    {
+        "id": "revco_17.4_upright_shelf",
+        "parent": "freezer_shelf",
+        "child":"rack2_4x5_4in_box",
+        "attributes": {
+            "description": "17.4 cu. ft. Upright Freezer Shelf",
+            "subdivisions": [4, 1, 1],
+            "dimensions": {
+                "exterior": {
+                    "height": 256,
+                    "depth": 640,
+                    "width": 600
+                }
+            }
+        }
+    },
+    {
+        "id": "revco_20.2_upright",
+        "parent": "upright_freezer",
+        "attributes": {
+            "description": "20.2 cu. ft. Upright Freezer",
+            "subdivisions": [5, -5, 1],
+            "volume": {
+                "litre": 572,
+                "cuft": 20.2
+            },
+            "dimensions": {
+                "interior": {
+                    "height": 1280,
+                    "depth": 620,
+                    "width": 720
+                },
+                "exterior": {
+                    "height": 1970,
+                    "depth": 916,
+                    "width": 1070
+                }
+            }
+        }
+    },
+    {
+        "id": "revco_24.4_upright",
+        "parent": "upright_freezer",
+        "attributes": {
+            "description": "24.4 cu. ft. Upright Freezer",
+            "subdivisions": [6, -5, 1],
+            "volume": {
+                "litre": 691,
+                "cuft": 24.4
+            },
+            "dimensions": {
+                "interior": {
+                    "height": 1280,
+                    "depth": 620,
+                    "width": 880
+                },
+                "exterior": {
+                    "height": 1970,
+                    "depth": 916,
+                    "width": 1222
+                }
+            }
+        }
+    },
+    {
+        "id": "revco_3.1_chest",
+        "parent": "chest_freezer",
+        "attributes": {
+            "description": "3.1 cu. ft Chest Freezer",
+            "subdivisions": [3, 1, 3],
+            "volume": {
+                "litre": 88,
+                "cuft": 3.1
+            },
+            "dimensions": {
+                "interior": {
+                    "height": 430,
+                    "depth": 430,
+                    "width": 480
+                },
+                "exterior": {
+                    "height": 1156,
+                    "depth": 760,
+                    "width": 766
+                }
+            }
+        }
+    },
+    {
+        "id": "revco_6.8_chest",
+        "parent": "chest_freezer",
+        "attributes": {
+            "description": "6.8 cu. ft. Chest Freezer",
+            "subdivisions": [4, 1, 3],
+            "volume": {
+                "litre": 193,
+                "cuft": 6.8
+            },
+            "dimensions": {
+                "interior": {
+                    "height": 670,
+                    "depth": 480,
+                    "width": 600
+                },
+                "exterior": {
+                    "height": 1040,
+                    "depth": 808,
+                    "width": 1230
+                }
+            }
+        }
+    },
+    {
+        "id": "revco_10.3_chest",
+        "parent": "chest_freezer",
+        "attributes": {
+            "description": "10.3 cu. ft. Chest Freezer",
+            "subdivisions": [6, 1, 3],
+            "volume": {
+                "litre": 292,
+                "cuft": 10.3
+            },
+            "dimensions": {
+                "interior": {
+                    "height": 670,
+                    "depth": 480,
+                    "width": 900
+                },
+                "exterior": {
+                    "height": 1040,
+                    "depth": 808,
+                    "width": 1530
+                }
+            }
+        }
+    },
+    {
+        "id": "revco_13.7_chest",
+        "parent": "chest_freezer",
+        "attributes": {
+            "description": "13.7 cu. ft. Chest Freezer",
+            "subdivisions": [8, 1, 3],
+            "volume": {
+                "litre": 388,
+                "cuft": 13.7
+            },
+            "dimensions": {
+                "interior": {
+                    "height": 670,
+                    "depth": 480,
+                    "width": 1190
+                },
+                "exterior": {
+                    "height": 1040,
+                    "depth": 808,
+                    "width": 1830
+                }
+            }
+        }
+    },
+    {
+        "id": "revco_17.1_chest",
+        "parent": "upright_freezer",
+        "attributes": {
+            "description": "17.1 cu. ft. Chest Freezer",
+            "subdivisions": [10, 1, 3],
+            "volume": {
+                "litre": 484,
+                "cuft": 17.1
+            },
+            "dimensions": {
+                "interior": {
+                    "height": 670,
+                    "depth": 480,
+                    "width": 1490
+                },
+                "exterior": {
+                    "height": 1040,
+                    "depth": 808,
+                    "width": 2130
+                }
+            }
+        }
+    },
+    {
+        "id": "revco_20.5_chest",
+        "parent": "chest_freezer",
+        "child": "rack_8x1_3in_box",
+        "attributes": {
+            "description": "20.5 cu. ft. Chest Freezer",
+            "subdivisions": [12, 1, 3],
+            "volume": {
+                "litre": 580,
+                "cuft": 20.5
+            },
+            "dimensions": {
+                "interior": {
+                    "height": 670,
+                    "depth": 480,
+                    "width": 1790
+                },
+                "exterior": {
+                    "height": 1040,
+                    "depth": 808,
+                    "width": 2430
+                }
+            }
+        }
+    }
+]

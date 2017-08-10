@@ -1,0 +1,450 @@
+[
+    {
+        "id": "revco_13.4_upright-86C",
+        "parent": "revco_13.4_upright",
+        "attributes": {
+            "description": "Revco Ultima II 13.4cuft -86C Upright Freezer",
+            "temperature": {
+                "min": "-50",
+                "max": "-86"
+            }
+        }
+    },
+    {
+        "id": "ULT-1386-9-A",
+        "parent": "revco_13.4_upright-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1386-9-D",
+        "parent": "revco_13.4_upright-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1386-9-V",
+        "parent": "revco_13.4_upright-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1386-9-W",
+        "parent": "revco_13.4_upright-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "revco_13.4_upright-40C",
+        "parent": "revco_13.4_upright",
+        "attributes": {
+            "description": "Revco Ultima II 13.4cuft -40C Upright Freezer",
+            "temperature": {
+                "min": "-10",
+                "max": "-40"
+            }
+        }
+    },
+    {
+        "id": "ULT-1340-9-A",
+        "parent": "revco_13.4_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1340-9-D",
+        "parent": "revco_13.4_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1340-9-V",
+        "parent": "revco_13.4_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1340-9-W",
+        "parent": "revco_13.4_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "revco_17.2_upright-40C",
+        "parent": "revco_17.2_upright",
+        "attributes": {
+            "description": "Revco Ultima II 17.2cuft -40C Upright Freezer",
+            "temperature": {
+                "min": "-10",
+                "max": "-40"
+            }
+        }
+    },
+    {
+        "id": "ULT-1740-9-A",
+        "parent": "revco_17.2_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1740-9-D",
+        "parent": "revco_17.2_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1740-9-V",
+        "parent": "revco_17.2_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1740-9-W",
+        "parent": "revco_17.2_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "revco_17.4_upright-86C",
+        "parent": "revco_17.4_upright",
+        "attributes": {
+            "description": "Revco Ultima Plus 17.4 cf -86C Upright Freezer",
+            "temperature": {
+                "min": "-50",
+                "max": "-86"
+            }
+        }
+    },
+    {
+        "id": "ULT1786-10-D46",
+        "parent": "revco_17.4_upright-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "revco_20.2_upright-40C",
+        "parent": "revco_20.2_upright",
+        "attributes": {
+            "description": "Revco Ultima II 20.2cuft -40C Upright Freezer",
+            "temperature": {
+                "min": "-10",
+                "max": "-40"
+            }
+        }
+    },
+    {
+        "id": "ULT-2140-9-A",
+        "parent": "revco_20.2_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-2140-9-D",
+        "parent": "revco_20.2_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-2140-9-V",
+        "parent": "revco_20.2_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-2140-9-W",
+        "parent": "revco_20.2_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "revco_24.4_upright-40C",
+        "parent": "revco_24.4_upright",
+        "attributes": {
+            "description": "Revco Ultima II 24.4cuft -40C Upright Freezer",
+            "temperature": {
+                "min": "-10",
+                "max": "-40"
+            }
+        }
+    },
+    {
+        "id": "ULT-2540-9-A",
+        "parent": "revco_24.4_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-2540-9-D",
+        "parent": "revco_24.4_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-2540-9-V",
+        "parent": "revco_24.4_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-2540-9-W",
+        "parent": "revco_24.4_upright-40C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+
+    {
+        "id": "revco_3.1_chest-86C",
+        "parent": "revco_3.1_chest",
+        "attributes": {
+            "description": "Revco Ultima II 3.1cuft -86C Chest Freezer",
+            "temperature": {
+                "min": "-40",
+                "max": "-86"
+            }
+        }
+    },
+    {
+        "id": "ULT-390-9-A",
+        "parent": "revco_3.1_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-390-9-D",
+        "parent": "revco_3.1_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-390-9-V",
+        "parent": "revco_3.1_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-390-9-W",
+        "parent": "revco_3.1_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "revco_6.8_chest-86C",
+        "parent": "revco_6.8_chest",
+        "attributes": {
+            "description": "Revco Ultima II 6.8cuft -86C Chest Freezer",
+            "temperature": {
+                "min": "-40",
+                "max": "-86"
+            }
+        }
+    },
+    {
+        "id": "ULT-790-9-A",
+        "parent": "revco_6.8_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-790-9-D",
+        "parent": "revco_6.8_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-790-9-V",
+        "parent": "revco_6.8_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-790-9-W",
+        "parent": "revco_6.8_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "revco_10.3_chest-86C",
+        "parent": "revco_10.3_chest",
+        "attributes": {
+            "description": "Revco Ultima II 10.3cuft -86C Chest Freezer",
+            "temperature": {
+                "min": "-40",
+                "max": "-86"
+            }
+        }
+    },
+    {
+        "id": "ULT-1090-9-A",
+        "parent": "revco_10.3_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1090-9-D",
+        "parent": "revco_10.3_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1090-9-V",
+        "parent": "revco_10.3_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1090-9-W",
+        "parent": "revco_10.3_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "revco_13.7_chest-86C",
+        "parent": "revco_13.7_chest",
+        "attributes": {
+            "description": "Revco Ultima II 13.7cuft -86C Chest Freezer",
+            "temperature": {
+                "min": "-40",
+                "max": "-86"
+            }
+        }
+    },
+    {
+        "id": "ULT-1490-9-A",
+        "parent": "revco_13.7_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1490-9-D",
+        "parent": "revco_13.7_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1490-9-V",
+        "parent": "revco_13.7_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1490-9-W",
+        "parent": "revco_13.7_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "revco_17.1_chest-86C",
+        "parent": "revco_17.1_chest",
+        "attributes": {
+            "description": "Revco Ultima II 17.1cuft -86C Chest Freezer",
+            "temperature": {
+                "min": "-40",
+                "max": "-86"
+            }
+        }
+    },
+    {
+        "id": "ULT-1790-9-A",
+        "parent": "revco_13.7_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1790-9-D",
+        "parent": "revco_13.7_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1790-9-V",
+        "parent": "revco_13.7_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-1790-9-W",
+        "parent": "revco_13.7_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "revco_20.5_chest-86C",
+        "parent": "revco_20.5_chest",
+        "attributes": {
+            "description": "Revco Ultima II 20.5cuft -86C Chest Freezer",
+            "temperature": {
+                "min": "-40",
+                "max": "-86"
+            }
+        }
+    },
+    {
+        "id": "ULT-2090-9-A",
+        "parent": "revco_20.5_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-2090-9-D",
+        "parent": "revco_20.5_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-2090-9-V",
+        "parent": "revco_20.5_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    },
+    {
+        "id": "ULT-2090-9-W",
+        "parent": "revco_20.5_chest-86C",
+        "attributes": {
+            "description": "Revco "
+        }
+    }
+]

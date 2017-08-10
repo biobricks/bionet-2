@@ -1,0 +1,203 @@
+[
+    {
+        "id": "freezer",
+        "attributes": {
+            "description": "Freezer",
+            "rootId": "freezer"
+        }
+    },
+    {
+        "id": "upright_freezer",
+        "parent": "freezer",
+        "child": "freezer_shelf",
+        "attributes": {
+            "description": "Upright freezer"
+        }
+    },
+    {
+        "id": "chest_freezer",
+        "parent": "freezer",
+        "child": "chest_freezer_rack",
+        "attributes": {
+            "description": "Chest freezer"
+        }
+    },
+    {
+        "id": "shelf",
+        "attributes": {
+            "description": "Shelf",
+            "rootId": "shelf"
+        }
+    },
+    {
+        "id": "freezer_shelf",
+        "parent": "shelf",
+        "child": "upright_freezer_rack",
+        "attributes": {
+            "description": "Freezer shelf"
+        }
+    },
+    {
+        "id": "rack",
+        "attributes": {
+            "description": "Rack",
+            "rootId": "rack"
+        }
+    },
+    {
+        "id": "upright_freezer_rack",
+        "parent": "rack",
+        "attributes": {
+            "description": "Upright freezer rack"
+        }
+    },
+    {
+        "id": "chest_freezer_rack",
+        "parent": "rack",
+        "attributes": {
+            "description": "Chest freezer rack"
+        }
+    },
+    {
+        "id": "upright_freezer_rack_2in_box",
+        "parent": "upright_freezer_rack",
+        "child": "2in_box",
+        "attributes": {
+            "description": "Upright freezer rack 2 inch box"
+        }
+    },
+    {
+        "id": "upright_freezer_rack_3in_box",
+        "parent": "upright_freezer_rack",
+        "child": "3in_box",
+        "attributes": {
+            "description": "Upright freezer rack 3 inch box"
+        }
+    },
+    {
+        "id": "upright_freezer_rack_4in_box",
+        "parent": "upright_freezer_rack",
+        "child": "4in_box",
+        "attributes": {
+            "description": "Upright freezer rack 4 inch box"
+        }
+    },
+    {
+        "id": "chest_freezer_rack_2in_box",
+        "parent": "chest_freezer_rack",
+        "child": "2in_box",
+        "attributes": {
+            "description": "Chest freezer rack 2 inch box"
+        }
+    },
+    {
+        "id": "chest_freezer_rack_3in_box",
+        "parent": "chest_freezer_rack",
+        "child": "3in_box",
+        "attributes": {
+            "description": "Chest freezer rack 3 inch box"
+        }
+    },
+    {
+        "id": "chest_freezer_rack_4in_box",
+        "parent": "chest_freezer_rack",
+        "child": "4in_box",
+        "attributes": {
+            "description": "Chest freezer rack 4 inch box"
+        }
+    },
+    {
+        "id": "box",
+        "attributes": {
+            "description": "Box",
+            "rootId": "box"
+        }
+    },
+    {
+        "id": "tube",
+        "attributes": {
+            "description": "Tube",
+            "rootId": "tube"
+        }
+    },
+    {
+        "id": "2in_box",
+        "parent": "box",
+        "attributes": {
+            "description": "2 inch box"
+        }
+    },
+    {
+        "id": "3in_box",
+        "parent": "box",
+        "attributes": {
+            "description": "3 inch box"
+        }
+    },
+    {
+        "id": "4in_box",
+        "parent": "box",
+        "attributes": {
+            "description": "4 inch box",
+            "dimensions": {
+                "exterior": {
+                    "height": 50,
+                    "depth": 102,
+                    "width": 102
+                }
+            }
+        }
+    },
+    {
+        "id": "shelving_unit",
+        "child": "shelf",
+        "attributes": {
+            "description": "Shelving unit",
+            "rootId": "shelving_unit"
+        }
+    },
+    {
+        "id": "cabinet",
+        "child": "shelf",
+        "attributes": {
+            "description": "Cabinet",
+            "rootId": "cabinet"
+        }
+    },
+    {
+        "id": "drawer_unit",
+        "child": "drawer",
+        "attributes": {
+            "description": "Drawer Unit",
+            "rootId": "drawer_unit"
+        }
+    },
+    {
+        "id": "drawer",
+        "attributes": {
+            "description": "Drawer",
+            "rootId": "drawer"
+        }
+    },
+    {
+        "id": "bin",
+        "attributes": {
+            "description": "Bin",
+            "rootId": "bin"
+        }
+    },
+    {
+        "id": "room",
+        "attributes": {
+            "description": "Room",
+            "rootId": "room"
+        }
+    },
+    {
+        "id": "walk_in_freezer",
+        "parent": "room",
+        "attributes": {
+            "description": "Walk in freezer"
+        }
+    }
+]

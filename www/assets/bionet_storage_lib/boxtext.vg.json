@@ -1,0 +1,278 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+    "width": {"signal": "width"},
+    "height": {"signal": "height"},
+    "padding": 0,
+    "innerPadding":5,
+    "title": {
+        "text": {"signal": "title"},
+        "fontSize": 30,
+        "anchor":"start",
+        "titleFontSize": 40
+    },
+    "autosize": "pad",
+    "signals": [
+        {
+            "name": "title",
+            "value": "List"
+        },
+        {
+            "name": "width",
+            "value": 600
+        },
+        {
+            "name": "height",
+            "value": 350
+        },
+        {
+            "name": "colWidth",
+            "value": 150
+        }
+    ],
+    "data": [
+        {
+            "name": "config",
+            "values": [
+                {
+                    "id": 0,
+                    "title": "Main -80 Freezer",
+                    "currentSelection": 15,
+                    "data": {
+                        "id": "p1234",
+                        "name": "Main -80 Freezer"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "tree",
+            "values": [
+                {
+                    "id": 0
+                }
+            ],
+
+            "transform": [
+                {
+                    "type": "stratify",
+                    "key": "id",
+                    "parentKey": "parent"
+                },
+                {
+                    "type": "treemap",
+                    "field": "size",
+                    "round": true,
+                    "method": "slicedice",
+                    "ratio": 0.25,
+                    "paddingInner":2,
+                    "size": [{
+                        "signal": "width"
+                    }, {
+                        "signal": "height"
+                    }]
+        }
+      ]
+    },
+        {
+            "name": "nodes",
+            "source": "tree",
+            "transform": [{
+                "type": "filter",
+                "expr": "!datum.class"
+            }]
+    },
+        {
+            "name": "cells",
+            "source": "tree",
+            "transform": [{
+                "type": "filter",
+                "expr": "datum.class"
+            }]
+    }
+  ],
+
+    "scales": [
+        {
+            "name": "color",
+            "type": "ordinal",
+            "range": [
+        "#3182bd", "#6baed6", "#9ecae1", "#c6dbef", "#e6550d",
+        "#fd8d3c", "#fdae6b", "#fdd0a2", "#31a354", "#74c476",
+        "#a1d99b", "#c7e9c0", "#756bb1", "#9e9ac8", "#bcbddc",
+        "#dadaeb", "#636363", "#969696", "#bdbdbd", "#d9d9d9"
+      ]
+    },
+        {
+            "name": "size",
+            "type": "ordinal",
+            "domain": [0, 1, 2, 3, 4, 5, 6],
+            "range": [256, 14, 14, 14,14,14]
+    },
+        {
+            "name": "opacity",
+            "type": "ordinal",
+            "domain": [0, 1, 2, 3],
+            "range": [0.15, 0.5, 0.8, 1.0]
+    }
+  ],
+
+    "marks": [
+        {
+            "type": "rect",
+            "from": {
+                "data": "tree"
+            },
+            "interactive": false,
+            "encode": {
+                "enter": {
+                    "fill": {
+                        "value": "transparent"
+                    },
+                    "stroke": {
+                        "value": "transparent"
+                    }
+                },
+                "update": {
+                    "x": {
+                        "field": "x0"
+                    },
+                    "y": {
+                        "field": "y0"
+                    },
+                    "x2": {
+                        "field": "x1"
+                    },
+                    "y2": {
+                        "field": "y1"
+                    }
+                }
+            }
+    },
+        {
+            "type": "rect",
+            "from": {
+                "data": "cells"
+            },
+            "encode": {
+                "enter": {
+                    "stroke": [
+                        {
+                            "test": "datum.selected",
+                            "value": "#404040"
+                        },
+                        {
+                            "value": "transparent"
+                        }],
+                    "strokeWidth": [
+                        {
+                            "test": "datum.selected",
+                            "value": 2
+                        },
+                        {
+                            "value": 1
+                        }],
+                    "fill": [
+                        {
+                            "test": "datum.selected",
+                            "value": "#00ffff"
+                        },
+                        {
+                            "test": "datum.class==='o'",
+                            "value": "#eeeeee"
+                        },
+                        {
+                            "value": "transparent"
+                        }]
+                },
+                "update": {
+                    "x": {
+                        "field": "x0"
+                    },
+                    "y": {
+                        "field": "y0"
+                    },
+                    "x2": {
+                        "field": "x1"
+                    },
+                    "y2": {
+                        "field": "y1"
+                    },
+                    "stroke": [
+                        {
+                            "test": "datum.selected",
+                            "value": "#404040"
+                        },
+                        {
+                            "value": "transparent"
+                        }],
+                    "strokeWidth": [
+                        {
+                            "test": "datum.selected",
+                            "value": 2
+                        },
+                        {
+                            "value": 1
+                        }],
+                    "fill": [
+                        {
+                            "test": "datum.selected",
+                            "value": "#00ffff"
+                        },
+                        {
+                            "test": "datum.class==='o'",
+                            "value": "#eeeeee"
+                        },
+                        {
+                            "value": "transparent"
+                        }]
+                },
+                "hover": {
+                    "fill": {
+                        "value": "#00d0ff"
+                    }
+                }
+            }
+    },
+        {
+            "type": "text",
+            "from": {
+                "data": "cells"
+            },
+            "interactive": false,
+            "encode": {
+                "enter": {
+                    "font": {
+                        "value": "Helvetica Neue, Arial"
+                    },
+                    "align": {
+                        "value": "left"
+                    },
+                    "baseline": {
+                        "value": "middle"
+                    },
+                    "fill": {
+                        "value": "#000"
+                    },
+                    "text": {
+                        "field": "name"
+                    },
+                    "limit": {
+                        "signal":"colWidth-10"
+                    },
+                    "fontSize": {
+                        "scale": "size",
+                        "field": "depth"
+                    }
+                },
+                "update": {
+                    "x": {
+                        "signal": "5+datum.x0"
+                    },
+                    "y": {
+                        "signal": "0.5 * (datum.y0 + datum.y1)"
+                    }
+                }
+            }
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+[{
+        "id": "rack_4x3_2in_box",
+        "parent": "upright_freezer_rack_2in_box",
+        "attributes": {
+            "description": "Adjustable Side Access Rack",
+            "subdivisions": [4, 3, 1],
+            "dimensions": {
+                "exterior": {
+                    "height": 239,
+                    "depth": 419,
+                    "width": 137
+                }
+            }
+        }
+}, {
+    "id": "rack_3x3_3in_box",
+    "parent": "upright_freezer_rack_3in_box",
+    "attributes": {
+        "description": "Side Access Rack",
+        "subdivisions": [3, 3, 1],
+        "dimensions": {
+            "exterior": {
+                "height": 239,
+                "depth": 419,
+                "width": 137
+            }
+        }
+    }
+}, {
+    "id": "rack_8x2_2in_box",
+    "parent": "upright_freezer_rack_2in_box",
+    "attributes": {
+        "description": "Adjustable Side Access Rack",
+        "subdivisions": [8, 2, 1],
+        "dimensions": {
+            "exterior": {
+                "height": 239,
+                "depth": 561,
+                "width": 137
+            }
+        }
+    }
+}, {
+    "id": "rack_4x3_3in_box",
+    "parent": "upright_freezer_rack_3in_box",
+    "attributes": {
+        "description": "Side Access Rack",
+        "subdivisions": [4, 3, 1],
+        "dimensions": {
+            "exterior": {
+                "height": 239,
+                "depth": 561,
+                "width": 137
+            }
+        }
+    }
+}, {
+    "id": "rack2_4x3_3in_box",
+    "parent": "upright_freezer_rack_3in_box",
+    "attributes": {
+        "description": "Side Access Rack",
+        "subdivisions": [4, 3, 1],
+        "dimensions": {
+            "exterior": {
+                "height": 240,
+                "depth": 559,
+                "width": 140
+            }
+        }
+    }
+}, {
+    "id": "rack2_4x5_4in_box",
+    "parent": "upright_freezer_rack_4in_box",
+    "attributes": {
+        "description": "Side Access Rack",
+        "subdivisions": [5, 4, 1],
+        "dimensions": {
+            "exterior": {
+                "height": 240,
+                "depth": 559,
+                "width": 140
+            }
+        }
+    }
+}, {
+    "id": "rack_sliding_8x2_2in_box",
+    "parent": "upright_freezer_rack_2in_box",
+    "attributes": {
+        "description": "Sliding Drawer Rack",
+        "subdivisions": [8, 2, 1],
+        "dimensions": {
+            "exterior": {
+                "height": 239,
+                "depth": 559,
+                "width": 140
+            }
+        }
+    }
+}, {
+    "id": "rack_sliding_4x3_2in_box",
+    "parent": "upright_freezer_rack_2in_box",
+    "attributes": {
+        "description": "Sliding Drawer Rack",
+        "subdivisions": [4, 3, 1],
+        "dimensions": {
+            "exterior": {
+                "height": 239,
+                "depth": 442,
+                "width": 140
+            }
+        }
+    }
+}, {
+    "id": "rack_12x1_2in_box",
+    "parent": "chest_freezer_rack_2in_box",
+    "attributes": {
+        "description": "12 x 1 2 in. Box Rack",
+        "subdivisions": [1, 12, 1],
+        "dimensions": {
+            "exterior": {
+                "height": 637,
+                "depth": 140,
+                "width": 140
+            }
+        }
+    }
+}, {
+    "id": "rack_7x1_2in_box",
+    "parent": "chest_freezer_rack_2in_box",
+    "attributes": {
+        "description": "7 x 1 2 in. Box Rack",
+        "subdivisions": [1, 7, 1],
+        "dimensions": {
+            "exterior": {
+                "height": 406,
+                "depth": 140,
+                "width": 140
+            }
+        }
+    }
+}, {
+    "id": "rack_5x1_3in_box",
+    "parent": "chest_freezer_rack_3in_box",
+    "attributes": {
+        "description": "5 x 1 3 in. Box Rack",
+        "subdivisions": [1, 5, 1],
+        "dimensions": {
+            "exterior": {
+                "height": 406,
+                "depth": 140,
+                "width": 140
+            }
+        }
+    }
+}, {
+    "id": "rack_8x1_3in_box",
+    "parent": "chest_freezer_rack_3in_box",
+    "attributes": {
+        "description": "8 x 1 3 in. Box Rack",
+        "subdivisions": [1, 8, 1],
+        "dimensions": {
+            "exterior": {
+                "height": 673,
+                "depth": 140,
+                "width": 140
+            }
+        }
+    }
+}]

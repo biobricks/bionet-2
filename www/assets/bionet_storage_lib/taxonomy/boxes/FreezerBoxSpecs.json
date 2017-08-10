@@ -1,0 +1,100 @@
+[{
+        "id": "2in_box_fiberboard",
+        "parent": "2in_box",
+        "child": "tube",
+        "attributes": {
+            "description": "2 in. Box, Fiberboard",
+            "dimensions": {
+                "exterior": {
+                    "height": 50,
+                    "depth": 51,
+                    "width": 51
+                }
+            },
+            "subdivisions": [1, 1, 1]
+        }
+},
+    {
+        "id": "3in_box_fiberboard",
+        "parent": "3in_box",
+        "child": "tube",
+        "attributes": {
+            "description": "3 in. Box, Fiberboard",
+            "dimensions": {
+                "exterior": {
+                    "height": 50,
+                    "depth": 77,
+                    "width": 77
+                }
+            },
+            "subdivisions": [1, 1, 1]
+        }
+},
+    {
+        "id": "4in_box_fiberboard",
+        "parent": "4in_box",
+        "child": "tube",
+        "attributes": {
+            "description": "4 in. Box, Fiberboard",
+            "dimensions": {
+                "exterior": {
+                    "height": 50,
+                    "depth": 102,
+                    "width": 102
+                }
+            },
+            "subdivisions": [1, 1, 1]
+        }
+},
+    {
+        "id": "4in_box_fiberboard_10x10",
+        "parent": "4in_box_fiberboard",
+        "child": "tube",
+        "attributes": {
+            "description": "4 in. Box, Fiberboard 10x10",
+            "subdivisions": [10, 10, 1]
+        }
+},
+    {
+        "id": "4in_box_fiberboard_9x9",
+        "parent": "4in_box_fiberboard",
+        "child": "tube",
+        "attributes": {
+            "description": "4 in. Box, Fiberboard 9x9",
+            "subdivisions": [9, 9, 1]
+        }
+},
+    {
+        "id": "2in_box_polycarbonate",
+        "parent": "2in_box",
+        "child": "tube",
+        "attributes": {
+            "storageChildren": ["tube"],
+            "description": "2 in. Box, Polycarbonate",
+            "dimensions": {
+                "exterior": {
+                    "height": 51,
+                    "depth": 51,
+                    "width": 51
+                }
+            },
+            "subdivisions": [1, 1, 1]
+        }
+},
+    {
+        "id": "3in_box_polycarbonate",
+        "parent": "3in_box",
+        "child": "tube",
+        "attributes": {
+            "storageChildren": ["tube"],
+            "description": "3 in. Box, Polycarbonate",
+            "dimensions": {
+                "exterior": {
+                    "height": 51,
+                    "depth": 80,
+                    "width": 80
+                }
+            },
+            "subdivisions": [1, 1, 1]
+        }
+}]

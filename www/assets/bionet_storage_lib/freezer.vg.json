@@ -1,0 +1,289 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v3.0.0-rc6.json",
+    "width": {
+        "signal": "width"
+    },
+    "height": {
+        "signal": "height"
+    },
+    "padding": {
+        "left": 0,
+        "top": 0,
+        "right": 5,
+        "bottom": 0
+    },
+    "title": {
+        "text": {
+            "signal": "title"
+        }
+    },
+    "signals": [
+        {
+            "name": "title",
+            "value": "Rack"
+        },
+        {
+            "name": "width",
+            "value": 100
+        },
+        {
+            "name": "height",
+            "value": 100
+        },
+        {
+            "name": "visWidth",
+            "value": 100
+        },
+        {
+            "name": "transformMethod",
+            "value": "slicedice"
+        },
+        {
+            "name": "fontSize",
+            "value": 10
+        }
+    ],
+    "data": [
+        {
+            "name": "config",
+            "values": [
+                {
+                    "id": 0,
+                    "title": "Main -80 Freezer",
+                    "currentSelection": 3,
+                    "data": {
+                        "id": "p1234",
+                        "name": "Main -80 Freezer"
+                    }
+                }
+            ]
+        },
+
+        {
+            "name": "tree",
+            "values": [{
+                    "id": 0
+            }],
+            "transform": [
+                {
+                    "type": "stratify",
+                    "key": "id",
+                    "parentKey": "parent"
+        },
+                {
+                    "type": "treemap",
+                    "field": "size",
+                    "round": true,
+                    "method": {
+                        "signal": "transformMethod"
+                    },
+                    "ratio": 1,
+                    "size": [{
+                        "signal": "visWidth"
+                    }, {
+                        "signal": "height"
+                    }]
+        }
+      ]
+    },
+        {
+            "name": "nodes",
+            "source": "tree",
+            "transform": [{
+                "type": "filter",
+                "expr": "!datum.class"
+            }]
+    },
+        {
+            "name": "cells",
+            "source": "tree",
+            "transform": [{
+                "type": "filter",
+                "expr": "datum.class"
+            }]
+    }
+  ],
+
+    "scales": [
+        {
+            "name": "color",
+            "type": "ordinal",
+            "range": [
+        "#3182bd", "#6baed6", "#9ecae1", "#c6dbef", "#e6550d",
+        "#fd8d3c", "#fdae6b", "#fdd0a2", "#31a354", "#74c476",
+        "#a1d99b", "#c7e9c0", "#756bb1", "#9e9ac8", "#bcbddc",
+        "#dadaeb", "#636363", "#969696", "#bdbdbd", "#d9d9d9"
+      ]
+    },
+        {
+            "name": "size",
+            "type": "ordinal",
+            "domain": [0, 1, 2, 3],
+            "range": [256, 14, 14, 7]
+    },
+        {
+            "name": "opacity",
+            "type": "ordinal",
+            "domain": [0, 1, 2, 3],
+            "range": [0.15, 0.5, 0.8, 1.0]
+    }
+  ],
+    "marks": [
+        {
+            "description": "Freezer layout",
+            "name": "freezerlayout",
+            "type": "group",
+            "width": {
+                "signal": "visWidth"
+            },
+            "height": {
+                "signal": "height"
+            },
+
+            "marks": [
+                {
+                    "type": "rect",
+                    "from": {
+                        "data": "nodes"
+                    },
+                    "interactive": false,
+                    "encode": {
+                        "enter": {
+                            "fill": {
+                                "value": "transparent"
+                            },
+                            "stroke": {
+                                "value": "transparent"
+                            }
+                        },
+                        "update": {
+                            "x": {
+                                "field": "x0"
+                            },
+                            "y": {
+                                "field": "y0"
+                            },
+                            "x2": {
+                                "field": "x1"
+                            },
+                            "y2": {
+                                "field": "y1"
+                            }
+                        }
+                    }
+    },
+                {
+                    "type": "rect",
+                    "from": {
+                        "data": "cells"
+                    },
+                    "encode": {
+                        "enter": {
+                            "stroke": {
+                                "value": "#404040"
+                            },
+                            "strokeWidth": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": 2
+                                },
+                                {
+                                    "value": 1
+                        }],
+                            "fill": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#00ffff"
+                                },
+                                {
+                                    "test": "datum.class==='o'",
+                                    "value": "white"
+                                },
+                                {
+                                    "value": "#cccccc"
+                        }]
+                        },
+                        "update": {
+                            "x": {
+                                "field": "x0"
+                            },
+                            "y": {
+                                "field": "y0"
+                            },
+                            "x2": {
+                                "field": "x1"
+                            },
+                            "y2": {
+                                "field": "y1"
+                            },
+                            "fill": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#00ffff"
+                                },
+                                {
+                                    "test": "datum.class==='o'",
+                                    "value": "white"
+                                },
+                                {
+                                    "value": "#cccccc"
+                        }],
+                            "strokeWidth": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": 2
+                                },
+                                {
+                                    "value": 1
+                        }]
+                        },
+                        "hover": {
+                            "fill": {
+                                "value": "#00d0ff"
+                            }
+                        }
+                    }
+    },
+                {
+                    "type": "text",
+                    "from": {
+                        "data": "cells"
+                    },
+                    "interactive": false,
+                    "encode": {
+                        "enter": {
+                            "font": {
+                                "value": "Helvetica Neue, Arial"
+                            },
+                            "align": {
+                                "value": "center"
+                            },
+                            "baseline": {
+                                "value": "middle"
+                            },
+                            "fill": {
+                                "value": "#000"
+                            },
+                            "text": {
+                                "field": "cellLabel"
+                            },
+                            "fontSize": {
+                                "signal": "fontSize"
+                            }
+                        },
+                        "update": {
+                            "x": {
+                                "signal": "0.5 * (datum.x0 + datum.x1)"
+                            },
+                            "y": {
+                                "signal": "0.5 * (datum.y0 + datum.y1)"
+                            },
+                            "fontSize": {
+                                "signal": "fontSize"
+                            }
+                        }
+                    }
+    }
+  ]
+        }]
+}

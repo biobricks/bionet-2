@@ -1,0 +1,376 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+    "width": {"signal": "width"},
+    "height": {"signal": "height"},
+    "padding": 0,
+    "autosize": "pad",
+    "signals": [
+        {
+            "name": "title",
+            "value": "Lab"
+        },
+        {
+            "name": "width",
+            "value": 200
+        },
+        {
+            "name": "height",
+            "value": 100
+        },
+        {
+            "name": "visWidth",
+            "value": 100
+        },
+        {
+            "name": "transformMethod",
+            "value": "slicedice"
+        },
+        {
+            "name": "fontSize",
+            "value": 10
+        }
+    ],
+    "data": [
+        {
+            "name": "config",
+            "values": [
+                {
+                    "id": 0,
+                    "text": {
+                        "signal": "title"
+                    },
+                    "currentSelection": 1,
+                    "data": {
+                        "id": "p1234",
+                        "name": "Main -80 Freezer"
+                    }
+                        }
+                    ]
+                },
+        {
+            "name": "tree",
+            "values": [
+                {
+                    "id": 0,
+                    "name": "Backup -80 Freezera",
+                    "class": "o",
+                    "selected":false,
+                    "x": 135,
+                    "y": 40,
+                    "w": 8,
+                    "h": 8
+                        },
+                {
+                    "id": 1,
+                    "name": "Endy Lab Main -80 Freezer",
+                    "class": "o",
+                    "x": 135,
+                    "selected":true,
+                    "y": 30,
+                    "w": 8,
+                    "h": 8
+                        },
+                {
+                    "id": 2,
+                    "name": "Aux 1",
+                    "class": "o",
+                    "selected":false,
+                    "x": 135,
+                    "y": 50,
+                    "w": 8,
+                    "h": 8
+                        },
+                {
+                    "id": 3,
+                    "name": "Aux 2",
+                    "class": "o",
+                    "selected":false,
+                    "x": 135,
+                    "y": 60,
+                    "w": 8,
+                    "h": 8
+                        }
+                  ]
+                }
+              ],
+    "marks": [
+        {
+            "description": "Lab Layout",
+            "name": "lablayout",
+            "type": "group",
+            "width": 200,
+            "height": 100,
+            "title": {
+                "text": "Endy Lab"
+            },
+            "encode": {
+                "enter": {
+                    "x": {
+                        "value": 0
+                    },
+                    "y": {
+                        "value": 0
+                    },
+                    "width": {
+                        "value": 200
+                    },
+                    "height": {
+                        "value": 100
+                    }
+                },
+                "update": {
+                    "x": {
+                        "value": 0
+                    },
+                    "y": {
+                        "value": 0
+                    },
+                    "width": {
+                        "value": 200
+                    },
+                    "height": {
+                        "value": 100
+                    }
+                }
+            },
+            "marks": [
+                {
+                    "type": "image",
+                    "encode": {
+                        "enter": {
+                            "url": {
+                                "value": "static/assets/bionet_storage_lib/endylab.svg"
+                            },
+                            "opacity": {
+                                "value": 1
+                            },
+                            "x": {
+                                "value": 0
+                            },
+                            "y": {
+                                "value": 0
+                            },
+                            "width": {
+                                "value": 200
+                            },
+                            "height": {
+                                "value": 100
+                            }
+                        },
+                        "update": {
+                            "x": {
+                                "value": 0
+                            },
+                            "y": {
+                                "value": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "type": "rect",
+                    "from": {
+                        "data": "tree"
+                    },
+                    "interactive": true,
+                    "encode": {
+                        "enter": {
+                            "x": {
+                                "field": "x"
+                            },
+                            "y": {
+                                "field": "y"
+                            },
+                            "width": {
+                                "field": "w"
+                            },
+                            "height": {
+                                "field": "h"
+                            },
+                            "fill": {
+                                "value": "transparent"
+                            },
+                            "stroke": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#ff0000"
+                                },
+                                {
+                                    "value": "#404040"
+                                }
+                            ],
+                            "strokeWidth": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": 4
+                                },
+                                {
+                                    "value": 2
+                                }],
+                            "fill": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#00ffff"
+                                },
+                                {
+                                    "test": "datum.class==='o'",
+                                    "value": "white"
+                                },
+                                {
+                                    "value": "#cccccc"
+                            }
+                            ]
+                        },
+                        "update": {
+                            "stroke": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#ff0000"
+                                },
+                                {
+                                    "value": "#404040"
+                                }
+                            ],
+                            "x": {
+                                "field": "x"
+                            },
+                            "y": {
+                                "field": "y"
+                            },
+                            "width": {
+                                "field": "w"
+                            },
+                            "height": {
+                                "field": "h"
+                            },
+                            "strokeWidth": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": 4
+                                },
+                                {
+                                    "value": 2
+                                }],
+                            "fill": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#00ffff"
+                                },
+                                {
+                                    "test": "datum.class==='o'",
+                                    "value": "white"
+                                },
+                                {
+                                    "value": "#cccccc"
+                            }]
+                        }
+                    }
+                },
+                {
+                    "type": "text",
+                    "from": {
+                        "data": "tree"
+                    },
+                    "interactive": false,
+                    "encode": {
+                        "update": {
+                            "font": {
+                                "value": "Helvetica Neue, Arial"
+                            },
+                            "align": {
+                                "value": "center"
+                            },
+                            "baseline": {
+                                "value": "middle"
+                            },
+                            "fill": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#000"
+                                },
+                                {
+                                    "value": "transparent"
+                                }
+                            ],
+                            "text": {
+                                "field": "name"
+                            },
+                            "fontSize": {
+                                "value": 14
+                            },
+                            "x": {
+                                "value": 100
+                            },
+                            "y": {
+                                "value": 100
+                            }
+                        }
+                    }
+                },
+                {
+                    "type": "line",
+                    "from": {
+                        "data": "tree"
+                    },
+                    "interactive": false,
+                    "encode": {
+                        "enter": {
+                            "x": [{
+                                    "test": "datum.selected",
+                                    "field": "x"
+                            },
+                                {
+                                    "value": 100
+                                }
+                            ],
+                            "y": [{
+                                    "test": "datum.selected",
+                                    "field": "y"
+                            },
+                                {
+                                    "value": 95
+                                }
+                            ],
+                            "stroke": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "transparent"
+                                },
+                                {
+                                    "value": "transparent"
+                                }
+                            ]
+                        },
+                        "update": {
+                            "x": [{
+                                    "test": "datum.selected",
+                                    "field": "x"
+                            },
+                                {
+                                    "value": 100
+                                }
+                            ],
+                            "y": [{
+                                    "test": "datum.selected",
+                                    "field": "y"
+                            },
+                                {
+                                    "value": 95
+                                }
+                            ],
+                            "stroke": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "transparent"
+                                },
+                                {
+                                    "value": "transparent"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
