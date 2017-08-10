@@ -143,7 +143,7 @@ module.exports = function(settings, users, accounts, db, index, mailer, p2p) {
       s.pipe.through(function(key, enc, next) {
         db.deleted.del(key, next);
       })
-      .on('end', cb);
+      .on('end', cb)
       .on('err', cb);
     },
     
