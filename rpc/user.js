@@ -5,6 +5,34 @@ var async = require('async');
 var through = require('through2');
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
+function del(curUser, dbName, key, cb) {
+  if(!dbName || dbName === 'user' || dbName === 'index') return cb(new Error("not allowed"));
+  if(!db[dbName]) return cb(new Error("database '"+dbname+"' does not exit"));
+  if(!key) return cb(new Error("Missing key"));
+  
+  key = translateKey(key, dbName);
+    
+  db.db.get(key, function(err, o) {
+    if(err) return cb(err);
+    
+    var now = (new Date).getTime();
+    var dKey = (Number.MAX_SAFE_INTEGER - now).toString() + uuid();
+    
+    db.deleted.put(dKey, {
+      db: dbName,
+      key: key,
+      deletedAt: now,
+      deletedBy: curUser.user.email,
+      data: o
+    }, function(err) {
+      if(err) return cb(err);
+      
+      db.db.del(key, cb);
+      
+    });
+  });
+}
+
 module.exports = function(settings, users, accounts, db, index, mailer, p2p) { 
 
   return {
@@ -104,18 +132,37 @@ module.exports = function(settings, users, accounts, db, index, mailer, p2p) {
       db.idGenerator.next(cb);
     },
 
-    delMaterial: function(curUser, id, cb) {
-      console.log('delMaterial:',id);
-      if(!id) return cb("Missing id");
-      
-      db.physical.del(id, cb);
+    listDeleted: rpc.syncReadStream(function(curUser) {
+      return db.deleted.createReadStream();
+    }),
+
+    // really delete all the deleted stuff
+    clearDeleted: function(curUser, cb) {
+      var s = db.deleted.createKeyStream();
+
+      s.pipe.through(function(key, enc, next) {
+        db.deleted.del(key, next);
+      })
+      .on('end', cb);
+      .on('err', cb);
     },
     
+    undelete: function(curUser, key, cb) {
+      db.deleted.get(key, function(err, o) {
+        if(err) return cb(err);
+        if(!o.key) return cb(new Error("Unable to undelete: Original key missing."))
+
+        db.db.put(o.key, o.data, function(err) {
+          if(err) return cb(err);
+          
+          db.deleted.del(key, cb);
+        });
+      });
+    },
+
     delPhysical: function(curUser, id, cb) {
       console.log('delPhysical:',id);
-      if(!id) return cb("Missing id");
-
-      db.physical.del(id, cb);
+      del(curUser, 'physical', id);
     },
 
     physicalAutocomplete: function(curUser, query, cb) {
