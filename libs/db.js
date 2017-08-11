@@ -32,6 +32,8 @@ module.exports = function(settings, users, acccounts) {
   // If dbTo is not specified then the highest leveldb (no sublevels) is assumed
   function translateKey(key, dbFrom, dbTo) {
     if(!dbTo) dbTo = db;
+    console.log("AAAA", dbFrom);
+    console.log("BBBB", dbTo);
     if(!dbFrom.db.prefix && !dbTo.db.prefix) throw new Error("Either the database has not finished initializing or neither of the specified DBs are sublevels");
 
     var fromPrefix = dbFrom.db.prefix || '';

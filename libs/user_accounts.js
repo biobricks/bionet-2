@@ -117,6 +117,7 @@ var accounts = {
 
     updatePasswordUnsafe: function(users, email, password, cb) {
         users.removeLogin(email, 'basic', function (err) {
+          // TODO this should not be possible
             if(err) return cb("PANIC! Updating password failed catastrophically and now the user '"+email+"' was accidentally deleted: " + err);
             users.addLogin(email, 'basic', {
                 username: email,
