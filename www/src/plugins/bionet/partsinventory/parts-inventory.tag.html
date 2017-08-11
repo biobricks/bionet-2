@@ -22,13 +22,14 @@
                             <div id="rack_vis" class="flex-item"></div>
                             <div id="box_vis" class="flex-item"></div>
                         </div>
-                        <div class="flex-row" style="margin-bottom:10px">
-                            <ul class="tabs">
+                        <div class="flex-row">
+                            <ul class="tabs" id='nav-subheader'>
                                 <li class="tab col active" id="navigate" onclick={setSelectionMode}>navigate</li>
                                 <li class="tab col" id="move" onclick={setSelectionMode}>move</li>
                                 <li class="tab col" id="edit" onclick={setSelectionMode}>edit</li>
                             </ul>
                         </div>
+                        <div id='nav-subheader-bottom' class="flex-row"></div>
                         <div class="flex-row">
                             <div id="zoomItemTable" class="flex-item"></div>
                             <div id="zoomItem_vis" class="flex-item"></div>
@@ -83,12 +84,25 @@
     </div>
 
     <style>
+        #nav-subheader {
+            margin: 0;
+            padding: 0;
+            width:100%;
+            background-color:#f5f5f5;
+        }
+        #nav-subheader-bottom {
+            background-image: url(/static/images/appbarBorder.png);
+            background-repeat: repeat-x;
+            height:20px;
+            width:100%;
+        }
         .flex-row {
             display: -webkit-flex;
             display: flex;
             -webkit-flex-direction: row;
             flex-direction: row;
-            margin-bottom: 0px;
+            margin: 0;
+            padding: 0;
         }
         
         .flex-col {
@@ -100,7 +114,7 @@
         
         .flex-item {
             margin-right: 20px;
-            margin-bottom: 20px;
+            //margin-bottom: 20px;
         }
         
         .threedview {
@@ -146,18 +160,18 @@
         }
         
         ul.tabs .tab.active {
-            text-transform: lowercase  !important;
+            text-transform: lowercase !important;
             color: #4285f4 !important;
             border-bottom: 3px solid #4285f4;
-            padding-right:10px;
-            padding-left:10px;
+            padding-right: 10px;
+            padding-left: 10px;
         }
         
         ul.tabs .tab {
-            text-transform: lowercase  !important;
+            text-transform: lowercase !important;
             color: #4285f4 !important;
-            padding-right:10px;
-            padding-left:10px;
+            padding-right: 10px;
+            padding-left: 10px;
         }
         /*
         .vg-tooltip {
@@ -433,7 +447,7 @@
                         $('#navigate').removeClass('active')
                         break;
                     case 'edit':
-                        selectionMode = BIONET_VIS.LOCATION_SELECTION
+                        selectionMode = BIONET_VIS.EDIT
                         $('#edit').addClass('active')
                         $('#move').removeClass('active')
                         $('#navigate').removeClass('active')
@@ -609,8 +623,8 @@
     <list-item each={node in opts.nodes} item={node} />
     <script>
         /*
-                                                                                                                                                                                                                                                                                                                                                                                                            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-                                                                                                                                                                                                                                                                                                                                                                                                            */
+                                                                                                                                                                                                                                                                                                                                                                                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                                                                                                                                                                                                                                                                                                                                                                                                    */
         const tag = this;
 
 

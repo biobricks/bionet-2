@@ -53247,7 +53247,7 @@ window.BIONET_VIS = {
     section: {},
     signal: {},
     NAV_SELECTION: 'nav',
-    LOCATION_SELECTION: 'setLocation',
+    EDIT_SELECTION: 'setLocation',
     MOVE_SELECTION: 'moveLocation',
     ZOOM_ITEM_IMAGE: 'zoomItemImage',
     ZOOM_ITEM_TABLE: 'zoomItemTable',
@@ -53660,30 +53660,34 @@ vegaView.prototype.scaleCoordinates = function (tuples, width, height) {
 };
 
 vegaView.prototype.setLocationCoordinates = function (coordinates) {
-    const scaleX = 1 / (this.scale * this._width);
-    const scaleY = 1 / (this.scale * this._height);
-    var x = coordinates[0] * scaleX;
-    var y = coordinates[1] * scaleY;
-    var w = coordinates[2] * scaleX - x;
-    var h = coordinates[3] * scaleY - y;
-    const currentSelection = viewApi.currentSelection;
-    //console.log('setLocationCoordinates: selection:%s %s, coordinates:%s', currentSelection.datum.name, currentSelection.datum.physicalId,x,y,w,h)
-    if (currentSelection.datum && currentSelection.datum.physicalId) {
-        ituples = this.getData(this.view);
+
+    // todo: get state from BIONET_VIS.state
+    const currentSelectionId = viewApi.currentSelectionId;
+
+    if (currentSelectionId) {
+        const ituples = this.getData(this.view).slice();
         for (var i = 0; i < ituples.length; i++) {
             var item = ituples[i];
-            if (item.physicalId === currentSelection.datum.physicalId) {
+            if (item.physicalId === currentSelectionId) {
+                const scaleX = 1 / (this.scale * this._width);
+                const scaleY = 1 / (this.scale * this._height);
+                var x = coordinates[0] * scaleX;
+                var y = coordinates[1] * scaleY;
+                var w = coordinates[2] * scaleX - x;
+                var h = coordinates[3] * scaleY - y;
                 item.x = x * this._width;
                 item.y = y * this._height;
                 item.w = w * this._width;
                 item.h = h * this._height;
+                //console.log('setLocationCoordinates:', currentSelectionId, item.x, item.y, item.w, item.h)
+                ituples[i] = item;
+                console.log('setLocationCoordinates:', JSON.stringify(ituples, null, 2));
+                this.update('tree', ituples);
+                this.view.render();
+                BIONET.signal.setItemCoordinates.dispatch(currentSelectionId, x, y, w, h);
+                break;
             }
         }
-        var utuples = JSON.parse(JSON.stringify(ituples));
-        //this.scaleCoordinates(utuples, this._width, this._height)
-        this.update('tree', utuples);
-        this.view.render();
-        BIONET.signal.setItemCoordinates.dispatch(currentSelection.datum.physicalId, x, y, w, h);
     }
 };
 
@@ -53714,7 +53718,7 @@ vegaView.prototype.initVega = function (vegaJSONSpec) {
         });
 
         view.addEventListener('mouseup', function (event, item) {
-            if (thisModule.selectionMode === BIONET_VIS.LOCATION_SELECTION && thisModule.viewId === BIONET_VIS.ZOOM_ITEM_IMAGE) {
+            if (thisModule.selectionMode === BIONET_VIS.MOVE_SELECTION && thisModule.viewId === BIONET_VIS.ZOOM_ITEM_IMAGE) {
                 const selectionRectangle = view.signal('brush');
                 thisModule.setLocationCoordinates(selectionRectangle);
             }
@@ -53760,7 +53764,10 @@ vegaView.prototype.updateSelection = function (view, item) {
         }
     }
     const id = item.datum.id;
+
+    // todo: set BIONET_VIS.state
     viewApi.currentSelection = item;
+    viewApi.currentSelectionId = item.datum.physicalId;
 
     changeset.modify(item.datum, 'selected', true);
     this.updateConfig(view, "currentSelection", id);
@@ -53770,7 +53777,7 @@ vegaView.prototype.updateSelection = function (view, item) {
         case BIONET_VIS.NAV_SELECTION:
             BIONET_VIS.signal.selectInventoryItem.dispatch(item.datum.physicalId);
             break;
-        case BIONET_VIS.LOCATION_SELECTION:
+        case BIONET_VIS.EDIT_SELECTION:
             console.log('setting location for %s', item.datum.name);
             //BIONET_VIS.signal.selectInventoryItem.dispatch(item.datum.physicalId)
             break;
