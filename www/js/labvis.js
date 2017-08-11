@@ -53177,12 +53177,14 @@ module.exports = {
         const setLocationPathBinding = BIONET_VIS.signal.setLocationPath.add(setLocationPath);
 
         const setFavorites = function (favorites) {
-            //var favorites = modelApi.normalizeLocationPath(id, locationPath)
-            //viewApi.setLocationPath(id, path)
-            //console.log('setFavorites:',JSON.stringify(favorites,null,2))
             viewApi.setFavorites(favorites);
         };
         const setFavoritesBinding = BIONET_VIS.signal.setFavorites.add(setFavorites);
+
+        const setSelectionMode = function (sectionId, selectionMode) {
+            viewApi.setSelectionMode(sectionId, selectionMode);
+        };
+        const setSelectionModeBinding = BIONET_VIS.signal.setSelectionMode.add(setSelectionMode);
 
         testUpdateView = function (testName) {
             switch (testName) {
@@ -53244,6 +53246,11 @@ const Loader = require('resource-loader');
 window.BIONET_VIS = {
     section: {},
     signal: {},
+    NAV_SELECTION: 'nav',
+    LOCATION_SELECTION: 'setLocation',
+    MOVE_SELECTION: 'moveLocation',
+    ZOOM_ITEM_IMAGE: 'zoomItemImage',
+    ZOOM_ITEM_TABLE: 'zoomItemTable',
     init: function (cb) {
 
         this.signal.navigateInventoryItem = new MiniSignal();
@@ -53620,15 +53627,64 @@ module.exports = {
 const viewClass = require('../viewClass.js');
 const vega = require('vega');
 const vegaTooltip = require('vega-tooltip');
+const viewApi = require('../view.js');
 
 const vegaView = function () {
     viewClass.call(this);
     this.view = null;
+    this.selectionMode = BIONET_VIS.NAV_SELECTION;
+    this.selection = null;
+    this.scale = 1;
+    this.viewId = null;
 };
+
 vegaView.prototype = Object.create(viewClass.prototype);
 
-vegaView.prototype.initialize = function (containerId, width, height) {
+vegaView.prototype.initialize = function (viewId, containerId, width, height) {
+    this.viewId = viewId;
     viewClass.prototype.initialize.call(this, containerId, width, height);
+};
+
+vegaView.prototype.scaleCoordinates = function (tuples, width, height) {
+    for (var i = 0; i < tuples.length; i++) {
+        var tuple = tuples[i];
+        if (!tuple.dbData) continue;
+        var coordinate = tuple.dbData.locationCoordinates;
+        if (coordinate) {
+            tuple.x = coordinate.x * width;
+            tuple.y = coordinate.y * height;
+            tuple.w = coordinate.w * width;
+            tuple.h = coordinate.h * height;
+        }
+    }
+};
+
+vegaView.prototype.setLocationCoordinates = function (coordinates) {
+    const scaleX = 1 / (this.scale * this._width);
+    const scaleY = 1 / (this.scale * this._height);
+    var x = coordinates[0] * scaleX;
+    var y = coordinates[1] * scaleY;
+    var w = coordinates[2] * scaleX - x;
+    var h = coordinates[3] * scaleY - y;
+    const currentSelection = viewApi.currentSelection;
+    //console.log('setLocationCoordinates: selection:%s %s, coordinates:%s', currentSelection.datum.name, currentSelection.datum.physicalId,x,y,w,h)
+    if (currentSelection.datum && currentSelection.datum.physicalId) {
+        ituples = this.getData(this.view);
+        for (var i = 0; i < ituples.length; i++) {
+            var item = ituples[i];
+            if (item.physicalId === currentSelection.datum.physicalId) {
+                item.x = x * this._width;
+                item.y = y * this._height;
+                item.w = w * this._width;
+                item.h = h * this._height;
+            }
+        }
+        var utuples = JSON.parse(JSON.stringify(ituples));
+        //this.scaleCoordinates(utuples, this._width, this._height)
+        this.update('tree', utuples);
+        this.view.render();
+        BIONET.signal.setItemCoordinates.dispatch(currentSelection.datum.physicalId, x, y, w, h);
+    }
 };
 
 vegaView.prototype.initVega = function (vegaJSONSpec) {
@@ -53656,6 +53712,21 @@ vegaView.prototype.initVega = function (vegaJSONSpec) {
         view.addEventListener('click', function (event, item) {
             thisModule.updateSelection(view, item);
         });
+
+        view.addEventListener('mouseup', function (event, item) {
+            if (thisModule.selectionMode === BIONET_VIS.LOCATION_SELECTION && thisModule.viewId === BIONET_VIS.ZOOM_ITEM_IMAGE) {
+                const selectionRectangle = view.signal('brush');
+                thisModule.setLocationCoordinates(selectionRectangle);
+            }
+        });
+
+        /*
+        view.addEventListener('mousemove', function (event, item) {
+            const drag = view.signal('drag')
+            console.log('drag:',drag)
+        })
+        */
+
         vegaTooltip.vega(view, ttoptions);
         view.signal('width', thisModule._width);
         view.signal('height', thisModule._height);
@@ -53668,7 +53739,6 @@ vegaView.prototype.load = function (assetName, vegaJSONFile) {
     loader.load(vegaJSONFile).then(function (vegaJSONData) {
         var vegaJSON = JSON.parse(vegaJSONData);
         thisModule._assets[assetName] = vegaJSON;
-        //vegaView.prototype.initVega.call(thisModule, vegaJSON)
         thisModule.initVega(vegaJSON);
     }).catch(function (error) {
         // error handling here
@@ -53678,6 +53748,7 @@ vegaView.prototype.load = function (assetName, vegaJSONFile) {
 vegaView.prototype.select = function (id) {};
 
 vegaView.prototype.updateSelection = function (view, item) {
+    if (!item) return;
     const scenegraph = view.scenegraph();
     const changeset = vega.changeset();
     var config = this.getConfig(view);
@@ -53689,10 +53760,25 @@ vegaView.prototype.updateSelection = function (view, item) {
         }
     }
     const id = item.datum.id;
+    viewApi.currentSelection = item;
+
     changeset.modify(item.datum, 'selected', true);
     this.updateConfig(view, "currentSelection", id);
     view.change('tree', changeset).run();
-    BIONET_VIS.signal.selectInventoryItem.dispatch(item.datum.physicalId);
+
+    switch (this.selectionMode) {
+        case BIONET_VIS.NAV_SELECTION:
+            BIONET_VIS.signal.selectInventoryItem.dispatch(item.datum.physicalId);
+            break;
+        case BIONET_VIS.LOCATION_SELECTION:
+            console.log('setting location for %s', item.datum.name);
+            //BIONET_VIS.signal.selectInventoryItem.dispatch(item.datum.physicalId)
+            break;
+        case BIONET_VIS.MOVE_SELECTION:
+            console.log('moving %s', item.datum.name);
+            //BIONET_VIS.signal.selectInventoryItem.dispatch(item.datum.physicalId)
+            break;
+    }
 };
 
 vegaView.prototype.getConfig = function (view) {
@@ -53743,16 +53829,20 @@ vegaView.prototype.update = function (dataId, tuplesIn) {
 
 module.exports = vegaView;
 
-},{"../viewClass.js":136,"vega":128,"vega-tooltip":11}],135:[function(require,module,exports){
+},{"../view.js":135,"../viewClass.js":136,"vega":128,"vega-tooltip":11}],135:[function(require,module,exports){
 const modelApi = require('../model/model.js');
-
 const vegaViewClass = require('./vega/vegaView.js');
+
 module.exports = {
     view: {},
+    currentSelection: null,
     load: function (loader) {
         const assets = [{
             name: 'lab',
             url: 'static/assets/bionet_storage_lib/lab.vg.json'
+        }, {
+            name: 'labEdit',
+            url: 'static/assets/bionet_storage_lib/labEdit.vg.json'
         }, {
             name: 'storageEntity',
             url: 'static/assets/bionet_storage_lib/freezer.vg.json'
@@ -53766,7 +53856,9 @@ module.exports = {
     initialize: function (resources) {
         const labSpec = resources.lab.data;
         this.initializeView('lab', 'lab_vis', labSpec, 200, 100);
-        this.initializeView('zoomItemImage', 'zoomItemImage_vis', labSpec, 400, 200);
+
+        const labEdit = resources.labEdit.data;
+        this.initializeView(BIONET_VIS.ZOOM_ITEM_IMAGE, 'zoomItemImage_vis', labEdit, 200, 100);
 
         const storageEntitySpec = resources.storageEntity.data;
         this.initializeView('freezer', 'freezer_vis', storageEntitySpec, 120, 100);
@@ -53778,14 +53870,14 @@ module.exports = {
         const zoomTableSpec = resources.zoomItemTable.data;
         this.initializeView('path', 'path_vis', zoomTableSpec, 100, 100);
         this.initializeView('favorites', 'favorites_vis', zoomTableSpec, 100, 100);
-        this.initializeView('zoomItemTable', 'zoomItemTable', zoomTableSpec, 600, 250);
+        this.initializeView(BIONET_VIS.ZOOM_ITEM_TABLE, 'zoomItemTable', zoomTableSpec, 600, 250);
 
         this.close = function () {};
     },
 
     initializeView: function (viewId, elementId, visSpecTemplate, width, height) {
         const vegaView = new vegaViewClass();
-        vegaView.initialize(elementId, width, height);
+        vegaView.initialize(viewId, elementId, width, height);
         const visSpec = JSON.parse(JSON.stringify(visSpecTemplate));
         vegaView.initVega(visSpec);
         this.view[viewId] = vegaView;
@@ -53818,9 +53910,15 @@ module.exports = {
         this.update('favorites', 'tree', ttable);
     },
 
+    setSelectionMode: function (sectionId, selectionMode) {
+        var view = this.getView(sectionId);
+        if (view) {
+            view.selectionMode = selectionMode;
+        }
+    },
+
     setLocationPath: function (id, locationPath) {
         const selectType = 'box';
-
         var sectionId = {
             'path': true,
             'favorites': true,
@@ -53863,6 +53961,7 @@ module.exports = {
                 ituples = view.getData(visView);
                 index = modelApi.generateTupleIndex(ituples, 'name');
                 modelApi.overlayDataset(ituples, item.children, index, 'name');
+                view.scaleCoordinates(ituples, view._width, view._height);
                 visView.signal('scale', 1);
             }
 
@@ -53892,7 +53991,7 @@ module.exports = {
 
             if (item.physicalId === id) {
                 selectedItem = item;
-                var tableView = this.getView('zoomItemTable');
+                var tableView = this.getView(BIONET_VIS.ZOOM_ITEM_TABLE);
                 const cellHeight = 25;
                 var nRows = Math.trunc(tableView._height / cellHeight);
                 var ttable = modelApi.condenseTuples(ituples, nRows);
@@ -53900,19 +53999,22 @@ module.exports = {
                 const nTuples = ttable.length;
                 var nCols = Math.trunc(nTuples / nRows);
                 if (nTuples % nRows != 0) nCols++;
-                var colWidth = Math.min(tableView._width / nCols, 200);
+                var colWidth = rootType === 'lab' ? 300 : Math.min(tableView._width / nCols, 200);
                 var width = nCols * colWidth;
+
+                var storageName = rootType === 'lab' ? ' Storage Units' : ' Contents';
 
                 var visTable = tableView.view;
                 visTable.signal('colWidth', colWidth);
-                visTable.signal('title', item.name + ' Contents');
+                visTable.signal('title', item.name + storageName);
                 visTable.signal('width', width);
                 visTable.signal('height', tableView._height);
-                this.update('zoomItemTable', 'tree', ttable);
+                this.update(BIONET_VIS.ZOOM_ITEM_TABLE, 'tree', ttable);
 
                 if (rootType !== 'lab') {
-                    var zoomTuples = JSON.parse(JSON.stringify(ituples));
                     var zoomView = this.getView('zoomItem');
+                    var zoomTuples = JSON.parse(JSON.stringify(ituples));
+                    zoomView.scaleCoordinates(zoomTuples, zoomView._width, zoomView._height);
                     var visViewZoom = zoomView.view;
                     var aspectRatio = view._width / view._height;
                     width = aspectRatio * zoomView._height;
@@ -53927,19 +54029,18 @@ module.exports = {
                     this.update('zoomItem', 'tree', zoomTuples);
                 } else {
                     var zoomTuples = JSON.parse(JSON.stringify(ituples));
-                    var zoomView = this.getView('zoomItemImage');
+                    var zoomView = this.getView(BIONET_VIS.ZOOM_ITEM_IMAGE);
+                    var scale = 3;
+                    zoomView.scale = scale;
                     var visViewZoom = zoomView.view;
-                    var scale = 2;
-                    //var aspectRatio = view._width / view._height
-                    //width = aspectRatio * zoomView._height
                     visViewZoom.signal('title', item.name);
                     visViewZoom.signal('scale', scale);
-                    //visViewZoom.signal('width', width)
-                    //visViewZoom.signal('height', zoomView._height)
-
+                    visViewZoom.signal('width', zoomView._width * scale);
+                    visViewZoom.signal('height', zoomView._height * scale);
                     sectionId.zoomItem = false;
                     sectionId.zoomItemImage = true;
-                    this.update('zoomItemImage', 'tree', zoomTuples);
+                    sectionId[rootType] = false;
+                    this.update(BIONET_VIS.ZOOM_ITEM_IMAGE, 'tree', zoomTuples);
                 }
 
                 if (item.selection) {

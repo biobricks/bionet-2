@@ -6,7 +6,7 @@
             <div id="navview" class="col s11">
                 <div class="flex-row">
                     <div class="flex-col">
-                        <div id="path_vis" class="flex-item" style="margin-bottom:25px;"></div>
+                        <div id="path_vis" class="flex-item"></div>
                         <div id="favorites_vis" class="flex-item"></div>
                     </div>
                     <div class="flex-col">
@@ -15,19 +15,19 @@
                             <h5>{currentItem.name}</h5>
                         </div>
                         -->
-                        <!--
-                        <div class="flex-row" style="margin-bottom:10px">
-                            <a id="navigateButton" class="waves-effect waves-teal btn-flat" onclick={setMode} style="margin-right:10px;">Navigate</a>
-                            <a id="moveButton" class="waves-effect waves-teal btn-flat" onclick={setMode} style="margin-right:10px;">Move</a>
-                            <a id="editButton" class="waves-effect waves-teal btn-flat" onclick={setMode} style="margin-right:10px;">Edit</a>
-                        </div>
-                        -->
                         <div class="flex-row">
                             <div id="lab_vis" class="flex-item"></div>
                             <div id="freezer_vis" class="flex-item"></div>
                             <div id="shelf_vis" class="flex-item"></div>
                             <div id="rack_vis" class="flex-item"></div>
                             <div id="box_vis" class="flex-item"></div>
+                        </div>
+                        <div class="flex-row" style="margin-bottom:10px">
+                            <ul class="tabs">
+                                <li class="tab col active" id="navigate" onclick={setSelectionMode}>navigate</li>
+                                <li class="tab col" id="move" onclick={setSelectionMode}>move</li>
+                                <li class="tab col" id="edit" onclick={setSelectionMode}>edit</li>
+                            </ul>
                         </div>
                         <div class="flex-row">
                             <div id="zoomItemTable" class="flex-item"></div>
@@ -88,7 +88,7 @@
             display: flex;
             -webkit-flex-direction: row;
             flex-direction: row;
-            margin-bottom: 40px;
+            margin-bottom: 0px;
         }
         
         .flex-col {
@@ -100,6 +100,7 @@
         
         .flex-item {
             margin-right: 20px;
+            margin-bottom: 20px;
         }
         
         .threedview {
@@ -143,9 +144,24 @@
             float: left;
             display: block;
         }
+        
+        ul.tabs .tab.active {
+            text-transform: lowercase  !important;
+            color: #4285f4 !important;
+            border-bottom: 3px solid #4285f4;
+            padding-right:10px;
+            padding-left:10px;
+        }
+        
+        ul.tabs .tab {
+            text-transform: lowercase  !important;
+            color: #4285f4 !important;
+            padding-right:10px;
+            padding-left:10px;
+        }
         /*
         .vg-tooltip {
-            visibility: hidden;
+            visibility: hidden;l
             padding: 6px;
             border-radius: 3px;
             position: fixed;
@@ -238,6 +254,7 @@
                 alignment: 'left',
                 stopPropagation: false
             });
+            $('ul.tabs').tabs('select_tab', 'navigate')
 
             tag.randomTest = function() {
                 BIONET_VIS.signal.test.dispatch('random')
@@ -250,7 +267,7 @@
             }
             tag.update()
 
-            var selectionMode = 'nav'
+            var selectionMode = BIONET_VIS.NAV_SELECTION
 
             tag.addToFavorites = function() {
                 if (tag.currentItem) {
@@ -361,6 +378,7 @@
 
 
             const retrieveLocationPath = function(id, cb) {
+                if (!id) return
                 const locationPath = {}
                 var results = 0
                 BIONET.remote.getLocationPath(id, function(err, locationPathAr) {
@@ -397,8 +415,35 @@
                 })
             }
 
-            const setSelectionMode = function(newMode) {
-                selectionMode = newMode
+            tag.setSelectionMode = function(e) {
+                const active = $(e.target)
+                const buttonId = e.currentTarget.id
+                var selectionMode = null
+                switch (buttonId) {
+                    case 'navigate':
+                        selectionMode = BIONET_VIS.NAV_SELECTION
+                        $('#navigate').addClass('active')
+                        $('#move').removeClass('active')
+                        $('#edit').removeClass('active')
+                        break;
+                    case 'move':
+                        selectionMode = BIONET_VIS.MOVE_SELECTION
+                        $('#move').addClass('active')
+                        $('#edit').removeClass('active')
+                        $('#navigate').removeClass('active')
+                        break;
+                    case 'edit':
+                        selectionMode = BIONET_VIS.LOCATION_SELECTION
+                        $('#edit').addClass('active')
+                        $('#move').removeClass('active')
+                        $('#navigate').removeClass('active')
+                        break;
+                }
+                console.log('setSelectionMode:', selectionMode)
+                if (selectionMode) {
+                    BIONET_VIS.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM_TABLE, selectionMode)
+                    BIONET_VIS.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM_IMAGE, selectionMode)
+                }
             }
 
             const enableLocationPathSections = function(sectionId) {
@@ -428,10 +473,10 @@
                 BIONET_VIS.signal.setFavorites.dispatch(favoritesArr)
             }
 
+
             tag.rootId = null
             BIONET_VIS.init(() => {
                 const selectInventoryItemBinding = BIONET_VIS.signal.selectInventoryItem.add(selectInventoryItem)
-                const setSelectionModeBinding = BIONET_VIS.signal.setSelectionMode.add(setSelectionMode)
                 const enableLocationPathSectionsBinding = BIONET_VIS.signal.enableLocationPathSections.add(enableLocationPathSections)
                 const getFavoritesResultBinding = BIONET.signal.getFavoritesResult.add(getFavoritesResult)
 
@@ -564,8 +609,8 @@
     <list-item each={node in opts.nodes} item={node} />
     <script>
         /*
-                                                                                                                                                                                                                                                                                                                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-                                                                                                                                                                                                                                                                                                                                                    */
+                                                                                                                                                                                                                                                                                                                                                                                                            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                                                                                                                                                                                                                                                                                                                                                                                            */
         const tag = this;
 
 
