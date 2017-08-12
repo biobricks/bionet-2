@@ -11,17 +11,20 @@ var accountdown = require('accountdown'); // user/login management
 var JSONStream = require('JSONStream');
 var uuid = require('uuid').v4;
 var accounts = require('../libs/user_accounts.js');
+var bytewise = require('bytewise');
 
 var minimist = require('minimist');
 var argv = minimist(process.argv.slice(2), {
     alias: {
         s: 'settings',
-        f: 'force'
+        f: 'force',
+        o: 'old'
     },
     boolean: [
         'help',
-        'force', // 
-        'online' // if set, this script will fail if the bionet app isn't running
+        'force', 
+        'online', // if set, this script will fail if the bionet app isn't running
+        'old'
     ],
     default: {
         settings: '../settings.js',
@@ -151,11 +154,11 @@ function main() {
 
   if(cmd.match(/^d/)) { // dump
 
-    var dbs = db.createReadStream()
+    var dbs = db.createReadStream({keyEncoding: 'binary', valueEncoding:'utf8'})
     var jstream = JSONStream.stringifyObject();
     dbs.pipe(through.obj(function(obj, enc, cb) {
       // reformat key/value as array since stringifyObject expects that
-      this.push([obj.key, obj.value])
+      this.push([obj.key.toString('base64'), obj.value])
       cb();
     })).pipe(jstream).pipe(process.stdout);
 
@@ -182,8 +185,23 @@ function main() {
     var ins = fs.createReadStream(args[0], {encoding: 'utf8'});
     var jstream = JSONStream.parse([{emitKey: true}]);
 
-    jstream.pipe(through.obj(function(obj, enc, cb) {    
-      db.put(obj.key, obj.value, cb);
+    // --old mode allows import of the old-style (broken) backups
+    // while fixing the broken user keys
+    if(argv.old) {
+      var fail = new Buffer([0x21, 0x75, 0x21, 0xef, 0xbf, 0xbd]);
+      var correct = new Buffer([0x21, 0x75, 0x21, 0xa0]);
+    }
+
+    jstream.pipe(through.obj(function(obj, enc, cb) {
+      if(argv.old) {
+        var b = new Buffer(obj.key, 'utf8');
+        if(b.compare(fail, 0, fail.length, 0, fail.length) === 0) {
+          b = Buffer.concat([correct, b.slice(fail.length)]);
+        }
+        db.put(b, obj.value, cb);
+      } else {
+        db.put(new Buffer(obj.key, 'base64'), obj.value, cb);
+      }
       count++;
     }, function(cb) {
       console.log("Imported", count, "rows.");    
