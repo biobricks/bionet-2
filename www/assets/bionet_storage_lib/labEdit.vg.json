@@ -1,0 +1,510 @@
+{
+    "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+    "width": {
+        "signal": "width"
+    },
+    "height": {
+        "signal": "height"
+    },
+    "padding": 0,
+    "autosize": "pad",
+    "signals": [
+        {
+            "name": "title",
+            "value": "Lab"
+        },
+        {
+            "name": "width",
+            "value": 200
+        },
+        {
+            "name": "height",
+            "value": 100
+        },
+        {
+            "name": "scale",
+            "value": 1.0
+        },
+        {
+            "name": "visWidth",
+            "value": 100
+        },
+        {
+            "name": "transformMethod",
+            "value": "slicedice"
+        },
+        {
+            "name": "fontSize",
+            "value": 10
+        },
+        {
+            "name": "drag",
+            "value": false,
+            "on": [
+                {
+                    "events": "window:mousedown",
+                    "update": {
+                        "value": true
+                    }
+                },
+                {
+                    "events": "window:mouseup",
+                    "update": {
+                        "value": false
+                    }
+                }
+            ]
+        },
+        {
+            "name": "brushStart",
+            "value": 0,
+            "on": [
+                {
+                    "events": "window:mousedown",
+                    "update": "[clamp(x(), 0, width),clamp(y(), 0, height)]"
+                }
+            ]
+        },
+        {
+            "name": "brush",
+            "value": 0,
+            "on": [
+                {
+                    "events": [
+                        {
+                            "source": "window",
+                            "type": "mousemove",
+                            "consume": true,
+                            "between": [{
+                                "type": "mousedown"
+                            }, {
+                                "source": "window",
+                                "type": "mouseup"
+                            }]
+                        },
+                        {
+                            "type": "mouseup"
+                        }
+                    ],
+                    "update": "[brushStart[0], brushStart[1], clamp(x(), 0, width), clamp(y(), 0, height)]"
+                }
+            ]
+        }
+    ],
+    "data": [
+        {
+            "name": "config",
+            "values": [
+                {
+                    "id": 0,
+                    "text": {
+                        "signal": "title"
+                    },
+                    "currentSelection": 1,
+                    "data": {
+                        "id": "p1234",
+                        "name": "Main -80 Freezer"
+                    }
+                                }
+                            ]
+                        },
+        {
+            "name": "tree",
+            "values": [
+                {
+                    "id": 0,
+                    "name": "1. Fearless Wanderer (Main -80C)",
+                    "class": "o",
+                    "selected": false,
+                    "x": 135,
+                    "y": 30,
+                    "w": 8,
+                    "h": 8
+                                },
+                {
+                    "id": 1,
+                    "name": "2. Wacko Overlord (Backup -80C)",
+                    "class": "o",
+                    "x": 135,
+                    "selected": true,
+                    "y": 40,
+                    "w": 8,
+                    "h": 8
+                                },
+                {
+                    "id": 2,
+                    "name": "3. Irate Mastermind (Walk-in 4C)",
+                    "class": "o",
+                    "selected": false,
+                    "x": 135,
+                    "y": 50,
+                    "w": 8,
+                    "h": 8
+                                },
+                {
+                    "id": 3,
+                    "name": "4. Bittah Genius (Left -20C)",
+                    "class": "o",
+                    "selected": false,
+                    "x": 135,
+                    "y": 60,
+                    "w": 8,
+                    "h": 8
+                                },
+                {
+                    "id": 4,
+                    "name": "5. Lucky Watcher (Right -20C)",
+                    "class": "o",
+                    "selected": false,
+                    "x": 135,
+                    "y": 70,
+                    "w": 8,
+                    "h": 8
+                                }
+                          ],
+            "transform": [
+                {
+                    "type": "formula",
+                    "as": "x",
+                    "expr": "datum.x * scale"
+                        },
+                {
+                    "type": "formula",
+                    "as": "y",
+                    "expr": "datum.y * scale"
+                        },
+                {
+                    "type": "formula",
+                    "as": "w",
+                    "expr": "datum.w * scale"
+                        },
+                {
+                    "type": "formula",
+                    "as": "h",
+                    "expr": "datum.h * scale"
+                        }
+                        ]
+                        }
+                      ],
+    "marks": [
+        {
+            "description": "Lab Layout",
+            "name": "lablayout",
+            "type": "group",
+            "width": {
+                "signal": "width"
+            },
+            "height": {
+                "signal": "height"
+            },
+            "title": {
+                "text": "Endy Lab"
+            },
+            "encode": {
+                "enter": {
+                    "x": {
+                        "value": 0
+                    },
+                    "y": {
+                        "value": 0
+                    },
+                    "width": {
+                        "signal": "width"
+                    },
+                    "height": {
+                        "signal": "height"
+                    }
+                },
+                "update": {
+                    "x": {
+                        "value": 0
+                    },
+                    "y": {
+                        "value": 0
+                    },
+                    "width": {
+                        "signal": "width"
+                    },
+                    "height": {
+                        "signal": "height"
+                    }
+                }
+            },
+            "marks": [
+                {
+                    "type": "image",
+                    "encode": {
+                        "enter": {
+                            "url": {
+                                "value": "static/assets/bionet_storage_lib/endylab.svg"
+                            },
+                            "opacity": {
+                                "value": 1
+                            },
+                            "x": {
+                                "value": 0
+                            },
+                            "y": {
+                                "value": 0
+                            },
+                            "width": {
+                                "signal": "width"
+                            },
+                            "height": {
+                                "signal": "height"
+                            }
+                        },
+                        "update": {
+                            "x": {
+                                "value": 0
+                            },
+                            "y": {
+                                "value": 0
+                            },
+                            "width": {
+                                "signal": "width"
+                            },
+                            "height": {
+                                "signal": "height"
+                            }
+                        }
+                    }
+                        },
+                {
+                    "type": "rect",
+                    "from": {
+                        "data": "tree"
+                    },
+                    "interactive": true,
+                    "encode": {
+                        "enter": {
+                            "x": {
+                                "field": "x"
+                            },
+                            "y": {
+                                "field": "y"
+                            },
+                            "width": {
+                                "field": "w"
+                            },
+                            "height": {
+                                "field": "h"
+                            },
+                            "stroke": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#ff0000"
+                                        },
+                                {
+                                    "value": "#404040"
+                                        }
+                                    ],
+                            "strokeWidth": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": 4
+                                        },
+                                {
+                                    "value": 2
+                                        }],
+                            "fill": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#00ffff"
+                                        },
+                                {
+                                    "test": "datum.class==='o'",
+                                    "value": "#60b0ff"
+                                        },
+                                {
+                                    "value": "#cccccc"
+                                    }
+                                    ]
+                        },
+                        "update": {
+                            "stroke": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#ff0000"
+                                        },
+                                {
+                                    "value": "#404040"
+                                        }
+                                    ],
+                            "x": {
+                                "field": "x"
+                            },
+                            "y": {
+                                "field": "y"
+                            },
+                            "width": {
+                                "field": "w"
+                            },
+                            "height": {
+                                "field": "h"
+                            },
+                            "strokeWidth": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": 4
+                                        },
+                                {
+                                    "value": 2
+                                        }],
+                            "fill": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#00ffff"
+                                        },
+                                {
+                                    "test": "datum.class==='o'",
+                                    "value": "#60b0ff"
+                                        },
+                                {
+                                    "value": "#cccccc"
+                                    }]
+                        }
+                    }
+                        },
+                {
+                    "type": "text",
+                    "from": {
+                        "data": "tree"
+                    },
+                    "interactive": false,
+                    "encode": {
+                        "update": {
+                            "font": {
+                                "value": "Helvetica Neue, Arial"
+                            },
+                            "align": {
+                                "value": "center"
+                            },
+                            "baseline": {
+                                "value": "middle"
+                            },
+                            "fill": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "#000"
+                                        },
+                                {
+                                    "value": "transparent"
+                                        }
+                                    ],
+                            "text": {
+                                "field": "name"
+                            },
+                            "fontSize": {
+                                "value": 14
+                            },
+                            "x": {
+                                "value": 100
+                            },
+                            "y": {
+                                "value": 100
+                            }
+                        }
+                    }
+                        },
+                {
+                    "type": "line",
+                    "from": {
+                        "data": "tree"
+                    },
+                    "interactive": false,
+                    "encode": {
+                        "enter": {
+                            "x": [{
+                                    "test": "datum.selected",
+                                    "field": "x"
+                                    },
+                                {
+                                    "value": 100
+                                        }
+                                    ],
+                            "y": [{
+                                    "test": "datum.selected",
+                                    "field": "y"
+                                    },
+                                {
+                                    "value": 95
+                                        }
+                                    ],
+                            "stroke": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "transparent"
+                                        },
+                                {
+                                    "value": "transparent"
+                                        }
+                                    ]
+                        },
+                        "update": {
+                            "x": [{
+                                    "test": "datum.selected",
+                                    "field": "x"
+                                    },
+                                {
+                                    "value": 100
+                                        }
+                                    ],
+                            "y": [{
+                                    "test": "datum.selected",
+                                    "field": "y"
+                                    },
+                                {
+                                    "value": 95
+                                        }
+                                    ],
+                            "stroke": [
+                                {
+                                    "test": "datum.selected",
+                                    "value": "transparent"
+                                        },
+                                {
+                                    "value": "transparent"
+                                        }
+                                    ]
+                        }
+                    }
+                        },
+                {
+                    "type": "rect",
+                    "name": "brush",
+                    "encode": {
+                        "enter": {
+                            "y": {
+                                "value": 0
+                            },
+                            "height": {
+                                "value": 70
+                            },
+                            "fill": {
+                                "value": "#333"
+                            },
+                            "fillOpacity": {
+                                "value": 0.2
+                            }
+                        },
+                        "update": {
+                            "x": {
+                                "signal": "brush[0]"
+                            },
+                            "width": {
+                                "signal": "brush[2] - brush[0]"
+                            },
+                            "y": {
+                                "signal": "brush[1]"
+                            },
+                            "height": {
+                                "signal": "brush[3] - brush[1]"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
