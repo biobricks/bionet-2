@@ -10,6 +10,7 @@
     "build": "cross-env NODE_ENV=production browserify -t babelify --presets es2015-riot -e www/src/main.js -m -o www/js/bionet.js",
     "lint": "eslint --ext .js www/src test/unit",
     "test": "karma start karma.conf.js",
+    "apitest": "node_modules/.bin/tape tests/*.js",
     "start": "./bin/cmd.js",
     "ftest": "./node_modules/.bin/nightwatch"
   },
@@ -126,7 +127,8 @@
     "riot": "^3.0.0",
     "riot-compiler": "^3.0.0",
     "riot-route": "^3.0.1",
-    "riotify": "^2.0.0"
+    "riotify": "^2.0.0",
+    "tape": "^4.8.0"
   },
   "license": "AGPL-3.0"
 }
