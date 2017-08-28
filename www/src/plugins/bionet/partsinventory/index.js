@@ -15,13 +15,18 @@ var partsInventory = {
                     app.error(err)
                     return
                 }
-                const locationCoordinates = {
-                    x: x,
-                    y: y,
-                    w: w,
-                    h: h
+                if (h && w) {
+                    const locationCoordinates = {
+                        x: x,
+                        y: y,
+                        w: w,
+                        h: h
+                    }
+                    data.locationCoordinates = locationCoordinates
+                } else {
+                    data.parent_x = x
+                    data.parent_y = y
                 }
-                data.locationCoordinates = locationCoordinates
                 app.remote.savePhysical(data, null, false, function (err, id) {
                     if (err) {
                         console.log('setItemCoordinates error: %s', err)
@@ -29,6 +34,7 @@ var partsInventory = {
                         return;
                     }
                     console.log('setItemCoordinates result:', JSON.stringify(data, null, 2))
+                    BIONET.signal.updateInventoryPath.dispatch(data.parent_id)
                 })
             })
         }

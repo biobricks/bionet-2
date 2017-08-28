@@ -77,7 +77,7 @@ route('/scan', function () {
 
 route('/parts-inventory', function () {
     app.appbarConfig({
-        enableTopNav: true,
+        enableTopNav: false,
         enableBreadCrumbs: false,
         enableSubbar: false,
         activeItem: 'local inventory'

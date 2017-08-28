@@ -6,7 +6,7 @@
         <!--
         <div id="top-nav" if={enableTopNav} class="row {theme.style.color.navBackground}">
         -->
-        <div id="top-nav" if={enableTopNav} class="row grey lighten-4" style="margin:0">
+        <div id="top-nav" class="row grey lighten-4" style="margin:0;">
             <div class="col s1 l1 m1 center">
                 <!-- logo -->
                 <a id="logo-container" href="/" class="brand-logoleft"><img src={ theme.style.color.smallLogo } style="height:44px; margin-top:10px;" alt="" /></a>
@@ -23,7 +23,7 @@
                 </ul>
             </nav>
         </div>
-        <div class="row grey lighten-4" style="margin:0;">
+        <div if={enableTopNav}  class="row grey lighten-4" style="margin:0;">
             <div class="col s1 l1 m1">
             </div>
             <nav class="col s6 m6 l6 grey lighten-4" style="box-shadow:none;  height:64px; line-height:64px">
@@ -59,6 +59,8 @@
         <!--
         <breadcrumbs if={enableBreadCrumbs} items={breadcrumbs} background={theme.style.color.highlightBackground} />
         -->
+        <div class="row" style="margin-bottom:0px; height:15px;background-color:#f5f5f5">
+        </div>
         <div class="row" style="height:20px; margin:0;padding:0;z-index:1000;background-image: url('/static/images/appbarBorder.png');background-repeat:repeat-x;"></div>
     </div>
 

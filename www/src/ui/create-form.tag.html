@@ -812,6 +812,38 @@
     </script>
 </part-attachment>
 
+<modal-virtual>
+        <div class="modal-content">
+            <div id="modal-virtual-contents"></div>
+        </div>
+
+    <script>
+        var tags;
+        const tag = this
+        this.on('mount', function() {
+            var type
+            var parent_id
+            if (opts.modaldata) {
+                type = opts.modaldata.type
+                parent_id = opts.modaldata.parent_id
+            }
+            tags = riot.mount('#modal-virtual-contents', 'create-virtual-form', {
+                topMargin: 10,
+                modal: true,
+                type: type,
+                parent_id: parent_id,
+                modalaction: opts.modalaction,
+                modaldata: opts.modaldata
+            });
+            $('#edit-virtual-modal').modal('open');
+        })
+
+        this.on('before-unmount', function() {
+            tags[0].unmount()
+        })
+    </script>
+</modal-virtual>
+
 <delete-modal>
     <div id="deleteModal" class="modal">
         <div class="modal-content">

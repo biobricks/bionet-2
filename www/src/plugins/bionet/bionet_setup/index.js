@@ -167,10 +167,13 @@ var bionetSetup = {
                     return;
                 }
                 console.log('delPhysical %s deleted', id)
+                BIONET.signal.physicalDeleted.dispatch()
             })
         }
         BIONET.signal.delPhysical = new MiniSignal()
+        BIONET.signal.physicalDeleted = new MiniSignal()
         BIONET.signal.delPhysical.add(delPhysical)
+        BIONET.signal.updateInventoryPath = new MiniSignal()
 
         //todo: refactor
         const bionetSetup = app.addStreamRouter('bionetSetup')
