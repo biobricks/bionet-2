@@ -56888,17 +56888,32 @@ window.BIONET_VIS = {
             modelApi.close();
         };
     },
-    getSelectedItemId: function () {
-        return stores.state.selectedId;
+
+    initVisualization: function (visId, visSpecs, containerElementId) {
+        viewApi.initVisualization(visId, visSpecs, containerElementId);
     },
+
+    removeVisualization: function (visId) {
+        viewApi.removeVisualization(visId);
+    },
+
     getSelectedItem: function () {
         return stores.state.selectedItem;
+    },
+    getSelectedItemId: function () {
+        return stores.state.selectedId;
     },
     getSelectedType: function () {
         return stores.state.selectedType;
     },
     getSelectionMode: function () {
         return stores.state.selectionMode;
+    },
+    getEditSelection: function () {
+        return stores.state.editSelection;
+    },
+    getSelectedCoordinates: function () {
+        return stores.state.selectedCoordinates;
     }
 };
 
@@ -57272,7 +57287,9 @@ const initialState = {
         selectedId: null,
         selectedItem: null,
         selectedType: null,
+        selectedCoordinates: null,
         moveSelectionId: null,
+        editSelection: null,
         selectionMode: 'nav',
         locationPath: null,
         favorites: null
@@ -57452,7 +57469,6 @@ vegaView.prototype.highlightSelection = function (item) {
         item.selected = true;
     }
 
-    // todo: set BIONET_VIS.state
     stores.state.selectedId = physicalId;
 
     changeset.modify(item.datum, 'selected', true);
@@ -57476,6 +57492,12 @@ vegaView.prototype.updateSelection = function (item) {
 
         case BIONET_VIS.EDIT_SELECTION:
             console.log('setting location for %s', item.datum.name);
+            stores.state.editSelection = {
+                physicalId: item.datum.physicalId,
+                x: item.datum.cellx,
+                y: item.datum.celly
+            };
+            console.log('setting location for %s', JSON.stringify(stores.state.editSelection));
             break;
 
         case BIONET_VIS.MOVE_SELECTION:
@@ -57546,6 +57568,7 @@ const stores = require('../stores.js');
 
 module.exports = {
     view: {},
+    resources: null,
     load: function (loader) {
         const assets = [{
             name: 'lab',
@@ -57564,6 +57587,7 @@ module.exports = {
     },
 
     initialize: function (resources) {
+        this.resources = resources;
         const labSpec = resources.lab.data;
         this.initializeView('lab', 'lab_vis', labSpec, 200, 100);
 
@@ -57591,6 +57615,7 @@ module.exports = {
         const visSpec = JSON.parse(JSON.stringify(visSpecTemplate));
         vegaView.initVega(visSpec);
         this.view[viewId] = vegaView;
+        return vegaView;
     },
 
     setFavorites: function (favorites) {
@@ -57769,6 +57794,7 @@ module.exports = {
         rootPath.reverse();
         if (selectedItem) {
             selectedItem.selected = true;
+            stores.state.selectedItem = selectedItem;
             rootPath.push(selectedItem);
         }
 
@@ -57783,6 +57809,40 @@ module.exports = {
         this.update('path', 'tree', pathTable);
 
         BIONET_VIS.signal.enableLocationPathSections.dispatch(sectionId);
+    },
+
+    initVisualization: function (visId, visSpecs, containerElementId) {
+        const storageEntitySpec = this.resources.storageEntity.data;
+        const view = this.initializeView(visId, containerElementId, storageEntitySpec, visSpecs.width, visSpecs.height);
+        view.selectionMode = BIONET_VIS.EDIT_SELECTION;
+        const visView = view.view;
+        var nx = visSpecs.nx;
+        var ny = visSpecs.ny;
+        var transformMethod = 'slicedice';
+        if (nx === 1) transformMethod = 'slice';
+        if (ny === 1) transformMethod = 'dice';
+        var ituples = modelApi.initTuples(nx, ny);
+
+        var cellSize = visSpecs.width / nx;
+        var index = modelApi.generateTupleIndex(ituples);
+        modelApi.overlayDataset(ituples, visSpecs.children, index);
+        visView.signal('title', visSpecs.name);
+        visView.signal('width', visSpecs.width);
+        visView.signal('height', visSpecs.height);
+        visView.signal('visWidth', visSpecs.visWidth);
+
+        var fontSize = 10;
+        if (cellSize < 15) fontSize = 0;else if (cellSize < 30) fontSize = 7;else if (cellSize > 100) fontSize = 14;
+        visView.signal('fontSize', fontSize);
+
+        visView.signal('transformMethod', transformMethod);
+        this.update(visId, 'tree', ituples);
+    },
+
+    removeVisualization: function (visId) {
+        if (!this.view[visId]) return;
+        this.view[visId].view.finalize();
+        delete this.view[visId];
     },
 
     loadFile: function (viewId, assetName, file) {

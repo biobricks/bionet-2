@@ -300,7 +300,18 @@
 
             const selectInventoryItem = function(id) {
                 const selectionMode = BIONET_VIS.getSelectionMode()
-                if (selectionMode === BIONET_VIS.EDIT_SELECTION) BIONET.signal.getPhysical.dispatch(id)
+                if (selectionMode === BIONET_VIS.EDIT_SELECTION) {
+                    //editSelection = BIONET_VIS.getEditSelection()
+                    editSelection = BIONET_VIS.getSelectedItem()
+                    if (editSelection) {
+                        if (editSelection.physicalId) {
+                            BIONET.signal.getPhysical.dispatch(id)
+                        } else {
+                            // create new physical and add to parent
+                            console.log('selectInventoryItem: create new physical', JSON.stringify(editSelection), id)
+                        }
+                    }
+                }
                 retrieveLocationPath(id, (path) => {
                     //console.log('retrieveLocationPath:', JSON.stringify(path, null, 2))
                     BIONET_VIS.signal.setLocationPath.dispatch(id, path)

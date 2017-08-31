@@ -5,7 +5,6 @@
         <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
         <div if={showPhysical}>
 
-            <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
 
             <!--
             <form-text-input3 label="Parent X" ref="locationid" name="parent_x" value={formData.parent_x}/>
@@ -17,11 +16,14 @@
             <input type="hidden" ref="barcode" name="barcode" value={formData.barcode} />
             <input type="hidden" ref="locationid" name="parent_id" value={formData.parent_id} />
             -->
+            <div class="row">
+                <div class="col" style="width:50%;">
+                    <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
+                    <div each={field in fields}>
+                        <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
+                    </div>
 
-            <div each={field in fields}>
-                <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
-            </div>
-            <!--
+                    <!--
             <a id="scanButton" ref="scanButton" class="waves-effect waves-light grey btn" onclick={scanItem} style="margin-right:10px; margin-left:0.75rem">{formData.barcode ? 'rescan tube' : 'scan tube'}</a> or <a id="createLabelButton" ref="createLabelButton" class="waves-effect grey waves-light btn" onclick={createLabel} style="margin-left:10px">{(formData.label || labelFormData) ? 'edit' : 'create'} label</a>
 
             <div style="margin-top:30px">
@@ -29,15 +31,21 @@
             </div>
             -->
 
-            <div id="autocomplete-container" style="margin-top:30px ">
-                <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name"/>
+                    <div id="autocomplete-container" style="margin-top:30px ">
+                        <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name" />
+                    </div>
+
+                </div>
+                <div id='physical-container-vis' class="col" style="width:50%;"></div>
             </div>
 
-            <div style="margin-top:30px; margin-left:0.75rem">
-                <std-button label="save" action={submitForm} />
-                <std-button if={formData.label || labelFormData} label="save & print" action={submitFormPrint} />
-            </div>
+            <div class="row">
 
+                <div style="margin-top:30px; margin-left:0.75rem">
+                    <std-button label="save" action={submitForm} />
+                    <std-button if={formData.label || labelFormData} label="save & print" action={submitFormPrint} />
+                </div>
+            </div>
             <input type="submit" style="visibility:hidden" />
         </div>
     </form>
@@ -115,6 +123,12 @@
             formData.label = tag.labelFormData;
             formData.type = tag.type
 
+            const parentItem = BIONET_VIS.getSelectedItem()
+            formData.parent_id = parentItem.physicalId
+
+            const editSelection = BIONET_VIS.getEditSelection()
+            formData.parent_x = editSelection.x
+            formData.parent_y = editSelection.y
             tag.formData = formData
 
             //if (!formData.parent_id && formData.parent_name) {
@@ -263,6 +277,19 @@
             tag.formData = data
             tag.type = data.type
             tag.showPhysical = true
+            
+            if (!data.id) {
+                const visId = 'physical-container-vis'
+                const containerElementId = visId
+                const visSpecs = BIONET_VIS.getSelectedItem()
+                if (visSpecs) {
+                    visSpecs.width = 300
+                    visSpecs.height = 200
+                    visSpecs.visWidth = visSpecs.width
+                    BIONET_VIS.initVisualization(visId, visSpecs, containerElementId)
+                }
+            }
+            
             tag.update()
         }
 
@@ -283,6 +310,35 @@
                 tag.formData.name = decodeURIComponent(opts.query.name);
                 //tag.type = tag.formData.name
             }
+
+            /*
+        const visView = this.initializeView(visId, containerElementId, storageEntitySpec, visSpecs.width, visSpecs.height)
+
+        var nx = visSpecs.nx
+        var ny = visSpecs.ny
+        var transformMethod = 'slicedice'
+        if (nx === 1) transformMethod = 'slice'
+        if (ny === 1) transformMethod = 'dice'
+        var ituples = modelApi.initTuples(nx, ny)
+
+        var cellSize = visSpecs.width / nx
+        var index = modelApi.generateTupleIndex(ituples)
+        modelApi.overlayDataset(ituples, visSpecs.children, index)
+        visView.signal('title', visSpecs.name)
+        visView.signal('width', visSpecs.width)
+        visView.signal('height', visSpecs.height)
+        visView.signal('visWidth', visSpecs.visWidth)
+
+        var fontSize = 10
+        if (cellSize < 15) fontSize = 0
+        else if (cellSize < 30) fontSize = 7
+        else if (cellSize > 100) fontSize = 14
+        visView.signal('fontSize', fontSize)
+
+        visView.signal('transformMethod', transformMethod)
+            */
+
+            //removeVisualization: function(visId) {
 
             tag.update();
 
