@@ -568,7 +568,7 @@
                 BIONET.remote.inventoryTree(function(err, children) {
                     for (var i = 0; i < children.length; i++) {
                         var item = children[i].value
-                        if (!item.parent_id) {
+                        if (!item.parent_id && item.type==='lab') {
                             tag.rootId = item.id
                             tag.rootItem = item
                             selectInventoryItem(tag.rootId)
