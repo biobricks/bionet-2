@@ -117,7 +117,7 @@ var settings = {
       }
     },{
       name: "-4 fridge",
-      title:"-4C Fridge",
+      title:"4C Fridge",
       fields: {
         Description: 'text',
         Shelf: 'text',
