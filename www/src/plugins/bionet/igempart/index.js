@@ -1,7 +1,7 @@
 const riot = require('riot')
     //import request from 'request'
 import bionetapi from '../bionetapi'
-
+const MiniSignal = require('mini-signals')
 var igempart = {
     init: function () {
         //----------------------------------------------------------------------------
@@ -159,6 +159,7 @@ var igempart = {
         app.addStreamRouter('editPart');
         app.addStream('getPartsList');
         app.addStream('partsList');
+        BIONET.signal.virtualSaveResult = new MiniSignal()
 
 
         /*

@@ -57178,9 +57178,18 @@ module.exports = {
         const tuples = [];
         for (var i = 0; i < dataset.length; i++) {
             var item = JSON.parse(JSON.stringify(dataset[i]));
+            var dbData = item.dbData;
             item.id = i;
-            item.cellId = i;
-            item.parent = item.parent_id;
+            if (dbData && dbData.parent_x && dbData.parent_y) {
+                var x = dbData.parent_x.toString();
+                if (dbData.parent_x < 10) x = '0' + x;
+                var y = dbData.parent_y.toString();
+                if (dbData.parent_y < 10) y = '0' + y;
+                item.cellId = y + "," + x;
+                item.parent = dbData.parent_id;
+            } else {
+                item.cellId = i;
+            }
             item.class = 'o';
             item.size = 100;
             tuples.push(item);
@@ -57414,6 +57423,10 @@ vegaView.prototype.initVega = function (vegaJSONSpec) {
             }
         });
 
+        view.addEventListener('dblclick', function (event, item) {
+            thisModule.updateSelection(item, BIONET_VIS.EDIT_SELECTION);
+        });
+
         /*
         view.addEventListener('mousemove', function (event, item) {
             const drag = view.signal('drag')
@@ -57481,23 +57494,32 @@ vegaView.prototype.moveSelection = function (item) {
     BIONET.signal.setItemCoordinates.dispatch(stores.state.moveSelectionId, item.datum.cellx, item.datum.celly);
 };
 
-vegaView.prototype.updateSelection = function (item) {
+vegaView.prototype.updateSelection = function (item, selectionModeEvent) {
     if (!item) return;
     this.highlightSelection(item);
+    const selectionMode = selectionModeEvent || this.selectionMode;
 
-    switch (this.selectionMode) {
+    switch (selectionMode) {
         case BIONET_VIS.NAV_SELECTION:
-            BIONET_VIS.signal.selectInventoryItem.dispatch(item.datum.physicalId);
+            BIONET_VIS.signal.selectInventoryItem.dispatch(item.datum.physicalId, this.selectionMode);
+            if (this.viewId === BIONET_VIS.ZOOM_ITEM_TABLE) {
+                BIONET_VIS.signal.highlightItem.dispatch(BIONET_VIS.ZOOM_ITEM, item.datum.physicalId);
+            } else if (this.viewId === BIONET_VIS.ZOOM_ITEM) {
+                BIONET_VIS.signal.highlightItem.dispatch(BIONET_VIS.ZOOM_ITEM_TABLE, item.datum.physicalId);
+            }
+
             break;
 
         case BIONET_VIS.EDIT_SELECTION:
-            console.log('setting location for %s', item.datum.name);
+            console.log('edit selection: %s', item.datum.name);
             stores.state.editSelection = {
                 physicalId: item.datum.physicalId,
+                dbData: item.datum.dbData,
                 x: item.datum.cellx,
                 y: item.datum.celly
             };
             console.log('setting location for %s', JSON.stringify(stores.state.editSelection));
+            BIONET_VIS.signal.selectInventoryItem.dispatch(item.datum.physicalId, selectionMode);
             break;
 
         case BIONET_VIS.MOVE_SELECTION:
@@ -57604,7 +57626,7 @@ module.exports = {
         const zoomTableSpec = resources.zoomItemTable.data;
         this.initializeView('path', 'path_vis', zoomTableSpec, 100, 100);
         this.initializeView('favorites', 'favorites_vis', zoomTableSpec, 100, 100);
-        this.initializeView(BIONET_VIS.ZOOM_ITEM_TABLE, 'zoomItemTable', zoomTableSpec, 600, 250);
+        this.initializeView(BIONET_VIS.ZOOM_ITEM_TABLE, 'zoomItemTable', zoomTableSpec, 600, 450);
 
         this.close = function () {};
     },
@@ -57694,7 +57716,10 @@ module.exports = {
             var width = view._width;
             var height = view._height;
             var visWidth = width;
-            if (rootType === 'freezer') visWidth *= 0.7;
+            if (rootType === 'freezer') visWidth *= 0.7;else if (item.type === '8 x 12 freezer box') {
+                width *= 1.5;
+                visWidth *= 1.5;
+            }
             visView.signal('title', item.name);
             visView.signal('width', width);
             visView.signal('height', height);
@@ -57714,12 +57739,17 @@ module.exports = {
                 const cellHeight = 25;
                 var nRows = Math.trunc(tableView._height / cellHeight);
                 var ttuples = modelApi.generateTuplesFromDataset(item.children);
+                ttuples.sort((a, b) => {
+                    if (a.cellId > b.cellId) return 1;else if (a.cellId < b.cellId) return -1;
+                    return 0;
+                });
                 var ttable = modelApi.condenseTuples(ttuples, nRows);
 
                 const nTuples = ttable.length;
                 var nCols = Math.trunc(nTuples / nRows);
                 if (nTuples % nRows != 0) nCols++;
                 var colWidth = rootType === 'lab' ? 300 : Math.min(tableView._width / nCols, 200);
+
                 var width = nCols * colWidth;
 
                 var storageName = rootType === 'lab' ? ' Storage Units' : ' Contents';
@@ -57736,7 +57766,7 @@ module.exports = {
                     var zoomTuples = JSON.parse(JSON.stringify(ituples));
                     zoomView.scaleCoordinates(zoomTuples, zoomView._width, zoomView._height);
                     var visViewZoom = zoomView.view;
-                    var aspectRatio = view._width / view._height;
+                    var aspectRatio = visWidth / view._height;
                     width = aspectRatio * zoomView._height;
                     var visWidth = width;
                     if (rootType === 'freezer') visWidth *= 0.7;

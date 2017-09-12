@@ -117,6 +117,7 @@
             e.preventDefault()
             const virtualName = app.state.createPart.name
             const physicalInstances = app.state.createPart.instances
+            var parentId = opts.parent_id || null
 
             // remove instances property from app.state.createPart - not to be stored with virtual data
             delete app.state.createPart.instances
@@ -127,11 +128,12 @@
                 app.state.editPart = app.state.createPart
 
                 if (physicalInstances !== undefined && physicalInstances !== '0') {
-                    BIONET.signal.generatePhysicals.dispatch(virtualName, physicalInstances)
+                    BIONET.signal.generatePhysicals.dispatch(virtualName, physicalInstances, parentId)
                     app.ui.toast('Created ' + physicalInstances + ' instances of ' + opts.type + ' ' + virtualName)
                 } else {
                     app.ui.toast('Created ' + opts.type + ' ' + virtualName)
                 }
+                BIONET.signal.virtualSaveResult.dispatch(id)
             });
 
 

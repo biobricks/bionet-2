@@ -100,9 +100,7 @@
         this.createdDate = ''
         this.updatedDate = ''
         const partDataAccessor = app.getStream('partDataAccessor')
-        tag.formData = {
-            created: ''
-        }
+        tag.formData = opts.modaldata || { created: '' }
 
         const configureVirtualAttributes = function(type) {
             if (!type) return
@@ -122,6 +120,10 @@
             tag.update()
         }
 
+        this.on('update', function() {
+            tag.formData = opts.modaldata || { created: '' }
+        })
+                
         this.on('mount', function() {
             app.state.editPart = {}
 

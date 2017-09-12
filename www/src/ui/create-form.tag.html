@@ -837,6 +837,10 @@
             });
             $('#edit-virtual-modal').modal('open');
         })
+        
+        this.on('update', function() {
+            if (opts.modalVirtualOpen) $('#edit-virtual-modal').modal('open');
+        })
 
         this.on('before-unmount', function() {
             tags[0].unmount()

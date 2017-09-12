@@ -73,12 +73,20 @@
 
         <div id="deleteicon" style="position:fixed; top:470px; {iconXPos}; width:55px; height:55px;" onclick={deleteItem} class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">delete</i></div>
 
-        <div id="threedicon" style="position:fixed; top:540px; {iconXPos}; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
+        <form id="importForm">
+            <div class="file-field input-field">
+                <div id="uploadicon" style="position:fixed; top:540px; {iconXPos}; width:55px; height:55px;" onclick={upload} class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">open_in_browser</i>
+                    <input id="upload-file" type="file">
+                </div>
+            </div>
+        </form>
+
+        <div id="threedicon" style="position:fixed; top:610px; {iconXPos}; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
 
         <delete-modal deleteaction={deleteAction}></delete-modal>
         <modal-physical title={modalPhysicalTitle} modalaction={modalAction} modaldata={modalData}/>
         <div id="edit-virtual-modal" class="modal">
-            <modal-virtual if={modalVirtualOpen} title={modalVirtualTitle} modalaction={modalAction} modaldata={modalData}/>
+            <modal-virtual if={modalVirtualOpen} title={modalVirtualTitle} modalaction={modalAction} modaldata={modalData} query={modalQuery} open={modalVirtualOpen}/>
         </div>
         <!--
         -->
@@ -191,6 +199,7 @@
 
         const appSettings = BIONET.getAppSettings()
         const dataTypes = appSettings.dataTypes
+        const async=require('async')
 
         tag.materials = []
         tag.locations = []
@@ -205,6 +214,7 @@
             }
         }
         tag.createType = 'storage'
+        tag.modalQuery = null
 
         this.on('mount', function() {
 
@@ -257,10 +267,44 @@
 
             }
 
+            var uploadFileElement = document.getElementById('upload-file');
+            uploadFileElement.addEventListener('change', function(e) {
+                const parent_id = BIONET_VIS.getSelectedItemId()
+                const fileName = uploadFileElement.value
+                if (this.files && this.files.length > 0) {
+                    async.eachSeries(this.files, function(file, next) {
+                        tag.readFile(file, next, parent_id)
+                    })
+                }
+            })
+
+            tag.readFile = function(file, next, parent_id) {
+
+                if (file.type.match(/csv/i)) {
+                    var reader = new FileReader();
+                    reader.onload = function(e2) { // finished reading file data.
+                        //BIONET.signal.generatePhysicalsFromUpload.dispatch(e2.target.result, parent_id)
+                        BIONET.signal.generatePhysicalsFromTwistUpload.dispatch(e2.target.result, parent_id)
+                        next();
+                    }
+                    reader.readAsText(file); // start reading the file data.
+
+                    // match genbank extension
+                } else if (file.name.match(/\.gbk?$|\.genbank$/i)) {
+
+                    var reader = new FileReader();
+                    reader.onload = function(e2) { // finished reading file data.
+                        BIONET.signal.generatePhysicalFromGenbankUpload.dispatch(file.name, e2.target.result, parent_id)
+                        next();
+                    }
+                    reader.readAsText(file); // start reading the file data.        
+                }
+            }
+
             tag.addToFavorites = function() {
                 const currentItem = BIONET_VIS.getSelectedItem()
                 if (currentItem) {
-                    BIONET.signal.addFavorite.dispatch(currentItem)
+                    BIONET.signal.addFavorite.dispatch(currentItem.dbData)
                 }
             }
 
@@ -298,20 +342,28 @@
                 })
             }
 
-            const selectInventoryItem = function(id) {
-                const selectionMode = BIONET_VIS.getSelectionMode()
+            const selectInventoryItem = function(id, selectionModeVis) {
+                const selectionMode = selectionModeVis || BIONET_VIS.getSelectionMode()
                 if (selectionMode === BIONET_VIS.EDIT_SELECTION) {
                     //editSelection = BIONET_VIS.getEditSelection()
-                    editSelection = BIONET_VIS.getSelectedItem()
-                    if (editSelection) {
-                        if (editSelection.physicalId) {
-                            BIONET.signal.getPhysical.dispatch(id)
+                    editSelection = BIONET_VIS.getEditSelection()
+                    if (editSelection && editSelection.dbData) {
+                        //if (editSelection.physicalId) {
+                        if (editSelection.dbData.type === 'physical') {
+                            tag.editMaterial()
                         } else {
-                            // create new physical and add to parent
-                            console.log('selectInventoryItem: create new physical', JSON.stringify(editSelection), id)
+                            tag.editItem()
+                                //BIONET.signal.getPhysical.dispatch(id)
                         }
+                        //} else {
+                        // create new physical and add to parent
+                        //console.log('selectInventoryItem: create new physical', JSON.stringify(editSelection), id)
+                        //}
                     }
+                    return
                 }
+                const currentItem = BIONET_VIS.getSelectedItem()
+                console.log('selectInventoryItem:', JSON.stringify(currentItem))
                 retrieveLocationPath(id, (path) => {
                     //console.log('retrieveLocationPath:', JSON.stringify(path, null, 2))
                     BIONET_VIS.signal.setLocationPath.dispatch(id, path)
@@ -359,17 +411,51 @@
                 tag.modalData = dbData
                 tag.displayPhysical = false
                 tag.modalOpen = true
+                var physicalUpdatedDetach
                 const physicalUpdatedModal = function(modalData) {
                     if (tag.modalOpen) {
                         console.log('close edit physical modal')
                         $('#edit-physical-modal').modal('close');
                         tag.displayPhysical = true
-                        tag.update()
                         tag.modalOpen = false
-                        selectInventoryItem(parentId)
+                        tag.update()
+                        selectInventoryItem(parentId, BIONET_VIS.NAV_SELECTION)
+                        physicalUpdatedBinding.detach()
                     }
                 }
-                BIONET.signal.physicalUpdated.add(physicalUpdatedModal)
+                physicalUpdatedBinding = BIONET.signal.physicalUpdated.add(physicalUpdatedModal)
+                tag.update()
+
+                $('#edit-physical-modal').modal('open');
+                BIONET.signal.getPhysicalResult.dispatch(dbData)
+
+            }
+
+            tag.editItem = function(e) {
+
+                var parentId = BIONET_VIS.getSelectedItemId()
+                    // initialize storage type
+                var editSelection = BIONET_VIS.getEditSelection()
+                if (!editSelection || !editSelection.dbData) return
+                const dbData = editSelection.dbData
+
+                tag.modalPhysicalTitle = "Edit " + dbData.name
+                tag.modalData = dbData
+                tag.displayPhysical = false
+                tag.modalOpen = true
+                var physicalUpdatedDetach
+                const physicalUpdatedModal = function(modalData) {
+                    if (tag.modalOpen) {
+                        console.log('close edit physical modal')
+                        $('#edit-physical-modal').modal('close');
+                        tag.displayPhysical = true
+                        tag.modalOpen = false
+                        tag.update()
+                        selectInventoryItem(parentId, BIONET_VIS.NAV_SELECTION)
+                        physicalUpdatedBinding.detach()
+                    }
+                }
+                physicalUpdatedBinding = BIONET.signal.physicalUpdated.add(physicalUpdatedModal)
                 tag.update()
 
                 $('#edit-physical-modal').modal('open');
@@ -379,68 +465,91 @@
 
             tag.addMaterial = function(e) {
 
-                    var parentId = BIONET_VIS.getSelectedItemId()
-                        // initialize storage type
-                    const active = $(e.target)
-                    const title = active.text()
-                    var type = null
-                    for (var i = 0; i < tag.materials.length; i++) {
-                        if (tag.materials[i].title === title) {
-                            type = tag.materials[i].name
-                        }
+                var parentId = BIONET_VIS.getSelectedItemId()
+                    // initialize storage type
+                const active = $(e.target)
+                const title = active.text()
+                var type = null
+                for (var i = 0; i < tag.materials.length; i++) {
+                    if (tag.materials[i].title === title) {
+                        type = tag.materials[i].name
                     }
-                    if (!type) {
-                        console.log('addMaterial, type not found for title:', title)
-                        return
-                    }
-
-                    // generate unique name
-                    const name = title
-
-                    // initialize standard attributes
-                    const dbData = {
-                        name: '',
-                        type: type,
-                        parent_id: parentId
-                    }
-
-                    // initialize attributes
-                    const attributes = app.getAttributesForType(type)
-                    for (var i = 0; i < attributes.length; i++) {
-                        dbData[attributes[i].name] = type + ' ' + attributes[i].name
-                    }
-
-                    tag.modalVirtualTitle = "Create " + title
-                    tag.modalData = dbData
-                    tag.modalType = type
-                        //tag.displayPhysical = false
-                    tag.modalVirtualOpen = true
-                    const virtualUpdatedModal = function(modalData) {
-                            if (tag.modalVirtualOpen) {
-                                console.log('close edit physical modal')
-                                $('#edit-physical-modal').modal('close');
-                                tag.displayPhysical = true
-                                tag.update()
-                                tag.modalVirtualOpen = false
-                                    //selectInventoryItem(parentId)
-                            }
-                        }
-                        //BIONET.signal.physicalUpdated.add(virtualUpdatedModal)
-                    tag.update()
-
-                    //$('#edit-virtual-modal').modal('open');
-                    //BIONET.signal.getPhysicalResult.dispatch(dbData)
-
                 }
-                /*
-                tag.addMaterial = function(e) {
-                    riot.mount('#material-form', 'create-quilt')
-                    $('#physical-storage').hide()
-                    $('#material-form').show()
-                    tag.update()
-                    //BIONET.signal.generatePhysicals.dispatch(tag.refs.selectVirtual.value, tag.refs.instances.value)
+                if (!type) {
+                    console.log('addMaterial, type not found for title:', title)
+                    return
                 }
-                */
+
+                // generate unique name
+                const name = title
+
+                // initialize standard attributes
+                const dbData = {
+                    name: '',
+                    type: type,
+                    parent_id: parentId
+                }
+
+                // initialize attributes
+                const attributes = app.getAttributesForType(type)
+                for (var i = 0; i < attributes.length; i++) {
+                    dbData[attributes[i].name] = type + ' ' + attributes[i].name
+                }
+
+                tag.modalVirtualTitle = "Create " + title
+                tag.modalData = dbData
+                tag.modalType = type
+                    //tag.displayPhysical = false
+                tag.modalVirtualOpen = true
+                var virtualSaveResultBinding
+                const virtualUpdatedModal = function(modalData) {
+                    if (tag.modalVirtualOpen) {
+                        console.log('close edit virtual modal')
+                        $('#edit-virtual-modal').modal('close');
+                        tag.modalVirtualOpen = false
+                        tag.update()
+                        virtualSaveResultBinding.detach()
+                    }
+                }
+                virtualSaveResultBinding = BIONET.signal.virtualSaveResult.add(virtualUpdatedModal)
+                tag.update()
+            }
+
+            tag.editMaterial = function(e) {
+
+                // initialize storage type
+                //var editSelection = BIONET_VIS.getSelectedItem()
+                var editSelection = BIONET_VIS.getEditSelection()
+                if (!editSelection || !editSelection.dbData) {
+                    console.log('editMaterial: null selection')
+                    return
+                }
+
+                const dbData = editSelection.dbData
+                tag.modalData = dbData
+                tag.modalType = dbData.type
+                tag.modalQuery = {
+                    name: dbData.name
+                }
+                tag.modalVirtualTitle = "Edit " + dbData.name
+                tag.modalVirtualOpen = true
+                var virtualSaveResultBinding
+                const virtualUpdatedModal = function(modalData) {
+                    if (tag.modalVirtualOpen) {
+                        console.log('close edit virtual modal')
+                        $('#edit-virtual-modal').modal('close');
+                        tag.modalVirtualOpen = false
+                        tag.modalQuery = null
+                        tag.modalData = null
+                        tag.modalType = null
+                        tag.update()
+                        virtualSaveResultBinding.detach()
+                    }
+                }
+                virtualSaveResultBinding = BIONET.signal.virtualSaveResult.add(virtualUpdatedModal)
+                tag.update()
+                $('#edit-virtual-modal').modal('open');
+            }
 
             tag.deleteItem = function() {
                 tag.deleteAction = function() {
@@ -456,23 +565,28 @@
                             }
                         })
                     }
+
                     const currentItem = BIONET_VIS.getSelectedItem()
-                    const parentId = currentItem.parent_id
-                    delChildren(currentItem)
-                    deleteNodes.push(currentItem)
+                    if (currentItem && currentItem.dbData) {
+                        const dbData = currentItem.dbData
+                        const parentId = dbData.parent_id
+                        delChildren(dbData)
+                        deleteNodes.push(dbData)
 
-                    const physicalDeleted = function() {
-                        selectInventoryItem(parentId)
-                    }
-                    BIONET.signal.physicalDeleted.add(physicalDeleted)
+                        const physicalDeleted = function() {
+                            selectInventoryItem(parentId)
+                        }
+                        BIONET.signal.physicalDeleted.add(physicalDeleted)
 
-                    for (var i = 0; i < deleteNodes.length; i++) {
-                        const item = deleteNodes[i]
-                        var id = null
-                        if (item.favorite_id) id = item.favorite_id
-                        else id = item.id
-                        BIONET.signal.delPhysical.dispatch(id)
+                        for (var i = 0; i < deleteNodes.length; i++) {
+                            const item = deleteNodes[i]
+                            var id = null
+                            if (item.favorite_id) id = item.favorite_id
+                            else id = item.id
+                            BIONET.signal.delPhysical.dispatch(id)
+                        }
                     }
+
                 }
                 $('#deleteModal').modal('open');
             }
@@ -489,6 +603,7 @@
                         $('#move_icon').removeClass('active-button')
                         $('#edit_icon').removeClass('active-button')
                         tag.enableNavZoom = true
+                        tag.modalVirtualOpen = false
                         break;
                     case 'move':
                         selectionMode = BIONET_VIS.MOVE_SELECTION
@@ -496,19 +611,23 @@
                         $('#edit_icon').removeClass('active-button')
                         $('#navigate_icon').removeClass('active-button')
                         tag.enableNavZoom = true
+                        tag.modalVirtualOpen = false
                         break;
                     case 'edit':
                         selectionMode = BIONET_VIS.EDIT_SELECTION
+                            //BIONET_VIS.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM, selectionMode)
                         $('#edit_icon').addClass('active-button')
                         $('#move_icon').removeClass('active-button')
                         $('#navigate_icon').removeClass('active-button')
-                        tag.enableNavZoom = false
-                        const id = BIONET_VIS.getSelectedItemId()
-                        BIONET_VIS.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM, selectionMode)
-                        BIONET.signal.getPhysical.dispatch(id)
-                        $('#nav-zoom').hide()
-                        $('#material-form').hide()
-                        $('#physical-storage').show()
+                        tag.enableNavZoom = true
+                            /*
+                            tag.enableNavZoom = false
+                            const id = BIONET_VIS.getSelectedItemId()
+                            BIONET.signal.getPhysical.dispatch(id)
+                            $('#nav-zoom').hide()
+                            $('#material-form').hide()
+                            $('#physical-storage').show()
+                            */
                         break;
                 }
                 tag.update()
@@ -523,6 +642,10 @@
                     BIONET_VIS.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM_IMAGE, selectionMode)
                     BIONET_VIS.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM, selectionMode)
                 }
+            }
+
+            tag.upload = function() {
+                BIONET.signal.generatePhysicalsFromTwistUpload.dispatch()
             }
 
             const enableLocationPathSections = function(sectionId) {
@@ -568,7 +691,7 @@
                 BIONET.remote.inventoryTree(function(err, children) {
                     for (var i = 0; i < children.length; i++) {
                         var item = children[i].value
-                        if (!item.parent_id && item.type==='lab') {
+                        if (!item.parent_id && item.type === 'lab') {
                             tag.rootId = item.id
                             tag.rootItem = item
                             selectInventoryItem(tag.rootId)
@@ -689,8 +812,8 @@
     <list-item each={node in opts.nodes} item={node} />
     <script>
         /*
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    */
         const tag = this;
 
 
