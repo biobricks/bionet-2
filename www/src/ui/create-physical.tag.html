@@ -2,7 +2,6 @@
     <div if={opts.topMargin!==undefined} id="createPhysical" style="margin-top:{opts.topMargin}px" />
     <div if={opts.topMargin===undefined} id="createPhysical" style="margin-top:0px" />
     <form id="createPhysicalForm" ref="createPhysicalForm" class={classes} onsubmit={submitForm}>
-        <h5 id="createPhysicalHeader" ref="createPhysicalHeader"></h5>
         <div if={showPhysical}>
 
 
@@ -18,6 +17,7 @@
             -->
             <div class="row">
                 <div class="col" style="width:50%;">
+                    <h5>{title}</h5><br/>
                     <form-text-input label="Name" ref="name" name="name" value={formData.name}/>
                     <div each={field in fields}>
                         <form-text-input label={field.name} ref={ 'field_'+field.name} name={field.name} value="{formData[field.name]}" />
@@ -30,21 +30,14 @@
                 <a id="containerScanButton" class="waves-effect waves-light grey btn" onclick={scanContainer} style="margin-right:10px; margin-left:0.75rem">scan parent container</a>
             </div>
             -->
-
-                    <div id="autocomplete-container" style="margin-top:30px ">
+                    <std-button action={enableContainer} label="Select Container" />
+                    <div if={selectContainerEnable} id="autocomplete-container" style="margin-top:30px ">
                         <autocomplete ref="selectContainer" searchcallback={updateAutocomplete} placeholder="enter container name" />
                     </div>
-
-                </div>
-                <div id='physical-container-vis' class="col" style="width:50%;"></div>
-            </div>
-
-            <div class="row">
-
-                <div style="margin-top:30px; margin-left:0.75rem">
                     <std-button label="save" action={submitForm} />
                     <std-button if={formData.label || labelFormData} label="save & print" action={submitFormPrint} />
                 </div>
+                <div id='physical-container-vis' class="col" style="width:50%;"></div>
             </div>
             <input type="submit" style="visibility:hidden" />
         </div>
@@ -74,6 +67,7 @@
         tag.labelFormData = null
         this.isMaterial = false
         this.showPhysical = true
+        tag.selectContainerEnable = false
         if (opts.show === undefined || opts.show === true) this.showPhysical = true
         else this.showPhysical = false
 
@@ -92,6 +86,10 @@
             parent_id: opts.parent_id
         }
         tag.container = {}
+        tag.enableContainer = function() {
+            tag.selectContainerEnable = true
+            tag.update()
+        }
 
         var savePhysical = function(p, labelImage, doPrint) {
             delete p.selectContainer
@@ -276,9 +274,11 @@
             if (tag.refs && tag.refs.selectContainer) tag.refs.selectContainer.value = null
             tag.formData = data
             tag.type = data.type
+            tag.title = 'Edit ' + data.name
             tag.showPhysical = true
-            
-            if (!data.id) {
+            tag.selectContainerEnable = false
+
+            if (!data.id||true) {
                 const visId = 'physical-container-vis'
                 const containerElementId = visId
                 const visSpecs = BIONET_VIS.getSelectedItem()
@@ -289,12 +289,11 @@
                     BIONET_VIS.initVisualization(visId, visSpecs, containerElementId)
                 }
             }
-            
+
             tag.update()
         }
 
         this.on('mount', function() {
-
             console.log("create physical tag mount, opts:%s", JSON.stringify(opts))
 
             const getPhysicalResultBinding = BIONET.signal.getPhysicalResult.add(getPhysicalResult)
@@ -466,7 +465,6 @@
 <modal-physical>
     <div id="edit-physical-modal" class="modal">
         <div class="modal-content">
-            <h4>{opts.title}</h4>
             <div id="modal-physical-contents"></div>
         </div>
         <!--
@@ -490,6 +488,7 @@
                 topMargin: 10,
                 modal: true,
                 type: type,
+                title: opts.title,
                 parent_id: parent_id,
                 modalaction: opts.modalaction,
                 modaldata: opts.modaldata

@@ -57407,13 +57407,27 @@ vegaView.prototype.initVega = function (vegaJSONSpec) {
         }],
         colorTheme: "dark"
     };
+    thisModule.clickCount = 0;
 
     var view = new vega.View(vega.parse(vegaJSONSpec)).renderer('canvas') // set renderer (canvas or svg)
     .initialize('#' + containerId) // initialize view within parent DOM container
     .width(thisModule._width).height(thisModule._height).run().hover().runAfter(function (view) {
         thisModule.view = view;
         view.addEventListener('click', function (event, item) {
-            thisModule.updateSelection(item);
+            if (thisModule.clickCount === 0) {
+                const timer = setTimeout(function () {
+                    if (thisModule.clickCount === 1) {
+                        thisModule.updateSelection(item);
+                    }
+                    thisModule.clickCount = 0;
+                }, 250);
+            }
+            thisModule.clickCount++;
+        });
+
+        view.addEventListener('dblclick', function (event, item) {
+            thisModule.clickCount = 2;
+            thisModule.updateSelection(item, BIONET_VIS.EDIT_SELECTION);
         });
 
         view.addEventListener('mouseup', function (event, item) {
@@ -57421,10 +57435,6 @@ vegaView.prototype.initVega = function (vegaJSONSpec) {
                 const selectionRectangle = view.signal('brush');
                 thisModule.setLocationCoordinates(selectionRectangle);
             }
-        });
-
-        view.addEventListener('dblclick', function (event, item) {
-            thisModule.updateSelection(item, BIONET_VIS.EDIT_SELECTION);
         });
 
         /*
