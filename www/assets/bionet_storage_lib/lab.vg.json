@@ -207,6 +207,12 @@
                             },
                             "y": {
                                 "value": 0
+                            },
+                            "width": {
+                                "signal": "width"
+                            },
+                            "height": {
+                                "signal": "height"
                             }
                         }
                     }

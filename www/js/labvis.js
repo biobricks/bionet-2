@@ -57690,6 +57690,23 @@ module.exports = {
         var rootPath = [];
         var selectedItem = null;
 
+        var scale = 1.0;
+        var twidth = 0;
+        for (var i = 0; i < locationPath.length; i++) {
+            var item = locationPath[i];
+            var rootType = item.rootType;
+            var view = this.getView(rootType);
+            if (!view) continue;
+            var width = view._width;
+            if (item.type === '8 x 12 freezer box') {
+                width *= 1.5;
+            }
+            twidth += width + 50;
+        }
+        var windowWidth = window.innerWidth - 350;
+        if (twidth !== 0) scale = windowWidth / twidth;
+        if (scale > 1.25) scale = 1.25;
+
         for (var i = 0; i < locationPath.length; i++) {
             var item = locationPath[i];
             var rootType = item.rootType;
@@ -57702,8 +57719,12 @@ module.exports = {
             var transformMethod = 'slicedice';
 
             sectionId[rootType] = true;
+            var width = view._width * scale;
+            var height = view._height * scale;
+            var visWidth = width;
 
             if (item.nx) {
+                visView.scale = scale;
                 var nx = item.nx;
                 var ny = item.ny;
                 if (nx === 1) transformMethod = 'slice';
@@ -57716,20 +57737,19 @@ module.exports = {
                 modelApi.overlayDataset(ituples, item.children, index);
                 visView.signal('transformMethod', transformMethod);
             } else if (item.image) {
+                view.scale = scale;
                 ituples = view.getData(visView);
                 index = modelApi.generateTupleIndex(ituples, 'name');
                 modelApi.overlayDataset(ituples, item.children, index, 'name');
                 view.scaleCoordinates(ituples, view._width, view._height);
-                visView.signal('scale', 1);
+                visView.signal('scale', scale);
             }
 
-            var width = view._width;
-            var height = view._height;
-            var visWidth = width;
             if (rootType === 'freezer') visWidth *= 0.7;else if (item.type === '8 x 12 freezer box') {
                 width *= 1.5;
                 visWidth *= 1.5;
             }
+            //visView.signal('scale', scale)
             visView.signal('title', item.name);
             visView.signal('width', width);
             visView.signal('height', height);
@@ -57782,7 +57802,7 @@ module.exports = {
                     if (rootType === 'freezer') visWidth *= 0.7;
                     visViewZoom.signal('title', item.name);
                     visViewZoom.signal('width', width);
-                    visViewZoom.signal('height', zoomView._height);
+                    visViewZoom.signal('height', zoomView._height * scale);
                     visViewZoom.signal('visWidth', visWidth);
                     //visViewZoom.signal('fontSize', fontSize)
                     visViewZoom.signal('transformMethod', transformMethod);
@@ -57790,13 +57810,13 @@ module.exports = {
                 } else {
                     var zoomTuples = JSON.parse(JSON.stringify(ituples));
                     var zoomView = this.getView(BIONET_VIS.ZOOM_ITEM_IMAGE);
-                    var scale = 3;
-                    zoomView.scale = scale;
+                    var scalez = scale * 2;
+                    zoomView.scale = scalez;
                     var visViewZoom = zoomView.view;
                     visViewZoom.signal('title', item.name);
-                    visViewZoom.signal('scale', scale);
-                    visViewZoom.signal('width', zoomView._width * scale);
-                    visViewZoom.signal('height', zoomView._height * scale);
+                    visViewZoom.signal('scale', 2);
+                    visViewZoom.signal('width', zoomView._width * scalez);
+                    visViewZoom.signal('height', zoomView._height * scalez);
                     sectionId.zoomItem = false;
                     sectionId.zoomItemImage = true;
                     sectionId[rootType] = false;
