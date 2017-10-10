@@ -122,7 +122,8 @@
             formData.type = tag.type
 
             const parentItem = BIONET_VIS.getSelectedItem()
-            formData.parent_id = parentItem.physicalId
+            // xxx possible issue:
+            //formData.parent_id = parentItem.physicalId
 
             const editSelection = BIONET_VIS.getEditSelection()
             formData.parent_x = editSelection.x
@@ -281,7 +282,8 @@
             if (!data.id||true) {
                 const visId = 'physical-container-vis'
                 const containerElementId = visId
-                const visSpecs = BIONET_VIS.getSelectedItem()
+                //const visSpecs = BIONET_VIS.getSelectedItem()
+                const visSpecs = BIONET_VIS.getItemInPath(data.parent_id)
                 if (visSpecs) {
                     visSpecs.width = 300
                     visSpecs.height = 200

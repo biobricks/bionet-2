@@ -7,6 +7,19 @@ var partsInventory = {
     init: function () {
         require('./parts-inventory.tag.html')
         BIONET.signal.setItemCoordinates = new MiniSignal()
+        
+        BIONET.signal.highlightItem = new MiniSignal()
+        BIONET.signal.selectInventoryItem = new MiniSignal()
+        BIONET.signal.setSelectionMode = new MiniSignal()
+        BIONET.signal.refreshInventoryPath = new MiniSignal()
+        BIONET.signal.savePhysicalProperties = new MiniSignal()
+        BIONET.signal.setLayout = new MiniSignal()
+
+        BIONET.NAV_SELECTION= 'nav'
+        BIONET.EDIT_SELECTION= 'edit'
+        BIONET.MOVE_SELECTION= 'moveLocation'
+        
+        BIONET_DATAGRID.init()
 
         const setItemCoordinates = function (id, x, y, w, h) {
             console.log('setItemCoordinates:', id, x, y, h, w)
@@ -34,17 +47,28 @@ var partsInventory = {
                         return;
                     }
                     console.log('setItemCoordinates result:', JSON.stringify(data, null, 2))
-                    BIONET.signal.updateInventoryPath.dispatch(data.parent_id)
+                    //BIONET.signal.updateInventoryPath.dispatch(data.parent_id)
+                    BIONET.signal.refreshInventoryPath.dispatch(data.parent_id)
                 })
             })
         }
         const setItemCoordinatesBinding = BIONET.signal.setItemCoordinates.add(setItemCoordinates)
+        
+        const savePhysicalProperties = function(id, properties) {
+            app.remote.get(id, function (err, data) {
+                _.merge(data,properties)
+                console.log('savePhysicalProperties:',properties, data)
+                app.remote.savePhysical(data, null, null, function (err, id) {
+                })
+            })
+        }
+        const savePhysicalPropertiesBinding = BIONET.signal.savePhysicalProperties.add(savePhysicalProperties)
 
         const inventoryRouter = function (q) {
             //var q = route.query()
 
             app.appbarConfig({
-                enableTopNav: true,
+                enableTopNav: false,
                 enableBreadCrumbs: true,
                 enableSubbar: false,
                 activeItem: 'local inventory'
@@ -55,7 +79,8 @@ var partsInventory = {
                 'label': 'local inventory',
                 'url': '/inventory'
             }]);
-            riot.mount('div#content', 'inventory-treeview', {
+            //riot.mount('div#content', 'inventory-treeview', {
+            riot.mount('div#content', 'parts-inventory', {
                 q: q
             })
         }

@@ -314,47 +314,6 @@
                     }
                 },
                 {
-                    "type": "text",
-                    "from": {
-                        "data": "tree"
-                    },
-                    "interactive": false,
-                    "encode": {
-                        "update": {
-                            "font": {
-                                "value": "Helvetica Neue, Arial"
-                            },
-                            "align": {
-                                "value": "center"
-                            },
-                            "baseline": {
-                                "value": "middle"
-                            },
-                            "fill": [
-                                {
-                                    "test": "datum.selected",
-                                    "value": "#000"
-                                },
-                                {
-                                    "value": "transparent"
-                                }
-                            ],
-                            "text": {
-                                "field": "name"
-                            },
-                            "fontSize": {
-                                "value": 14
-                            },
-                            "x": {
-                                "value": 100
-                            },
-                            "y": {
-                                "value": 100
-                            }
-                        }
-                    }
-                },
-                {
                     "type": "line",
                     "from": {
                         "data": "tree"

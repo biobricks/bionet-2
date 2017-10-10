@@ -1,55 +1,86 @@
 <parts-inventory>
     <div id="inventory-wrapper">
-        <div class="row" style="margin-bottom:0; padding-bottom:0">
-            <div id="action-icons" class="col s1 m1 l1" style="padding:0">
+        <!--
+        <div class="row flex-row" style="margin-bottom:0; padding-bottom:0">
+            <div class="col s1 m1 l1 flex-col" style="padding:0">
             </div>
-            <div id="navview" class="col s11">
-                <div class="flex-row">
-                    <div class="flex-col">
-                        <div id="path_vis" class="flex-item"></div>
-                        <div id="favorites_vis" class="flex-item"></div>
-                    </div>
-                    <div class="flex-col">
+            <div style="width:8.3333333333%"></div>
+                <div style="width:55px"></div>
+            <div style="col s7 m7 l7 flex-col">
+                <h5>{selectedName}</h5>
+            </div>
+            <div style="col s4 m4 l4 flex-col">
+            </div>
+        </div>
+                -->
+        <div style="margin-left:8.3333333333%; padding-left:10px; margin-bottom:0">
+            <h5>{selectedName}</h5>
+        </div>
+        <div class="row flex-row" style="margin-bottom:0; padding-bottom:0">
+            <div id="action-icons" class="flex-col col s1 m1 l1" style="padding:0">
+            </div>
+            <div id="navview" class="flex-col col s7 m7 l7">
+                <div class="flex-row" style="margin-bottom:10px;">
+                    <div class="flex-item-right" style="display:flex">
                         <!--
-                        <div class="flex-item">
-                            <h5>{currentItem.name}</h5>
-                        </div>
-                        -->
-                        <div class="flex-row">
-                            <div id="lab_vis" class="flex-item"></div>
-                            <div id="freezer_vis" class="flex-item"></div>
-                            <div id="shelf_vis" class="flex-item"></div>
-                            <div id="rack_vis" class="flex-item"></div>
-                            <div id="box_vis" class="flex-item"></div>
-                        </div>
-                        <div id='nav-subheader-bottom' class="flex-row"></div>
-                        <div id="nav-zoom" class="flex-row">
+                                <div id="navigate" class="horizontal-nav-button" data-constrainwidth="false" onclick={setSelectionMode}><i id="navigate_icon" class="material-icons horizontal-nav-button-contents">forward</i></div>
+                        <div id="edit" class="horizontal-nav-button " data-constrainwidth="false" onclick={setSelectionMode}><i id="edit_icon" class="material-icons horizontal-nav-button-contents">edit</i></div>
+
+                                <div class="horizontal-nav-button " data-constrainwidth="false" onclick={addToFavorites}><i class="material-icons">star</i></div>
+
+                                <div id="deleteicon" class="horizontal-nav-button " onclick={deleteItem}><i class="material-icons">delete</i>
+                                </div>
+
+                        <div id="move" class="horizontal-nav-button " data-constrainwidth="false" onclick={setSelectionMode}><i id="move_icon" class="material-icons horizontal-nav-button-contents">shuffle</i></div>
+
+
+                        <div id="threedicon" onclick={activate3d} class="horizontal-nav-button"><span class="horizontal-nav-button-contents">3D</span></div>
+                                -->
+                    </div>
+                </div>
+                <div class="flex-row" style="margin-bottom:10px;min-width:340px">
+                    <!--
+                    <div id="path_vis" class="flex-item"></div>
+                    -->
+                    <div id="lab_vis" class="flex-item"></div>
+                    <div id="freezer_vis" class="flex-item"></div>
+                    <div id="shelf_vis" class="flex-item"></div>
+                    <div id="rack_vis" class="flex-item"></div>
+                    <div id="box_vis" class="flex-item"></div>
+                </div>
+                <div id="nav-zoom" class="flex-row">
+                    <!--
                             <div id="zoomItemTable" class="flex-item"></div>
-                            <div id="zoomItem_vis" class="flex-item"></div>
-                            <div id="zoomItemImage_vis" class="flex-item"></div>
-                        </div>
-                        <div if={!enableNavZoom} class="flex-row">
-                            <!--
+                            -->
+                    <div id="itemDataGrid" class="flex-item"></div>
+                </div>
+                <div if={!enableNavZoom} class="flex-row">
+                    <!--
                             <div id="threedview" class="row threedview" style="margin:0;padding:0;">
                                 <babylon-3d></babylon-3d>
                             </div>
                             -->
-                            <div id="physical-props-view" class="row physical-view">
-                                <div id="physical-storage" class="edit-physical" style="width:100%">
-                                    <create-physical show="true" top-margin="0px" style="width:100%" />
-                                </div>
-                                <!--
+                    <div id="physical-props-view" class="row physical-view">
+                        <div id="physical-storage" class="edit-physical" style="width:100%">
+                            <create-physical show="true" top-margin="0px" style="width:100%" />
+                        </div>
+                        <!--
                                 <div id="box" class="edit-physical" style="width:100%">
                                     <box-contents />
                                 </div>
                                 -->
-                                <div id="material-form" class="row physical-view">
-                                </div>
-                            </div>
+                        <div id="material-form" class="row physical-view">
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div id="favview" class="flex-row col s4 m4 l4" style="margin-top:10px">
+                <div class="flex-row" style="margin-bottom:10px;flex-wrap: wrap; align-items: flex-start; justify-content: flex-start;">
+                    <div id="zoomItem_vis" class="flex-item"></div>
+                    <div id="zoomItemImage_vis" class="flex-item"></div>
+                    <div id="favorites_vis" class="flex-item"></div>
+                </div>
             </div>
         </div>
 
@@ -63,33 +94,26 @@
             <li if={createType==='material' } each={item in materials} class="add-type"><span onclick={addMaterial}>{item.title}</span></li>
         </ul>
 
-        <a id="navigate" class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:fixed; top:190px; {iconXPos}; text-align:left" onclick={setSelectionMode}><i id="navigate_icon" class="material-icons">forward</i></a>
+        <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:fixed; top:190px; {iconXPos}; text-align:left" onclick={addToFavorites}><i class="material-icons">star</i></a>
 
-        <a id="edit" class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:fixed; top:260px; {iconXPos}; text-align:left" onclick={setSelectionMode}><i id="edit_icon" class="material-icons">edit</i></a>
+        <div id="edit" style="position:fixed; top:260px; {iconXPos}; width:55px; height:55px;" class="btn-floating btn-large waves-effect waves-light blue" data-constrainwidth="false" onclick={setSelectionMode}><i id="edit_icon" class="material-icons horizontal-nav-button-contents">edit</i></div>
 
-        <a id="move" class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:fixed; top:330px; {iconXPos}; text-align:left" onclick={setSelectionMode}><i id="move_icon" class="material-icons">shuffle</i></a>
-
-        <a class="btn-floating btn-large waves-effect waves-light blue dropdown-button" data-constrainwidth="false" style="position:fixed; top:400px; {iconXPos}; text-align:left" onclick={addToFavorites}><i class="material-icons">star</i></a>
-
-        <div id="deleteicon" style="position:fixed; top:470px; {iconXPos}; width:55px; height:55px;" onclick={deleteItem} class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">delete</i></div>
+        <div id="deleteicon" style="position:fixed; top:330px; {iconXPos}; width:55px; height:55px;" onclick={deleteItem} class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">delete</i></div>
 
         <form id="importForm">
             <div class="file-field input-field">
-                <div id="uploadicon" style="position:fixed; top:540px; {iconXPos}; width:55px; height:55px;" onclick={upload} class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">open_in_browser</i>
+                <div id="uploadicon" style="position:fixed; top:400px; {iconXPos}; width:55px; height:55px;" onclick={upload} class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">open_in_browser</i>
                     <input id="upload-file" type="file">
                 </div>
             </div>
         </form>
-
-        <div id="threedicon" style="position:fixed; top:610px; {iconXPos}; width:55px; height:55px;" onclick={activate3d} class="btn-floating btn-large waves-effect waves-light blue"><span>3d</span></div>
 
         <delete-modal deleteaction={deleteAction}></delete-modal>
         <modal-physical title={modalPhysicalTitle} modalaction={modalAction} modaldata={modalData}/>
         <div id="edit-virtual-modal" class="modal">
             <modal-virtual if={modalVirtualOpen} title={modalVirtualTitle} modalaction={modalAction} modaldata={modalData} query={modalQuery} open={modalVirtualOpen}/>
         </div>
-        <!--
-        -->
+
     </div>
 
     <style>
@@ -99,11 +123,13 @@
             width: 100%;
             background-color: #f5f5f5;
         }
-        
-        #nav-subheader-bottom {
+        /*
             background-image: url(/static/images/appbarBorder.png);
             background-repeat: repeat-x;
-            height: 20px;
+        */
+        
+        #nav-subheader-bottom {
+            height: 10px;
             width: 100%;
         }
         
@@ -126,6 +152,30 @@
         .flex-item {
             margin-right: 20px;
             //margin-bottom: 20px;
+        }
+        
+        .flex-item-right {
+            margin-left: auto;
+        }
+        
+        .horizontal-nav-button {
+            margin-right: 15px;
+        }
+        
+        .horizontal-nav-button-contents {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            color: #ffffff;
+            background-color: #2196F3;
+        }
+        
+        .selected-table-row td {
+            border: 1px solid black;
+            background: #00ffff!important;
         }
         
         .threedview {
@@ -199,7 +249,7 @@
 
         const appSettings = BIONET.getAppSettings()
         const dataTypes = appSettings.dataTypes
-        const async=require('async')
+        const async = require('async')
 
         tag.materials = []
         tag.locations = []
@@ -217,6 +267,29 @@
         tag.modalQuery = null
 
         this.on('mount', function() {
+            const windowWidth = $(window).innerWidth()
+            const windowHeight = $(window).innerHeight()
+
+            const updateLayout = function() {
+                const layout = {
+                    leftWidth: $('#action-icons').width(),
+                    centerWidth: $('#navview').width(),
+                    rightWidth: $('#favview').width(),
+                    topMargin: $('#appbar').height(),
+                    bottomMargin: $('.bionet-page-footer').height(),
+                    windowWidth: windowWidth,
+                    windowHeight: windowHeight
+                }
+                layout.centerWidth = windowWidth - (layout.leftWidth + layout.rightWidth)
+                layout.centerHeight = windowHeight - (layout.topMargin + layout.bottomMargin)
+                tag.layout = layout
+                BIONET.signal.setLayout.dispatch(tag.layout)
+            }
+            updateLayout()
+
+            $('#navview').css({
+                width: tag.layout.centerWidth
+            })
 
             $('#inventory-wrapper').css({
                 marginTop: $('#appbar').height(),
@@ -227,10 +300,15 @@
             $('#zoomItem_vis').hide()
 
             tag.iconXPos = 'left:' + ($('#action-icons').width() - 55) * 0.5 + 'px'
-            $('#navigate_icon').addClass('active-button')
+
+            tag.selectionMode = BIONET.NAV_SELECTION
+                //$('#edit_icon').addClass('active-button')
 
             tag.enableNavZoom = true
-                //var selectionMode = BIONET_VIS.NAV_SELECTION
+            tag.selectedName = ''
+                //var selectionMode = BIONET.NAV_SELECTION
+
+            BIONET_DATAGRID.setContainer('itemDataGrid')
 
             $('.dropdown-button').dropdown({
                 inDuration: 300,
@@ -242,24 +320,31 @@
                 alignment: 'left',
                 stopPropagation: false
             });
-            /*
-            1BIONET_VIS.getSelectedItem()
-    getSelectedItemId: function() {
-        return stores.state.selectedId
-    },
-    getSelectedItem: function() {
-        return stores.state.selectedItem
-    },
-    getSelectionMode: function() {
-        return stores.stat.selectionMode
-    }
-            */
 
             $('.modal').modal();
 
-            tag.randomTest = function() {
-                BIONET_VIS.signal.test.dispatch('random')
+            const generateRows = function(n) {
+                const rows = []
+                for (var i = 0; i < n; i++) {
+                    var row = {
+                        id: i,
+                        partname: 'part' + i,
+                        creator: 'created' + i,
+                        updated: 'upd' + i,
+                        location: Number(i).toString() + ',' + Number(n - i).toString(),
+                        cart: true
+                    }
+                    rows.push(row)
+                }
+                return rows
             }
+
+            tag.randomTest = function() {
+                const dataset1 = generateRows(41)
+                BIONET_DATAGRID.updateDataTable(dataset1)
+                    //BIONET_VIS.signal.test.dispatch('random')
+            }
+
             tag.pathTest = function() {
                 //BIONET_VIS.signal.navigateInventoryItem.dispatch('p-a4b81480-e449-4563-9fd6-8194cd21c348')
             }
@@ -342,9 +427,43 @@
                 })
             }
 
+            const getChildTable = function(children) {
+                const table = []
+                for (var i = 0; i < children.length; i++) {
+                    var child = children[i].value
+                    if (!child) continue
+                    var location = null
+                    if (child.parent_x) {
+                        location = child.parent_x + ',' + child.parent_y
+                    }
+                    var d = new Date()
+                    d.setTime(child.updated.time * 1000)
+                    var row = {
+                        id: i,
+                        physicalId: child.id,
+                        partname: child.name,
+                        creator: child.created.user,
+                        updated: d.toDateString(),
+                        location: location,
+                        parent_x: child.parent_x,
+                        parent_y: child.parent_y,
+                        cart: true
+                    }
+                    table.push(row)
+                }
+                return table
+            }
+            const refreshInventoryPath = function(id) {
+                retrieveLocationPath(id, (path) => {
+                    BIONET_VIS.signal.setLocationPath.dispatch(id, path)
+                })
+            }
+            BIONET.signal.refreshInventoryPath.add(refreshInventoryPath)
+
             const selectInventoryItem = function(id, selectionModeVis) {
+                BIONET.signal.setLayout.dispatch(tag.layout)
                 const selectionMode = selectionModeVis || BIONET_VIS.getSelectionMode()
-                if (selectionMode === BIONET_VIS.EDIT_SELECTION) {
+                if (selectionMode === BIONET.EDIT_SELECTION) {
                     //editSelection = BIONET_VIS.getEditSelection()
                     editSelection = BIONET_VIS.getEditSelection()
                     if (editSelection && editSelection.dbData) {
@@ -361,14 +480,30 @@
                         //}
                     }
                     return
+                } else if (selectionMode === BIONET.MOVE_SELECTION) {
+                    BIONET.signal.highlightItem.dispatch(BIONET_VIS.ZOOM_ITEM, id)
+                    BIONET_VIS.setMoveItemId(id)
+                    const currentItem = BIONET_VIS.getSelectedItem()
+                    console.log('selectInventoryItem: move', id, currentItem)
+                        /*
+                        const parentId = currentItem.parent_id
+                        retrieveLocationPath(parentId, (path) => {
+                            BIONET_VIS.signal.setLocationPath.dispatch(parentId, path)
+                        })
+                        */
+                    return
                 }
-                const currentItem = BIONET_VIS.getSelectedItem()
-                console.log('selectInventoryItem:', JSON.stringify(currentItem))
+
                 retrieveLocationPath(id, (path) => {
                     //console.log('retrieveLocationPath:', JSON.stringify(path, null, 2))
                     BIONET_VIS.signal.setLocationPath.dispatch(id, path)
                     const type = BIONET_VIS.getSelectedType()
+                    const currentItem = BIONET_VIS.getSelectedItem()
+                    if (currentItem) tag.selectedName = currentItem.name
                     tag.createType = (type === 'box') ? 'material' : 'storage'
+                    const selectedChildren = getChildTable(path[id].children)
+                    updateLayout()
+                    BIONET_DATAGRID.updateDataTable(selectedChildren)
                     tag.update()
                 })
             }
@@ -419,7 +554,7 @@
                         tag.displayPhysical = true
                         tag.modalOpen = false
                         tag.update()
-                        selectInventoryItem(parentId, BIONET_VIS.NAV_SELECTION)
+                        selectInventoryItem(parentId, BIONET.NAV_SELECTION)
                         physicalUpdatedBinding.detach()
                     }
                 }
@@ -451,7 +586,7 @@
                         tag.displayPhysical = true
                         tag.modalOpen = false
                         tag.update()
-                        selectInventoryItem(parentId, BIONET_VIS.NAV_SELECTION)
+                        selectInventoryItem(parentId, BIONET.NAV_SELECTION)
                         physicalUpdatedBinding.detach()
                     }
                 }
@@ -598,49 +733,42 @@
                 const prevNavZoom = tag.enableNavZoom
                 switch (buttonId) {
                     case 'navigate':
-                        selectionMode = BIONET_VIS.NAV_SELECTION
+                        selectionMode = BIONET.NAV_SELECTION
                         $('#navigate_icon').addClass('active-button')
                         $('#move_icon').removeClass('active-button')
                         $('#edit_icon').removeClass('active-button')
+                            //$('#zoomItem_vis').hide()
                         tag.enableNavZoom = true
                         tag.modalVirtualOpen = false
                         break;
                     case 'move':
-                        selectionMode = BIONET_VIS.MOVE_SELECTION
+                        selectionMode = BIONET.MOVE_SELECTION
                         $('#move_icon').addClass('active-button')
                         $('#edit_icon').removeClass('active-button')
                         $('#navigate_icon').removeClass('active-button')
+                            //$('#zoomItem_vis').show()
                         tag.enableNavZoom = true
                         tag.modalVirtualOpen = false
                         break;
                     case 'edit':
-                        selectionMode = BIONET_VIS.EDIT_SELECTION
-                            //BIONET_VIS.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM, selectionMode)
-                        $('#edit_icon').addClass('active-button')
-                        $('#move_icon').removeClass('active-button')
-                        $('#navigate_icon').removeClass('active-button')
-                        tag.enableNavZoom = true
-                            /*
-                            tag.enableNavZoom = false
-                            const id = BIONET_VIS.getSelectedItemId()
-                            BIONET.signal.getPhysical.dispatch(id)
-                            $('#nav-zoom').hide()
-                            $('#material-form').hide()
-                            $('#physical-storage').show()
-                            */
+                        if (tag.selectionMode === BIONET.EDIT_SELECTION) {
+                            $('#edit_icon').removeClass('active-button')
+                            selectionMode = BIONET.NAV_SELECTION
+                        } else {
+                            $('#edit_icon').addClass('active-button')
+                            selectionMode = BIONET.EDIT_SELECTION
+                        }
+                        tag.selectionMode = selectionMode
                         break;
                 }
                 tag.update()
 
-                if (!prevNavZoom && tag.enableNavZoom) {
-                    $('#nav-zoom').show()
-                }
-
                 console.log('setSelectionMode:', selectionMode)
                 if (selectionMode) {
-                    BIONET_VIS.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM_TABLE, selectionMode)
-                    BIONET_VIS.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM_IMAGE, selectionMode)
-                    BIONET_VIS.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM, selectionMode)
+                    const navSelection = (selectionMode===BIONET.EDIT_SELECTION) ? BIONET.MOVE_SELECTION : BIONET.NAV_SELECTION
+                    BIONET.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM_TABLE, selectionMode)
+                    BIONET.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM_IMAGE, navSelection)
+                    BIONET.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM, navSelection)
                 }
             }
 
@@ -679,7 +807,7 @@
 
             tag.rootId = null
             BIONET_VIS.init(() => {
-                const selectInventoryItemBinding = BIONET_VIS.signal.selectInventoryItem.add(selectInventoryItem)
+                const selectInventoryItemBinding = BIONET.signal.selectInventoryItem.add(selectInventoryItem)
                 const enableLocationPathSectionsBinding = BIONET_VIS.signal.enableLocationPathSections.add(enableLocationPathSections)
                 const getFavoritesResultBinding = BIONET.signal.getFavoritesResult.add(getFavoritesResult)
 
@@ -812,8 +940,8 @@
     <list-item each={node in opts.nodes} item={node} />
     <script>
         /*
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            */
         const tag = this;
 
 
