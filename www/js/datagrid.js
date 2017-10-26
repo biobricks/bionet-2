@@ -43739,9 +43739,9 @@ var CRUDTable = function (_React$Component) {
 
     _this.state = {
       rows: _this.props.rows, // initial rows
-      columns: _this.getColumns(800), // initial columns
+      columns: _this.getColumns(600), // initial columns
       width: '100%',
-      height: 300
+      height: '100%'
     };
     _this.onAdd = _this.onAdd.bind(_this);
     _this.onRemove = _this.onRemove.bind(_this);
@@ -43825,8 +43825,17 @@ var CRUDTable = function (_React$Component) {
       var rowIndex = _ref.rowIndex,
           rowKey = _ref.rowKey;
 
+
+      var getClassName = function getClassName(row) {
+        var className = 'test';
+        if (row.selected) className = 'selected-table-row';
+        if (!(row.parent_x && row.parent_y || row.locationCoordinates)) className += ' grey';
+        return className;
+        //className: classnames((row.selected) ? 'selected-table-row' : 'test'),
+      };
+
       return {
-        className: (0, _classnames2.default)(row.selected ? 'selected-table-row' : 'test'),
+        className: getClassName(row),
         onClick: function onClick() {
           console.log('clicked body row', row);
           switch (_this2.selectionMode) {
@@ -43906,7 +43915,7 @@ var CRUDTable = function (_React$Component) {
           });
         }
       });
-      var width = this.state && this.state.width ? this.state.width : 800;
+      var width = this.state && this.state.width ? this.state.width : 600;
       return [{
         property: 'partname',
         header: {

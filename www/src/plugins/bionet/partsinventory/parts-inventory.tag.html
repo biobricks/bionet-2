@@ -452,6 +452,7 @@
                         location: location,
                         parent_x: child.parent_x,
                         parent_y: child.parent_y,
+                        locationCoordinates:child.locationCoordinates,
                         cart: true
                     }
                     table.push(row)
@@ -462,6 +463,7 @@
                 console.log('refreshInventoryPath:', id)
                 retrieveLocationPath(id, (path) => {
                     BIONET_VIS.signal.setLocationPath.dispatch(id, path)
+                    BIONET.signal.getFavorites.dispatch()
                     const selectedChildren = getChildTable(path[id].children)
                     if (id.indexOf('p->') >= 0 || id.indexOf('v-') >= 0) {
                         tag.editPart(path[id])
@@ -526,6 +528,7 @@
                     } else {
                         $('#edititem').hide()
                         BIONET_DATAGRID.updateDataTable(selectedChildren)
+                        BIONET.signal.getFavorites.dispatch()
                     }
                     tag.update()
                 })
