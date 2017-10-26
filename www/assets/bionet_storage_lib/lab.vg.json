@@ -8,6 +8,13 @@
     },
     "padding": 0,
     "autosize": "pad",
+    "title": {
+        "text": {
+            "signal": "title"
+        },
+        "name":"titleMark",
+        "interactive":true
+    },
     "signals": [
         {
             "name": "title",
@@ -183,7 +190,7 @@
                     "encode": {
                         "enter": {
                             "url": {
-                                "value": "static/assets/bionet_storage_lib/endylab.svg"
+                                "value": "/static/assets/bionet_storage_lib/endylab.svg"
                             },
                             "opacity": {
                                 "value": 1

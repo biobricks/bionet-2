@@ -56874,8 +56874,9 @@ window.BIONET_VIS = {
         //this.signal.highlightItem = new MiniSignal()
 
         const loader = new Loader();
-        loader.onError.add(() => {
-            console.log('loader error');
+        loader.reset();
+        loader.onError.add((error, eobj, resource) => {
+            console.log('loader error', error);
         });
         modelApi.load(loader);
         viewApi.load(loader);
@@ -56926,6 +56927,9 @@ window.BIONET_VIS = {
     },
     getItemInPath: function (id) {
         return viewApi.getItemInPath(id);
+    },
+    getItemInPathByName: function (id) {
+        return viewApi.getItemInPathByName(id);
     }
 };
 
@@ -56993,9 +56997,8 @@ module.exports = {
     typeFromDBType: function (type) {
         var stype = null;
         if (type.indexOf('physical') >= 0) {
-            stype = 'tube';
-        }
-        if (type.indexOf('lab') >= 0) {
+            stype = 'part';
+        } else if (type.indexOf('lab') >= 0) {
             stype = 'lab';
         } else if (type.indexOf('box') >= 0) {
             stype = 'box';
@@ -57426,15 +57429,25 @@ vegaView.prototype.initVega = function (vegaJSONSpec) {
     .width(thisModule._width).height(thisModule._height).run().hover().runAfter(function (view) {
         thisModule.view = view;
         view.addEventListener('click', function (event, item) {
-            if (thisModule.clickCount === 0) {
-                const timer = setTimeout(function () {
-                    if (thisModule.clickCount === 1) {
-                        thisModule.updateSelection(item);
-                    }
-                    thisModule.clickCount = 0;
-                }, 250);
+            console.log('view click, item=', item);
+            if (item.mark && item.mark.name === 'titleMark') {
+                const pathItem = BIONET_VIS.getItemInPathByName(item.text);
+                const dbData = pathItem.dbData;
+                const id = dbData.id;
+                console.log('title clicked: %s id:', item.text, dbData, id);
+                if (id) BIONET.signal.selectInventoryItem.dispatch(dbData.id, thisModule.selectionMode);
+                thisModule.clickCount = 0;
+            } else {
+                if (thisModule.clickCount === 0) {
+                    const timer = setTimeout(function () {
+                        if (thisModule.clickCount === 1) {
+                            thisModule.updateSelection(item);
+                        }
+                        thisModule.clickCount = 0;
+                    }, 250);
+                }
+                thisModule.clickCount++;
             }
-            thisModule.clickCount++;
         });
 
         view.addEventListener('dblclick', function (event, item) {
@@ -57625,16 +57638,16 @@ module.exports = {
     load: function (loader) {
         const assets = [{
             name: 'lab',
-            url: 'static/assets/bionet_storage_lib/lab.vg.json'
+            url: '/static/assets/bionet_storage_lib/lab.vg.json'
         }, {
             name: 'labEdit',
-            url: 'static/assets/bionet_storage_lib/labEdit.vg.json'
+            url: '/static/assets/bionet_storage_lib/labEdit.vg.json'
         }, {
             name: 'storageEntity',
-            url: 'static/assets/bionet_storage_lib/freezer.vg.json'
+            url: '/static/assets/bionet_storage_lib/freezer.vg.json'
         }, {
             name: 'zoomItemTable',
-            url: 'static/assets/bionet_storage_lib/boxtext.vg.json'
+            url: '/static/assets/bionet_storage_lib/boxtext.vg.json'
         }];
         loader.add(assets);
     },
@@ -57652,6 +57665,7 @@ module.exports = {
         this.initializeView('shelf', 'shelf_vis', storageEntitySpec, 150, 100);
         this.initializeView('rack', 'rack_vis', storageEntitySpec, 150, 100);
         this.initializeView('box', 'box_vis', storageEntitySpec, 100, 100);
+        this.initializeView('part', 'part_vis', labSpec, 100, 100);
         this.initializeView(BIONET_VIS.ZOOM_ITEM, 'zoomItem_vis', storageEntitySpec, 250, 250);
 
         const zoomTableSpec = resources.zoomItemTable.data;
@@ -57697,7 +57711,6 @@ module.exports = {
 
     setLocationPath: function (id, locationPath) {
         if (!locationPath) return;
-        const selectType = 'box';
         var sectionId = {
             'path': false,
             'favorites': true,
@@ -57706,6 +57719,7 @@ module.exports = {
             'shelf': false,
             'rack': false,
             'box': false,
+            'part': false,
             'zoomItem': true,
             'zoomItemImage': false
             //'zoomItem': (stores.state.selectionMode===BIONET.MOVE_SELECTION) ? true : false,
@@ -57814,7 +57828,9 @@ module.exports = {
                 this.update(BIONET_VIS.ZOOM_ITEM_TABLE, 'tree', ttable)
                 */
 
-                if (rootType !== 'lab') {
+                if (rootType === 'part') {
+                    sectionId.zoomItem = false;
+                } else if (rootType !== 'lab') {
                     var zoomView = this.getView(BIONET_VIS.ZOOM_ITEM);
                     var zoomTuples = JSON.parse(JSON.stringify(ituples));
                     zoomView.scaleCoordinates(zoomTuples, zoomView._width, zoomView._height);
@@ -57978,6 +57994,16 @@ module.exports = {
         for (var i = 0; i < path.length; i++) {
             var item = path[i];
             if (item.physicalId === id) return item;
+        }
+        return null;
+    },
+
+    getItemInPathByName: function (name) {
+        const path = this.locationPath;
+        if (!path) return null;
+        for (var i = 0; i < path.length; i++) {
+            var item = path[i];
+            if (item.name === name) return item;
         }
         return null;
     }

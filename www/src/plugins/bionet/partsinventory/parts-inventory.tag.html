@@ -1,3 +1,4 @@
+
 <parts-inventory>
     <div id="inventory-wrapper">
         <!--
@@ -47,6 +48,7 @@
                     <div id="shelf_vis" class="flex-item"></div>
                     <div id="rack_vis" class="flex-item"></div>
                     <div id="box_vis" class="flex-item"></div>
+                    <div id="part_vis" class="flex-item"></div>
                 </div>
                 <div id="nav-zoom" class="flex-row">
                     <!--
@@ -79,6 +81,7 @@
                 <div class="flex-row" style="margin-bottom:10px;flex-wrap: wrap; align-items: flex-start; justify-content: flex-start;">
                     <div id="zoomItem_vis" class="flex-item"></div>
                     <div id="zoomItemImage_vis" class="flex-item"></div>
+                    <div id="edititem" class="flex-item"></div>
                     <div id="favorites_vis" class="flex-item"></div>
                 </div>
             </div>
@@ -308,6 +311,8 @@
             tag.selectedName = ''
                 //var selectionMode = BIONET.NAV_SELECTION
 
+            var q = (this.opts.q) ? decodeURIComponent(this.opts.q) : null;
+
             BIONET_DATAGRID.setContainer('itemDataGrid')
 
             $('.dropdown-button').dropdown({
@@ -454,8 +459,17 @@
                 return table
             }
             const refreshInventoryPath = function(id) {
+                console.log('refreshInventoryPath:', id)
                 retrieveLocationPath(id, (path) => {
                     BIONET_VIS.signal.setLocationPath.dispatch(id, path)
+                    const selectedChildren = getChildTable(path[id].children)
+                    if (id.indexOf('p->') >= 0 || id.indexOf('v-') >= 0) {
+                        tag.editPart(path[id])
+                        $('#edititem').show()
+                    } else {
+                        BIONET_DATAGRID.updateDataTable(selectedChildren)
+                        $('#edititem').hide()
+                    }
                 })
             }
             BIONET.signal.refreshInventoryPath.add(refreshInventoryPath)
@@ -495,15 +509,24 @@
                 }
 
                 retrieveLocationPath(id, (path) => {
-                    //console.log('retrieveLocationPath:', JSON.stringify(path, null, 2))
+                        //console.log('retrieveLocationPath:', JSON.stringify(path, null, 2))
                     BIONET_VIS.signal.setLocationPath.dispatch(id, path)
                     const type = BIONET_VIS.getSelectedType()
                     const currentItem = BIONET_VIS.getSelectedItem()
-                    if (currentItem) tag.selectedName = currentItem.name
+                    console.log('retrieveLocationPath:', path, type, currentItem)
+                    if (currentItem) {
+                        tag.selectedName = currentItem.name
+                    }
                     tag.createType = (type === 'box') ? 'material' : 'storage'
                     const selectedChildren = getChildTable(path[id].children)
                     updateLayout()
-                    BIONET_DATAGRID.updateDataTable(selectedChildren)
+                    if (type==='part' || id.indexOf('v-') >= 0) {
+                        $('#edititem').show()
+                        tag.editPart(currentItem.dbData)
+                    } else {
+                        $('#edititem').hide()
+                        BIONET_DATAGRID.updateDataTable(selectedChildren)
+                    }
                     tag.update()
                 })
             }
@@ -726,6 +749,45 @@
                 $('#deleteModal').modal('open');
             }
 
+            tag.editPart = function(item) {
+                console.log('editPart:', item)
+
+                if (item.id.indexOf('p-') >= 0) {
+                    riot.mount('#edititem', 'create-physical', {
+                        topMargin: 0
+                    })
+
+                    BIONET.signal.getPhysical.dispatch(item.id)
+
+                    const bionetStorageLocation = app.getStream('bionetStorageLocation')
+                    bionetStorageLocation.dispatch('configure', item.id)
+
+                    tag.itemType = 'p'
+                } else if (item.id.indexOf('v-') >= 0) {
+                    riot.mount('#edititem', 'part-specification')
+
+                    // TODO: messaging async api call
+                    partDataAccessor.route('getVirtual', undefined, item.id)
+                    tag.itemType = 'v'
+                    p
+                } else {
+                    tag.itemType = ''
+                }
+                console.log('itemClick, type:%s %s', tag.itemType, JSON.stringify(item))
+                tag.update()
+
+                app.setBreadcrumbs([{
+                    'label': 'search',
+                    'url': '/search'
+                }, {
+                    'label': opts.terms,
+                    'url': '/search/' + opts.terms,
+                }, {
+                    'label': item.primary_text,
+                    'url': '/search/' + opts.terms
+                }])
+            }
+
             tag.setSelectionMode = function(e) {
                 const active = $(e.target)
                 const buttonId = e.currentTarget.id
@@ -765,7 +827,7 @@
 
                 console.log('setSelectionMode:', selectionMode)
                 if (selectionMode) {
-                    const navSelection = (selectionMode===BIONET.EDIT_SELECTION) ? BIONET.MOVE_SELECTION : BIONET.NAV_SELECTION
+                    const navSelection = (selectionMode === BIONET.EDIT_SELECTION) ? BIONET.MOVE_SELECTION : BIONET.NAV_SELECTION
                     BIONET.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM_TABLE, selectionMode)
                     BIONET.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM_IMAGE, navSelection)
                     BIONET.signal.setSelectionMode.dispatch(BIONET_VIS.ZOOM_ITEM, navSelection)
@@ -816,6 +878,10 @@
 
                 // retrieve inventory root node
                 // todo: skip if id parameter provided
+                if (q) {
+                    selectInventoryItem(q)
+                    return
+                }
                 BIONET.remote.inventoryTree(function(err, children) {
                     for (var i = 0; i < children.length; i++) {
                         var item = children[i].value
@@ -832,7 +898,7 @@
 
     </script>
 </parts-inventory>
-
+/* */
 <parts-inventory-form>
     <div style="padding-top:100px;" />
     <form onsubmit={submitForm}>
@@ -940,8 +1006,8 @@
     <list-item each={node in opts.nodes} item={node} />
     <script>
         /*
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <list-header primary-header={primaryHeader} secondary-header={secondaryHeader}/>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            */
         const tag = this;
 
 

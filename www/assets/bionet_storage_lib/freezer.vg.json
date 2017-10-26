@@ -15,12 +15,24 @@
     "title": {
         "text": {
             "signal": "title"
-        }
+        },
+        "name":"titleMark",
+        "interactive":true
     },
     "signals": [
         {
             "name": "title",
             "value": "Rack"
+        },
+        {
+            "name":"titleSignal",
+            "value":""
+        },
+        {
+            "name": "titleclick",
+              "on": [
+                {"events": "@titleMark:click", "update": "titleSignal"}
+              ]
         },
         {
             "name": "width",

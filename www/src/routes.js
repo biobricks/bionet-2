@@ -17,12 +17,12 @@ route('/', function () {
 
     if (app.user) {
         app.appbarConfig({
-            enableTopNav: true,
-            enableBreadCrumbs: true,
+            enableTopNav: false,
+            enableBreadCrumbs: false,
             enableSubbar: false,
             activeItem: 'local inventory'
         })
-        riot.mount('div#content', 'inventory-treeview')
+        riot.mount('div#content', 'parts-inventory')
     } else {
         app.appbarConfig({
             enableTopNav: true,

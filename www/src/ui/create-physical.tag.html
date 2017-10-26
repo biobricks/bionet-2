@@ -38,6 +38,7 @@
                     <std-button if={formData.label || labelFormData} label="save & print" action={submitFormPrint} />
                 </div>
                 <div id='physical-container-vis' class="col" style="width:50%;"></div>
+                <div id="itemDataGrid" class="flex-item"></div>
             </div>
             <input type="submit" style="visibility:hidden" />
         </div>
@@ -148,6 +149,9 @@
             savePhysical(formData, tag.labelImageData, doPrint);
 
         }
+        
+        // todo: step 2 - assign locations to physicals
+        // BIONET_DATAGRID.updateDataTable(selectedChildren)
 
         this.submitFormPrint = function(e) {
             this.submitForm(e, true);
@@ -311,6 +315,8 @@
                 tag.formData.name = decodeURIComponent(opts.query.name);
                 //tag.type = tag.formData.name
             }
+            
+            BIONET_DATAGRID.setContainer('itemDataGrid')
 
             /*
         const visView = this.initializeView(visId, containerElementId, storageEntitySpec, visSpecs.width, visSpecs.height)
