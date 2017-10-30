@@ -374,7 +374,7 @@
                     var reader = new FileReader();
                     reader.onload = function(e2) { // finished reading file data.
                         //BIONET.signal.generatePhysicalsFromUpload.dispatch(e2.target.result, parent_id)
-                        BIONET.signal.generatePhysicalsFromTwistUpload.dispatch(e2.target.result, parent_id)
+                        BIONET.signal.generatePhysicalsFromUpload.dispatch(e2.target.result, parent_id)
                         next();
                     }
                     reader.readAsText(file); // start reading the file data.
@@ -838,7 +838,7 @@
             }
 
             tag.upload = function() {
-                BIONET.signal.generatePhysicalsFromTwistUpload.dispatch()
+                BIONET.signal.generatePhysicalsFromUpload.dispatch()
             }
 
             const enableLocationPathSections = function(sectionId) {
