@@ -190,6 +190,15 @@ var workbench = {
         bionet: ["Name","Created By","Created","Description","Sequence","Physical Instances"]
         twist: Plate,Well,customer_line_item_id,line_item_number,order_item_id,Insert Sequence,Insert Length,Frag Analysis Status,synthesized sequence length,Yield (ng)
          */
+        const wellIdToObj = function(well_id_str) {
+            var well_x = Number(well_id_str.substr(1))
+            var well_y = well_id_str.charCodeAt(0) - 64
+            var well_id = {
+                x: well_x,
+                y: well_y
+            }
+            return well_id
+        }
         
         const generatePhysicalsFromUpload = function (csvData, container_id) {
             if (!csvData) return
@@ -222,6 +231,7 @@ var workbench = {
                 const sequenceIdx = headerLine.indexOf('Sequence')
                 const instancesIdx = headerLine.indexOf('Physical Instances')
                 const genomeIdx = headerLine.indexOf('Genome')
+                const wellIdx = headerLine.indexOf('Well')
                 if (nameIdx < 0 || typeIdx < 0 || instancesIdx < 0) {
                     app.toast('invalid format specified, missing name, type or instances')
                     return
@@ -248,6 +258,11 @@ var workbench = {
                     var description = line[descriptionIdx]
                     var sequence = line[sequenceIdx]
                     var genome = line[genomeIdx]
+                    var well_id = null
+                    if (wellIdx>=0) {
+                        var well_id_str = line[wellIdx]
+                        well_id = wellIdToObj(well_id_str)
+                    }
                     var virtualObj = {
                         name: seriesName,
                         type: virtualType,
@@ -258,7 +273,7 @@ var workbench = {
                         Sequence: sequence,
                         Genome: genome
                     }
-                    createVirtual(virtualObj, instances, container_id)
+                    createVirtual(virtualObj, instances, container_id, well_id)
 
                     /*
 
@@ -295,13 +310,9 @@ var workbench = {
                     if (!instances || isNaN(instances)) continue
                     var seriesName = line[nameIdx]
                     var well_id_str = line[wellIdx]
-                    var well_x = Number(well_id_str.substr(1))
-                    var well_y = well_id_str.charCodeAt(0) - 64
-                    var well_id = {
-                            x: well_x,
-                            y: well_y
-                        }
+                    var well_id = wellIdToObj(well_id_str)
                         //var userName = line[usernameIdx]
+                    
                     var userName = app.user.email
                         //var virtualType = line[typeIdx]
                     var virtualType = 'vector'
