@@ -43809,7 +43809,12 @@ var CRUDTable = function (_React$Component) {
         }
       }
       items.sort(function (a, b) {
-        if (a.cellId > b.cellId) return 1;else if (a.cellId < b.cellId) return -1;
+        /*
+          if (a.cellId > b.cellId) return 1
+          else if (a.cellId < b.cellId) return -1
+          return 0
+          */
+        if (a.name > b.name) return 1;else if (a.name < b.name) return -1;
         return 0;
       });
       this.setState({
