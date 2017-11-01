@@ -713,6 +713,8 @@
             }
 
             tag.deleteItem = function() {
+                BIONET.ui.toast('Delete is temporarily disabled until issues are resolved')
+                return;
                 tag.deleteAction = function() {
                     const deleteNodes = []
 
