@@ -31,12 +31,13 @@ module.exports = function(settings, db) {
     });
   })
 
-  function rebuild() {
+  function rebuild(cb) {
     // TODO rebuild elasticSearch index as well
 
     inventoryTree.rebuild(function(err) {
-      if(err) return console.error("inventory tree rebuild error:", err);
+      if(err) return cb(err)
       console.log("Finished inventory tree rebuild");
+      cb();
     });
   }
 

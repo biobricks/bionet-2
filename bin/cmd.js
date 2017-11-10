@@ -173,7 +173,15 @@ websocket.createServer({server: server}, function(stream) {
 
 
 // initialize the db (if it 
-db.init();
+db.init(function(err) {
+  if(err) throw err;
+
+  index.rebuild(function(err) {
+    if(err) throw err;
+
+    console.log("Indexes rebuilt!");
+  });
+});
 
 
 var rpcMethods = require('../rpc/public.js')(settings, users, accounts, db, index, mailer);

@@ -336,7 +336,11 @@ module.exports = function(settings, users, acccounts) {
       };
       
       physicalDB.put(m.id, m, {valueEncoding: 'json'}, function(err) {
-        if(err) return console.error("Creating initial lab failed");
+        if(err) {
+          cb(err);
+          console.error("Creating initial lab failed");
+          return;
+        }
 
         console.log("Created initial lab");
         cb();

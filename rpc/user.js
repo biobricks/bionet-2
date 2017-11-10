@@ -172,7 +172,15 @@ module.exports = function(settings, users, accounts, db, index, mailer, p2p) {
 
     delPhysical: function(curUser, id, cb) {
       console.log('delPhysical:',id);
-      del(curUser, db, 'physical', id, cb);
+      del(curUser, db, 'physical', id, function(err) {
+        if(err) return cb(err);
+
+        index.rebuild(function(err) {
+          if(err) return cb(err);
+
+          cb();
+        });
+      });
     },
 
     physicalAutocomplete: function(curUser, query, cb) {

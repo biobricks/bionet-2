@@ -713,8 +713,8 @@
             }
 
             tag.deleteItem = function() {
-                BIONET.ui.toast('Delete is temporarily disabled until issues are resolved')
-                return;
+//                BIONET.ui.toast('Delete is temporarily disabled until issues are resolved')
+//                return;
                 tag.deleteAction = function() {
                     const deleteNodes = []
 
@@ -887,7 +887,8 @@
                     selectInventoryItem(q)
                     return
                 }
-                BIONET.remote.inventoryTree(function(err, children) {
+                                    BIONET.remote.inventoryTree(function(err, children) {
+                                    if(err) return console.log("ERROR:", err);
                     for (var i = 0; i < children.length; i++) {
                         var item = children[i].value
                         if (!item.parent_id && item.type === 'lab') {
