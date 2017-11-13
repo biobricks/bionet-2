@@ -1,7 +1,7 @@
 const riot = require('riot')
 import bionetapi from '../bionetapi'
 
-const genbankToJson = require('bio-parsers/src/parsers/genbankToJson');
+const genbankToJson = require('bio-parsers/parsers/genbankToJson');
 
 const MiniSignal = require('mini-signals')
 var workbench = {
