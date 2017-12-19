@@ -16,6 +16,9 @@ var settings = {
   // Port for low-level access to db via multilevel.
   dbPort: 13377, 
 
+  // set this if the port to use for p2p is different,
+//p2pPort: 443,
+
   // The url where this app is accessed
   // Used for generating email links
   // and as the universally unique peer name

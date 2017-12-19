@@ -13,7 +13,7 @@ module.exports = function(rpcMethods, settings) {
 
   var peerDiscover = new PeerDiscover({
     channel: settings.dhtChannel,
-    port: settings.port
+    port: settings.p2pPort || settings.port
   }, function(err, peer, type) {
     if(err) {
       // TODO
