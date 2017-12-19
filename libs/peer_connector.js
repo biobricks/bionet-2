@@ -48,12 +48,14 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
   };
 
   this._toUrl = function(hostname, port) {
+
     var prefix;
-    if(this.port === 443) {
+    if(port === 443) {
       prefix = 'wss://';
     } else {
       prefix = 'ws://';
     }
+
     return prefix+hostname+':'+port+'/';
   };
 
@@ -66,7 +68,7 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
 //    console.log("Connecting to:", peer.url);
     peer.attempts++;
 
-    var stream = websocket(peer.url);
+    var stream = websocket(peer.url, {rejectUnauthorized: false});
 
     var rpcMethods = xtend(self.rpcMethods, {
 
