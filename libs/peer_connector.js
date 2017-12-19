@@ -68,6 +68,8 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
 //    console.log("Connecting to:", peer.url);
     peer.attempts++;
 
+    // TODO we should not reject unauthorized
+    //      but it's not a big deal since searches are public anyway
     var stream = websocket(peer.url, {rejectUnauthorized: false});
 
     var rpcMethods = xtend(self.rpcMethods, {
