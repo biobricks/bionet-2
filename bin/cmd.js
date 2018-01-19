@@ -112,7 +112,7 @@ server.listen(settings.port, settings.hostname);
 // initialize the websocket server on top of the webserver
 websocket.createServer({server: server}, function(stream) {
 
-  var rpcMethods = require('../rpc/public.js')(settings, users, accounts, db, index, mailer);
+  var rpcMethods = require('../rpc/public.js')(settings, users, accounts, db, index, mailer, p2p);
 
 
   // these functions only available to users in the 'user' group

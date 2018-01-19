@@ -2,7 +2,7 @@
 var through = require('through2');
 var rpc = require('rpc-multistream'); // rpc and stream multiplexing
 
-module.exports = function(settings, users, accounts, db, index, mailer) { 
+module.exports = function(settings, users, accounts, db, index, mailer, p2p) { 
   return {
 
     getPeerInfo: function(curUser, cb) {
@@ -49,6 +49,68 @@ module.exports = function(settings, users, accounts, db, index, mailer) {
         db.ensureUserData(users, user, accounts, cb)
      });
     }, 
+
+    search: function(curUser, q, cb) {
+      console.log("CALLED SEARCH:", q);
+      var s = db.bio.createReadStream({valueEncoding: 'json'});
+
+      var ret = [];
+
+      var out = s.pipe(through.obj(function(data, enc, next) {
+        if((data.value.name && data.value.name.toLowerCase().match(q.toLowerCase())) || (data.value.description && data.value.description.toLowerCase().match(q.toLowerCase()))) {
+          // skip stuff beginning with underscore
+          if(data.value.name && data.value.name[0] === '_') {
+            return;
+          }
+          // this.push(data.value);
+          ret.push(data.value);
+        }
+        
+        next();
+      }));
+      
+      s.on('error', function(err) {
+        cb(err);
+      });
+      s.on('end', function() {
+        console.log("SENDING:", ret);
+        cb(null, ret);
+      });
+    },
+
+    // TODO switch to using a stream as output rather than a callback
+    peerSearch: function(curUser, query, cb) {
+      if(!p2p) return cb(new Error("p2p not supported by this node"));
+
+      function onError(err) {
+        // do we really care about remote errors? probably not
+      }
+
+      // for each connected peer
+      p2p.connector.peerDo(function(peer, next) {
+
+        // run a streaming blast query
+        var s = peer.remote.searchAvailable(query);
+
+        s.on('error', onError);
+
+        s.on('data', function(data) {
+          cb(null, {
+            id: peer.id,
+            name: peer.name,
+            position: peer.position,
+            distance: peer.distance
+          }, data);
+        });
+
+        // TODO time out the search after a while
+
+        next();
+
+      }, function(err) {
+        if(err) return cb(err);
+      });
+    },
 
     searchAvailable: rpc.syncReadStream(function(curUser, q, cb) {
       var s = db.physical.createReadStream({valueEncoding: 'json'});

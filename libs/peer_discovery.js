@@ -35,7 +35,7 @@ function discover(opts, cb) {
   
   this.channel.join(this.opts.channel, this.opts.port, function(err, peers) {
     if(err) return cb(err);
-    
+
     if(peers) {
       console.log(peers);
     }

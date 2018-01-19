@@ -27,13 +27,13 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
   this._connectFail = function(peer) {
     peer.connected = false;
     
-    console.log("_connectFail");
+//    console.log("_connectFail");
 
     peer.rpc.die(); // prevent a future 'death' event
 
     if(peer.attempts >= this.opts.maxAttempts || !peer.wasConnected || peer.stopTrying) {
 //      if(peer.url === 'ws://172.30.0.26:8000/' || peer.url === 'ws://72.244.126.50:9009/') {
-        console.log("FAIL FAIL:", peer.url, peer.attempts, this.opts.maxAttempts, peer.wasConnected, peer.stopTrying);
+//        console.log("FAIL FAIL:", peer.url, peer.attempts, this.opts.maxAttempts, peer.wasConnected, peer.stopTrying);
 //      }
       if(this.urls[peer.url]) {
         //delete this.urls[peer.url];
@@ -48,12 +48,14 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
   };
 
   this._toUrl = function(hostname, port) {
+
     var prefix;
-    if(this.port === 443) {
+    if(port === 443) {
       prefix = 'wss://';
     } else {
       prefix = 'ws://';
     }
+
     return prefix+hostname+':'+port+'/';
   };
 
@@ -63,10 +65,12 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
   this._connectToPeer = function(peer) {
     var self = this;
 
-    console.log("Connecting to:", peer.url);
+//    console.log("Connecting to:", peer.url);
     peer.attempts++;
 
-    var stream = websocket(peer.url);
+    // TODO we should not reject unauthorized
+    //      but it's not a big deal since searches are public anyway
+    var stream = websocket(peer.url, {rejectUnauthorized: false});
 
     var rpcMethods = xtend(self.rpcMethods, {
 
@@ -110,7 +114,7 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
           console.error('[peer getPeerInfo error]', err);
           return peer.stream.socket.close();
         }
-        console.log("GOT", info);
+//        console.log("GOT", info);
         peer.id = info.id;
         peer.name = info.name;
         peer.position = info.position;
@@ -169,7 +173,7 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
     }
 
     console.log("WANT TO ATTEMPT:", peer.url);
-    console.log(this.urls[peer.url] ? "  already connected" : "  not yet connected");
+//    console.log(this.urls[peer.url] ? "  already connected" : "  not yet connected");
 
     // alredy connected to this peer
     if(this.urls[peer.url]) return;
@@ -191,7 +195,7 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
 
     // reached backoff timeout
     bo.on('ready', function(number, delay) {
-      console.log("RETRYING");
+//      console.log("RETRYING");
       this._connectToPeer(peer);
     }.bind(this));
 
@@ -206,7 +210,7 @@ function PeerConnector(peerID, hostname, port, rpcMethods, opts) {
 
     // TODO check options and reject if e.g. hostname or port missing
 
-    console.log("INCOMING:", peerInfo);
+//    console.log("INCOMING:", peerInfo);
 
     if(peer) {
       if(peer.connected && !peer.incoming) {
